@@ -6,6 +6,7 @@ import '../endless_runner.dart';
 import '../endless_world.dart';
 import '../effects/hurt_effect.dart';
 import '../effects/jump_effect.dart';
+import '../helper.dart';
 import 'obstacle.dart';
 import 'point.dart';
 import 'powerpoint.dart';
@@ -67,7 +68,9 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
 
   @override
   Future<void> onLoad() async {
-    Ball underlyingBallReal = Ball(ghostBall: isGhost, realCharacter: this);
+    Ball underlyingBallReal = Ball();
+    underlyingBallReal.ghostBall = isGhost; //FIXME should do this in the initiator, but didn't work
+    underlyingBallReal.realCharacter = this; //FIXME should do this in the initiator, but didn't work
     underlyingBallLegacy = underlyingBallReal;
     if (isGhost) {
       underlyingBallReal!.bodyDef!.position = Vector2(0, 0);
