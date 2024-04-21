@@ -102,9 +102,10 @@ class EndlessWorld extends Forge2DWorld
       accelerometerEventStream().listen(
         (AccelerometerEvent event) {
           if (android) {
-            gravity = Vector2(event.y, event.x) * 18;
-            globalGravity.x = event.x;
-            globalGravity.y = event.y;
+            //p(event);
+            gravity = Vector2(event.y, event.x - 3) * 18; //NOTE dimensions flipped
+            globalGravity.x = event.x - 3; //NOTE dimensions not flipped
+            globalGravity.y = event.y; //NOTE dimensions not flipped
           }
         },
         onError: (error) {

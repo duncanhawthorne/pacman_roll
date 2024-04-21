@@ -49,11 +49,21 @@ class Ball extends BodyComponent with TapCallbacks, ContactCallbacks {
       if (other.ghostBall && !ghostBall) {
         if (realCharacter != null && realCharacter!.maniacMode) {
           globalAudioController!.playSfx(SfxType.hit);
-          removeEnemy(other);
+          removeEnemyBall(other);
           addEnemy(world);
         } else {
           //realCharacter!.add(HurtEffect());
           globalAudioController!.playSfx(SfxType.damage);
+
+          /*
+          for (var i = 0; i < enemies.length; i++) {
+            //Ball enemy = enemies[i];
+            removeEnemyBall(enemies[i]);
+            addEnemy(world);
+          }
+          
+           */
+
           realCharacter!.removeFromParent();
           removeFromParent();
         }

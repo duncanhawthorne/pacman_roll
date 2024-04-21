@@ -48,7 +48,7 @@ void addEnemy(world) {
   enemies.add(ghost);
 }
 
-void removeEnemy(Ball other) {
+void removeEnemyBall(Ball other) {
   other.realCharacter!.removeFromParent();
   other.removeFromParent();
   enemies.remove(other);
