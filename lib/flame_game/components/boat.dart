@@ -21,7 +21,8 @@ class Boat extends SpriteAnimationGroupComponent<BoatState>
     required this.addScore,
     required this.resetScore,
     super.position,
-  }) : super(size: Vector2.all(150 / dzoom), anchor: Anchor.center, priority: 1);
+  }) : super(
+            size: Vector2.all(150 / dzoom), anchor: Anchor.center, priority: 1);
 
   final void Function({int amount}) addScore;
   final VoidCallback resetScore;
@@ -34,7 +35,7 @@ class Boat extends SpriteAnimationGroupComponent<BoatState>
   //final double _jumpLength = 600;
 
   Vector2 pull = Vector2.all(0);
-  Vector2 target = Vector2(200,700);
+  Vector2 target = Vector2(200, 700);
   Vector2 velocity = Vector2.all(0);
   Vector2 force = Vector2.all(0);
 
@@ -108,7 +109,8 @@ class Boat extends SpriteAnimationGroupComponent<BoatState>
 
      */
     //position += pull * 1;
-    force = Vector2.all(0.0);//(target - position) * 0.5 + Vector2(-640,0) - velocity*3;
+    force = Vector2.all(
+        0.0); //(target - position) * 0.5 + Vector2(-640,0) - velocity*3;
     velocity += force * dt;
     position += velocity;
     _lastPosition.setFrom(position);
@@ -116,9 +118,9 @@ class Boat extends SpriteAnimationGroupComponent<BoatState>
 
   @override
   void onCollisionStart(
-      Set<Vector2> intersectionPoints,
-      PositionComponent other,
-      ) {
+    Set<Vector2> intersectionPoints,
+    PositionComponent other,
+  ) {
     super.onCollisionStart(intersectionPoints, other);
     //print("BOat collision");
     // When the player collides with an obstacle it should lose all its points.
@@ -134,7 +136,6 @@ class Boat extends SpriteAnimationGroupComponent<BoatState>
       //addScore();
     }
   }
-
 }
 
 enum BoatState {

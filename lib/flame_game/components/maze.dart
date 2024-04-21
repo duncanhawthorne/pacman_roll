@@ -1,4 +1,3 @@
-
 import '../constants.dart';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
@@ -7,16 +6,9 @@ import 'package:flame_forge2d/flame_forge2d.dart';
 import 'dart:math';
 import 'wall.dart';
 
-
-
 import 'package:flame/extensions.dart';
 
-
-
-
-
 void createMaze(double sizex, double sizey, world) {
-
   if (mazeOn) {
     for (var i = 0; i < 28; i++) {
       for (var j = 0; j < 28; j++) {
@@ -57,5 +49,4 @@ void createMaze(double sizex, double sizey, world) {
       }
     }
   }
-
 }

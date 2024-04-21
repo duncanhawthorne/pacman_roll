@@ -13,7 +13,6 @@ import 'package:flutter/material.dart';
 import 'package:flame/src/events/messages/pointer_move_event.dart'
     as dhpointer_move_event;
 
-
 import 'components/point.dart';
 import 'components/wall.dart';
 import 'game_screen.dart';
@@ -22,14 +21,11 @@ import 'components/player.dart';
 import 'components/boat.dart';
 import 'components/ball.dart';
 import 'constants.dart';
+import 'helper.dart';
 
 import 'package:sensors_plus/sensors_plus.dart';
 
 import 'package:flutter/foundation.dart';
-
-//BALL WAS HERE
-//PILL WAS HERE
-//WALL WAS HERE
 
 /// The world is where you place all the components that should live inside of
 /// the game, like the player, enemies, obstacles and points for example.
@@ -129,12 +125,11 @@ class EndlessWorld extends Forge2DWorld
         );
         add(boat);
       }
-      player = Player(
-          realIsGhost: false
-        //position: Vector2(boat.position.x, boat.position.y),
-        //addScore: addScore,
-        //resetScore: resetScore,
-      );
+      player = Player(realIsGhost: false
+          //position: Vector2(boat.position.x, boat.position.y),
+          //addScore: addScore,
+          //resetScore: resetScore,
+          );
       add(player);
       if (realsurf) {
         player.target = boat.position;
@@ -186,8 +181,8 @@ class EndlessWorld extends Forge2DWorld
     }
     ball = Ball(size: size.y / dzoom / 2 / 14 / 2 * 0.95, enemy: false);
     add(ball);
-    ball.ballPlayerLink = player;
-    player.playerTargetBall = ball;
+    ball.realCharacter = player;
+    player.underlyingBall = ball;
 
     for (int i = 0; i < 4; i++) {
       Future.delayed(Duration(seconds: i), () {
@@ -245,8 +240,6 @@ class EndlessWorld extends Forge2DWorld
   @override
   void update(double dt) {
     super.update(dt);
-    //rope.position = player.position;
-    //rope.size = Vector2((boat.position.y - player.position.y), (boat.position.x - player.position.x));
     if (realsurf) {
       rope.position = (boat.position + player.position) / 2;
       rope.size = Vector2(
@@ -260,115 +253,56 @@ class EndlessWorld extends Forge2DWorld
     }
   }
 
-  Vector2 getTarget(Vector2 localPosition, Vector2 size) {
-    return Vector2(
-        min(size.x / dzoom / 2, max(-size.x / dzoom / 2, localPosition.x)),
-        min(size.y / dzoom / 2 * 10 / 10,
-            max(size.y / dzoom / 2 * 0 / 10, localPosition.y)));
-  }
-
-
-
   /// [onTapDown] is called when the player taps the screen and then calculates
   /// if and how the player should jump.
   @override
   void onTapDown(TapDownEvent event) {
-    //addEnemy(this, size.y);
-    //add(Pill((Vector2.random() - Vector2.random()) * 100));
-    // Which direction the player should jump.
-    //final towards = (event.localPosition - player.position)..normalize();
-    // If the tap is underneath the player no jump is triggered, but if it is
-    // above the player it triggers a jump, even though the player might be in
-    // the air. This makes it possible to later implement double jumping inside
-    // of the `player` class if one would want to.
-    //player.position = event.localPosition;
-    //player.target = event.localPosition;
-    //player.force = Vector2.all(0);
-    //player.velocity = Vector2.all(0);
     if (realsurf) {
       boat.position = getTarget(event.localPosition, size);
       player.target = boat.position;
     }
-    //player.jump(towards);
-    //if (towards.y.isNegative) {
-    //  player.jump(towards);
-    //}
   }
 
   @override
   void onDragStart(DragStartEvent event) {
     super.onDragStart(event);
-    // Which direction the player should jump.
-    //final towards = (event.localPosition - player.position)..normalize();
-    // If the tap is underneath the player no jump is triggered, but if it is
-    // above the player it triggers a jump, even though the player might be in
-    // the air. This makes it possible to later implement double jumping inside
-    // of the `player` class if one would want to.
-    //player.pull = towards;
     if (realsurf) {
       boat.position = getTarget(event.localPosition, size);
       player.target = boat.position;
     }
-    dhdragStart = event.localPosition;
-    //player.jump(towards);
-    //if (towards.y.isNegative) {
-    //  player.jump(towards);
-    //}
+    if (addRandomWalls) {
+      dhdragStart = event.localPosition;
+    }
   }
 
   @override
   void onDragEnd(DragEndEvent event) {
     super.onDragEnd(event);
-    add(Wall(dhdragStart, dhdragLatest));
-
-    //player.jump(towards);
-    //if (towards.y.isNegative) {
-    //  player.jump(towards);
-    //}
+    if (addRandomWalls) {
+      add(Wall(dhdragStart, dhdragLatest));
+    }
   }
 
   @override
   void onDragUpdate(DragUpdateEvent event) {
-    // Which direction the player should jump.
-    //final towards = (event.localStartPosition - player.position)..normalize();
-    // If the tap is underneath the player no jump is triggered, but if it is
-    // above the player it triggers a jump, even though the player might be in
-    // the air. This makes it possible to later implement double jumping inside
-    // of the `player` class if one would want to.
-    //player.pull = towards;
     if (realsurf) {
       boat.position = getTarget(event.localStartPosition, size);
       player.target = boat.position;
     }
-    dhdragLatest = event.localStartPosition;
-    //player.jump(towards);
-    //if (towards.y.isNegative) {
-    //  player.jump(towards);
-    //}
+    if (addRandomWalls) {
+      dhdragLatest = event.localStartPosition;
+    }
   }
 
   @override
   void onPointerMove(dhpointer_move_event.PointerMoveEvent event) {
-    //gravity = (Vector2.random() - Vector2.random()) * 100;
-    // Which direction the player should jump.
-
-    // If the tap is underneath the player no jump is triggered, but if it is
-    // above the player it triggers a jump, even though the player might be in
-    // the air. This makes it possible to later implement double jumping inside
-    // of the `player` class if one would want to.
-    //player.pull = towards;
     if (!android) {
       gravity = event.localPosition - player.position;
     }
     if (realsurf) {
-      //final towards = (event.localPosition - player.position)..normalize();
       boat.position = getTarget(event.localPosition, size);
       player.target = boat.position;
     }
-    //player.jump(towards);
-    //if (towards.y.isNegative) {
-    //  player.jump(towards);
-    //}
   }
 
   /// A helper function to define how fast a certain level should be.

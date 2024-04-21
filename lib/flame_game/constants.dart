@@ -12,18 +12,12 @@ import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
 
-
 import 'package:flame/extensions.dart';
-
 
 import 'package:flutter/foundation.dart';
 
-
-
 import 'components/point.dart';
 import 'components/powerpoint.dart';
-
-
 
 void p(x) {
   // ignore: prefer_interpolation_to_compose_strings
@@ -42,7 +36,7 @@ void addPillsAndPowerPills(world, double sizex, double sizey) {
       double B = (j * 1.0 - 14) * scaley;
       double D = 1.0 * scalex;
       double E = 1.0 * scaley;
-      Vector2 location = Vector2(A + D/2, B+E/2);
+      Vector2 location = Vector2(A + D / 2, B + E / 2);
 
       if (layout[k] == 0) {
         var pillx = Point();
@@ -57,7 +51,6 @@ void addPillsAndPowerPills(world, double sizex, double sizey) {
     }
   }
 }
-
 
 /*
 
@@ -95,6 +88,7 @@ class Wall extends BodyComponent with CollisionCallbacks {
 
  */
 
+const bool addRandomWalls = false;
 bool mazeOn = true;
 const dzoom = 20.0;
 bool surf = true; //false;
@@ -106,7 +100,6 @@ final defaultPaint = Paint()
 
 double ksizex = 100;
 double ksizey = 100;
-
 
 bool android = defaultTargetPlatform == TargetPlatform.android;
 

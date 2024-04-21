@@ -3,16 +3,13 @@ import 'package:flame/game.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flutter/material.dart';
 
-
 import '../audio/audio_controller.dart';
 import '../level_selection/levels.dart';
 import '../player_progress/player_progress.dart';
 
 import 'endless_world.dart';
 import 'constants.dart';
-import 'components/wall.dart';
-
-
+import 'helper.dart';
 
 import 'components/maze.dart';
 
@@ -62,7 +59,6 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
   ///
   ///
   ///
-
 
   @override
   Future<void> onLoad() async {

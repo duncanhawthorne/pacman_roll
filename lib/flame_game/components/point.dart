@@ -9,7 +9,7 @@ class Point extends SpriteAnimationComponent
     with HasGameReference, HasWorldReference<EndlessWorld> {
   Point() : super(size: spriteSize, anchor: Anchor.center);
 
-  static final Vector2 spriteSize = Vector2.all(100 /3 / dzoom);
+  static final Vector2 spriteSize = Vector2.all(100 / 3 / dzoom);
   final speed = 0;
 
   @override

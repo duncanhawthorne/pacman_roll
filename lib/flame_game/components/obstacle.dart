@@ -8,7 +8,8 @@ import '../constants.dart';
 
 /// The [Obstacle] component can represent three different types of obstacles
 /// that the player can run into.
-class Obstacle extends SpriteAnimationComponent with HasGameReference, HasWorldReference<EndlessWorld> {
+class Obstacle extends SpriteAnimationComponent
+    with HasGameReference, HasWorldReference<EndlessWorld> {
   Obstacle.small({super.position})
       : _srcSize = Vector2.all(16),
         _srcPosition = Vector2.all(32),

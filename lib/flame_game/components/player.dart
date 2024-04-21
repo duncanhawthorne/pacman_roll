@@ -27,7 +27,10 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
     //required this.resetScore,
     required this.realIsGhost,
     super.position,
-  }) : super(size: Vector2.all(min(ksizex,ksizey) / dzoom / 2 / 14), anchor: Anchor.center, priority: 1);
+  }) : super(
+            size: Vector2.all(min(ksizex, ksizey) / dzoom / 2 / 14),
+            anchor: Anchor.center,
+            priority: 1);
 
   //final void Function({int amount}) addScore;
   //final VoidCallback resetScore;
@@ -45,7 +48,7 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
   Vector2 velocity = Vector2.all(0);
   Vector2 force = Vector2.all(0);
   Vector2 gyroforce = Vector2.all(0);
-  Ball? playerTargetBall;
+  Ball? underlyingBall;
   bool maniacMode = false;
   //bool isGhost = false;
 
@@ -66,7 +69,10 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
     // This defines the different animation states that the player can be in.
     animations = {
       PlayerState.running: SpriteAnimation.spriteList(
-        [await game.loadSprite(realIsGhost ? 'dash/ghost1.png' : 'dash/pacmanman.png')],
+        [
+          await game.loadSprite(
+              realIsGhost ? 'dash/ghost1.png' : 'dash/pacmanman.png')
+        ],
         stepTime: double.infinity,
       ),
       PlayerState.jumping: SpriteAnimation.spriteList(
@@ -85,7 +91,7 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
     if (realsurf) {
       // ignore: deprecated_member_use
       accelerometerEvents.listen(
-            (AccelerometerEvent event) {
+        (AccelerometerEvent event) {
           //print(event);
 
           // ignore: dead_code
@@ -93,8 +99,8 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
             //world.gravity = Vector2(-event.x, event.y) * 50;
             gyroforce.x = -event.x;
             gyroforce.y = 0; //-event.y;
-          }
-          else { //android
+          } else {
+            //android
             //world.gravity = Vector2(event.y, event.x) * 50;
             gyroforce.x = event.y / 10;
             gyroforce.y = 0; //-event.y;
@@ -118,8 +124,8 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
   @override
   void update(double dt) {
     super.update(dt);
-    if (playerTargetBall!= null) {
-      position = playerTargetBall!.position;
+    if (underlyingBall != null) {
+      position = underlyingBall!.position;
     }
     //return;
     // When we are in the air the gravity should affect our position and pull
@@ -175,8 +181,7 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
         game.audioController.playSfx(SfxType.score);
         other.removeFromParent();
         //addScore();
-      }
-      else if (other is Powerpoint) {
+      } else if (other is Powerpoint) {
         game.audioController.playSfx(SfxType.score);
         maniacMode = true;
         current = PlayerState.jumping;
