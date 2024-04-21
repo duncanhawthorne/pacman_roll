@@ -48,7 +48,7 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
   Vector2 velocity = Vector2.all(0);
   Vector2 force = Vector2.all(0);
   Vector2 gyroforce = Vector2.all(0);
-  Ball? underlyingBall;
+  Ball? underlyingBallLegacy;
   bool maniacMode = false;
   Ball? underlyingBallReal;
   //bool isGhost = false;
@@ -67,10 +67,10 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
 
   @override
   Future<void> onLoad() async {
-    Ball underlyingBallReal = Ball(enemy: isGhost, realCharacter: this);
-    underlyingBall = underlyingBallReal;
+    Ball underlyingBallReal = Ball(ghostBall: isGhost, realCharacter: this);
+    underlyingBallLegacy = underlyingBallReal;
     if (isGhost) {
-      underlyingBall!.bodyDef!.position = Vector2(0, 0);
+      underlyingBallReal!.bodyDef!.position = Vector2(0, 0);
     }
     world.add(underlyingBallReal);
 
@@ -125,8 +125,8 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
   @override
   void update(double dt) {
     super.update(dt);
-    if (underlyingBall != null) {
-      position = underlyingBall!.position;
+    if (underlyingBallLegacy != null) {
+      position = underlyingBallLegacy!.position;
     }
 
     if (realsurf) {

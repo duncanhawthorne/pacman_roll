@@ -8,7 +8,7 @@ import '../helper.dart';
 import 'dart:math';
 
 class Ball extends BodyComponent with TapCallbacks, ContactCallbacks {
-  Ball({Vector2? initialPosition, double? size, Color? color, bool? enemy, Player? realCharacter})
+  Ball({Vector2? initialPosition, double? size, Color? color, bool? ghostBall, Player? realCharacter})
       : super(
             fixtureDefs: [
               FixtureDef(
@@ -28,7 +28,7 @@ class Ball extends BodyComponent with TapCallbacks, ContactCallbacks {
               ..color = color ?? Colors.transparent
               ..style = PaintingStyle.fill);
 
-  bool enemy = false;
+  bool ghostBall = false;
   Player? realCharacter;
 
   @override
@@ -43,7 +43,7 @@ class Ball extends BodyComponent with TapCallbacks, ContactCallbacks {
   void beginContact(Object other, Contact contact) {
     super.beginContact(other, contact);
     if (other is Ball) {
-      if (other.enemy && !enemy) {
+      if (other.ghostBall && !ghostBall) {
         if (realCharacter != null && realCharacter!.maniacMode) {
           removeEnemy(other);
           addEnemy(world);
