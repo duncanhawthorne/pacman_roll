@@ -12,6 +12,7 @@ import 'point.dart';
 import 'powerpoint.dart';
 import 'ball.dart';
 import 'dart:math';
+import 'dart:core';
 
 import 'package:sensors_plus/sensors_plus.dart';
 import '../constants.dart';
@@ -69,11 +70,13 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
   @override
   Future<void> onLoad() async {
     Ball underlyingBallReal = Ball();
-    underlyingBallReal.ghostBall = isGhost; //FIXME should do this in the initiator, but didn't work
-    underlyingBallReal.realCharacter = this; //FIXME should do this in the initiator, but didn't work
+    underlyingBallReal.ghostBall =
+        isGhost; //FIXME should do this in the initiator, but didn't work
+    underlyingBallReal.realCharacter =
+        this; //FIXME should do this in the initiator, but didn't work
     underlyingBallLegacy = underlyingBallReal;
     if (isGhost) {
-      underlyingBallReal!.bodyDef!.position = Vector2(0, 0);
+      underlyingBallReal.bodyDef!.position = Vector2(-10, 0); //FIXME -10
     }
     world.add(underlyingBallReal);
 
@@ -81,13 +84,16 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
     animations = {
       PlayerState.running: SpriteAnimation.spriteList(
         [
-          await game.loadSprite(
-              isGhost ? 'dash/ghost1.png' : 'dash/pacmanman.png')
+          await game
+              .loadSprite(isGhost ? 'dash/ghost1.png' : 'dash/pacmanman.png')
         ],
         stepTime: double.infinity,
       ),
       PlayerState.jumping: SpriteAnimation.spriteList(
-        [await game.loadSprite(isGhost ? 'dash/ghostscared1.png' : 'dash/pacmanman_angry.png')],
+        [
+          await game.loadSprite(
+              isGhost ? 'dash/ghostscared1.png' : 'dash/pacmanman_angry.png')
+        ],
         stepTime: double.infinity,
       ),
       PlayerState.falling: SpriteAnimation.spriteList(
@@ -100,8 +106,7 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
     _lastPosition.setFrom(position);
 
     if (realsurf) {
-      // ignore: deprecated_member_use
-      accelerometerEvents.listen(
+      accelerometerEventStream().listen(
         (AccelerometerEvent event) {
           if (!android) {
             gyroforce.x = -event.x;
@@ -132,7 +137,9 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
     if (underlyingBallLegacy != null) {
       position = underlyingBallLegacy!.position;
     }
-    angle += (position - _lastPosition).length / (size.x / 2);
+
+    angle +=
+        (position - _lastPosition).length / (size.x / 2) * getMagicParity();
 
     if (realsurf) {
       force = (target - position) * 0.5 +
@@ -175,7 +182,8 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
           maniacMode = false;
           current = PlayerState.running;
 
-          for (var enemy in enemies) { //FIXME could gt two pills
+          for (var enemy in enemies) {
+            //FIXME could gt two pills
             enemy.current = PlayerState.running;
           }
           //p("END MANIAC");

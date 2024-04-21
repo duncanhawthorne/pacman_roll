@@ -10,7 +10,7 @@ class Wall extends BodyComponent with CollisionCallbacks {
   @override
   Body createBody() {
     final shape = EdgeShape()..set(_start, _end);
-    final fixtureDef = FixtureDef(shape, friction: 0.1, restitution: 0.6);
+    final fixtureDef = FixtureDef(shape, friction: 0.1, restitution: 0.0);
     final bodyDef = BodyDef(position: Vector2.zero());
     return world.createBody(bodyDef)..createFixture(fixtureDef);
   }

@@ -14,6 +14,32 @@ void p(x) {
   debugPrint("///// A " + DateTime.now().toString() + " " + x.toString());
 }
 
+int getMagicParity() {
+  int diry = 1;
+  if (globalGravity.y > 0) {
+    diry = 1;
+  } else {
+    diry = -1;
+  }
+
+  int dirx = 1;
+  if (globalGravity.x > 0) {
+    dirx = 1;
+  } else {
+    dirx = -1;
+  }
+
+  int dirside = 1;
+  if ((globalGravity.x).abs() > (globalGravity.y).abs()) {
+    dirside = 1;
+  } else {
+    dirside = -1;
+  }
+
+  int magicparity = diry * dirx * dirside;
+  return magicparity;
+}
+
 var enemies = [];
 
 void addEnemy(world) {

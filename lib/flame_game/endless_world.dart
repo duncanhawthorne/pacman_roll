@@ -27,8 +27,6 @@ import 'package:sensors_plus/sensors_plus.dart';
 
 import 'package:flutter/foundation.dart';
 
-
-
 import '../audio/audio_controller.dart';
 
 /// The world is where you place all the components that should live inside of
@@ -101,10 +99,12 @@ class EndlessWorld extends Forge2DWorld
 
     // ignore: deprecated_member_use
     if (android) {
-      accelerometerEvents.listen(
-            (AccelerometerEvent event) {
+      accelerometerEventStream().listen(
+        (AccelerometerEvent event) {
           if (android) {
-            gravity = Vector2(event.y, event.x) * 50;
+            gravity = Vector2(event.y, event.x) * 18;
+            globalGravity.x = event.x;
+            globalGravity.y = event.y;
           }
         },
         onError: (error) {

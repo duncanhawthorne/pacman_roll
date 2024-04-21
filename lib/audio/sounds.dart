@@ -10,8 +10,8 @@ List<String> soundTypeToFilename(SfxType type) {
       ];
     case SfxType.hit:
       return const [
-        'hit1.mp3',
-        'hit2.mp3',
+        'eat_ghost.mp3'
+        //'hit2.mp3',
       ];
     case SfxType.damage:
       return const [

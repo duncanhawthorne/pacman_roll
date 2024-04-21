@@ -12,8 +12,10 @@ class Ball extends BodyComponent with TapCallbacks, ContactCallbacks {
       : super(
             fixtureDefs: [
               FixtureDef(
-                CircleShape()..radius = size ?? min(ksizey,ksizex) / dzoom / 2 / 14 / 2 * 0.95,
-                restitution: 0.6,
+                CircleShape()
+                  ..radius = size ??
+                      min(ksizey, ksizex) / dzoom / 2 / 14 / 2 * 0.99, //0.95
+                restitution: 0.0,
                 friction: 0.1,
                 userData: Ball,
               ),
@@ -46,6 +48,7 @@ class Ball extends BodyComponent with TapCallbacks, ContactCallbacks {
     if (other is Ball) {
       if (other.ghostBall && !ghostBall) {
         if (realCharacter != null && realCharacter!.maniacMode) {
+          globalAudioController!.playSfx(SfxType.hit);
           removeEnemy(other);
           addEnemy(world);
         } else {
@@ -53,7 +56,6 @@ class Ball extends BodyComponent with TapCallbacks, ContactCallbacks {
           globalAudioController!.playSfx(SfxType.damage);
           realCharacter!.removeFromParent();
           removeFromParent();
-
         }
       }
     }

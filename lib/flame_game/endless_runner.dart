@@ -94,7 +94,7 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
     // The scoreComponent is added to the viewport, which means that even if the
     // camera's viewfinder move around and looks at different positions in the
     // world, the score is always static to the viewport.
-    camera.viewport.add(scoreComponent);
+    //camera.viewport.add(scoreComponent);
 
     // Here we add a listener to the notifier that is updated when the player
     // gets a new point, in the callback we update the text of the
