@@ -1,4 +1,3 @@
-
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 import 'components/wall.dart';
@@ -6,7 +5,7 @@ import 'components/ball.dart';
 import 'components/powerpoint.dart';
 import 'components/point.dart';
 import 'constants.dart';
-import'dart:math';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'components/player.dart';
 
@@ -16,26 +15,14 @@ void p(x) {
 }
 
 void addEnemy(world) {
-  Ball ghostBall = Ball(
-      size: ksizey / dzoom / 2 / 14 / 2 * 0.95,
-      color: Colors.transparent,
-      enemy: true);
-  ghostBall.enemy = true;
-  ghostBall.bodyDef!.position = Vector2(0, 0);
-  world.add(ghostBall);
-
-  Player ghost = Player(realIsGhost: true
-  );
+  Player ghost = Player(isGhost: true);
   world.add(ghost);
-  ghostBall.realCharacter = ghost;
-  ghost.underlyingBall = ghostBall;
 }
 
 void removeEnemy(Ball other) {
   other.realCharacter!.removeFromParent();
   other.removeFromParent();
 }
-
 
 List<Component> createBoundaries(CameraComponent camera) {
   final Rect visibleRect = camera.visibleWorldRect;
@@ -59,7 +46,9 @@ Vector2 getTarget(Vector2 localPosition, Vector2 size) {
           max(size.y / dzoom / 2 * 0 / 10, localPosition.y)));
 }
 
-void addPillsAndPowerPills(world, double sizex, double sizey) {
+void addPillsAndPowerPills(world) {
+  double sizex = ksizex;
+  double sizey = ksizey;
   for (var i = 0; i < 28; i++) {
     for (var j = 0; j < 28; j++) {
       int k = i * 28 + j;

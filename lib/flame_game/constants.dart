@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 const bool addRandomWalls = false;
 bool mazeOn = true;
 const dzoom = 20.0;
-bool surf = true; //false;
+//bool surf = true; //false;
 const bool realsurf = false;
 const defaultColor = Colors.cyan;
 final defaultPaint = Paint()

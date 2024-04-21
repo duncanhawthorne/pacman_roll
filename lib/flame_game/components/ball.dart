@@ -5,13 +5,14 @@ import '../constants.dart';
 import 'player.dart';
 import '../effects/hurt_effect.dart';
 import '../helper.dart';
+import 'dart:math';
 
 class Ball extends BodyComponent with TapCallbacks, ContactCallbacks {
-  Ball({Vector2? initialPosition, double? size, Color? color, bool? enemy})
+  Ball({Vector2? initialPosition, double? size, Color? color, bool? enemy, Player? realCharacter})
       : super(
             fixtureDefs: [
               FixtureDef(
-                CircleShape()..radius = size ?? 20 / dzoom,
+                CircleShape()..radius = size ?? min(ksizey,ksizex) / dzoom / 2 / 14 / 2 * 0.95,
                 restitution: 0.6,
                 friction: 0.1,
                 userData: Ball,

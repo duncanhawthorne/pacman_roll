@@ -25,7 +25,7 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
   Player({
     //required this.addScore,
     //required this.resetScore,
-    required this.realIsGhost,
+    required this.isGhost,
     super.position,
   }) : super(
             size: Vector2.all(min(ksizex, ksizey) / dzoom / 2 / 14),
@@ -34,7 +34,7 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
 
   //final void Function({int amount}) addScore;
   //final VoidCallback resetScore;
-  final bool realIsGhost;
+  final bool isGhost;
 
   // The current velocity that the player has that comes from being affected by
   // the gravity. Defined in virtual pixels/s².
@@ -50,6 +50,7 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
   Vector2 gyroforce = Vector2.all(0);
   Ball? underlyingBall;
   bool maniacMode = false;
+  Ball? underlyingBallReal;
   //bool isGhost = false;
 
   // Whether the player is currently in the air, this can be used to restrict
@@ -66,12 +67,19 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
 
   @override
   Future<void> onLoad() async {
+    Ball underlyingBallReal = Ball(enemy: isGhost, realCharacter: this);
+    underlyingBall = underlyingBallReal;
+    if (isGhost) {
+      underlyingBall!.bodyDef!.position = Vector2(0, 0);
+    }
+    world.add(underlyingBallReal);
+
     // This defines the different animation states that the player can be in.
     animations = {
       PlayerState.running: SpriteAnimation.spriteList(
         [
           await game.loadSprite(
-              realIsGhost ? 'dash/ghost1.png' : 'dash/pacmanman.png')
+              isGhost ? 'dash/ghost1.png' : 'dash/pacmanman.png')
         ],
         stepTime: double.infinity,
       ),
@@ -92,20 +100,13 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
       // ignore: deprecated_member_use
       accelerometerEvents.listen(
         (AccelerometerEvent event) {
-          //print(event);
-
-          // ignore: dead_code
-          if (false) {
-            //world.gravity = Vector2(-event.x, event.y) * 50;
+          if (!android) {
             gyroforce.x = -event.x;
             gyroforce.y = 0; //-event.y;
           } else {
-            //android
-            //world.gravity = Vector2(event.y, event.x) * 50;
             gyroforce.x = event.y / 10;
             gyroforce.y = 0; //-event.y;
           }
-          //print(world.gravity);
         },
         onError: (error) {
           // Logic to handle error
@@ -127,31 +128,7 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
     if (underlyingBall != null) {
       position = underlyingBall!.position;
     }
-    //return;
-    // When we are in the air the gravity should affect our position and pull
-    // us closer to the ground.
-    /*
-    if (inAir) {
-      _gravityVelocity += world.gravity * dt;
-      position.y += _gravityVelocity;
 
-      if (isFalling) {
-        current = PlayerState.falling;
-      }
-    }
-
-    final belowGround = position.y + size.y / 2 > world.groundLevel;
-    // If the player's new position would overshoot the ground level after
-    // updating its position we need to move the player up to the ground level
-    // again.
-    if (belowGround) {
-      position.y = world.groundLevel - size.y / 2;
-      _gravityVelocity = 0;
-      current = PlayerState.running;
-    }
-
-     */
-    //position += pull * 1;
     if (realsurf) {
       force = (target - position) * 0.5 +
           Vector2(0, -world.size.y / 4 / dzoom) -
@@ -169,7 +146,7 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
     PositionComponent other,
   ) {
     super.onCollisionStart(intersectionPoints, other);
-    if (!realIsGhost) {
+    if (!isGhost) {
       // When the player collides with an obstacle it should lose all its points.
       if (other is Obstacle) {
         game.audioController.playSfx(SfxType.damage);

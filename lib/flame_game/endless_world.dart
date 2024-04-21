@@ -93,30 +93,23 @@ class EndlessWorld extends Forge2DWorld
     // calculate how long time it took to finish the level.
     timeStarted = DateTime.now();
 
-    // The player is the component that we control when we tap the screen, the
-    // Dash in this case.
-
     // ignore: deprecated_member_use
-    accelerometerEvents.listen(
-      (AccelerometerEvent event) {
-        //print(event);
+    if (android) {
+      accelerometerEvents.listen(
+            (AccelerometerEvent event) {
+          if (android) {
+            gravity = Vector2(event.y, event.x) * 50;
+          }
+        },
+        onError: (error) {
+          // Logic to handle error
+          // Needed for Android in case sensor is not available
+        },
+        cancelOnError: true,
+      );
+    }
 
-        if (!android) {
-          //gravity = Vector2(-event.x, event.y) * 50;
-        } else {
-          //android
-          gravity = Vector2(event.y, event.x) * 50;
-        }
-        //print(world.gravity);
-      },
-      onError: (error) {
-        // Logic to handle error
-        // Needed for Android in case sensor is not available
-      },
-      cancelOnError: true,
-    );
-
-    if (surf) {
+    if (realsurf) {
       if (realsurf) {
         boat = Boat(
           position: Vector2(0, size.y / 4 / dzoom),
@@ -125,12 +118,6 @@ class EndlessWorld extends Forge2DWorld
         );
         add(boat);
       }
-      player = Player(realIsGhost: false
-          //position: Vector2(boat.position.x, boat.position.y),
-          //addScore: addScore,
-          //resetScore: resetScore,
-          );
-      add(player);
       if (realsurf) {
         player.target = boat.position;
 
@@ -142,7 +129,6 @@ class EndlessWorld extends Forge2DWorld
         );
         add(rope);
       }
-      //add(Ball());
 
       if (realsurf) {
         //bad things
@@ -179,19 +165,21 @@ class EndlessWorld extends Forge2DWorld
         );
       }
     }
-    ball = Ball(size: size.y / dzoom / 2 / 14 / 2 * 0.95, enemy: false);
-    add(ball);
-    ball.realCharacter = player;
-    player.underlyingBall = ball;
+
+    player = Player(isGhost: false
+        //position: Vector2(boat.position.x, boat.position.y),
+        //addScore: addScore,
+        //resetScore: resetScore,
+        );
+    add(player);
 
     for (int i = 0; i < 4; i++) {
       Future.delayed(Duration(seconds: i), () {
         addEnemy(this);
-        //setStateGlobal();
       });
     }
 
-    addPillsAndPowerPills(this, size.x, size.y);
+    addPillsAndPowerPills(this);
 
     // When the player takes a new point we check if the score is enough to
     // pass the level and if it is we calculate what time the level was passed
