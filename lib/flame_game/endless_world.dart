@@ -103,8 +103,8 @@ class EndlessWorld extends Forge2DWorld
         (AccelerometerEvent event) {
           if (android) {
             //p(event);
-            gravity = Vector2(event.y, event.x - 3) * 18; //NOTE dimensions flipped
-            globalGravity.x = event.x - 3; //NOTE dimensions not flipped
+            gravity = Vector2(event.y, event.x - 5) * 18; //NOTE dimensions flipped
+            globalGravity.x = event.x - 5; //NOTE dimensions not flipped
             globalGravity.y = event.y; //NOTE dimensions not flipped
           }
         },

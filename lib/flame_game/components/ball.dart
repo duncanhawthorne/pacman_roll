@@ -61,9 +61,8 @@ class Ball extends BodyComponent with TapCallbacks, ContactCallbacks {
             removeEnemyBall(enemies[i]);
             addEnemy(world);
           }
-          
-           */
 
+           */
           realCharacter!.removeFromParent();
           removeFromParent();
         }
