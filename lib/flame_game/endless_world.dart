@@ -186,12 +186,10 @@ class EndlessWorld extends Forge2DWorld
 
     for (int i = 0; i < 4; i++) {
       Future.delayed(Duration(seconds: i), () {
-        addEnemy(this, size.y);
+        addEnemy(this);
         //setStateGlobal();
       });
     }
-
-    //PILLS
 
     addPillsAndPowerPills(this, size.x, size.y);
 

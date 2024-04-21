@@ -4,22 +4,7 @@ import 'package:flutter/material.dart';
 import '../constants.dart';
 import 'player.dart';
 import '../effects/hurt_effect.dart';
-
-void addEnemy(world, double sizey) {
-  Ball ghostBall = Ball(
-      size: sizey / dzoom / 2 / 14 / 2 * 0.95,
-      color: Colors.transparent,
-      enemy: true);
-  ghostBall.enemy = true;
-  ghostBall.bodyDef!.position = Vector2(0, 0);
-  world.add(ghostBall);
-
-  Player ghost = Player(realIsGhost: true
-      );
-  world.add(ghost);
-  ghostBall.realCharacter = ghost;
-  ghost.underlyingBall = ghostBall;
-}
+import '../helper.dart';
 
 class Ball extends BodyComponent with TapCallbacks, ContactCallbacks {
   Ball({Vector2? initialPosition, double? size, Color? color, bool? enemy})
@@ -54,19 +39,13 @@ class Ball extends BodyComponent with TapCallbacks, ContactCallbacks {
   }
 
   @override
-  void onTapDown(event) {
-    body.applyLinearImpulse(Vector2(0, -50000000 * 20 / dzoom));
-  }
-
-  @override
   void beginContact(Object other, Contact contact) {
     super.beginContact(other, contact);
     if (other is Ball) {
       if (other.enemy && !enemy) {
         if (realCharacter != null && realCharacter!.maniacMode) {
-          other.realCharacter!.removeFromParent();
-          other.removeFromParent();
-          addEnemy(world, ksizey);
+          removeEnemy(other);
+          addEnemy(world);
         } else {
           realCharacter!.add(HurtEffect());
         }

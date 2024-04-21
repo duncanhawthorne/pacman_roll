@@ -21,7 +21,7 @@ void createMaze(double sizex, double sizey, world) {
         double B = (j * 1.0 - 14) * scaley;
         double D = 1.0 * scalex;
         double E = 1.0 * scaley;
-        if (layout[k] == 1) {
+        if (mazeLayout[k] == 1) {
 /*
           world.add(Wall(Vector2(A,B),Vector2(A+D,B)));
           world.add(Wall(Vector2(A+D,B),Vector2(A+D,B+E)));
@@ -31,16 +31,16 @@ void createMaze(double sizex, double sizey, world) {
  */
         }
         if (k + 1 < 28 * 28 &&
-            (layout[k] == 1 && layout[k + 1] != 1 ||
-                layout[k] != 1 && layout[k + 1] == 1)) {
+            (mazeLayout[k] == 1 && mazeLayout[k + 1] != 1 ||
+                mazeLayout[k] != 1 && mazeLayout[k + 1] == 1)) {
           //world.add(Wall(Vector2(A,B),Vector2(A+D,B)));
           //world.add(Wall(Vector2(A+D,B),Vector2(A+D,B+E)));
           world.add(Wall(Vector2(A + D, B + E), Vector2(A, B + E)));
           //world.add(Wall(Vector2(A,B+E),Vector2(A,B)));
         }
         if (k + 28 < 28 * 28 &&
-            (layout[k] == 1 && layout[k + 28] != 1 ||
-                layout[k] != 1 && layout[k + 28] == 1)) {
+            (mazeLayout[k] == 1 && mazeLayout[k + 28] != 1 ||
+                mazeLayout[k] != 1 && mazeLayout[k + 28] == 1)) {
           //world.add(Wall(Vector2(A,B),Vector2(A+D,B)));
           world.add(Wall(Vector2(A + D, B), Vector2(A + D, B + E)));
           //world.add(Wall(Vector2(A+D,B+E),Vector2(A,B+E)));
