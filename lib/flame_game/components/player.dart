@@ -87,7 +87,7 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
         stepTime: double.infinity,
       ),
       PlayerState.jumping: SpriteAnimation.spriteList(
-        [await game.loadSprite('dash/pacmanman_angry.png')],
+        [await game.loadSprite(isGhost ? 'dash/ghostscared1.png' : 'dash/pacmanman_angry.png')],
         stepTime: double.infinity,
       ),
       PlayerState.falling: SpriteAnimation.spriteList(
@@ -128,9 +128,11 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
   @override
   void update(double dt) {
     super.update(dt);
+
     if (underlyingBallLegacy != null) {
       position = underlyingBallLegacy!.position;
     }
+    angle += (position - _lastPosition).length / (size.x / 2);
 
     if (realsurf) {
       force = (target - position) * 0.5 +
@@ -139,8 +141,8 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
           gyroforce * 50;
       velocity += force * dt;
       position += velocity;
-      _lastPosition.setFrom(position);
     }
+    _lastPosition.setFrom(position);
   }
 
   @override
@@ -162,13 +164,20 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
         other.removeFromParent();
         //addScore();
       } else if (other is Powerpoint) {
-        game.audioController.playSfx(SfxType.score);
+        game.audioController.playSfx(SfxType.jump);
         maniacMode = true;
         current = PlayerState.jumping;
+        for (var enemy in enemies) {
+          enemy.current = PlayerState.jumping;
+        }
         //p("start maniac");
         Future.delayed(const Duration(seconds: 10), () {
           maniacMode = false;
           current = PlayerState.running;
+
+          for (var enemy in enemies) { //FIXME could gt two pills
+            enemy.current = PlayerState.running;
+          }
           //p("END MANIAC");
           //setStateGlobal();
         });

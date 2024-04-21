@@ -2,7 +2,7 @@ List<String> soundTypeToFilename(SfxType type) {
   switch (type) {
     case SfxType.jump:
       return const [
-        'jump1.mp3',
+        'ghosts_runaway.mp3',
       ];
     case SfxType.doubleJump:
       return const [
@@ -15,13 +15,13 @@ List<String> soundTypeToFilename(SfxType type) {
       ];
     case SfxType.damage:
       return const [
-        'damage1.mp3',
-        'damage2.mp3',
+        'pacman_death.mp3'
+        //'damage2.mp3',
       ];
     case SfxType.score:
       return const [
-        'score1.mp3',
-        'score2.mp3',
+        'pacman_waka_ka.mp3',
+        //'pacman_waka_wa.mp3',
       ];
     case SfxType.buttonTap:
       return const [

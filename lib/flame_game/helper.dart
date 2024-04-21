@@ -14,14 +14,18 @@ void p(x) {
   debugPrint("///// A " + DateTime.now().toString() + " " + x.toString());
 }
 
+var enemies = [];
+
 void addEnemy(world) {
   Player ghost = Player(isGhost: true);
   world.add(ghost);
+  enemies.add(ghost);
 }
 
 void removeEnemy(Ball other) {
   other.realCharacter!.removeFromParent();
   other.removeFromParent();
+  enemies.remove(other);
 }
 
 List<Component> createBoundaries(CameraComponent camera) {

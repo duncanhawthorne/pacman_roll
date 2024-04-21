@@ -27,6 +27,10 @@ import 'package:sensors_plus/sensors_plus.dart';
 
 import 'package:flutter/foundation.dart';
 
+
+
+import '../audio/audio_controller.dart';
+
 /// The world is where you place all the components that should live inside of
 /// the game, like the player, enemies, obstacles and points for example.
 /// The world can be much bigger than what the camera is currently looking at,
@@ -65,7 +69,7 @@ class EndlessWorld extends Forge2DWorld
   /// other parts of the code is interested in when the score is updated they
   /// can listen to it and act on the updated value.
   final scoreNotifier = ValueNotifier(0);
-  late final Player player;
+  late Player player;
   late final Boat boat;
   late final Ball ball;
   late final RectangleComponent rope;
@@ -73,6 +77,8 @@ class EndlessWorld extends Forge2DWorld
   late final DateTime timeStarted;
   Vector2 get size => (parent as FlameGame).size;
   int levelCompletedIn = 0;
+  late final AudioController audioController;
+  get getAudioController => audioController;
 
   /// The random number generator that is used to spawn periodic components.
   final Random _random;
@@ -173,7 +179,7 @@ class EndlessWorld extends Forge2DWorld
         );
     add(player);
 
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 3; i++) {
       Future.delayed(Duration(seconds: i), () {
         addEnemy(this);
       });
@@ -243,6 +249,7 @@ class EndlessWorld extends Forge2DWorld
   /// if and how the player should jump.
   @override
   void onTapDown(TapDownEvent event) {
+    //audioController.playSfx(SfxType.damage);
     if (realsurf) {
       boat.position = getTarget(event.localPosition, size);
       player.target = boat.position;

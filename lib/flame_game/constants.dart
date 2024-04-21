@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import '../audio/audio_controller.dart';
+
 
 const bool addRandomWalls = false;
 bool mazeOn = true;
@@ -10,6 +12,7 @@ const defaultColor = Colors.cyan;
 final defaultPaint = Paint()
   ..color = defaultColor
   ..style = PaintingStyle.stroke;
+AudioController? globalAudioController;
 
 double ksizex = 100;
 double ksizey = 100;

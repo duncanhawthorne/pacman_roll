@@ -3,9 +3,9 @@ import 'package:flame/events.dart';
 import 'package:flutter/material.dart';
 import '../constants.dart';
 import 'player.dart';
-import '../effects/hurt_effect.dart';
 import '../helper.dart';
 import 'dart:math';
+import '../../audio/sounds.dart';
 
 class Ball extends BodyComponent with TapCallbacks, ContactCallbacks {
   Ball({Vector2? initialPosition, double? size, Color? color})
@@ -49,7 +49,11 @@ class Ball extends BodyComponent with TapCallbacks, ContactCallbacks {
           removeEnemy(other);
           addEnemy(world);
         } else {
-          realCharacter!.add(HurtEffect());
+          //realCharacter!.add(HurtEffect());
+          globalAudioController!.playSfx(SfxType.damage);
+          realCharacter!.removeFromParent();
+          removeFromParent();
+
         }
       }
     }
