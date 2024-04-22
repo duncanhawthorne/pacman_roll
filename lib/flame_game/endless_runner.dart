@@ -42,7 +42,7 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
   }) : super(
           world: EndlessWorld(level: level, playerProgress: playerProgress),
           camera:
-              CameraComponent.withFixedResolution(width: 2800, height: 1700),
+              CameraComponent.withFixedResolution(width: 1700, height: 1700), //2800, 1700
           zoom: dzoom,
         );
 

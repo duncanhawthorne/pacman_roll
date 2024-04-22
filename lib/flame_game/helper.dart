@@ -41,7 +41,7 @@ int getMagicParity() {
 
 List<Player> ghostPlayersList = [];
 
-void addEnemy(world) {
+void addGhost(world) {
   Player ghost = Player(isGhost: true);
   world.add(ghost);
   ghostPlayersList.add(ghost);

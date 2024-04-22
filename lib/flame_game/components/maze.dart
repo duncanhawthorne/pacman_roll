@@ -17,9 +17,6 @@ void createMaze(double sizex, double sizey, world) {
       for (var j = 0; j < mazelen; j++) {
 
         int k = j * mazelen + i;
-        print(k);
-        print(k+1);
-        print(mazelen * mazelen);
         double scalex = sizex / dzoom / mazelen;
         double scaley = sizey / dzoom / mazelen;
         scalex = min(scalex, scaley);
@@ -38,7 +35,7 @@ void createMaze(double sizex, double sizey, world) {
  */
         }
         //assert(k + 1 < mazelen * mazelen);
-        p("a");
+        //p("a");
         try {
           if (k + 1 < mazelen * mazelen &&
               (mazeLayout[k] == 1 && mazeLayout[k + 1] != 1 ||
@@ -50,10 +47,10 @@ void createMaze(double sizex, double sizey, world) {
           }
         }
         catch(e) {
-
+              p(e); //FIXME
         }
 
-        p("B");
+        //p("B");
         try {
           if (k + mazelen < mazelen * mazelen &&
               (mazeLayout[k] == 1 && mazeLayout[k + mazelen] != 1 ||
@@ -63,8 +60,8 @@ void createMaze(double sizex, double sizey, world) {
             world.add(Wall(Vector2(A+D,B+E),Vector2(A,B+E)));
             //world.add(Wall(Vector2(A,B+E),Vector2(A,B)));
           }
-        }catch(e) {
-
+        } catch(e) {
+          p(e); //FIXME
         }
       }
     }

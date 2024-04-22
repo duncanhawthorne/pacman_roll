@@ -53,6 +53,7 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
   Ball underlyingBallReal = Ball();
   //bool online = true;
   int ghostScaredTime = 0;
+  int ghostNumber = 1;
   //bool ghostScared = false;
   //bool isGhost = false;
 
@@ -76,7 +77,8 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
         this; //FIXME should do this in the initiator, but didn't work
     //underlyingBallLegacy = underlyingBallReal;
     if (isGhost) {
-      underlyingBallRealTmp.bodyDef!.position = Vector2(0, -12); //FIXME -12 hardcoded
+      underlyingBallRealTmp.bodyDef!.position =
+          Vector2(0, -12); //FIXME -12 hardcoded
     }
     return underlyingBallRealTmp;
   }
@@ -87,26 +89,41 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
     world.add(underlyingBallReal);
 
     // This defines the different animation states that the player can be in.
-    animations = {
-      PlayerState.running: SpriteAnimation.spriteList(
-        [
-          await game
-              .loadSprite(isGhost ? 'dash/ghost1.png' : 'dash/pacmanman.png')
-        ],
-        stepTime: double.infinity,
-      ),
-      PlayerState.scared: SpriteAnimation.spriteList(
-        [
-          await game.loadSprite(
-              isGhost ? 'dash/ghostscared1.png' : 'dash/pacmanman_angry.png')
-        ],
-        stepTime: double.infinity,
-      ),
-      PlayerState.falling: SpriteAnimation.spriteList(
-        [await game.loadSprite('dash/dash_falling.png')],
-        stepTime: double.infinity,
-      ),
-    };
+    animations = isGhost
+        ? {
+            PlayerState.running: SpriteAnimation.spriteList(
+              [await game.loadSprite('dash/ghost1.png')],
+              stepTime: double.infinity,
+            ),
+            PlayerState.scared: SpriteAnimation.spriteList(
+              [
+                await game.loadSprite('dash/ghostscared1.png'),
+                await game.loadSprite('dash/ghostscared2.png')
+              ],
+              stepTime: 0.1,
+            ),
+            PlayerState.eating: SpriteAnimation.spriteList(
+              [await game.loadSprite('dash/dash_falling.png')],
+              stepTime: double.infinity,
+            ),
+          }
+        : {
+            PlayerState.running: SpriteAnimation.spriteList(
+              [await game.loadSprite('dash/pacmanman.png')],
+              stepTime: double.infinity,
+            ),
+            PlayerState.scared: SpriteAnimation.spriteList(
+              [await game.loadSprite('dash/pacmanman_angry.png')],
+              stepTime: double.infinity,
+            ),
+            PlayerState.eating: SpriteAnimation.spriteList(
+              [
+                await game.loadSprite('dash/pacmanman_eat.png'),
+                await game.loadSprite('dash/pacmanman.png')
+              ], //FIXME
+              stepTime: 0.25,
+            ),
+          };
     // The starting state will be that the player is running.
     current = PlayerState.running;
     _lastPosition.setFrom(position);
@@ -142,7 +159,7 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
         //pacman eats ghost
         globalAudioController!.playSfx(SfxType.hit);
         removeEnemy(otherPlayer);
-        addEnemy(world);
+        addGhost(world);
       } else {
         //ghost kills pacman
         globalAudioController!.playSfx(SfxType.damage);
@@ -166,8 +183,9 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
     try {
       position = underlyingBallReal.position;
     } catch (e) {
-      p(e);
+      p(e); //FIXME
     }
+
 
     angle +=
         (position - _lastPosition).length / (size.x / 2) * getMagicParity();
@@ -190,12 +208,23 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
   ) {
     //FIXME include logic to deal with Player collision here too, so handle the collision twice, once in physics and once in flame, belt and braces
     super.onCollisionStart(intersectionPoints, other);
-    if (!isGhost) { //only pacman
+    if (!isGhost) {
+      //only pacman
       if (other is MiniPellet) {
         game.audioController.playSfx(SfxType.waka);
+        current = PlayerState.eating;
+        Future.delayed(Duration(seconds: 1), () {
+          //FIXME deal with repeats
+          current = PlayerState.running;
+        });
         other.removeFromParent();
       } else if (other is SuperPellet) {
         game.audioController.playSfx(SfxType.ghostsScared);
+        current = PlayerState.eating;
+        Future.delayed(Duration(seconds: 1), () {
+          //FIXME deal with repeats
+          current = PlayerState.running;
+        });
         for (int i = 0; i < ghostPlayersList.length; i++) {
           ghostPlayersList[i].current = PlayerState.scared;
           ghostPlayersList[i].ghostScaredTime =
@@ -227,5 +256,5 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
 enum PlayerState {
   running,
   scared,
-  falling,
+  eating,
 }
