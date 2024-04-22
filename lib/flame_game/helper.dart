@@ -1,7 +1,6 @@
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 import 'components/wall.dart';
-import 'components/ball.dart';
 import 'components/powerpoint.dart';
 import 'components/point.dart';
 import 'constants.dart';
@@ -40,18 +39,27 @@ int getMagicParity() {
   return magicparity;
 }
 
-var enemies = [];
+List<Player> ghostPlayersList = [];
 
 void addEnemy(world) {
   Player ghost = Player(isGhost: true);
   world.add(ghost);
-  enemies.add(ghost);
+  ghostPlayersList.add(ghost);
 }
 
+/*
 void removeEnemyBall(Ball other) {
   other.realCharacter!.removeFromParent();
   other.removeFromParent();
-  enemies.remove(other);
+  ghostPlayersList.remove(other.realCharacter);
+}
+ */
+
+
+void removeEnemy(Player otherPlayer) {
+  otherPlayer.removeFromParent();
+  otherPlayer.underlyingBallReal.removeFromParent();
+  ghostPlayersList.remove(otherPlayer);
 }
 
 List<Component> createBoundaries(CameraComponent camera) {

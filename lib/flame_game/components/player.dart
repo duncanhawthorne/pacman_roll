@@ -50,9 +50,12 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
   Vector2 velocity = Vector2.all(0);
   Vector2 force = Vector2.all(0);
   Vector2 gyroforce = Vector2.all(0);
-  Ball? underlyingBallLegacy;
-  bool maniacMode = false;
-  Ball? underlyingBallReal;
+  //Ball? underlyingBallLegacy;
+  //bool maniacMode = false;
+  Ball underlyingBallReal = Ball();
+  //bool online = true;
+  int ghostScaredTime = 0;
+  //bool ghostScared = false;
   //bool isGhost = false;
 
   // Whether the player is currently in the air, this can be used to restrict
@@ -67,17 +70,22 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
   // this is used to set the correct animation for the player.
   bool get isFalling => _lastPosition.y < position.y;
 
+  Ball createUnderlyingBall() {
+    Ball underlyingBallRealTmp = Ball();
+    //underlyingBallReal.ghostBall =
+    //    isGhost; //FIXME should do this in the initiator, but didn't work
+    underlyingBallRealTmp.realCharacter =
+        this; //FIXME should do this in the initiator, but didn't work
+    //underlyingBallLegacy = underlyingBallReal;
+    if (isGhost) {
+      underlyingBallRealTmp.bodyDef!.position = Vector2(-10, 0); //FIXME -10
+    }
+    return underlyingBallRealTmp;
+  }
+
   @override
   Future<void> onLoad() async {
-    Ball underlyingBallReal = Ball();
-    underlyingBallReal.ghostBall =
-        isGhost; //FIXME should do this in the initiator, but didn't work
-    underlyingBallReal.realCharacter =
-        this; //FIXME should do this in the initiator, but didn't work
-    underlyingBallLegacy = underlyingBallReal;
-    if (isGhost) {
-      underlyingBallReal.bodyDef!.position = Vector2(-10, 0); //FIXME -10
-    }
+    underlyingBallReal = createUnderlyingBall();
     world.add(underlyingBallReal);
 
     // This defines the different animation states that the player can be in.
@@ -130,12 +138,45 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
     add(CircleHitbox());
   }
 
+  void handleCollisionWithPlayer(Player otherPlayer) {
+    if (!isGhost && otherPlayer.isGhost) {
+      if (otherPlayer.current == PlayerState.jumping) {
+        globalAudioController!.playSfx(SfxType.hit);
+        removeEnemy(otherPlayer);
+        addEnemy(world);
+      } else {
+        globalAudioController!.playSfx(SfxType.damage);
+
+        if (true) {
+          underlyingBallReal.removeFromParent();
+          underlyingBallReal = createUnderlyingBall();
+          //online = false;
+          world.add(underlyingBallReal);
+          //online = true;
+
+          //Future.delayed(const Duration(seconds: 3), () {});
+        } else {
+          removeFromParent();
+          underlyingBallReal.removeFromParent();
+        }
+      }
+    }
+  }
+
   @override
   void update(double dt) {
     super.update(dt);
 
-    if (underlyingBallLegacy != null) {
-      position = underlyingBallLegacy!.position;
+    if (isGhost && current == PlayerState.jumping) {
+      if (DateTime.now().millisecondsSinceEpoch - ghostScaredTime > 10 * 1000) {
+        current = PlayerState.running;
+      }
+    }
+
+    try {
+      position = underlyingBallReal.position;
+    } catch (e) {
+      p(e);
     }
 
     angle +=
@@ -157,6 +198,7 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
     Set<Vector2> intersectionPoints,
     PositionComponent other,
   ) {
+    //FIXME include logic to deal with Player collision here too, so handle the collision twice, once in physics and once in flame, belt and braces
     super.onCollisionStart(intersectionPoints, other);
     if (!isGhost) {
       // When the player collides with an obstacle it should lose all its points.
@@ -172,23 +214,36 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
         //addScore();
       } else if (other is Powerpoint) {
         game.audioController.playSfx(SfxType.jump);
+        /*
         maniacMode = true;
         current = PlayerState.jumping;
-        for (var enemy in enemies) {
+
+         */
+        for (int i = 0; i < ghostPlayersList.length; i++) {
+          ghostPlayersList[i].current = PlayerState.jumping;
+          ghostPlayersList[i].ghostScaredTime =
+              DateTime.now().millisecondsSinceEpoch;
+        }
+        /*
+        for (var enemy in ghostPlayersList) {
           enemy.current = PlayerState.jumping;
         }
+         */
         //p("start maniac");
+        /*
         Future.delayed(const Duration(seconds: 10), () {
           maniacMode = false;
           current = PlayerState.running;
 
-          for (var enemy in enemies) {
+          for (var enemy in ghostPlayersList) {
             //FIXME could gt two pills
             enemy.current = PlayerState.running;
           }
           //p("END MANIAC");
           //setStateGlobal();
         });
+
+         */
         other.removeFromParent();
       }
     }

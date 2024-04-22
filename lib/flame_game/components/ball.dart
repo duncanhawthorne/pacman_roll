@@ -5,7 +5,6 @@ import '../constants.dart';
 import 'player.dart';
 import '../helper.dart';
 import 'dart:math';
-import '../../audio/sounds.dart';
 
 class Ball extends BodyComponent with TapCallbacks, ContactCallbacks {
   Ball({Vector2? initialPosition, double? size, Color? color})
@@ -30,7 +29,7 @@ class Ball extends BodyComponent with TapCallbacks, ContactCallbacks {
               ..color = color ?? Colors.transparent
               ..style = PaintingStyle.fill);
 
-  bool ghostBall = false;
+  //bool ghostBall = false;
   Player? realCharacter;
 
   @override
@@ -45,7 +44,14 @@ class Ball extends BodyComponent with TapCallbacks, ContactCallbacks {
   void beginContact(Object other, Contact contact) {
     super.beginContact(other, contact);
 
-    if (other is Ball) {
+    if (other is Ball && other.realCharacter != null) {
+      if (other.realCharacter != null && realCharacter != null) {
+        realCharacter!.handleCollisionWithPlayer(other.realCharacter!);
+      }
+      else {
+        p("shouldn't have got here");
+      }
+      /*
       if (other.ghostBall && !ghostBall) {
         if (realCharacter != null && realCharacter!.maniacMode) {
           globalAudioController!.playSfx(SfxType.hit);
@@ -67,6 +73,7 @@ class Ball extends BodyComponent with TapCallbacks, ContactCallbacks {
           removeFromParent();
         }
       }
+      */
     }
   }
 }
