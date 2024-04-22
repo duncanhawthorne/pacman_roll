@@ -19,6 +19,10 @@ double ksizex = 100;
 double ksizey = 100;
 Vector2 globalGravity = Vector2(0, 0);
 const mazelen = 21;
+final Vector2 kGhostStartLocation = Vector2(0, -12); //FIXME -12 hardcoded
+final Vector2 kPacmanStartLocation = Vector2(0, 20); //fixme 20 harcoded
+final Vector2 kLeftPortalLocation = Vector2(-36, -4); //FIXME
+final Vector2 kRightPortalLocation = Vector2(36, -4); //FIXME
 
 bool android = defaultTargetPlatform == TargetPlatform.android;
 

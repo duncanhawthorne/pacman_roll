@@ -21,7 +21,7 @@ class Ball extends BodyComponent with TapCallbacks, ContactCallbacks {
             ],
             bodyDef: BodyDef(
               angularDamping: 0.1,
-              position: initialPosition ?? Vector2(0, 20), //fixme 20 harcoded
+              position: initialPosition ?? kPacmanStartLocation,
               type: BodyType.dynamic,
               userData: Ball,
             ),

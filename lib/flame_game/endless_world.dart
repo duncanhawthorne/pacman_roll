@@ -182,7 +182,7 @@ class EndlessWorld extends Forge2DWorld
 
     for (int i = 0; i < 3; i++) {
       Future.delayed(Duration(seconds: i), () {
-        addGhost(this);
+        addGhost(this, i);
       });
     }
 

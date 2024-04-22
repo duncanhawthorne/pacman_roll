@@ -4,6 +4,7 @@ import 'package:flame/components.dart';
 import '../../audio/sounds.dart';
 import '../endless_runner.dart';
 import '../endless_world.dart';
+import '../constants.dart';
 import '../effects/jump_effect.dart';
 import '../helper.dart';
 import 'point.dart';
@@ -13,7 +14,6 @@ import 'dart:math';
 import 'dart:core';
 
 import 'package:sensors_plus/sensors_plus.dart';
-import '../constants.dart';
 
 /// The [Player] is the component that the physical player of the game is
 /// controlling.
@@ -53,7 +53,7 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
   Ball underlyingBallReal = Ball();
   //bool online = true;
   int ghostScaredTime = 0;
-  int ghostNumber = 1;
+  int ghostNumber = 1; //FIXME make this do something
   //bool ghostScared = false;
   //bool isGhost = false;
 
@@ -77,8 +77,7 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
         this; //FIXME should do this in the initiator, but didn't work
     //underlyingBallLegacy = underlyingBallReal;
     if (isGhost) {
-      underlyingBallRealTmp.bodyDef!.position =
-          Vector2(0, -12); //FIXME -12 hardcoded
+      underlyingBallRealTmp.bodyDef!.position = kGhostStartLocation;
     }
     return underlyingBallRealTmp;
   }
@@ -92,7 +91,7 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
     animations = isGhost
         ? {
             PlayerState.running: SpriteAnimation.spriteList(
-              [await game.loadSprite('dash/ghost1.png')],
+              [await game.loadSprite(ghostNumber == 1 ? 'dash/ghost1.png' : ghostNumber == 2 ? 'dash/ghost2.png' : 'dash/ghost3.png')],
               stepTime: double.infinity,
             ),
             PlayerState.scared: SpriteAnimation.spriteList(
@@ -153,19 +152,31 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
     add(CircleHitbox());
   }
 
+  void moveUnderlyingBallToVector(Vector2 targetLoc) {
+    underlyingBallReal.removeFromParent();
+    underlyingBallReal = createUnderlyingBall();
+    underlyingBallReal.bodyDef!.position = targetLoc;
+    world.add(underlyingBallReal);
+  }
+
   void handleCollisionWithPlayer(Player otherPlayer) {
     if (!isGhost && otherPlayer.isGhost) {
       if (otherPlayer.current == PlayerState.scared) {
         //pacman eats ghost
         globalAudioController!.playSfx(SfxType.hit);
-        removeEnemy(otherPlayer);
-        addGhost(world);
+        int tmpGhostNumber = otherPlayer.ghostNumber;
+        removeGhost(otherPlayer);
+        addGhost(world, tmpGhostNumber);
       } else {
         //ghost kills pacman
         globalAudioController!.playSfx(SfxType.damage);
+        moveUnderlyingBallToVector(kPacmanStartLocation);
+        /*
         underlyingBallReal.removeFromParent();
         underlyingBallReal = createUnderlyingBall();
         world.add(underlyingBallReal);
+
+         */
       }
     }
   }
@@ -186,6 +197,16 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
       p(e); //FIXME
     }
 
+    if (true) {
+      if (position.x > 36) {
+        moveUnderlyingBallToVector(kLeftPortalLocation);
+        //FIXME keep momentum
+      }
+      else if (position.x < -36) {
+        moveUnderlyingBallToVector(kRightPortalLocation);
+        //FIXME keep momentum
+      }
+    }
 
     angle +=
         (position - _lastPosition).length / (size.x / 2) * getMagicParity();
@@ -213,7 +234,7 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
       if (other is MiniPellet) {
         game.audioController.playSfx(SfxType.waka);
         current = PlayerState.eating;
-        Future.delayed(Duration(seconds: 1), () {
+        Future.delayed(const Duration(seconds: 1), () {
           //FIXME deal with repeats
           current = PlayerState.running;
         });
@@ -221,7 +242,7 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
       } else if (other is SuperPellet) {
         game.audioController.playSfx(SfxType.ghostsScared);
         current = PlayerState.eating;
-        Future.delayed(Duration(seconds: 1), () {
+        Future.delayed(const Duration(seconds: 1), () {
           //FIXME deal with repeats
           current = PlayerState.running;
         });
@@ -257,4 +278,5 @@ enum PlayerState {
   running,
   scared,
   eating,
+  deadGhost
 }

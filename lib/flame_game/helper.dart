@@ -41,22 +41,14 @@ int getMagicParity() {
 
 List<Player> ghostPlayersList = [];
 
-void addGhost(world) {
+void addGhost(world, int number) {
   Player ghost = Player(isGhost: true);
+  ghost.ghostNumber = number;
   world.add(ghost);
   ghostPlayersList.add(ghost);
 }
 
-/*
-void removeEnemyBall(Ball other) {
-  other.realCharacter!.removeFromParent();
-  other.removeFromParent();
-  ghostPlayersList.remove(other.realCharacter);
-}
- */
-
-
-void removeEnemy(Player otherPlayer) {
+void removeGhost(Player otherPlayer) {
   otherPlayer.removeFromParent();
   otherPlayer.underlyingBallReal.removeFromParent();
   ghostPlayersList.remove(otherPlayer);

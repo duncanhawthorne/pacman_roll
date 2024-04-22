@@ -11,7 +11,6 @@ import 'package:flame/extensions.dart';
 
 
 void createMaze(double sizex, double sizey, world) {
-  print(mazeLayout.length);
   if (mazeOn) {
     for (var i = 0; i < mazelen; i++) {
       for (var j = 0; j < mazelen; j++) {
@@ -37,7 +36,7 @@ void createMaze(double sizex, double sizey, world) {
         //assert(k + 1 < mazelen * mazelen);
         //p("a");
         try {
-          if (k + 1 < mazelen * mazelen &&
+          if (k + 1 < mazeLayout.length &&
               (mazeLayout[k] == 1 && mazeLayout[k + 1] != 1 ||
                   mazeLayout[k] != 1 && mazeLayout[k + 1] == 1)) {
             //world.add(Wall(Vector2(A,B),Vector2(A+D,B)));
@@ -52,7 +51,7 @@ void createMaze(double sizex, double sizey, world) {
 
         //p("B");
         try {
-          if (k + mazelen < mazelen * mazelen &&
+          if (k + mazelen < mazeLayout.length &&
               (mazeLayout[k] == 1 && mazeLayout[k + mazelen] != 1 ||
                   mazeLayout[k] != 1 && mazeLayout[k + mazelen] == 1)) {
             //world.add(Wall(Vector2(A,B),Vector2(A+D,B)));
