@@ -83,7 +83,7 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
       ),
     );
 
-    final scoreText = "Lives: 3";
+    const scoreText = "Lives: 3";
 
     // The component that is responsible for rendering the text that contains
     // the current score.

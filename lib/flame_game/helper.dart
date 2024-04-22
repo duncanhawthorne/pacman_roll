@@ -42,7 +42,7 @@ int getMagicParity() {
 List<VisiblePlayer> ghostPlayersList = [];
 
 void addGhost(world, int number) {
-  VisiblePlayer ghost = VisiblePlayer(isGhost: true);
+  VisiblePlayer ghost = VisiblePlayer(isGhost: true, startPosition: kGhostStartLocation + Vector2.random() / 100);
   ghost.ghostNumber = number;
   world.add(ghost);
   //ghost.moveUnderlyingBallToVector(

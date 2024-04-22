@@ -26,6 +26,7 @@ class VisiblePlayer extends SpriteAnimationGroupComponent<PlayerState>
     //required this.addScore,
     //required this.resetScore,
     required this.isGhost,
+    required this.startPosition,
     super.position,
   }) : super(
             size: Vector2.all(min(ksizex, ksizey) / dzoom / 2 / 14),
@@ -35,6 +36,7 @@ class VisiblePlayer extends SpriteAnimationGroupComponent<PlayerState>
   //final void Function({int amount}) addScore;
   //final VoidCallback resetScore;
   final bool isGhost;
+  Vector2 startPosition;
 
   // The current velocity that the player has that comes from being affected by
   // the gravity. Defined in virtual pixels/s².
@@ -78,9 +80,9 @@ class VisiblePlayer extends SpriteAnimationGroupComponent<PlayerState>
     underlyingBallRealTmp.realCharacter =
         this; //FIXME should do this in the initiator, but didn't work
     //underlyingBallLegacy = underlyingBallReal;
-    if (isGhost) {
-      underlyingBallRealTmp.bodyDef!.position = kGhostStartLocation;
-    }
+    //if (isGhost) {
+      underlyingBallRealTmp.bodyDef!.position = startPosition;
+    //}
     return underlyingBallRealTmp;
   }
 
