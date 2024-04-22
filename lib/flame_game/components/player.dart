@@ -13,7 +13,6 @@ import 'ball.dart';
 import 'dart:math';
 import 'dart:core';
 
-import 'package:sensors_plus/sensors_plus.dart';
 
 /// The [VisiblePlayer] is the component that the physical player of the game is
 /// controlling.
@@ -137,25 +136,6 @@ class VisiblePlayer extends SpriteAnimationGroupComponent<PlayerState>
     current = PlayerState.running;
     _lastPosition.setFrom(position);
 
-    if (realsurf) {
-      accelerometerEventStream().listen(
-        (AccelerometerEvent event) {
-          if (!android) {
-            gyroforce.x = -event.x;
-            gyroforce.y = 0; //-event.y;
-          } else {
-            gyroforce.x = event.y / 10;
-            gyroforce.y = 0; //-event.y;
-          }
-        },
-        onError: (error) {
-          // Logic to handle error
-          // Needed for Android in case sensor is not available
-        },
-        cancelOnError: true,
-      );
-    }
-
     // When adding a CircleHitbox without any arguments it automatically
     // fills up the size of the component as much as it can without overflowing
     // it.
@@ -260,15 +240,6 @@ class VisiblePlayer extends SpriteAnimationGroupComponent<PlayerState>
         position = ghostDeadPosition * (1 - timefrac) +
             kGhostStartLocation * (timefrac);
       }
-    }
-
-    if (realsurf) {
-      force = (target - position) * 0.5 +
-          Vector2(0, -world.size.y / 4 / dzoom) -
-          velocity * 3 +
-          gyroforce * 50;
-      velocity += force * dt;
-      position += velocity;
     }
     _lastPosition.setFrom(position);
   }

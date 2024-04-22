@@ -6,17 +6,13 @@ import '../level_selection/levels.dart';
 import '../player_progress/player_progress.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
-import 'package:flame/experimental.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 // ignore: implementation_imports
 import 'package:flame/src/events/messages/pointer_move_event.dart'
     as dhpointer_move_event;
 
-import 'components/point.dart';
-import 'components/wall.dart';
 import 'game_screen.dart';
-import 'components/obstacle.dart';
 import 'components/player.dart';
 import 'components/boat.dart';
 import 'components/ball.dart';
@@ -79,6 +75,7 @@ class EndlessWorld extends Forge2DWorld
   get getAudioController => audioController;
 
   /// The random number generator that is used to spawn periodic components.
+  // ignore: unused_field
   final Random _random;
 
   /// The gravity is defined in virtual pixels per second squared.
@@ -103,7 +100,8 @@ class EndlessWorld extends Forge2DWorld
         (AccelerometerEvent event) {
           if (android) {
             //p(event);
-            gravity = Vector2(event.y, event.x - 5) * 18; //NOTE dimensions flipped
+            gravity =
+                Vector2(event.y, event.x - 5) * 18; //NOTE dimensions flipped
             globalGravity.x = event.x - 5; //NOTE dimensions not flipped
             globalGravity.y = event.y; //NOTE dimensions not flipped
           }
@@ -116,74 +114,13 @@ class EndlessWorld extends Forge2DWorld
       );
     }
 
-    if (realsurf) {
-      if (realsurf) {
-        boat = Boat(
-          position: Vector2(0, size.y / 4 / dzoom),
-          addScore: addScore,
-          resetScore: resetScore,
-        );
-        add(boat);
-      }
-      if (realsurf) {
-        player.target = boat.position;
 
-        rope = RectangleComponent(
-          position: Vector2(10.0, 15.0),
-          size: Vector2.all(100),
-          angle: pi / 2,
-          anchor: Anchor.center,
-        );
-        add(rope);
-      }
 
-      if (realsurf) {
-        //bad things
-        add(
-          SpawnComponent.periodRange(
-            factory: (_) => Obstacle.random(
-              random: _random,
-              canSpawnTall: false,
-            ),
-            minPeriod: 1.0,
-            maxPeriod: 2.0,
-            area: Rectangle.fromPoints(
-              Vector2(-size.x / 2, size.y / 2 + MiniPellet.spriteSize.y) / dzoom,
-              Vector2(size.x / 2, size.y / 2 + MiniPellet.spriteSize.y) / dzoom,
-            ),
-            random: _random,
-          ),
-        );
-      }
-
-      if (realsurf) {
-        //good things
-        add(
-          SpawnComponent.periodRange(
-            factory: (_) => MiniPellet(),
-            minPeriod: 1.0,
-            maxPeriod: 2.0,
-            area: Rectangle.fromPoints(
-              Vector2(-size.x / 2, size.y / 2 + MiniPellet.spriteSize.y) / dzoom,
-              Vector2(size.x / 2, size.y / 2 + MiniPellet.spriteSize.y) / dzoom,
-            ),
-            random: _random,
-          ),
-        );
-      }
-    }
-
-    player = VisiblePlayer(isGhost: false, startPosition: kPacmanStartLocation
-        //position: Vector2(boat.position.x, boat.position.y),
-        //addScore: addScore,
-        //resetScore: resetScore,
-        );
+    player = VisiblePlayer(isGhost: false, startPosition: kPacmanStartLocation);
     add(player);
 
     for (int i = 0; i < 3; i++) {
-      //Future.delayed(Duration(milliseconds: i), () {
-        addGhost(this, i);
-      //});
+      addGhost(this, i);
     }
 
     addPillsAndPowerPills(this);
@@ -231,71 +168,9 @@ class EndlessWorld extends Forge2DWorld
   }
 
   @override
-  void update(double dt) {
-    super.update(dt);
-    if (realsurf) {
-      rope.position = (boat.position + player.position) / 2;
-      rope.size = Vector2(
-          10000 /
-              dzoom /
-              dzoom /
-              max(100, (boat.position - player.position).length),
-          (boat.position - player.position).length);
-      rope.angle =
-          -(player.position - boat.position).angleToSigned(Vector2(0, 1));
-    }
-  }
-
-  /// [onTapDown] is called when the player taps the screen and then calculates
-  /// if and how the player should jump.
-  @override
-  void onTapDown(TapDownEvent event) {
-    //audioController.playSfx(SfxType.damage);
-    if (realsurf) {
-      boat.position = getTarget(event.localPosition, size);
-      player.target = boat.position;
-    }
-  }
-
-  @override
-  void onDragStart(DragStartEvent event) {
-    super.onDragStart(event);
-    if (realsurf) {
-      boat.position = getTarget(event.localPosition, size);
-      player.target = boat.position;
-    }
-    if (addRandomWalls) {
-      dhdragStart = event.localPosition;
-    }
-  }
-
-  @override
-  void onDragEnd(DragEndEvent event) {
-    super.onDragEnd(event);
-    if (addRandomWalls) {
-      add(Wall(dhdragStart, dhdragLatest));
-    }
-  }
-
-  @override
-  void onDragUpdate(DragUpdateEvent event) {
-    if (realsurf) {
-      boat.position = getTarget(event.localStartPosition, size);
-      player.target = boat.position;
-    }
-    if (addRandomWalls) {
-      dhdragLatest = event.localStartPosition;
-    }
-  }
-
-  @override
   void onPointerMove(dhpointer_move_event.PointerMoveEvent event) {
     if (!android) {
       gravity = event.localPosition - player.position;
-    }
-    if (realsurf) {
-      boat.position = getTarget(event.localPosition, size);
-      player.target = boat.position;
     }
   }
 

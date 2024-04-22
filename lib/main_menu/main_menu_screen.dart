@@ -26,7 +26,7 @@ class MainMenuScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Image.asset(
-                'assets/images/banner.png',
+                'assets/images/dash/ghost1.png',
                 filterQuality: FilterQuality.none,
               ),
               _gap,
@@ -35,7 +35,7 @@ class MainMenuScreen extends StatelessWidget {
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 500),
                   child: const Text(
-                    'A Flutter game template.',
+                    'Pacman',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontFamily: 'Press Start 2P',
@@ -77,7 +77,7 @@ class MainMenuScreen extends StatelessWidget {
               ),
             ),
             _gap,
-            const Text('Built with Flame'),
+            //const Text('Built with Flame'),
           ],
         ),
       ),
