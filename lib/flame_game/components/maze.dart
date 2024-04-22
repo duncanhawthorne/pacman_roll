@@ -9,12 +9,10 @@ import 'wall.dart';
 
 import 'package:flame/extensions.dart';
 
-
 void createMaze(double sizex, double sizey, world) {
   if (mazeOn) {
     for (var i = 0; i < mazelen; i++) {
       for (var j = 0; j < mazelen; j++) {
-
         int k = j * mazelen + i;
         double scalex = sizex / dzoom / mazelen;
         double scaley = sizey / dzoom / mazelen;
@@ -40,13 +38,12 @@ void createMaze(double sizex, double sizey, world) {
               (mazeLayout[k] == 1 && mazeLayout[k + 1] != 1 ||
                   mazeLayout[k] != 1 && mazeLayout[k + 1] == 1)) {
             //world.add(Wall(Vector2(A,B),Vector2(A+D,B)));
-            world.add(Wall(Vector2(A+D,B),Vector2(A+D,B+E)));
+            world.add(Wall(Vector2(A + D, B), Vector2(A + D, B + E)));
             //world.add(Wall(Vector2(A + D, B + E), Vector2(A, B + E)));
             //world.add(Wall(Vector2(A,B+E),Vector2(A,B)));
           }
-        }
-        catch(e) {
-              p(e); //FIXME
+        } catch (e) {
+          p(e); //FIXME
         }
 
         //p("B");
@@ -56,10 +53,10 @@ void createMaze(double sizex, double sizey, world) {
                   mazeLayout[k] != 1 && mazeLayout[k + mazelen] == 1)) {
             //world.add(Wall(Vector2(A,B),Vector2(A+D,B)));
             //world.add(Wall(Vector2(A + D, B), Vector2(A + D, B + E)));
-            world.add(Wall(Vector2(A+D,B+E),Vector2(A,B+E)));
+            world.add(Wall(Vector2(A + D, B + E), Vector2(A, B + E)));
             //world.add(Wall(Vector2(A,B+E),Vector2(A,B)));
           }
-        } catch(e) {
+        } catch (e) {
           p(e); //FIXME
         }
       }

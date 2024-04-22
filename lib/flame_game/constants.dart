@@ -4,7 +4,7 @@ import '../audio/audio_controller.dart';
 import 'maze_layout.dart';
 import 'package:flame/components.dart';
 
-const debugMode = true;
+const debugMode = false;
 const bool addRandomWalls = false;
 bool mazeOn = true;
 const dzoom = 20.0;
@@ -25,6 +25,7 @@ final Vector2 kPacmanStartLocation = Vector2(0, 20); //fixme 20 harcoded
 final Vector2 kLeftPortalLocation = Vector2(-36, -4); //FIXME
 final Vector2 kRightPortalLocation = Vector2(36, -4); //FIXME
 const int ghostResetTime = 1;
+const int pacmanDeadResetTime = 1;
 bool globalPhysicsLinked = true;
 
 bool android = defaultTargetPlatform == TargetPlatform.android;

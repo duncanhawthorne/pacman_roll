@@ -13,7 +13,6 @@ import 'helper.dart';
 import 'components/maze.dart';
 import 'components/background.dart';
 
-
 /// This is the base of the game which is added to the [GameWidget].
 ///
 /// This class defines a few different properties for the game:
@@ -42,8 +41,8 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
     required this.audioController,
   }) : super(
           world: EndlessWorld(level: level, playerProgress: playerProgress),
-          camera:
-              CameraComponent.withFixedResolution(width: 1700, height: 1700), //2800, 1700
+          camera: CameraComponent.withFixedResolution(
+              width: 1700, height: 1700), //2800, 1700
           zoom: dzoom,
         );
 

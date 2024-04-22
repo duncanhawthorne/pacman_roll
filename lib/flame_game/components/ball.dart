@@ -46,8 +46,7 @@ class Ball extends BodyComponent with TapCallbacks, ContactCallbacks {
     if (other is Ball && other.realCharacter != null) {
       if (other.realCharacter != null && realCharacter != null) {
         realCharacter!.handlePacmanMeetsGhost(other.realCharacter!);
-      }
-      else {
+      } else {
         p("shouldn't have got here");
       }
     }

@@ -8,12 +8,12 @@ List<String> soundTypeToFilename(SfxType type) {
       return const [
         'double_jump1.mp3',
       ];
-    case SfxType.hit:
+    case SfxType.eatGhost:
       return const [
         'eat_ghost.mp3'
         //'hit2.mp3',
       ];
-    case SfxType.damage:
+    case SfxType.pacmanDeath:
       return const [
         'pacman_death.mp3'
         //'damage2.mp3',
@@ -39,8 +39,8 @@ double soundTypeToVolume(SfxType type) {
     case SfxType.waka:
     case SfxType.ghostsScared:
     case SfxType.doubleJump:
-    case SfxType.damage:
-    case SfxType.hit:
+    case SfxType.pacmanDeath:
+    case SfxType.eatGhost:
       return 0.4;
     case SfxType.buttonTap:
       return 1.0;
@@ -51,7 +51,7 @@ enum SfxType {
   waka,
   ghostsScared,
   doubleJump,
-  hit,
-  damage,
+  eatGhost,
+  pacmanDeath,
   buttonTap,
 }

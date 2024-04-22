@@ -31,11 +31,10 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
   final bool isGhost;
   Vector2 startPosition;
   Ball underlyingBallReal = Ball(); //to avoid null safety issues
-  bool localObjectPhysicsLinked = true;
-  int ghostScaredTime = 0; //a long time ago
-  int ghostNumber = 1; //FIXME make this do something
-  int ghostDeadTime = 0; //a long time ago
-  int playerEatingTime = 0; //a long time ago
+  int ghostNumber = 1;
+  int ghostScaredTimeLatest = 0; //a long time ago
+  int ghostDeadTimeLatest = 0; //a long time ago
+  int playerEatingTimeLatest = 0; //a long time ago
   Vector2 ghostDeadPosition = Vector2(0, 0);
 
   // Used to store the last position of the player, so that we later can
@@ -59,58 +58,44 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
   void handlePacmanMeetsGhost(RealCharacter otherPlayer) {
     // ignore: unnecessary_this
     if (!this.isGhost && otherPlayer.isGhost) {
-      if (otherPlayer.current == PlayerState.scared ||
-          otherPlayer.current == PlayerState.deadGhost) {
-        if (otherPlayer.localObjectPhysicsLinked) {
-          //pacman eats ghost
+      if (otherPlayer.current == PlayerState.scared) {
+        //pacman eats ghost
 
-          //pacman visuals
-          globalAudioController!.playSfx(SfxType.hit);
-          current = PlayerState.eating;
-          playerEatingTime = DateTime.now().millisecondsSinceEpoch;
+        //pacman visuals
+        globalAudioController!.playSfx(SfxType.eatGhost);
+        current = PlayerState.eating;
+        playerEatingTimeLatest = DateTime.now().millisecondsSinceEpoch;
 
-          //ghost impact
-          otherPlayer.moveUnderlyingBallToVector(kGhostStartLocation + Vector2.random() / 100); //FIXME check doesn't cause inconsistency with animation which goes to one exact place
-          otherPlayer.localObjectPhysicsLinked = false; //FIXME think can just use deadGhost state instead
-          otherPlayer.current = PlayerState.deadGhost;
-          otherPlayer.ghostDeadTime = DateTime.now().millisecondsSinceEpoch;
-          otherPlayer.ghostDeadPosition = Vector2(position.x, position.y);
-          Future.delayed(const Duration(seconds: ghostResetTime), () {
-            int tmpGhostNumber = otherPlayer.ghostNumber;
-            otherPlayer.localObjectPhysicsLinked = true;
-            otherPlayer.current = PlayerState.normal;
-            //removeGhost(
-            //    otherPlayer); // FIXME ideally just move ball rather than removing and re-adding
-            //addGhost(world, tmpGhostNumber);
-          });
-        }
+        //ghost impact
+        otherPlayer.moveUnderlyingBallToVector(kGhostStartLocation +
+            Vector2.random() /
+                100); //FIXME check doesn't cause inconsistency with animation which goes to one exact place
+        otherPlayer.current = PlayerState.deadGhost;
+        otherPlayer.ghostDeadTimeLatest = DateTime.now().millisecondsSinceEpoch;
+        otherPlayer.ghostDeadPosition = Vector2(position.x, position.y);
       } else {
         //ghost kills pacman
         if (globalPhysicsLinked) {
           //prevent multiple hits
-          globalAudioController!.playSfx(SfxType.damage);
-          world.addScore();
+
+          globalAudioController!.playSfx(SfxType.pacmanDeath);
+          //FIXME proper animation for pacman
+          world.addScore(); //score counting deaths
           globalPhysicsLinked = false;
 
-          Future.delayed(const Duration(seconds: ghostResetTime), () {
+          Future.delayed(const Duration(seconds: pacmanDeadResetTime), () {
             if (!globalPhysicsLinked) {
               //prevent multiple resets
               moveUnderlyingBallToVector(kPacmanStartLocation);
               for (var i = 0; i < ghostPlayersList.length; i++) {
                 ghostPlayersList[i].moveUnderlyingBallToVector(
                     kGhostStartLocation + Vector2.random() / 100);
-                ghostPlayersList[i].ghostDeadTime = 0;
-                ghostPlayersList[i].ghostScaredTime = 0;
+                ghostPlayersList[i].ghostDeadTimeLatest = 0;
+                ghostPlayersList[i].ghostScaredTimeLatest = 0;
               }
               globalPhysicsLinked = true;
             }
           });
-          /*
-        underlyingBallReal.removeFromParent();
-        underlyingBallReal = createUnderlyingBall();
-        world.add(underlyingBallReal);
-
-         */
         }
       }
     }
@@ -155,7 +140,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
               [await game.loadSprite('dash/pacmanman_angry.png')],
               stepTime: double.infinity,
             ),
-            PlayerState.eating: SpriteAnimation.spriteList(
+            PlayerState.eating: SpriteAnimation.spriteList( //FIXME proper animation
               [
                 await game.loadSprite('dash/pacmanman_eat.png'),
                 await game.loadSprite('dash/pacmanman.png')
@@ -178,21 +163,36 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
     super.update(dt);
 
     if (isGhost && current == PlayerState.scared) {
-      if (DateTime.now().millisecondsSinceEpoch - ghostScaredTime > 10 * 1000) {
+      if (DateTime.now().millisecondsSinceEpoch - ghostScaredTimeLatest >
+          10 * 1000) {
+        current = PlayerState.normal;
+      }
+    }
+    if (isGhost && current == PlayerState.deadGhost) {
+      if (DateTime.now().millisecondsSinceEpoch - ghostDeadTimeLatest >
+          ghostResetTime * 1000) {
         current = PlayerState.normal;
       }
     }
     if (!isGhost && current == PlayerState.eating) {
-      if (DateTime.now().millisecondsSinceEpoch - playerEatingTime > 1 * 1000) {
+      if (DateTime.now().millisecondsSinceEpoch - playerEatingTimeLatest >
+          1 * 1000) {
         current = PlayerState.normal;
       }
     }
 
     if (globalPhysicsLinked) {
-      if (localObjectPhysicsLinked) {
+      if (isGhost && current == PlayerState.deadGhost) {
+        double timefrac =
+            (DateTime.now().millisecondsSinceEpoch - ghostDeadTimeLatest) /
+                (1000 * ghostResetTime);
+        position = ghostDeadPosition * (1 - timefrac) +
+            kGhostStartLocation * (timefrac);
+      } else {
         try {
           position = underlyingBallReal.position;
         } catch (e) {
+          //effectively leave unchanged and pick up next frame
           p(e); //FIXME if physical ball not initialised properly
         }
 
@@ -208,14 +208,6 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
 
         angle +=
             (position - _lastPosition).length / (size.x / 2) * getMagicParity();
-
-      } else {
-        assert(isGhost);
-        double timefrac =
-            (DateTime.now().millisecondsSinceEpoch - ghostDeadTime) /
-                (1000 * ghostResetTime);
-        position = ghostDeadPosition * (1 - timefrac) +
-            kGhostStartLocation * (timefrac);
       }
     }
     _lastPosition.setFrom(position);
@@ -232,15 +224,16 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
       if (other is MiniPellet) {
         game.audioController.playSfx(SfxType.waka);
         current = PlayerState.eating;
-        playerEatingTime = DateTime.now().millisecondsSinceEpoch;
+        playerEatingTimeLatest = DateTime.now().millisecondsSinceEpoch;
         other.removeFromParent();
       } else if (other is SuperPellet) {
-        game.audioController.playSfx(SfxType.ghostsScared); //FIXME extend and don't cut out
+        game.audioController
+            .playSfx(SfxType.ghostsScared); //FIXME extend and don't cut out
         current = PlayerState.eating;
-        playerEatingTime = DateTime.now().millisecondsSinceEpoch;
+        playerEatingTimeLatest = DateTime.now().millisecondsSinceEpoch;
         for (int i = 0; i < ghostPlayersList.length; i++) {
           ghostPlayersList[i].current = PlayerState.scared;
-          ghostPlayersList[i].ghostScaredTime =
+          ghostPlayersList[i].ghostScaredTimeLatest =
               DateTime.now().millisecondsSinceEpoch;
         }
         other.removeFromParent();

@@ -84,7 +84,8 @@ class EndlessWorld extends Forge2DWorld
     timeStarted = DateTime.now();
 
     if (android) {
-      accelerometerEventStream().listen( //start once and then runs
+      accelerometerEventStream().listen(
+        //start once and then runs
         (AccelerometerEvent event) {
           if (android) {
             gravity = Vector2(event.y, event.x - 5) * 18; //NOTE dimensions flip

@@ -7,7 +7,8 @@ class Wall extends BodyComponent with CollisionCallbacks {
 
   @override
   // ignore: overridden_fields
-  final renderBody = false; //hide walls so replaced by bitmap background with the same visual meaning
+  final renderBody =
+      false; //hide walls so replaced by bitmap background with the same visual meaning
 
   Wall(this._start, this._end);
 

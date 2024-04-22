@@ -14,6 +14,7 @@ void p(x) {
 }
 
 int getMagicParity() {
+  //FIXME doesn't work
   int diry = 1;
   if (globalGravity.y > 0) {
     diry = 1;
@@ -42,18 +43,12 @@ int getMagicParity() {
 List<RealCharacter> ghostPlayersList = [];
 
 void addGhost(world, int number) {
-  RealCharacter ghost = RealCharacter(isGhost: true, startPosition: kGhostStartLocation + Vector2.random() / 100);
+  RealCharacter ghost = RealCharacter(
+      isGhost: true,
+      startPosition: kGhostStartLocation + Vector2.random() / 100);
   ghost.ghostNumber = number;
   world.add(ghost);
-  //ghost.moveUnderlyingBallToVector(
-  //    kGhostStartLocation + Vector2.random() / 100);
   ghostPlayersList.add(ghost);
-}
-
-void removeGhost(RealCharacter otherPlayer) {
-  otherPlayer.removeFromParent();
-  otherPlayer.underlyingBallReal.removeFromParent();
-  ghostPlayersList.remove(otherPlayer);
 }
 
 List<Component> createBoundaries(CameraComponent camera) {
@@ -71,24 +66,17 @@ List<Component> createBoundaries(CameraComponent camera) {
   ];
 }
 
-Vector2 getTarget(Vector2 localPosition, Vector2 size) {
-  return Vector2(
-      min(size.x / dzoom / 2, max(-size.x / dzoom / 2, localPosition.x)),
-      min(size.y / dzoom / 2 * 10 / 10,
-          max(size.y / dzoom / 2 * 0 / 10, localPosition.y)));
-}
-
 void addPillsAndPowerPills(world) {
   double sizex = ksizex;
   double sizey = ksizey;
-  for (var i = 0; i < mazelen ; i++) {
+  for (var i = 0; i < mazelen; i++) {
     for (var j = 0; j < mazelen; j++) {
       int k = j * mazelen + i;
       double scalex = sizex / dzoom / mazelen;
       double scaley = sizey / dzoom / mazelen;
       scalex = min(scalex, scaley);
       scaley = min(scalex, scaley);
-      double A = (i * 1.0 - mazelen  / 2) * scalex;
+      double A = (i * 1.0 - mazelen / 2) * scalex;
       double B = (j * 1.0 - mazelen / 2) * scaley;
       double D = 1.0 * scalex;
       double E = 1.0 * scaley;
