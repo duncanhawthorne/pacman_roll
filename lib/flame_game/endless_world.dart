@@ -14,8 +14,6 @@ import 'package:flame/src/events/messages/pointer_move_event.dart'
 
 import 'game_screen.dart';
 import 'components/player.dart';
-import 'components/boat.dart';
-import 'components/ball.dart';
 import 'constants.dart';
 import 'helper.dart';
 
@@ -49,26 +47,15 @@ class EndlessWorld extends Forge2DWorld
   /// The properties of the current level.
   final GameLevel level;
 
-  Vector2 dhdragStart = Vector2(0, 0);
-  Vector2 dhdragLatest = Vector2(0, 0);
-
   /// Used to see what the current progress of the player is and to update the
   /// progress if a level is finished.
   final PlayerProgress playerProgress;
-
-  /// The speed is used for determining how fast the background should pass by
-  /// and how fast the enemies and obstacles should move.
-  late double speed = _calculateSpeed(level.number * 5);
 
   /// In the [scoreNotifier] we keep track of what the current score is, and if
   /// other parts of the code is interested in when the score is updated they
   /// can listen to it and act on the updated value.
   final scoreNotifier = ValueNotifier(0);
-  late VisiblePlayer player;
-  late final Boat boat;
-  late final Ball ball;
-  late final RectangleComponent rope;
-  late PolygonComponent poly;
+  late RealCharacter player;
   late final DateTime timeStarted;
   Vector2 get size => (parent as FlameGame).size;
   int levelCompletedIn = 0;
@@ -85,27 +72,24 @@ class EndlessWorld extends Forge2DWorld
   final Vector2 gravity = Vector2(0, 100);
 
   /// Where the ground is located in the world and things should stop falling.
-  late final double groundLevel = (size.y / 2) - (size.y / 5);
+  //late final double groundLevel = (size.y / 2) - (size.y / 5);
 
   @override
   Future<void> onLoad() async {
     WakelockPlus.toggle(enable: true);
-    ksizex = size.x;
-    ksizey = size.y;
+    ksizex = size.x; //FIXME effective hardcoding
+    ksizey = size.y; //FIXME effective hardcoding
     // Used to keep track of when the level started, so that we later can
     // calculate how long time it took to finish the level.
     timeStarted = DateTime.now();
 
-    // ignore: deprecated_member_use
     if (android) {
-      accelerometerEventStream().listen(
+      accelerometerEventStream().listen( //start once and then runs
         (AccelerometerEvent event) {
           if (android) {
-            //p(event);
-            gravity =
-                Vector2(event.y, event.x - 5) * 18; //NOTE dimensions flipped
-            globalGravity.x = event.x - 5; //NOTE dimensions not flipped
-            globalGravity.y = event.y; //NOTE dimensions not flipped
+            gravity = Vector2(event.y, event.x - 5) * 18; //NOTE dimensions flip
+            globalGravity.x = event.x - 5; //NOTE dimensions not flip
+            globalGravity.y = event.y; //NOTE dimensions not flip
           }
         },
         onError: (error) {
@@ -116,9 +100,7 @@ class EndlessWorld extends Forge2DWorld
       );
     }
 
-
-
-    player = VisiblePlayer(isGhost: false, startPosition: kPacmanStartLocation);
+    player = RealCharacter(isGhost: false, startPosition: kPacmanStartLocation);
     add(player);
 
     for (int i = 0; i < 3; i++) {
@@ -172,10 +154,8 @@ class EndlessWorld extends Forge2DWorld
   @override
   void onPointerMove(dhpointer_move_event.PointerMoveEvent event) {
     if (!android) {
+      //simulate gravity based on pointer position
       gravity = event.localPosition - player.position;
     }
   }
-
-  /// A helper function to define how fast a certain level should be.
-  static double _calculateSpeed(int level) => (100 + (level * 100)) / dzoom;
 }

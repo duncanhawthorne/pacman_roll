@@ -41,7 +41,7 @@ class GameScreen extends StatelessWidget {
               right: 10,
               child: NesButton(
                 type: NesButtonType.normal,
-                onPressed: GoRouter.of(context).pop,
+                onPressed: () => GoRouter.of(context).go("/"),
                 child: NesIcon(iconData: NesIcons.leftArrowIndicator),
               ),
             );

@@ -4,8 +4,10 @@ import 'package:flame/collisions.dart';
 class Wall extends BodyComponent with CollisionCallbacks {
   final Vector2 _start;
   final Vector2 _end;
+
   @override
-  final renderBody = false;
+  // ignore: overridden_fields
+  final renderBody = false; //hide walls so replaced by bitmap background with the same visual meaning
 
   Wall(this._start, this._end);
 

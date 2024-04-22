@@ -48,7 +48,7 @@ class GameWinDialog extends StatelessWidget {
             if (true) ...[
               NesButton(
                 onPressed: () {
-                  context.go('/play');
+                  context.go('/');
                 },
                 type: NesButtonType.primary,
                 child: const Text('Retry'),

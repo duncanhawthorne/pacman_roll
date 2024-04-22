@@ -29,8 +29,7 @@ class Ball extends BodyComponent with TapCallbacks, ContactCallbacks {
               ..color = color ?? Colors.transparent
               ..style = PaintingStyle.fill);
 
-  //bool ghostBall = false;
-  VisiblePlayer? realCharacter;
+  RealCharacter? realCharacter;
 
   @override
   Body createBody() {
@@ -51,29 +50,6 @@ class Ball extends BodyComponent with TapCallbacks, ContactCallbacks {
       else {
         p("shouldn't have got here");
       }
-      /*
-      if (other.ghostBall && !ghostBall) {
-        if (realCharacter != null && realCharacter!.maniacMode) {
-          globalAudioController!.playSfx(SfxType.hit);
-          removeEnemyBall(other);
-          addEnemy(world);
-        } else {
-          //realCharacter!.add(HurtEffect());
-          globalAudioController!.playSfx(SfxType.damage);
-
-          /*
-          for (var i = 0; i < enemies.length; i++) {
-            //Ball enemy = enemies[i];
-            removeEnemyBall(enemies[i]);
-            addEnemy(world);
-          }
-
-           */
-          realCharacter!.removeFromParent();
-          removeFromParent();
-        }
-      }
-      */
     }
   }
 }

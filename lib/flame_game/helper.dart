@@ -39,10 +39,10 @@ int getMagicParity() {
   return magicparity;
 }
 
-List<VisiblePlayer> ghostPlayersList = [];
+List<RealCharacter> ghostPlayersList = [];
 
 void addGhost(world, int number) {
-  VisiblePlayer ghost = VisiblePlayer(isGhost: true, startPosition: kGhostStartLocation + Vector2.random() / 100);
+  RealCharacter ghost = RealCharacter(isGhost: true, startPosition: kGhostStartLocation + Vector2.random() / 100);
   ghost.ghostNumber = number;
   world.add(ghost);
   //ghost.moveUnderlyingBallToVector(
@@ -50,7 +50,7 @@ void addGhost(world, int number) {
   ghostPlayersList.add(ghost);
 }
 
-void removeGhost(VisiblePlayer otherPlayer) {
+void removeGhost(RealCharacter otherPlayer) {
   otherPlayer.removeFromParent();
   otherPlayer.underlyingBallReal.removeFromParent();
   ghostPlayersList.remove(otherPlayer);

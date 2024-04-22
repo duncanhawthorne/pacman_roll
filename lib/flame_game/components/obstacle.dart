@@ -1,3 +1,4 @@
+/*
 import 'dart:math';
 
 import 'package:flame/collisions.dart';
@@ -108,3 +109,5 @@ enum ObstacleType {
   tall,
   wide,
 }
+
+ */

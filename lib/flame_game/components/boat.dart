@@ -1,3 +1,4 @@
+/*
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/animation.dart';
@@ -143,3 +144,6 @@ enum BoatState {
   jumping,
   falling,
 }
+
+
+ */
