@@ -35,33 +35,33 @@ class GameWinDialog extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'Well done!',
+              'You died',
               style: Theme.of(context).textTheme.headlineMedium,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
-            Text(
-              'You completed level ${level.number} in $levelCompletedIn seconds.',
-              textAlign: TextAlign.center,
-            ),
+            //Text(
+            //  'You completed level ${level.number} in $levelCompletedIn seconds.',
+            //  textAlign: TextAlign.center,
+            //),
             const SizedBox(height: 16),
-            if (level.number < gameLevels.length) ...[
+            if (true) ...[
               NesButton(
                 onPressed: () {
-                  context.go('/play/session/${level.number + 1}');
+                  context.go('/play');
                 },
                 type: NesButtonType.primary,
-                child: const Text('Next level'),
+                child: const Text('Retry'),
               ),
               const SizedBox(height: 16),
             ],
-            NesButton(
-              onPressed: () {
-                context.go('/play');
-              },
-              type: NesButtonType.normal,
-              child: const Text('Level selection'),
-            ),
+            //NesButton(
+            //  onPressed: () {
+            //    context.go('/play');
+            //  },
+            //  type: NesButtonType.normal,
+            //  child: const Text('Level selection'),
+            //),
           ],
         ),
       ),

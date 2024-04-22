@@ -69,7 +69,9 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
     world.addAll(createBoundaries(camera));
     world.audioController = audioController;
     globalAudioController = audioController;
-    createMaze(size.x, size.y, world);
+    if (!debugMode) {
+      createMaze(size.x, size.y, world);
+    }
 
     // With the `TextPaint` we define what properties the text that we are going
     // to render will have, like font family, size and color in this instance.
@@ -81,7 +83,7 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
       ),
     );
 
-    final scoreText = 'Embers: 0 / ${level.winScore}';
+    final scoreText = "Lives: 3";
 
     // The component that is responsible for rendering the text that contains
     // the current score.
@@ -94,14 +96,14 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
     // The scoreComponent is added to the viewport, which means that even if the
     // camera's viewfinder move around and looks at different positions in the
     // world, the score is always static to the viewport.
-    //camera.viewport.add(scoreComponent);
+    camera.viewport.add(scoreComponent);
 
     // Here we add a listener to the notifier that is updated when the player
     // gets a new point, in the callback we update the text of the
     // `scoreComponent`.
     world.scoreNotifier.addListener(() {
       scoreComponent.text =
-          scoreText.replaceFirst('0', '${world.scoreNotifier.value}');
+          scoreText.replaceFirst('3', '${3 - world.scoreNotifier.value}');
     });
   }
 }

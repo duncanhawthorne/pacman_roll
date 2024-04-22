@@ -30,7 +30,7 @@ class Ball extends BodyComponent with TapCallbacks, ContactCallbacks {
               ..style = PaintingStyle.fill);
 
   //bool ghostBall = false;
-  Player? realCharacter;
+  VisiblePlayer? realCharacter;
 
   @override
   Body createBody() {

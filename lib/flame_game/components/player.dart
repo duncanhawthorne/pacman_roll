@@ -15,14 +15,14 @@ import 'dart:core';
 
 import 'package:sensors_plus/sensors_plus.dart';
 
-/// The [Player] is the component that the physical player of the game is
+/// The [VisiblePlayer] is the component that the physical player of the game is
 /// controlling.
-class Player extends SpriteAnimationGroupComponent<PlayerState>
+class VisiblePlayer extends SpriteAnimationGroupComponent<PlayerState>
     with
         CollisionCallbacks,
         HasWorldReference<EndlessWorld>,
         HasGameReference<EndlessRunner> {
-  Player({
+  VisiblePlayer({
     //required this.addScore,
     //required this.resetScore,
     required this.isGhost,
@@ -51,9 +51,11 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
   //Ball? underlyingBallLegacy;
   //bool maniacMode = false;
   Ball underlyingBallReal = Ball();
-  //bool online = true;
+  bool physicsLink = true;
   int ghostScaredTime = 0;
   int ghostNumber = 1; //FIXME make this do something
+  int ghostDeadTime = 0;
+  Vector2 ghostDeadPosition = Vector2(0,0);
   //bool ghostScared = false;
   //bool isGhost = false;
 
@@ -91,7 +93,13 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
     animations = isGhost
         ? {
             PlayerState.running: SpriteAnimation.spriteList(
-              [await game.loadSprite(ghostNumber == 1 ? 'dash/ghost1.png' : ghostNumber == 2 ? 'dash/ghost2.png' : 'dash/ghost3.png')],
+              [
+                await game.loadSprite(ghostNumber == 1
+                    ? 'dash/ghost1.png'
+                    : ghostNumber == 2
+                        ? 'dash/ghost2.png'
+                        : 'dash/ghost3.png')
+              ],
               stepTime: double.infinity,
             ),
             PlayerState.scared: SpriteAnimation.spriteList(
@@ -101,8 +109,8 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
               ],
               stepTime: 0.1,
             ),
-            PlayerState.eating: SpriteAnimation.spriteList(
-              [await game.loadSprite('dash/dash_falling.png')],
+            PlayerState.deadGhost: SpriteAnimation.spriteList(
+              [await game.loadSprite('dash/eyes.png')],
               stepTime: double.infinity,
             ),
           }
@@ -159,24 +167,53 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
     world.add(underlyingBallReal);
   }
 
-  void handleCollisionWithPlayer(Player otherPlayer) {
+  void handleCollisionWithPlayer(VisiblePlayer otherPlayer) {
     if (!isGhost && otherPlayer.isGhost) {
-      if (otherPlayer.current == PlayerState.scared) {
-        //pacman eats ghost
-        globalAudioController!.playSfx(SfxType.hit);
-        int tmpGhostNumber = otherPlayer.ghostNumber;
-        removeGhost(otherPlayer);
-        addGhost(world, tmpGhostNumber);
+      if (otherPlayer.current == PlayerState.scared || otherPlayer.current == PlayerState.deadGhost) {
+        if (otherPlayer.physicsLink) {
+          //pacman eats ghost
+          globalAudioController!.playSfx(SfxType.hit);
+          otherPlayer.moveUnderlyingBallToVector(kGhostStartLocation);
+          otherPlayer.physicsLink = false;
+          otherPlayer.current = PlayerState.deadGhost;
+          otherPlayer.ghostDeadTime = DateTime
+              .now()
+              .millisecondsSinceEpoch;
+          otherPlayer.ghostDeadPosition = Vector2(position.x, position.y);
+          Future.delayed(const Duration(seconds: ghostResetTime), () {
+            int tmpGhostNumber = otherPlayer.ghostNumber;
+            otherPlayer.physicsLink = true;
+            removeGhost(
+                otherPlayer); // FIXME ideally just move ball rather than removing and re-adding
+            addGhost(world, tmpGhostNumber);
+          });
+        }
       } else {
         //ghost kills pacman
-        globalAudioController!.playSfx(SfxType.damage);
-        moveUnderlyingBallToVector(kPacmanStartLocation);
-        /*
+        if (globalPhysicsLink) { //prevent multiple hits
+          globalAudioController!.playSfx(SfxType.damage);
+          world.addScore();
+          globalPhysicsLink = false;
+
+          Future.delayed(const Duration(seconds: ghostResetTime), () {
+            if (!globalPhysicsLink) { //prevent multiple resets
+              moveUnderlyingBallToVector(kPacmanStartLocation);
+              for (var i = 0; i < ghostPlayersList.length; i++) {
+                ghostPlayersList[i].moveUnderlyingBallToVector(
+                    kGhostStartLocation + Vector2.random() / 100);
+                ghostPlayersList[i].ghostDeadTime = 0;
+                ghostPlayersList[i].ghostScaredTime = 0;
+              }
+              globalPhysicsLink = true;
+            }
+          });
+          /*
         underlyingBallReal.removeFromParent();
         underlyingBallReal = createUnderlyingBall();
         world.add(underlyingBallReal);
 
          */
+        }
       }
     }
   }
@@ -185,31 +222,43 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
   void update(double dt) {
     super.update(dt);
 
+
     if (isGhost && current == PlayerState.scared) {
       if (DateTime.now().millisecondsSinceEpoch - ghostScaredTime > 10 * 1000) {
         current = PlayerState.running;
       }
     }
 
-    try {
-      position = underlyingBallReal.position;
-    } catch (e) {
-      p(e); //FIXME
-    }
+    if (globalPhysicsLink) {
+      if (physicsLink) {
+        try {
+          position = underlyingBallReal.position;
+        } catch (e) {
+          p(e); //FIXME
+        }
 
-    if (true) {
-      if (position.x > 36) {
-        moveUnderlyingBallToVector(kLeftPortalLocation);
-        //FIXME keep momentum
+        if (!debugMode) {
+          if (position.x > 36) {
+            moveUnderlyingBallToVector(kLeftPortalLocation);
+            //FIXME keep momentum
+          } else if (position.x < -36) {
+            moveUnderlyingBallToVector(kRightPortalLocation);
+            //FIXME keep momentum
+          }
+        }
+
+        angle +=
+            (position - _lastPosition).length / (size.x / 2) * getMagicParity();
       }
-      else if (position.x < -36) {
-        moveUnderlyingBallToVector(kRightPortalLocation);
-        //FIXME keep momentum
+      else {
+        assert(isGhost);
+        double timefrac = (DateTime
+            .now()
+            .millisecondsSinceEpoch - ghostDeadTime) / (1000 * ghostResetTime);
+        position = ghostDeadPosition * (1 - timefrac) +
+            kGhostStartLocation * (timefrac);
       }
     }
-
-    angle +=
-        (position - _lastPosition).length / (size.x / 2) * getMagicParity();
 
     if (realsurf) {
       force = (target - position) * 0.5 +
@@ -252,7 +301,7 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
               DateTime.now().millisecondsSinceEpoch;
         }
         other.removeFromParent();
-      } else if (other is Player) {
+      } else if (other is VisiblePlayer) {
         handleCollisionWithPlayer(other);
       }
     }
@@ -274,9 +323,4 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
   }
 }
 
-enum PlayerState {
-  running,
-  scared,
-  eating,
-  deadGhost
-}
+enum PlayerState { running, scared, eating, deadGhost }

@@ -67,7 +67,7 @@ class EndlessWorld extends Forge2DWorld
   /// other parts of the code is interested in when the score is updated they
   /// can listen to it and act on the updated value.
   final scoreNotifier = ValueNotifier(0);
-  late Player player;
+  late VisiblePlayer player;
   late final Boat boat;
   late final Ball ball;
   late final RectangleComponent rope;
@@ -173,7 +173,7 @@ class EndlessWorld extends Forge2DWorld
       }
     }
 
-    player = Player(isGhost: false
+    player = VisiblePlayer(isGhost: false
         //position: Vector2(boat.position.x, boat.position.y),
         //addScore: addScore,
         //resetScore: resetScore,
@@ -181,7 +181,7 @@ class EndlessWorld extends Forge2DWorld
     add(player);
 
     for (int i = 0; i < 3; i++) {
-      Future.delayed(Duration(seconds: i), () {
+      Future.delayed(Duration(milliseconds: i), () {
         addGhost(this, i);
       });
     }
