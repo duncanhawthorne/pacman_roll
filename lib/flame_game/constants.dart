@@ -4,7 +4,7 @@ import '../audio/audio_controller.dart';
 import 'maze_layout.dart';
 import 'package:flame/components.dart';
 
-const debugMode = false;
+const debugMode = true;
 const bool addRandomWalls = false;
 bool mazeOn = true;
 const dzoom = 20.0;
