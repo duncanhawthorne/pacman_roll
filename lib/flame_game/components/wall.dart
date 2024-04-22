@@ -4,6 +4,8 @@ import 'package:flame/collisions.dart';
 class Wall extends BodyComponent with CollisionCallbacks {
   final Vector2 _start;
   final Vector2 _end;
+  @override
+  final renderBody = false;
 
   Wall(this._start, this._end);
 
@@ -12,6 +14,7 @@ class Wall extends BodyComponent with CollisionCallbacks {
     final shape = EdgeShape()..set(_start, _end);
     final fixtureDef = FixtureDef(shape, friction: 0.1, restitution: 0.0);
     final bodyDef = BodyDef(position: Vector2.zero());
+    //final renderBody = false;
     return world.createBody(bodyDef)..createFixture(fixtureDef);
   }
 }

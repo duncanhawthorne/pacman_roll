@@ -25,6 +25,7 @@ dependencies:
   logging: ^1.2.0
   flame_forge2d: ^0.18.0
   sensors_plus: ^5.0.1
+  wakelock_plus: ^1.2.4
 
 dev_dependencies:
   flame_test: ^1.15.3

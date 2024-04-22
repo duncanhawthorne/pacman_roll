@@ -11,6 +11,7 @@ import 'endless_world.dart';
 import 'constants.dart';
 import 'helper.dart';
 import 'components/maze.dart';
+import 'components/background.dart';
 
 
 /// This is the base of the game which is added to the [GameWidget].
@@ -64,7 +65,7 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
   Future<void> onLoad() async {
     // The backdrop is a static layer behind the world that the camera is
     // looking at, so here we add our parallax background.
-    //camera.backdrop.add(Background(speed: world.speed));
+    camera.backdrop.add(Background(speed: 0));
 
     world.addAll(createBoundaries(camera));
     world.audioController = audioController;

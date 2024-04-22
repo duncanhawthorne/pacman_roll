@@ -24,6 +24,7 @@ import 'package:sensors_plus/sensors_plus.dart';
 import 'package:flutter/foundation.dart';
 
 import '../audio/audio_controller.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 /// The world is where you place all the components that should live inside of
 /// the game, like the player, enemies, obstacles and points for example.
@@ -88,6 +89,7 @@ class EndlessWorld extends Forge2DWorld
 
   @override
   Future<void> onLoad() async {
+    WakelockPlus.toggle(enable: true);
     ksizex = size.x;
     ksizey = size.y;
     // Used to keep track of when the level started, so that we later can

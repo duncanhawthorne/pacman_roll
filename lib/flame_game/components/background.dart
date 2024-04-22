@@ -15,11 +15,11 @@ class Background extends ParallaxComponent {
   @override
   Future<void> onLoad() async {
     final layers = [
-      ParallaxImageData('scenery/background.png'),
-      ParallaxImageData('scenery/clouds.png'),
-      ParallaxImageData('scenery/cliffs.png'),
-      ParallaxImageData('scenery/trees.png'),
-      ParallaxImageData('scenery/ground.png'),
+      ParallaxImageData('dash/Pac-Man.png'),
+      //ParallaxImageData('scenery/clouds.png'),
+      //ParallaxImageData('scenery/cliffs.png'),
+      //ParallaxImageData('scenery/trees.png'),
+      //ParallaxImageData('scenery/ground.png'),
     ];
 
     // The base velocity sets the speed of the layer the farthest to the back.
