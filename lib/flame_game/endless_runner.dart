@@ -10,6 +10,7 @@ import '../player_progress/player_progress.dart';
 import 'endless_world.dart';
 import 'constants.dart';
 import 'helper.dart';
+import 'components/maze.dart';
 
 
 /// This is the base of the game which is added to the [GameWidget].
@@ -68,7 +69,7 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
     world.addAll(createBoundaries(camera));
     world.audioController = audioController;
     globalAudioController = audioController;
-    //createMaze(size.x, size.y, world);
+    createMaze(size.x, size.y, world);
 
     // With the `TextPaint` we define what properties the text that we are going
     // to render will have, like font family, size and color in this instance.

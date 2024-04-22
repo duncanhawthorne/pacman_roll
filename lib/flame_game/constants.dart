@@ -18,6 +18,7 @@ AudioController? globalAudioController;
 double ksizex = 100;
 double ksizey = 100;
 Vector2 globalGravity = Vector2(0, 0);
+const mazelen = 21;
 
 bool android = defaultTargetPlatform == TargetPlatform.android;
 

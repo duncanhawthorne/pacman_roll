@@ -5,9 +5,9 @@ import '../constants.dart';
 
 /// The [Point] components are the components that the [Player] should collect
 /// to finish a level. The points are represented by Flame's mascot; Ember.
-class Powerpoint extends SpriteAnimationComponent
+class SuperPellet extends SpriteAnimationComponent
     with HasGameReference, HasWorldReference<EndlessWorld> {
-  Powerpoint() : super(size: spriteSize, anchor: Anchor.center);
+  SuperPellet() : super(size: spriteSize, anchor: Anchor.center);
 
   static final Vector2 spriteSize = Vector2.all(100 / 3 / dzoom);
   final speed = 0;

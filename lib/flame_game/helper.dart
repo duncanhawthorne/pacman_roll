@@ -87,26 +87,26 @@ Vector2 getTarget(Vector2 localPosition, Vector2 size) {
 void addPillsAndPowerPills(world) {
   double sizex = ksizex;
   double sizey = ksizey;
-  for (var i = 0; i < 28; i++) {
-    for (var j = 0; j < 28; j++) {
-      int k = i * 28 + j;
-      double scalex = sizex / dzoom / 2 / 14;
-      double scaley = sizey / dzoom / 2 / 14;
+  for (var i = 0; i < mazelen ; i++) {
+    for (var j = 0; j < mazelen; j++) {
+      int k = j * mazelen + i;
+      double scalex = sizex / dzoom / mazelen;
+      double scaley = sizey / dzoom / mazelen;
       scalex = min(scalex, scaley);
       scaley = min(scalex, scaley);
-      double A = (i * 1.0 - 14) * scalex;
-      double B = (j * 1.0 - 14) * scaley;
+      double A = (i * 1.0 - mazelen  / 2) * scalex;
+      double B = (j * 1.0 - mazelen / 2) * scaley;
       double D = 1.0 * scalex;
       double E = 1.0 * scaley;
       Vector2 location = Vector2(A + D / 2, B + E / 2);
 
       if (mazeLayout[k] == 0) {
-        var pillx = Point();
+        var pillx = MiniPellet();
         pillx.position = location;
         world.add(pillx);
       }
       if (mazeLayout[k] == 3) {
-        var powerpill = Powerpoint();
+        var powerpill = SuperPellet();
         powerpill.position = location;
         world.add(powerpill);
       }

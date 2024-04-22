@@ -13,7 +13,7 @@ class Ball extends BodyComponent with TapCallbacks, ContactCallbacks {
               FixtureDef(
                 CircleShape()
                   ..radius = size ??
-                      min(ksizey, ksizex) / dzoom / 2 / 14 / 2 * 0.99, //0.95
+                      min(ksizey, ksizex) / dzoom / mazelen / 2 * 0.99, //0.95
                 restitution: 0.0,
                 friction: 0.1,
                 userData: Ball,
@@ -21,7 +21,7 @@ class Ball extends BodyComponent with TapCallbacks, ContactCallbacks {
             ],
             bodyDef: BodyDef(
               angularDamping: 0.1,
-              position: initialPosition ?? Vector2(20, 0),
+              position: initialPosition ?? Vector2(0, 20), //fixme 20 harcoded
               type: BodyType.dynamic,
               userData: Ball,
             ),

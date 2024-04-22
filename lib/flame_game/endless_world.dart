@@ -148,8 +148,8 @@ class EndlessWorld extends Forge2DWorld
             minPeriod: 1.0,
             maxPeriod: 2.0,
             area: Rectangle.fromPoints(
-              Vector2(-size.x / 2, size.y / 2 + Point.spriteSize.y) / dzoom,
-              Vector2(size.x / 2, size.y / 2 + Point.spriteSize.y) / dzoom,
+              Vector2(-size.x / 2, size.y / 2 + MiniPellet.spriteSize.y) / dzoom,
+              Vector2(size.x / 2, size.y / 2 + MiniPellet.spriteSize.y) / dzoom,
             ),
             random: _random,
           ),
@@ -160,12 +160,12 @@ class EndlessWorld extends Forge2DWorld
         //good things
         add(
           SpawnComponent.periodRange(
-            factory: (_) => Point(),
+            factory: (_) => MiniPellet(),
             minPeriod: 1.0,
             maxPeriod: 2.0,
             area: Rectangle.fromPoints(
-              Vector2(-size.x / 2, size.y / 2 + Point.spriteSize.y) / dzoom,
-              Vector2(size.x / 2, size.y / 2 + Point.spriteSize.y) / dzoom,
+              Vector2(-size.x / 2, size.y / 2 + MiniPellet.spriteSize.y) / dzoom,
+              Vector2(size.x / 2, size.y / 2 + MiniPellet.spriteSize.y) / dzoom,
             ),
             random: _random,
           ),

@@ -1,4 +1,5 @@
 import '../constants.dart';
+import '../helper.dart';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
@@ -8,17 +9,23 @@ import 'wall.dart';
 
 import 'package:flame/extensions.dart';
 
+
 void createMaze(double sizex, double sizey, world) {
+  print(mazeLayout.length);
   if (mazeOn) {
-    for (var i = 0; i < 28; i++) {
-      for (var j = 0; j < 28; j++) {
-        int k = i * 28 + j;
-        double scalex = sizex / dzoom / 2 / 14;
-        double scaley = sizey / dzoom / 2 / 14;
+    for (var i = 0; i < mazelen; i++) {
+      for (var j = 0; j < mazelen; j++) {
+
+        int k = j * mazelen + i;
+        print(k);
+        print(k+1);
+        print(mazelen * mazelen);
+        double scalex = sizex / dzoom / mazelen;
+        double scaley = sizey / dzoom / mazelen;
         scalex = min(scalex, scaley);
         scaley = min(scalex, scaley);
-        double A = (i * 1.0 - 14) * scalex;
-        double B = (j * 1.0 - 14) * scaley;
+        double A = (i * 1.0 - mazelen / 2) * scalex;
+        double B = (j * 1.0 - mazelen / 2) * scaley;
         double D = 1.0 * scalex;
         double E = 1.0 * scaley;
         if (mazeLayout[k] == 1) {
@@ -30,21 +37,34 @@ void createMaze(double sizex, double sizey, world) {
 
  */
         }
-        if (k + 1 < 28 * 28 &&
-            (mazeLayout[k] == 1 && mazeLayout[k + 1] != 1 ||
-                mazeLayout[k] != 1 && mazeLayout[k + 1] == 1)) {
-          //world.add(Wall(Vector2(A,B),Vector2(A+D,B)));
-          //world.add(Wall(Vector2(A+D,B),Vector2(A+D,B+E)));
-          world.add(Wall(Vector2(A + D, B + E), Vector2(A, B + E)));
-          //world.add(Wall(Vector2(A,B+E),Vector2(A,B)));
+        //assert(k + 1 < mazelen * mazelen);
+        p("a");
+        try {
+          if (k + 1 < mazelen * mazelen &&
+              (mazeLayout[k] == 1 && mazeLayout[k + 1] != 1 ||
+                  mazeLayout[k] != 1 && mazeLayout[k + 1] == 1)) {
+            //world.add(Wall(Vector2(A,B),Vector2(A+D,B)));
+            world.add(Wall(Vector2(A+D,B),Vector2(A+D,B+E)));
+            //world.add(Wall(Vector2(A + D, B + E), Vector2(A, B + E)));
+            //world.add(Wall(Vector2(A,B+E),Vector2(A,B)));
+          }
         }
-        if (k + 28 < 28 * 28 &&
-            (mazeLayout[k] == 1 && mazeLayout[k + 28] != 1 ||
-                mazeLayout[k] != 1 && mazeLayout[k + 28] == 1)) {
-          //world.add(Wall(Vector2(A,B),Vector2(A+D,B)));
-          world.add(Wall(Vector2(A + D, B), Vector2(A + D, B + E)));
-          //world.add(Wall(Vector2(A+D,B+E),Vector2(A,B+E)));
-          //world.add(Wall(Vector2(A,B+E),Vector2(A,B)));
+        catch(e) {
+
+        }
+
+        p("B");
+        try {
+          if (k + mazelen < mazelen * mazelen &&
+              (mazeLayout[k] == 1 && mazeLayout[k + mazelen] != 1 ||
+                  mazeLayout[k] != 1 && mazeLayout[k + mazelen] == 1)) {
+            //world.add(Wall(Vector2(A,B),Vector2(A+D,B)));
+            //world.add(Wall(Vector2(A + D, B), Vector2(A + D, B + E)));
+            world.add(Wall(Vector2(A+D,B+E),Vector2(A,B+E)));
+            //world.add(Wall(Vector2(A,B+E),Vector2(A,B)));
+          }
+        }catch(e) {
+
         }
       }
     }

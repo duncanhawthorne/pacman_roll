@@ -128,7 +128,7 @@ class Boat extends SpriteAnimationGroupComponent<BoatState>
       game.audioController.playSfx(SfxType.damage);
       resetScore();
       add(HurtEffect());
-    } else if (other is Point) {
+    } else if (other is MiniPellet) {
       // When the player collides with a point it should gain a point and remove
       // the `Point` from the game.
       //game.audioController.playSfx(SfxType.score);

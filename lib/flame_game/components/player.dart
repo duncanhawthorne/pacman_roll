@@ -4,10 +4,8 @@ import 'package:flame/components.dart';
 import '../../audio/sounds.dart';
 import '../endless_runner.dart';
 import '../endless_world.dart';
-import '../effects/hurt_effect.dart';
 import '../effects/jump_effect.dart';
 import '../helper.dart';
-import 'obstacle.dart';
 import 'point.dart';
 import 'powerpoint.dart';
 import 'ball.dart';
@@ -78,7 +76,7 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
         this; //FIXME should do this in the initiator, but didn't work
     //underlyingBallLegacy = underlyingBallReal;
     if (isGhost) {
-      underlyingBallRealTmp.bodyDef!.position = Vector2(-10, 0); //FIXME -10
+      underlyingBallRealTmp.bodyDef!.position = Vector2(0, -12); //FIXME -12 hardcoded
     }
     return underlyingBallRealTmp;
   }
@@ -97,7 +95,7 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
         ],
         stepTime: double.infinity,
       ),
-      PlayerState.jumping: SpriteAnimation.spriteList(
+      PlayerState.scared: SpriteAnimation.spriteList(
         [
           await game.loadSprite(
               isGhost ? 'dash/ghostscared1.png' : 'dash/pacmanman_angry.png')
@@ -140,25 +138,17 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
 
   void handleCollisionWithPlayer(Player otherPlayer) {
     if (!isGhost && otherPlayer.isGhost) {
-      if (otherPlayer.current == PlayerState.jumping) {
+      if (otherPlayer.current == PlayerState.scared) {
+        //pacman eats ghost
         globalAudioController!.playSfx(SfxType.hit);
         removeEnemy(otherPlayer);
         addEnemy(world);
       } else {
+        //ghost kills pacman
         globalAudioController!.playSfx(SfxType.damage);
-
-        if (true) {
-          underlyingBallReal.removeFromParent();
-          underlyingBallReal = createUnderlyingBall();
-          //online = false;
-          world.add(underlyingBallReal);
-          //online = true;
-
-          //Future.delayed(const Duration(seconds: 3), () {});
-        } else {
-          removeFromParent();
-          underlyingBallReal.removeFromParent();
-        }
+        underlyingBallReal.removeFromParent();
+        underlyingBallReal = createUnderlyingBall();
+        world.add(underlyingBallReal);
       }
     }
   }
@@ -167,7 +157,7 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
   void update(double dt) {
     super.update(dt);
 
-    if (isGhost && current == PlayerState.jumping) {
+    if (isGhost && current == PlayerState.scared) {
       if (DateTime.now().millisecondsSinceEpoch - ghostScaredTime > 10 * 1000) {
         current = PlayerState.running;
       }
@@ -200,51 +190,20 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
   ) {
     //FIXME include logic to deal with Player collision here too, so handle the collision twice, once in physics and once in flame, belt and braces
     super.onCollisionStart(intersectionPoints, other);
-    if (!isGhost) {
-      // When the player collides with an obstacle it should lose all its points.
-      if (other is Obstacle) {
-        game.audioController.playSfx(SfxType.damage);
-        //resetScore();
-        add(HurtEffect());
-      } else if (other is Point) {
-        // When the player collides with a point it should gain a point and remove
-        // the `Point` from the game.
-        game.audioController.playSfx(SfxType.score);
+    if (!isGhost) { //only pacman
+      if (other is MiniPellet) {
+        game.audioController.playSfx(SfxType.waka);
         other.removeFromParent();
-        //addScore();
-      } else if (other is Powerpoint) {
-        game.audioController.playSfx(SfxType.jump);
-        /*
-        maniacMode = true;
-        current = PlayerState.jumping;
-
-         */
+      } else if (other is SuperPellet) {
+        game.audioController.playSfx(SfxType.ghostsScared);
         for (int i = 0; i < ghostPlayersList.length; i++) {
-          ghostPlayersList[i].current = PlayerState.jumping;
+          ghostPlayersList[i].current = PlayerState.scared;
           ghostPlayersList[i].ghostScaredTime =
               DateTime.now().millisecondsSinceEpoch;
         }
-        /*
-        for (var enemy in ghostPlayersList) {
-          enemy.current = PlayerState.jumping;
-        }
-         */
-        //p("start maniac");
-        /*
-        Future.delayed(const Duration(seconds: 10), () {
-          maniacMode = false;
-          current = PlayerState.running;
-
-          for (var enemy in ghostPlayersList) {
-            //FIXME could gt two pills
-            enemy.current = PlayerState.running;
-          }
-          //p("END MANIAC");
-          //setStateGlobal();
-        });
-
-         */
         other.removeFromParent();
+      } else if (other is Player) {
+        handleCollisionWithPlayer(other);
       }
     }
   }
@@ -252,14 +211,14 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
   /// [towards] should be a normalized vector that points in the direction that
   /// the player should jump.
   void jump(Vector2 towards) {
-    current = PlayerState.jumping;
+    current = PlayerState.scared;
     // Since `towards` is normalized we need to scale (multiply) that vector by
     // the length that we want the jump to have.
     final jumpEffect = JumpEffect(towards..scaleTo(_jumpLength));
 
     // We only allow jumps when the player isn't already in the air.
     if (!inAir) {
-      game.audioController.playSfx(SfxType.jump);
+      game.audioController.playSfx(SfxType.ghostsScared);
       add(jumpEffect);
     }
   }
@@ -267,6 +226,6 @@ class Player extends SpriteAnimationGroupComponent<PlayerState>
 
 enum PlayerState {
   running,
-  jumping,
+  scared,
   falling,
 }
