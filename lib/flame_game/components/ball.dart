@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import '../constants.dart';
 import 'player.dart';
 import '../helper.dart';
-import 'dart:math';
 
 class Ball extends BodyComponent with TapCallbacks, ContactCallbacks {
   Ball({Vector2? initialPosition, double? size, Color? color})
