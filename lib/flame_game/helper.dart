@@ -7,7 +7,6 @@ import 'components/point.dart';
 import 'constants.dart';
 import 'dart:math';
 import 'package:flutter/material.dart';
-
 import 'package:flame_forge2d/flame_forge2d.dart';
 
 void p(x) {
@@ -26,8 +25,6 @@ int getStartingNumberPelletsAndSuperPellets() {
   return c;
 }
 
-List<RealCharacter> ghostPlayersList = [];
-
 double getSingleSquareWidth() {
   return min(ksizex, ksizey) / flameGameZoom / getMazeLen();
 }
@@ -35,6 +32,8 @@ double getSingleSquareWidth() {
 int getMazeLen() {
   return sqrt(mazeLayout.length).toInt();
 }
+
+List<RealCharacter> ghostPlayersList = [];
 
 void addGhost(world, int number) {
   RealCharacter ghost = RealCharacter(

@@ -52,23 +52,23 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
     return underlyingBallRealTmp;
   }
 
+  void moveUnderlyingBallToVector(Vector2 targetLoc) {
+    underlyingBallReal.removeFromParent();
+    underlyingBallReal = createUnderlyingBall(targetLoc);
+    world.add(underlyingBallReal);
+  }
+
   void endOfGameTestAndAct() {
     if (world.pelletsRemaining == 0) {
       for (int i = 0; i < ghostPlayersList.length; i++) {
         ghostPlayersList[i]
             .moveUnderlyingBallToVector(kCageLocation + Vector2.random() / 100);
       }
-      Future.delayed(const Duration(milliseconds: kPacmanEatingResetTimeMillis * 2),
-          () {
+      Future.delayed(
+          const Duration(milliseconds: kPacmanEatingResetTimeMillis * 2), () {
         game.audioController.playSfx(SfxType.clearedBoard);
       });
     }
-  }
-
-  void moveUnderlyingBallToVector(Vector2 targetLoc) {
-    underlyingBallReal.removeFromParent();
-    underlyingBallReal = createUnderlyingBall(targetLoc);
-    world.add(underlyingBallReal);
   }
 
   void handleTwoCharactersMeet(PositionComponent other) {
@@ -76,12 +76,13 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
       //only pacman
       if (other is MiniPellet) {
         if (playerEatingSoundTimeLatest <
-            DateTime.now().millisecondsSinceEpoch - kPacmanEatingResetTimeMillis * 2) {
+            DateTime.now().millisecondsSinceEpoch -
+                kPacmanEatingResetTimeMillis * 2) {
           playerEatingSoundTimeLatest = DateTime.now().millisecondsSinceEpoch;
           game.audioController.playSfx(SfxType.wa);
 
-          Future.delayed(const Duration(milliseconds: kPacmanEatingResetTimeMillis),
-              () {
+          Future.delayed(
+              const Duration(milliseconds: kPacmanEatingResetTimeMillis), () {
             game.audioController.playSfx(SfxType.ka);
           });
         }
@@ -142,7 +143,8 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
         otherPlayer
             .moveUnderlyingBallToVector(kCageLocation + Vector2.random() / 100);
 
-        Future.delayed(const Duration(milliseconds: kGhostResetTimeMillis - 5), () {
+        Future.delayed(const Duration(milliseconds: kGhostResetTimeMillis - 5),
+            () {
           //delay so doesn't have time to move by gravity after being placed in the right position
           otherPlayer.moveUnderlyingBallToVector(
               kGhostStartLocation + Vector2.random() / 100);
@@ -161,6 +163,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
               const Duration(milliseconds: kPacmanDeadResetTimeMillis), () {
             if (!globalPhysicsLinked) {
               //prevent multiple resets
+
               world.addScore(); //score counting deaths
               moveUnderlyingBallToVector(kPacmanStartLocation);
               for (var i = 0; i < ghostPlayersList.length; i++) {
@@ -320,14 +323,14 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
             (kPacmanDeadResetTimeMillis);
       }
 
-      double mouthwidth = munching
+      double mouthWidth = munching
           ? 0
           : !dying
               ? 5 / 32
               : (5 / 32 * (1 - tween) + 1 * tween);
 
-      canvas.drawArc(rect, 2 * pi * ((mouthwidth / 2) + 0.5),
-          2 * pi * (1 - mouthwidth), true, _paint);
+      canvas.drawArc(rect, 2 * pi * ((mouthWidth / 2) + 0.5),
+          2 * pi * (1 - mouthWidth), true, _paint);
     }
   }
 }
