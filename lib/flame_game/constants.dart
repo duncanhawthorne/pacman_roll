@@ -28,7 +28,8 @@ final Vector2 kRightPortalLocation = Vector2(36, -4); //FIXME harcoded
 const int ghostResetTime = 1;
 const int ghostChaseTime = 10;
 const int pacmanDeadResetTime = 1;
-bool globalPhysicsLinked = true;
+const int pacmanEatingTime = 130;
+bool globalPhysicsLinked = false;
 
 bool android = defaultTargetPlatform == TargetPlatform.android;
 

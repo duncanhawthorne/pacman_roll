@@ -35,6 +35,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
   int ghostScaredTimeLatest = 0; //a long time ago
   int ghostDeadTimeLatest = 0; //a long time ago
   int playerEatingTimeLatest = 0; //a long time ago
+  int playerEatingSoundTimeLatest = 0;
   Vector2 ghostDeadPosition = Vector2(0, 0);
 
   // Used to store the last position of the player, so that we later can
@@ -49,6 +50,26 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
     return underlyingBallRealTmp;
   }
 
+  Future<void> startGame() async {
+    globalPhysicsLinked = false;
+    game.audioController.playSfx(SfxType.startMusic);
+    Future.delayed(const Duration(milliseconds: 2000), () {
+      globalPhysicsLinked = true;
+    });
+  }
+
+  void endOfGameTestAndAct() {
+    if (world.pelletsRemaining == 0) {
+
+      for (int i = 0; i < ghostPlayersList.length; i++) {
+        ghostPlayersList[i].moveUnderlyingBallToVector(kCageLocation + Vector2.random() / 100);
+      }
+      Future.delayed(const Duration(milliseconds: pacmanEatingTime * 2), () {
+        game.audioController.playSfx(SfxType.clearedBoard);
+      });
+    }
+  }
+
   void moveUnderlyingBallToVector(Vector2 targetLoc) {
     underlyingBallReal.removeFromParent();
     underlyingBallReal = createUnderlyingBall(targetLoc);
@@ -58,13 +79,13 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
   void handleTwoCharactersMeet(PositionComponent other) {
     if (!isGhost) {
       //only pacman
-      //TODO need win music if get all pellets and superpellets
       if (other is MiniPellet) {
-        // TODO sometimes just doesn't play when rolling at speed
-        if (playerEatingTimeLatest <
-            DateTime.now().millisecondsSinceEpoch - 200) {
+        if (playerEatingSoundTimeLatest <
+            DateTime.now().millisecondsSinceEpoch - pacmanEatingTime * 2) {
+          playerEatingSoundTimeLatest = DateTime.now().millisecondsSinceEpoch;
           game.audioController.playSfx(SfxType.wa);
-          Future.delayed(const Duration(milliseconds: 200), () {
+
+          Future.delayed(const Duration(milliseconds: pacmanEatingTime), () {
             game.audioController.playSfx(SfxType.ka);
           });
         }
@@ -73,9 +94,12 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
         playerEatingTimeLatest = DateTime.now().millisecondsSinceEpoch;
 
         other.removeFromParent();
+        world.pelletsRemaining -= 1;
+        endOfGameTestAndAct();
       } else if (other is SuperPellet) {
-        //FIXME just do as loop
+
         for (int i = 0; i < ghostChaseTime * 1000 / 500; i++) {
+          //FIXME just do as loop
           Future.delayed(Duration(milliseconds: 500 * i), () {
             game.audioController.playSfx(SfxType.ghostsScared);
           });
@@ -89,6 +113,8 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
               DateTime.now().millisecondsSinceEpoch;
         }
         other.removeFromParent();
+        world.pelletsRemaining -= 1;
+        endOfGameTestAndAct();
       } else if (other is RealCharacter) {
         //belts and braces. Already handled by physics collisions in Ball
         handlePacmanMeetsGhost(other);
@@ -157,6 +183,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
 
   @override
   Future<void> onLoad() async {
+    startGame();
     underlyingBallReal = createUnderlyingBall(startPosition);
     world.add(underlyingBallReal);
 
@@ -194,13 +221,10 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
               [await game.loadSprite('dash/pacmanman_angry.png')],
               stepTime: double.infinity,
             ),
-            PlayerState.eating: SpriteAnimation.spriteList(
-              [
-                await game.loadSprite('dash/pacmanman_eat.png'),
-                await game.loadSprite('dash/pacmanman.png')
-              ],
-              stepTime: 0.25,
-            ),
+            PlayerState.eating: SpriteAnimation.spriteList([
+              await game.loadSprite('dash/pacmanman_eat.png'),
+              await game.loadSprite('dash/pacmanman.png')
+            ], stepTime: pacmanEatingTime / 1000 * 2),
           };
     // The starting state will be that the player is running.
     current = PlayerState.normal;
@@ -231,7 +255,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
     }
     if (!isGhost && current == PlayerState.eating) {
       if (DateTime.now().millisecondsSinceEpoch - playerEatingTimeLatest >
-          1 * 1000) {
+          2 * pacmanEatingTime) {
         current = PlayerState.normal;
       }
     }
@@ -273,7 +297,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
 
         angle += (position - _lastPosition).length /
             (size.x / 2) *
-            getMagicParity(vel.x, vel.y);
+            getMagicParity(world, this, vel.x, vel.y);
       }
     }
     _lastPosition.setFrom(position);

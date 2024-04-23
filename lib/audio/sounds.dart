@@ -4,9 +4,9 @@ List<String> soundTypeToFilename(SfxType type) {
       return const [
         'ghosts_runaway.mp3',
       ];
-    case SfxType.doubleJump:
+    case SfxType.clearedBoard:
       return const [
-        'double_jump1.mp3',
+        'win.mp3',
       ];
     case SfxType.eatGhost:
       return const [
@@ -26,6 +26,10 @@ List<String> soundTypeToFilename(SfxType type) {
       return const [
         'pacman_waka_ka.mp3',
       ];
+    case SfxType.startMusic:
+      return const [
+        'pacman_beginning.mp3',
+      ];
     case SfxType.buttonTap:
       return const [
         'click1.mp3',
@@ -41,8 +45,9 @@ double soundTypeToVolume(SfxType type) {
   switch (type) {
     case SfxType.wa:
     case SfxType.ka:
+    case SfxType.startMusic:
     case SfxType.ghostsScared:
-    case SfxType.doubleJump:
+    case SfxType.clearedBoard:
     case SfxType.pacmanDeath:
     case SfxType.eatGhost:
       return 0.4;
@@ -54,8 +59,9 @@ double soundTypeToVolume(SfxType type) {
 enum SfxType {
   wa,
   ka,
+  startMusic,
   ghostsScared,
-  doubleJump,
+  clearedBoard,
   eatGhost,
   pacmanDeath,
   buttonTap,

@@ -1,56 +1,103 @@
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 import 'components/wall.dart';
+import 'components/player.dart';
 import 'components/powerpoint.dart';
 import 'components/point.dart';
 import 'constants.dart';
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'components/player.dart';
+
+
+import 'package:flame_forge2d/flame_forge2d.dart';
+
+
+
+
+
+
 
 void p(x) {
   // ignore: prefer_interpolation_to_compose_strings
   debugPrint("///// A " + DateTime.now().toString() + " " + x.toString());
 }
 
-int getMagicParity(double velx, double vely) {
-  //TODO doesn't work properly for rolling animation
-  int diry = 1;
-  if (globalGravity.y > 0) {
-    diry = 1;
-  } else {
-    diry = -1;
+int getStartingNumberPelletsAndSuperPellets() {
+  return 2;
+  int c = 0;
+  c += mazeLayout.map((element) => element == 0 ? 1 : 0).reduce((value, element) => value + element);
+  c += mazeLayout.map((element) => element == 3 ? 1 : 0).reduce((value, element) => value + element);
+  return c;
+}
+
+enum WallLocation {bottom, top, left, right}
+int getMagicParity(Forge2DWorld world, RealCharacter character, double velx, double vely) {
+  //FIXME probably can be dramatically simplified
+
+  WallLocation onWall = WallLocation.bottom;
+  bool clockwise = true;
+  Vector2 gravityWeCareAbout = globalGravity;
+  double small = 4;
+
+  if (velx.abs() > small) { //moving left or right
+    if (gravityWeCareAbout.y > 0) {
+      onWall= WallLocation.bottom;
+    }
+    else {
+      onWall= WallLocation.top;
+    }
+  }
+  else if (vely.abs() > small) { //moving up or down
+    if (gravityWeCareAbout.x > 0) {
+      onWall= WallLocation.right;
+    }
+    else {
+      onWall= WallLocation.left;
+    }
   }
 
-  int dirx = 1;
-  if (globalGravity.x > 0) {
-    dirx = 1;
-  } else {
-    dirx = -1;
+  if (onWall == WallLocation.bottom) {
+    if ((velx) > 0) {
+      clockwise = true;
+    }
+    else {
+      clockwise = false;
+    }
   }
 
-  int dirside = 1;
-  if ((globalGravity.x).abs() > (globalGravity.y).abs()) {
-    dirside = 1;
-  } else {
-    dirside = -1;
+  if (onWall == WallLocation.top) {
+    if ((velx) > 0) {
+      clockwise = false;
+    }
+    else {
+      clockwise = true;
+    }
   }
 
-  double focusVel = velx;
-  if (velx.abs() > vely.abs()) {
-    focusVel = velx;
-  } else {
-    focusVel = vely;
-  }
-  int dirvel = 1;
-  if (focusVel > 0) {
-    dirvel = -1;
-  } else {
-    dirvel = 1;
+  if (onWall == WallLocation.left) {
+    if ((vely) > 0) {
+      clockwise = true;
+    }
+    else {
+      clockwise = false;
+    }
   }
 
-  int magicparity = diry * dirx * dirside * dirvel;
-  return magicparity;
+  if (onWall == WallLocation.right) {
+    if ((vely) > 0) {
+      clockwise = false;
+    }
+    else {
+      clockwise = true;
+    }
+  }
+
+  if (clockwise) {
+    return 1;
+  }
+  else {
+    return -1;
+  }
 }
 
 List<RealCharacter> ghostPlayersList = [];

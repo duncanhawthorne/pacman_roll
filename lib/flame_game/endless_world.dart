@@ -61,6 +61,7 @@ class EndlessWorld extends Forge2DWorld
   int levelCompletedIn = 0;
   late final AudioController audioController;
   get getAudioController => audioController;
+  int pelletsRemaining = 1;
 
   /// The random number generator that is used to spawn periodic components.
   // ignore: unused_field
@@ -76,6 +77,9 @@ class EndlessWorld extends Forge2DWorld
 
   @override
   Future<void> onLoad() async {
+
+    pelletsRemaining = getStartingNumberPelletsAndSuperPellets();
+
     WakelockPlus.toggle(enable: true);
     ksizex = size.x; //FIXME effective hardcoding
     ksizey = size.y; //FIXME effective hardcoding
@@ -87,7 +91,7 @@ class EndlessWorld extends Forge2DWorld
       accelerometerEventStream().listen(
         //start once and then runs
         (AccelerometerEvent event) {
-          if (android) {
+          if (android && globalPhysicsLinked) {
             gravity = Vector2(event.y, event.x - 5) * 18; //NOTE dimensions flip
             globalGravity.x = event.x - 5; //NOTE dimensions not flip
             globalGravity.y = event.y; //NOTE dimensions not flip
@@ -154,9 +158,12 @@ class EndlessWorld extends Forge2DWorld
 
   @override
   void onPointerMove(dhpointer_move_event.PointerMoveEvent event) {
-    if (!android) {
+
+    if (!android && globalPhysicsLinked) {
       //simulate gravity based on pointer position
       gravity = event.localPosition - player.position;
+      globalGravity.x = (event.localPosition - player.position).x; //NOTE dimensions not flip
+      globalGravity.y = (event.localPosition - player.position).y; //NOTE dimensions not flip
     }
   }
 }
