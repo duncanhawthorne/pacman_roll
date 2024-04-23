@@ -101,7 +101,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
           });
         }
 
-        current = PlayerState.eating; //TODO better eating animation
+        current = PlayerState.eating;
         playerEatingTimeLatest = DateTime.now().millisecondsSinceEpoch;
         for (int i = 0; i < ghostPlayersList.length; i++) {
           ghostPlayersList[i].current = PlayerState.scared;
@@ -156,13 +156,13 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
 
           globalAudioController!.playSfx(SfxType.pacmanDeath);
           pacmanDeadTimeLatest = DateTime.now().millisecondsSinceEpoch;
-          //TODO proper animation for pacman dying
-          world.addScore(); //score counting deaths
+
           globalPhysicsLinked = false;
 
-          Future.delayed(const Duration(seconds: pacmanDeadResetTime), () {
+          Future.delayed(const Duration(milliseconds: pacmanDeadResetTime * 1000), () {
             if (!globalPhysicsLinked) {
               //prevent multiple resets
+              world.addScore(); //score counting deaths
               moveUnderlyingBallToVector(kPacmanStartLocation);
               for (var i = 0; i < ghostPlayersList.length; i++) {
                 ghostPlayersList[i].moveUnderlyingBallToVector(

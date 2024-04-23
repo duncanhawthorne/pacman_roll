@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../audio/audio_controller.dart';
+// ignore: unused_import
 import '../audio/sounds.dart';
 import '../settings/settings.dart';
 import '../style/wobbly_button.dart';
@@ -16,6 +17,7 @@ class MainMenuScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final palette = context.watch<Palette>();
     final settingsController = context.watch<SettingsController>();
+    // ignore: unused_local_variable
     final audioController = context.watch<AudioController>();
 
     return Scaffold(
@@ -53,7 +55,7 @@ class MainMenuScreen extends StatelessWidget {
           children: [
             WobblyButton(
               onPressed: () {
-                audioController.playSfx(SfxType.buttonTap);
+                //audioController.playSfx(SfxType.buttonTap);
                 GoRouter.of(context).go('/play/session/1');
               },
               child: const Text('Play'),

@@ -5,6 +5,7 @@ import 'package:nes_ui/nes_ui.dart';
 import 'package:provider/provider.dart';
 
 import '../audio/audio_controller.dart';
+// ignore: unused_import
 import '../audio/sounds.dart';
 import '../player_progress/player_progress.dart';
 import '../style/wobbly_button.dart';
@@ -60,8 +61,9 @@ class LevelSelectionScreen extends StatelessWidget {
                     ListTile(
                       enabled: playerProgress.levels.length >= level.number - 1,
                       onTap: () {
+                        // ignore: unused_local_variable
                         final audioController = context.read<AudioController>();
-                        audioController.playSfx(SfxType.buttonTap);
+                        //audioController.playSfx(SfxType.buttonTap);
 
                         GoRouter.of(context)
                             .go('/play/session/${level.number}');
