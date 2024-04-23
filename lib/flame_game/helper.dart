@@ -13,7 +13,7 @@ void p(x) {
   debugPrint("///// A " + DateTime.now().toString() + " " + x.toString());
 }
 
-int getMagicParity() {
+int getMagicParity(double velx, double vely) {
   //FIXME doesn't work
   int diry = 1;
   if (globalGravity.y > 0) {

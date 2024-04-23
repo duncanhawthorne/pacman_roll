@@ -22,9 +22,11 @@ Vector2 globalGravity = Vector2(0, 0);
 const mazelen = 21;
 final Vector2 kGhostStartLocation = Vector2(0, -12); //FIXME -12 hardcoded
 final Vector2 kPacmanStartLocation = Vector2(0, 20); //fixme 20 harcoded
+final Vector2 kCageLocation = Vector2(0, -6); //fixme 20 harcoded
 final Vector2 kLeftPortalLocation = Vector2(-36, -4); //FIXME
 final Vector2 kRightPortalLocation = Vector2(36, -4); //FIXME
 const int ghostResetTime = 1;
+const int ghostChaseTime = 10;
 const int pacmanDeadResetTime = 1;
 bool globalPhysicsLinked = true;
 

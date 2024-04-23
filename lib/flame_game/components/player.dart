@@ -58,28 +58,41 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
   void handlePacmanMeetsGhost(RealCharacter otherPlayer) {
     // ignore: unnecessary_this
     if (!this.isGhost && otherPlayer.isGhost) {
+      if (otherPlayer.current == PlayerState.deadGhost) {
+        //nothing, but need to keep if condition
+      }
       if (otherPlayer.current == PlayerState.scared) {
         //pacman eats ghost
 
         //pacman visuals
         globalAudioController!.playSfx(SfxType.eatGhost);
+
         current = PlayerState.eating;
         playerEatingTimeLatest = DateTime.now().millisecondsSinceEpoch;
 
         //ghost impact
-        otherPlayer.moveUnderlyingBallToVector(kGhostStartLocation +
-            Vector2.random() /
-                100); //FIXME check doesn't cause inconsistency with animation which goes to one exact place
         otherPlayer.current = PlayerState.deadGhost;
         otherPlayer.ghostDeadTimeLatest = DateTime.now().millisecondsSinceEpoch;
         otherPlayer.ghostDeadPosition = Vector2(position.x, position.y);
+
+        //immediately move into cage where out of the way an no ball interactions
+        //FIXME somehow ghost can still kill pacman while in this state
+        otherPlayer
+            .moveUnderlyingBallToVector(kCageLocation + Vector2.random() / 100);
+
+        Future.delayed(const Duration(milliseconds: ghostResetTime * 995), () {
+          //delay so doesn't have time to move by gravity after being placed in the right position
+          otherPlayer.moveUnderlyingBallToVector(kGhostStartLocation +
+              Vector2.random() /
+                  100); //FIXME slight inconsistency vs animation which goes to exact place
+        });
       } else {
         //ghost kills pacman
         if (globalPhysicsLinked) {
           //prevent multiple hits
 
           globalAudioController!.playSfx(SfxType.pacmanDeath);
-          //FIXME proper animation for pacman
+          //FIXME proper animation for pacman dying
           world.addScore(); //score counting deaths
           globalPhysicsLinked = false;
 
@@ -140,7 +153,8 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
               [await game.loadSprite('dash/pacmanman_angry.png')],
               stepTime: double.infinity,
             ),
-            PlayerState.eating: SpriteAnimation.spriteList( //FIXME proper animation
+            PlayerState.eating: SpriteAnimation.spriteList(
+              //FIXME proper animation
               [
                 await game.loadSprite('dash/pacmanman_eat.png'),
                 await game.loadSprite('dash/pacmanman.png')
@@ -164,7 +178,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
 
     if (isGhost && current == PlayerState.scared) {
       if (DateTime.now().millisecondsSinceEpoch - ghostScaredTimeLatest >
-          10 * 1000) {
+          ghostChaseTime * 1000) {
         current = PlayerState.normal;
       }
     }
@@ -182,6 +196,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
     }
 
     if (globalPhysicsLinked) {
+      Vector2 vel = Vector2(underlyingBallReal.body.linearVelocity.x,underlyingBallReal.body.linearVelocity.y);
       if (isGhost && current == PlayerState.deadGhost) {
         double timefrac =
             (DateTime.now().millisecondsSinceEpoch - ghostDeadTimeLatest) /
@@ -198,16 +213,24 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
 
         if (!debugMode) {
           if (position.x > 36) {
+            //Vector2 vel = (position - _lastPosition)/dt *100;
+
             moveUnderlyingBallToVector(kLeftPortalLocation);
-            //FIXME keep momentum. Should be able to apply linear impulse
+            Future.delayed(const Duration(seconds: 0), () {
+              //FIXME physical ball not initialised immediately
+              underlyingBallReal.body.linearVelocity = vel;
+            });
           } else if (position.x < -36) {
             moveUnderlyingBallToVector(kRightPortalLocation);
-            //FIXME keep momentum. Should be able to apply linear impulse
+            Future.delayed(const Duration(seconds: 0), () {
+              //FIXME physical ball not initialised immediately
+              underlyingBallReal.body.linearVelocity = vel;
+            });
           }
         }
 
         angle +=
-            (position - _lastPosition).length / (size.x / 2) * getMagicParity();
+            (position - _lastPosition).length / (size.x / 2) * getMagicParity(vel.x, vel.y);
       }
     }
     _lastPosition.setFrom(position);
@@ -219,17 +242,25 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
     PositionComponent other,
   ) {
     super.onCollisionStart(intersectionPoints, other);
+    //FIXME move this logic into the other handlePacmanMeetsGhost function
     if (!isGhost) {
       //only pacman
+      //FIXME need win music if get all pellets and superpellets
       if (other is MiniPellet) {
-        game.audioController.playSfx(SfxType.waka);
+        game.audioController.playSfx(SfxType.waka); //FIXME wa and ka not just wa //FIXME fixed speed waka rather than variable based on pellets eaten
+
         current = PlayerState.eating;
         playerEatingTimeLatest = DateTime.now().millisecondsSinceEpoch;
         other.removeFromParent();
       } else if (other is SuperPellet) {
-        game.audioController
-            .playSfx(SfxType.ghostsScared); //FIXME extend and don't cut out
-        current = PlayerState.eating;
+        //FIXME just do as loop
+        for (int i = 0; i < ghostChaseTime * 1000 / 500; i++) {
+          Future.delayed(Duration(milliseconds: 500 * i), () {
+            game.audioController.playSfx(SfxType.ghostsScared);
+          });
+        }
+
+        current = PlayerState.eating; //FIXME better eating animation
         playerEatingTimeLatest = DateTime.now().millisecondsSinceEpoch;
         for (int i = 0; i < ghostPlayersList.length; i++) {
           ghostPlayersList[i].current = PlayerState.scared;
