@@ -11,6 +11,8 @@ import 'powerpoint.dart';
 import 'ball.dart';
 import 'dart:math';
 import 'dart:core';
+import 'dart:ui';
+import 'package:flutter/material.dart';
 
 /// The [RealCharacter] is the component that the physical player of the game is
 /// controlling.
@@ -34,8 +36,9 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
   int ghostNumber = 1;
   int ghostScaredTimeLatest = 0; //a long time ago
   int ghostDeadTimeLatest = 0; //a long time ago
+  int pacmanDeadTimeLatest = 0; //a long time ago
   int playerEatingTimeLatest = 0; //a long time ago
-  int playerEatingSoundTimeLatest = 0;
+  int playerEatingSoundTimeLatest = 0; //a long time ago
   Vector2 ghostDeadPosition = Vector2(0, 0);
 
   // Used to store the last position of the player, so that we later can
@@ -50,13 +53,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
     return underlyingBallRealTmp;
   }
 
-  Future<void> startGame() async {
-    globalPhysicsLinked = false;
-    game.audioController.playSfx(SfxType.startMusic);
-    Future.delayed(const Duration(milliseconds: 2000), () {
-      globalPhysicsLinked = true;
-    });
-  }
+
 
   void endOfGameTestAndAct() {
     if (world.pelletsRemaining == 0) {
@@ -159,6 +156,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
           //prevent multiple hits
 
           globalAudioController!.playSfx(SfxType.pacmanDeath);
+          pacmanDeadTimeLatest = DateTime.now().millisecondsSinceEpoch;
           //TODO proper animation for pacman dying
           world.addScore(); //score counting deaths
           globalPhysicsLinked = false;
@@ -183,7 +181,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
 
   @override
   Future<void> onLoad() async {
-    startGame();
+
     underlyingBallReal = createUnderlyingBall(startPosition);
     world.add(underlyingBallReal);
 
@@ -222,7 +220,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
               stepTime: double.infinity,
             ),
             PlayerState.eating: SpriteAnimation.spriteList([
-              await game.loadSprite('dash/pacmanman_eat.png'),
+              //await game.loadSprite('dash/pacmanman_eat.png'),
               await game.loadSprite('dash/pacmanman.png')
             ], stepTime: pacmanEatingTime / 1000 * 2),
           };
@@ -311,6 +309,39 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
     super.onCollisionStart(intersectionPoints, other);
     handleTwoCharactersMeet(other);
   }
+
+  Paint _paint = Paint()..color = Colors.red;
+  Rect rect = Rect.fromCenter(center: Offset(getSingleSquareWidth()/2,getSingleSquareWidth()/2), width: getSingleSquareWidth(), height: getSingleSquareWidth());
+
+  @override
+  void render(Canvas canvas) {
+    super.render(canvas);
+    if (!isGhost) {
+
+      bool munching = false;
+      if (DateTime.now().millisecondsSinceEpoch - playerEatingTimeLatest < pacmanEatingTime) {
+        munching = true;
+      }
+
+      if (DateTime.now().millisecondsSinceEpoch - pacmanDeadTimeLatest < pacmanDeadResetTime) {
+        munching = false;
+      }
+      
+
+      int mouthwidth = 1;
+
+      canvas.drawArc(
+          rect,
+          pi * (3 / 4 + 1/2 - 1/8) ,
+          pi * (munching ? 2 : (6 / 4 + 2* 1/8)),
+          true,
+          _paint
+      );
+    }
+  }
+
+
+
 }
 
 enum PlayerState { normal, scared, eating, deadGhost }

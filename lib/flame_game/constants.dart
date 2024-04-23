@@ -29,7 +29,9 @@ const int ghostResetTime = 1;
 const int ghostChaseTime = 10;
 const int pacmanDeadResetTime = 1;
 const int pacmanEatingTime = 130;
-bool globalPhysicsLinked = false;
+bool globalPhysicsLinked = true;
+bool gravityTurnedOn = false;
+bool startGameMusic = false;
 
 bool android = defaultTargetPlatform == TargetPlatform.android;
 

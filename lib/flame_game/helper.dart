@@ -23,7 +23,6 @@ void p(x) {
 }
 
 int getStartingNumberPelletsAndSuperPellets() {
-  return 2;
   int c = 0;
   c += mazeLayout.map((element) => element == 0 ? 1 : 0).reduce((value, element) => value + element);
   c += mazeLayout.map((element) => element == 3 ? 1 : 0).reduce((value, element) => value + element);
@@ -102,10 +101,15 @@ int getMagicParity(Forge2DWorld world, RealCharacter character, double velx, dou
 
 List<RealCharacter> ghostPlayersList = [];
 
+double getSingleSquareWidth() {
+  //FIXME change references elsehwere to this
+  return min(ksizex, ksizey) / dzoom / mazelen;
+}
+
 void addGhost(world, int number) {
   RealCharacter ghost = RealCharacter(
       isGhost: true,
-      startPosition: kGhostStartLocation + Vector2.random() / 100);
+      startPosition: kGhostStartLocation + Vector2(getSingleSquareWidth() * (number - 1),0));
   ghost.ghostNumber = number;
   world.add(ghost);
   ghostPlayersList.add(ghost);

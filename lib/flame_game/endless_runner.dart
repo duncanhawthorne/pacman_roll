@@ -6,12 +6,16 @@ import 'package:flutter/material.dart';
 import '../audio/audio_controller.dart';
 import '../level_selection/levels.dart';
 import '../player_progress/player_progress.dart';
+import '../settings/settings.dart';
+
 
 import 'endless_world.dart';
 import 'constants.dart';
 import 'helper.dart';
 import 'components/maze.dart';
 import 'components/background.dart';
+import '../../audio/sounds.dart';
+import 'dart:core';
 
 /// This is the base of the game which is added to the [GameWidget].
 ///
@@ -26,12 +30,6 @@ import 'components/background.dart';
 ///
 /// Note that both of the last are passed in to the super constructor, they
 /// could also be set inside of `onLoad` for example.
-///
-///
-///
-///
-///
-///
 
 class EndlessRunner extends Forge2DGame<EndlessWorld>
     with HasCollisionDetection {
@@ -54,14 +52,24 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
 
   /// In the [onLoad] method you load different type of assets and set things
   /// that only needs to be set once when the level starts up.
-  ///
-  ///
-  ///
-  ///
-  ///
+
+
+  Future<void> startGame() async {
+    if (startGameMusic) {
+      gravityTurnedOn = false;
+      audioController.playSfx(SfxType.startMusic);
+      Future.delayed(const Duration(milliseconds: 4300), () {
+        gravityTurnedOn = true;
+      });
+    }
+    else {
+      gravityTurnedOn = true;
+    }
+  }
 
   @override
   Future<void> onLoad() async {
+    startGame();
     // The backdrop is a static layer behind the world that the camera is
     // looking at, so here we add our parallax background.
     camera.backdrop.add(Background(speed: 0));

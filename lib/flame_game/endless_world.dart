@@ -75,6 +75,8 @@ class EndlessWorld extends Forge2DWorld
   /// Where the ground is located in the world and things should stop falling.
   //late final double groundLevel = (size.y / 2) - (size.y / 5);
 
+
+
   @override
   Future<void> onLoad() async {
 
@@ -91,10 +93,10 @@ class EndlessWorld extends Forge2DWorld
       accelerometerEventStream().listen(
         //start once and then runs
         (AccelerometerEvent event) {
-          if (android && globalPhysicsLinked) {
+          if (android && globalPhysicsLinked && gravityTurnedOn) {
             gravity = Vector2(event.y, event.x - 5) * 18; //NOTE dimensions flip
-            globalGravity.x = event.x - 5; //NOTE dimensions not flip
-            globalGravity.y = event.y; //NOTE dimensions not flip
+            globalGravity.y = event.x - 5; //NOTE dimensions not flip
+            globalGravity.x = event.y; //NOTE dimensions not flip
           }
         },
         onError: (error) {
@@ -109,7 +111,7 @@ class EndlessWorld extends Forge2DWorld
     add(player);
 
     for (int i = 0; i < 3; i++) {
-      addGhost(this, i);
+      //addGhost(this, i);
     }
 
     addPillsAndPowerPills(this);
@@ -159,7 +161,7 @@ class EndlessWorld extends Forge2DWorld
   @override
   void onPointerMove(dhpointer_move_event.PointerMoveEvent event) {
 
-    if (!android && globalPhysicsLinked) {
+    if (!android && globalPhysicsLinked && gravityTurnedOn) {
       //simulate gravity based on pointer position
       gravity = event.localPosition - player.position;
       globalGravity.x = (event.localPosition - player.position).x; //NOTE dimensions not flip
