@@ -26,6 +26,26 @@ int getStartingNumberPelletsAndSuperPellets() {
   return c;
 }
 
+List<RealCharacter> ghostPlayersList = [];
+
+double getSingleSquareWidth() {
+  return min(ksizex, ksizey) / flameGameZoom / getMazeLen();
+}
+
+int getMazeLen() {
+  return sqrt(mazeLayout.length).toInt();
+}
+
+void addGhost(world, int number) {
+  RealCharacter ghost = RealCharacter(
+      isGhost: true,
+      startPosition: kGhostStartLocation +
+          Vector2(getSingleSquareWidth() * (number - 1), 0));
+  ghost.ghostNumber = number;
+  world.add(ghost);
+  ghostPlayersList.add(ghost);
+}
+
 enum WallLocation { bottom, top, left, right }
 
 int getMagicParity(
@@ -90,26 +110,6 @@ int getMagicParity(
   } else {
     return -1;
   }
-}
-
-List<RealCharacter> ghostPlayersList = [];
-
-double getSingleSquareWidth() {
-  return min(ksizex, ksizey) / flameGameZoom / getMazeLen();
-}
-
-int getMazeLen() {
-  return sqrt(mazeLayout.length).toInt();
-}
-
-void addGhost(world, int number) {
-  RealCharacter ghost = RealCharacter(
-      isGhost: true,
-      startPosition: kGhostStartLocation +
-          Vector2(getSingleSquareWidth() * (number - 1), 0));
-  ghost.ghostNumber = number;
-  world.add(ghost);
-  ghostPlayersList.add(ghost);
 }
 
 List<Component> createBoundaries(CameraComponent camera) {
