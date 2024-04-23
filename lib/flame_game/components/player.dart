@@ -55,6 +55,47 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
     world.add(underlyingBallReal);
   }
 
+  void handleTwoCharactersMeet(PositionComponent other) {
+    if (!isGhost) {
+      //only pacman
+      //TODO need win music if get all pellets and superpellets
+      if (other is MiniPellet) {
+        // TODO sometimes just doesn't play when rolling at speed
+        if (playerEatingTimeLatest <
+            DateTime.now().millisecondsSinceEpoch - 200) {
+          game.audioController.playSfx(SfxType.wa);
+          Future.delayed(const Duration(milliseconds: 200), () {
+            game.audioController.playSfx(SfxType.ka);
+          });
+        }
+
+        current = PlayerState.eating;
+        playerEatingTimeLatest = DateTime.now().millisecondsSinceEpoch;
+
+        other.removeFromParent();
+      } else if (other is SuperPellet) {
+        //FIXME just do as loop
+        for (int i = 0; i < ghostChaseTime * 1000 / 500; i++) {
+          Future.delayed(Duration(milliseconds: 500 * i), () {
+            game.audioController.playSfx(SfxType.ghostsScared);
+          });
+        }
+
+        current = PlayerState.eating; //TODO better eating animation
+        playerEatingTimeLatest = DateTime.now().millisecondsSinceEpoch;
+        for (int i = 0; i < ghostPlayersList.length; i++) {
+          ghostPlayersList[i].current = PlayerState.scared;
+          ghostPlayersList[i].ghostScaredTimeLatest =
+              DateTime.now().millisecondsSinceEpoch;
+        }
+        other.removeFromParent();
+      } else if (other is RealCharacter) {
+        //belts and braces. Already handled by physics collisions in Ball
+        handlePacmanMeetsGhost(other);
+      }
+    }
+  }
+
   void handlePacmanMeetsGhost(RealCharacter otherPlayer) {
     // ignore: unnecessary_this
     if (!this.isGhost && otherPlayer.isGhost) {
@@ -92,7 +133,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
           //prevent multiple hits
 
           globalAudioController!.playSfx(SfxType.pacmanDeath);
-          //FIXME proper animation for pacman dying
+          //TODO proper animation for pacman dying
           world.addScore(); //score counting deaths
           globalPhysicsLinked = false;
 
@@ -154,11 +195,10 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
               stepTime: double.infinity,
             ),
             PlayerState.eating: SpriteAnimation.spriteList(
-              //FIXME proper animation
               [
                 await game.loadSprite('dash/pacmanman_eat.png'),
                 await game.loadSprite('dash/pacmanman.png')
-              ], //FIXME
+              ],
               stepTime: 0.25,
             ),
           };
@@ -176,6 +216,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
   void update(double dt) {
     super.update(dt);
 
+    //FIXME instead of testing this every frame, move into futures, and still test every frame, but only when in the general zone that need to test this
     if (isGhost && current == PlayerState.scared) {
       if (DateTime.now().millisecondsSinceEpoch - ghostScaredTimeLatest >
           ghostChaseTime * 1000) {
@@ -196,7 +237,8 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
     }
 
     if (globalPhysicsLinked) {
-      Vector2 vel = Vector2(underlyingBallReal.body.linearVelocity.x,underlyingBallReal.body.linearVelocity.y);
+      Vector2 vel = Vector2(underlyingBallReal.body.linearVelocity.x,
+          underlyingBallReal.body.linearVelocity.y);
       if (isGhost && current == PlayerState.deadGhost) {
         double timefrac =
             (DateTime.now().millisecondsSinceEpoch - ghostDeadTimeLatest) /
@@ -229,8 +271,9 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
           }
         }
 
-        angle +=
-            (position - _lastPosition).length / (size.x / 2) * getMagicParity(vel.x, vel.y);
+        angle += (position - _lastPosition).length /
+            (size.x / 2) *
+            getMagicParity(vel.x, vel.y);
       }
     }
     _lastPosition.setFrom(position);
@@ -242,37 +285,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
     PositionComponent other,
   ) {
     super.onCollisionStart(intersectionPoints, other);
-    //FIXME move this logic into the other handlePacmanMeetsGhost function
-    if (!isGhost) {
-      //only pacman
-      //FIXME need win music if get all pellets and superpellets
-      if (other is MiniPellet) {
-        game.audioController.playSfx(SfxType.waka); //FIXME wa and ka not just wa //FIXME fixed speed waka rather than variable based on pellets eaten
-
-        current = PlayerState.eating;
-        playerEatingTimeLatest = DateTime.now().millisecondsSinceEpoch;
-        other.removeFromParent();
-      } else if (other is SuperPellet) {
-        //FIXME just do as loop
-        for (int i = 0; i < ghostChaseTime * 1000 / 500; i++) {
-          Future.delayed(Duration(milliseconds: 500 * i), () {
-            game.audioController.playSfx(SfxType.ghostsScared);
-          });
-        }
-
-        current = PlayerState.eating; //FIXME better eating animation
-        playerEatingTimeLatest = DateTime.now().millisecondsSinceEpoch;
-        for (int i = 0; i < ghostPlayersList.length; i++) {
-          ghostPlayersList[i].current = PlayerState.scared;
-          ghostPlayersList[i].ghostScaredTimeLatest =
-              DateTime.now().millisecondsSinceEpoch;
-        }
-        other.removeFromParent();
-      } else if (other is RealCharacter) {
-        //belts and braces. Already handled by physics collisions in Ball
-        handlePacmanMeetsGhost(other);
-      }
-    }
+    handleTwoCharactersMeet(other);
   }
 }
 

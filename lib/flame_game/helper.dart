@@ -14,7 +14,7 @@ void p(x) {
 }
 
 int getMagicParity(double velx, double vely) {
-  //FIXME doesn't work
+  //TODO doesn't work properly for rolling animation
   int diry = 1;
   if (globalGravity.y > 0) {
     diry = 1;
@@ -36,7 +36,20 @@ int getMagicParity(double velx, double vely) {
     dirside = -1;
   }
 
-  int magicparity = diry * dirx * dirside;
+  double focusVel = velx;
+  if (velx.abs() > vely.abs()) {
+    focusVel = velx;
+  } else {
+    focusVel = vely;
+  }
+  int dirvel = 1;
+  if (focusVel > 0) {
+    dirvel = -1;
+  } else {
+    dirvel = 1;
+  }
+
+  int magicparity = diry * dirx * dirside * dirvel;
   return magicparity;
 }
 

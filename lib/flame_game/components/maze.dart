@@ -43,7 +43,7 @@ void createMaze(double sizex, double sizey, world) {
             //world.add(Wall(Vector2(A,B+E),Vector2(A,B)));
           }
         } catch (e) {
-          p(e); //FIXME
+          p(e); //FIXME should never happen
         }
 
         //p("B");
@@ -57,7 +57,7 @@ void createMaze(double sizex, double sizey, world) {
             //world.add(Wall(Vector2(A,B+E),Vector2(A,B)));
           }
         } catch (e) {
-          p(e); //FIXME
+          p(e); //FIXME should never happen
         }
       }
     }
