@@ -8,14 +8,7 @@ import 'constants.dart';
 import 'dart:math';
 import 'package:flutter/material.dart';
 
-
 import 'package:flame_forge2d/flame_forge2d.dart';
-
-
-
-
-
-
 
 void p(x) {
   // ignore: prefer_interpolation_to_compose_strings
@@ -24,13 +17,19 @@ void p(x) {
 
 int getStartingNumberPelletsAndSuperPellets() {
   int c = 0;
-  c += mazeLayout.map((element) => element == 0 ? 1 : 0).reduce((value, element) => value + element);
-  c += mazeLayout.map((element) => element == 3 ? 1 : 0).reduce((value, element) => value + element);
+  c += mazeLayout
+      .map((element) => element == 0 ? 1 : 0)
+      .reduce((value, element) => value + element);
+  c += mazeLayout
+      .map((element) => element == 3 ? 1 : 0)
+      .reduce((value, element) => value + element);
   return c;
 }
 
-enum WallLocation {bottom, top, left, right}
-int getMagicParity(Forge2DWorld world, RealCharacter character, double velx, double vely) {
+enum WallLocation { bottom, top, left, right }
+
+int getMagicParity(
+    Forge2DWorld world, RealCharacter character, double velx, double vely) {
   //FIXME probably can be dramatically simplified
 
   WallLocation onWall = WallLocation.bottom;
@@ -38,28 +37,26 @@ int getMagicParity(Forge2DWorld world, RealCharacter character, double velx, dou
   Vector2 gravityWeCareAbout = globalGravity;
   double small = 4;
 
-  if (velx.abs() > small) { //moving left or right
+  if (velx.abs() > small) {
+    //moving left or right
     if (gravityWeCareAbout.y > 0) {
-      onWall= WallLocation.bottom;
+      onWall = WallLocation.bottom;
+    } else {
+      onWall = WallLocation.top;
     }
-    else {
-      onWall= WallLocation.top;
-    }
-  }
-  else if (vely.abs() > small) { //moving up or down
+  } else if (vely.abs() > small) {
+    //moving up or down
     if (gravityWeCareAbout.x > 0) {
-      onWall= WallLocation.right;
-    }
-    else {
-      onWall= WallLocation.left;
+      onWall = WallLocation.right;
+    } else {
+      onWall = WallLocation.left;
     }
   }
 
   if (onWall == WallLocation.bottom) {
     if ((velx) > 0) {
       clockwise = true;
-    }
-    else {
+    } else {
       clockwise = false;
     }
   }
@@ -67,8 +64,7 @@ int getMagicParity(Forge2DWorld world, RealCharacter character, double velx, dou
   if (onWall == WallLocation.top) {
     if ((velx) > 0) {
       clockwise = false;
-    }
-    else {
+    } else {
       clockwise = true;
     }
   }
@@ -76,8 +72,7 @@ int getMagicParity(Forge2DWorld world, RealCharacter character, double velx, dou
   if (onWall == WallLocation.left) {
     if ((vely) > 0) {
       clockwise = true;
-    }
-    else {
+    } else {
       clockwise = false;
     }
   }
@@ -85,16 +80,14 @@ int getMagicParity(Forge2DWorld world, RealCharacter character, double velx, dou
   if (onWall == WallLocation.right) {
     if ((vely) > 0) {
       clockwise = false;
-    }
-    else {
+    } else {
       clockwise = true;
     }
   }
 
   if (clockwise) {
     return 1;
-  }
-  else {
+  } else {
     return -1;
   }
 }
@@ -102,14 +95,14 @@ int getMagicParity(Forge2DWorld world, RealCharacter character, double velx, dou
 List<RealCharacter> ghostPlayersList = [];
 
 double getSingleSquareWidth() {
-  //FIXME change references elsehwere to this
   return min(ksizex, ksizey) / dzoom / mazelen;
 }
 
 void addGhost(world, int number) {
   RealCharacter ghost = RealCharacter(
       isGhost: true,
-      startPosition: kGhostStartLocation + Vector2(getSingleSquareWidth() * (number - 1),0));
+      startPosition: kGhostStartLocation +
+          Vector2(getSingleSquareWidth() * (number - 1), 0));
   ghost.ghostNumber = number;
   world.add(ghost);
   ghostPlayersList.add(ghost);
@@ -131,15 +124,11 @@ List<Component> createBoundaries(CameraComponent camera) {
 }
 
 void addPillsAndPowerPills(world) {
-  double sizex = ksizex;
-  double sizey = ksizey;
   for (var i = 0; i < mazelen; i++) {
     for (var j = 0; j < mazelen; j++) {
       int k = j * mazelen + i;
-      double scalex = sizex / dzoom / mazelen;
-      double scaley = sizey / dzoom / mazelen;
-      scalex = min(scalex, scaley);
-      scaley = min(scalex, scaley);
+      double scalex = getSingleSquareWidth();
+      double scaley = getSingleSquareWidth();
       double A = (i * 1.0 - mazelen / 2) * scalex;
       double B = (j * 1.0 - mazelen / 2) * scaley;
       double D = 1.0 * scalex;

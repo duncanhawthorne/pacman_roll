@@ -31,7 +31,8 @@ const int pacmanDeadResetTime = 1;
 const int pacmanEatingResetTime = 130;
 bool globalPhysicsLinked = true;
 bool gravityTurnedOn = false;
-bool startGameMusic = false; //FIXME need to detect is settings have turned sound off, else slow down game when no sound playing
+bool startGameMusic =
+    false; //FIXME need to detect is settings have turned sound off, else slow down game when no sound playing
 
 bool android = defaultTargetPlatform == TargetPlatform.android;
 

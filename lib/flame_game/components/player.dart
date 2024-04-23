@@ -25,7 +25,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
     required this.startPosition,
     super.position,
   }) : super(
-            size: Vector2.all(min(ksizex, ksizey) / dzoom / mazelen),
+            size: Vector2.all(getSingleSquareWidth()),
             anchor: Anchor.center,
             priority: 1);
 
@@ -52,15 +52,14 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
     return underlyingBallRealTmp;
   }
 
-
-
   void endOfGameTestAndAct() {
     if (world.pelletsRemaining == 0) {
-
       for (int i = 0; i < ghostPlayersList.length; i++) {
-        ghostPlayersList[i].moveUnderlyingBallToVector(kCageLocation + Vector2.random() / 100);
+        ghostPlayersList[i]
+            .moveUnderlyingBallToVector(kCageLocation + Vector2.random() / 100);
       }
-      Future.delayed(const Duration(milliseconds: pacmanEatingResetTime * 2), () {
+      Future.delayed(const Duration(milliseconds: pacmanEatingResetTime * 2),
+          () {
         game.audioController.playSfx(SfxType.clearedBoard);
       });
     }
@@ -81,7 +80,8 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
           playerEatingSoundTimeLatest = DateTime.now().millisecondsSinceEpoch;
           game.audioController.playSfx(SfxType.wa);
 
-          Future.delayed(const Duration(milliseconds: pacmanEatingResetTime), () {
+          Future.delayed(const Duration(milliseconds: pacmanEatingResetTime),
+              () {
             game.audioController.playSfx(SfxType.ka);
           });
         }
@@ -93,7 +93,6 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
         world.pelletsRemaining -= 1;
         endOfGameTestAndAct();
       } else if (other is SuperPellet) {
-
         for (int i = 0; i < ghostChaseTime * 1000 / 500; i++) {
           //FIXME just do as loop
           Future.delayed(Duration(milliseconds: 500 * i), () {
@@ -145,9 +144,8 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
 
         Future.delayed(const Duration(milliseconds: ghostResetTime * 995), () {
           //delay so doesn't have time to move by gravity after being placed in the right position
-          otherPlayer.moveUnderlyingBallToVector(kGhostStartLocation +
-              Vector2.random() /
-                  100); //FIXME slight inconsistency vs animation which goes to exact place
+          otherPlayer.moveUnderlyingBallToVector(
+              kGhostStartLocation + Vector2.random() / 100);
         });
       } else {
         //ghost kills pacman
@@ -159,7 +157,8 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
 
           globalPhysicsLinked = false;
 
-          Future.delayed(const Duration(milliseconds: pacmanDeadResetTime * 1000), () {
+          Future.delayed(
+              const Duration(milliseconds: pacmanDeadResetTime * 1000), () {
             if (!globalPhysicsLinked) {
               //prevent multiple resets
               world.addScore(); //score counting deaths
@@ -180,7 +179,6 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
 
   @override
   Future<void> onLoad() async {
-
     underlyingBallReal = createUnderlyingBall(startPosition);
     world.add(underlyingBallReal);
 
@@ -209,8 +207,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
               stepTime: double.infinity,
             ),
           }
-        : {
-          };
+        : {};
     // The starting state will be that the player is running.
     current = PlayerState.normal;
     _lastPosition.setFrom(position);
@@ -298,41 +295,41 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
   }
 
   final Paint _paint = Paint()..color = Colors.yellowAccent;
-  final Rect rect = Rect.fromCenter(center: Offset(getSingleSquareWidth()/2,getSingleSquareWidth()/2), width: getSingleSquareWidth(), height: getSingleSquareWidth());
+  final Rect rect = Rect.fromCenter(
+      center: Offset(getSingleSquareWidth() / 2, getSingleSquareWidth() / 2),
+      width: getSingleSquareWidth(),
+      height: getSingleSquareWidth());
 
   @override
   void render(Canvas canvas) {
     super.render(canvas);
     if (!isGhost) {
-
       double tween = 0;
       bool munching = false;
       bool dying = false;
-      if (DateTime.now().millisecondsSinceEpoch - playerEatingTimeLatest < pacmanEatingResetTime) {
+      if (DateTime.now().millisecondsSinceEpoch - playerEatingTimeLatest <
+          pacmanEatingResetTime) {
         munching = true;
       }
 
-      if (DateTime.now().millisecondsSinceEpoch - pacmanDeadTimeLatest < (pacmanDeadResetTime * 1000)) {
+      if (DateTime.now().millisecondsSinceEpoch - pacmanDeadTimeLatest <
+          (pacmanDeadResetTime * 1000)) {
         munching = false;
         dying = true;
-        tween = (DateTime.now().millisecondsSinceEpoch - pacmanDeadTimeLatest) / (pacmanDeadResetTime * 1000);
+        tween = (DateTime.now().millisecondsSinceEpoch - pacmanDeadTimeLatest) /
+            (pacmanDeadResetTime * 1000);
       }
 
+      double mouthwidth = munching
+          ? 0
+          : !dying
+              ? 5 / 32
+              : (5 / 32 * (1 - tween) + 1 * tween);
 
-      double mouthwidth = munching ? 0 : !dying ? 5 / 32 : (5 / 32 * (1-tween) + 1 * tween);
-
-      canvas.drawArc(
-          rect,
-          2 * pi * ((mouthwidth / 2) + 0.5),
-          2 * pi * (1 - mouthwidth),
-          true,
-          _paint
-      );
+      canvas.drawArc(rect, 2 * pi * ((mouthwidth / 2) + 0.5),
+          2 * pi * (1 - mouthwidth), true, _paint);
     }
   }
-
-
-
 }
 
 enum PlayerState { normal, scared, eating, deadGhost }

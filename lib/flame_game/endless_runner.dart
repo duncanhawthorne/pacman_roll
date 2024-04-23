@@ -7,7 +7,6 @@ import '../audio/audio_controller.dart';
 import '../level_selection/levels.dart';
 import '../player_progress/player_progress.dart';
 
-
 import 'endless_world.dart';
 import 'constants.dart';
 import 'helper.dart';
@@ -52,7 +51,6 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
   /// In the [onLoad] method you load different type of assets and set things
   /// that only needs to be set once when the level starts up.
 
-
   Future<void> startGame() async {
     if (startGameMusic) {
       gravityTurnedOn = false;
@@ -60,8 +58,7 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
       Future.delayed(const Duration(milliseconds: 4300), () {
         gravityTurnedOn = true;
       });
-    }
-    else {
+    } else {
       gravityTurnedOn = true;
     }
   }

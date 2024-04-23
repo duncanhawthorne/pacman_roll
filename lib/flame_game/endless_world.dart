@@ -75,11 +75,8 @@ class EndlessWorld extends Forge2DWorld
   /// Where the ground is located in the world and things should stop falling.
   //late final double groundLevel = (size.y / 2) - (size.y / 5);
 
-
-
   @override
   Future<void> onLoad() async {
-
     pelletsRemaining = getStartingNumberPelletsAndSuperPellets();
 
     WakelockPlus.toggle(enable: true);
@@ -160,12 +157,13 @@ class EndlessWorld extends Forge2DWorld
 
   @override
   void onPointerMove(dhpointer_move_event.PointerMoveEvent event) {
-
     if (!android && globalPhysicsLinked && gravityTurnedOn) {
       //simulate gravity based on pointer position
       gravity = event.localPosition - player.position;
-      globalGravity.x = (event.localPosition - player.position).x; //NOTE dimensions not flip
-      globalGravity.y = (event.localPosition - player.position).y; //NOTE dimensions not flip
+      globalGravity.x =
+          (event.localPosition - player.position).x; //NOTE dimensions not flip
+      globalGravity.y =
+          (event.localPosition - player.position).y; //NOTE dimensions not flip
     }
   }
 }

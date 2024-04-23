@@ -12,8 +12,7 @@ class Ball extends BodyComponent with TapCallbacks, ContactCallbacks {
             fixtureDefs: [
               FixtureDef(
                 CircleShape()
-                  ..radius = size ??
-                      min(ksizey, ksizex) / dzoom / mazelen / 2 * 0.99, //0.95
+                  ..radius = size ?? getSingleSquareWidth() / 2 * 0.99, //0.95
                 restitution: 0.0,
                 friction: 0.1,
                 userData: Ball,
