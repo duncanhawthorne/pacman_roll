@@ -9,7 +9,7 @@ class SuperPellet extends SpriteAnimationComponent
     with HasGameReference, HasWorldReference<EndlessWorld> {
   SuperPellet() : super(size: spriteSize, anchor: Anchor.center);
 
-  static final Vector2 spriteSize = Vector2.all(100 / 3 / dzoom);
+  static final Vector2 spriteSize = Vector2.all(100 / 3 / flameGameZoom);
   final speed = 0;
 
   @override

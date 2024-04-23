@@ -95,7 +95,11 @@ int getMagicParity(
 List<RealCharacter> ghostPlayersList = [];
 
 double getSingleSquareWidth() {
-  return min(ksizex, ksizey) / dzoom / mazelen;
+  return min(ksizex, ksizey) / flameGameZoom / getMazeLen();
+}
+
+int getMazeLen() {
+  return sqrt(mazeLayout.length).toInt();
 }
 
 void addGhost(world, int number) {
@@ -124,6 +128,7 @@ List<Component> createBoundaries(CameraComponent camera) {
 }
 
 void addPillsAndPowerPills(world) {
+  int mazelen = getMazeLen();
   for (var i = 0; i < mazelen; i++) {
     for (var j = 0; j < mazelen; j++) {
       int k = j * mazelen + i;

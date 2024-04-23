@@ -1,4 +1,4 @@
-const realLayout = [
+const realMazeLayout = [
   1,
   1,
   1,

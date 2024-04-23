@@ -9,7 +9,7 @@ class MiniPellet extends SpriteAnimationComponent
     with HasGameReference, HasWorldReference<EndlessWorld> {
   MiniPellet() : super(size: spriteSize, anchor: Anchor.center);
 
-  static final Vector2 spriteSize = Vector2.all(100 / 3 / dzoom);
+  static final Vector2 spriteSize = Vector2.all(100 / 3 / flameGameZoom);
   final speed = 0;
 
   @override
@@ -60,7 +60,7 @@ class MiniPellet extends SpriteAnimationComponent
     // anchor) and the center of the world is in (0, 0), so when the components
     // position plus its size in X-axis is outside of minus half the world size
     // we know that it is no longer visible and it can be removed.
-    if (position.y + size.y / 2 < -world.size.y / dzoom / 2) {
+    if (position.y + size.y / 2 < -world.size.y / flameGameZoom / 2) {
       removeFromParent();
     }
   }

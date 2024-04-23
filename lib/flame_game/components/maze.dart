@@ -9,6 +9,7 @@ import 'package:flame/extensions.dart';
 
 void createMaze(double sizex, double sizey, world) {
   if (mazeOn) {
+    int mazelen = getMazeLen();
     for (var i = 0; i < mazelen; i++) {
       for (var j = 0; j < mazelen; j++) {
         int k = j * mazelen + i;
