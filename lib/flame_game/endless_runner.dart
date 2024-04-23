@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import '../audio/audio_controller.dart';
 import '../level_selection/levels.dart';
 import '../player_progress/player_progress.dart';
-import '../settings/settings.dart';
 
 
 import 'endless_world.dart';

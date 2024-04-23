@@ -11,7 +11,6 @@ import 'powerpoint.dart';
 import 'ball.dart';
 import 'dart:math';
 import 'dart:core';
-import 'dart:ui';
 import 'package:flutter/material.dart';
 
 /// The [RealCharacter] is the component that the physical player of the game is
@@ -61,7 +60,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
       for (int i = 0; i < ghostPlayersList.length; i++) {
         ghostPlayersList[i].moveUnderlyingBallToVector(kCageLocation + Vector2.random() / 100);
       }
-      Future.delayed(const Duration(milliseconds: pacmanEatingTime * 2), () {
+      Future.delayed(const Duration(milliseconds: pacmanEatingResetTime * 2), () {
         game.audioController.playSfx(SfxType.clearedBoard);
       });
     }
@@ -78,11 +77,11 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
       //only pacman
       if (other is MiniPellet) {
         if (playerEatingSoundTimeLatest <
-            DateTime.now().millisecondsSinceEpoch - pacmanEatingTime * 2) {
+            DateTime.now().millisecondsSinceEpoch - pacmanEatingResetTime * 2) {
           playerEatingSoundTimeLatest = DateTime.now().millisecondsSinceEpoch;
           game.audioController.playSfx(SfxType.wa);
 
-          Future.delayed(const Duration(milliseconds: pacmanEatingTime), () {
+          Future.delayed(const Duration(milliseconds: pacmanEatingResetTime), () {
             game.audioController.playSfx(SfxType.ka);
           });
         }
@@ -211,18 +210,6 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
             ),
           }
         : {
-            PlayerState.normal: SpriteAnimation.spriteList(
-              [await game.loadSprite('dash/pacmanman.png')],
-              stepTime: double.infinity,
-            ),
-            PlayerState.scared: SpriteAnimation.spriteList(
-              [await game.loadSprite('dash/pacmanman_angry.png')],
-              stepTime: double.infinity,
-            ),
-            PlayerState.eating: SpriteAnimation.spriteList([
-              //await game.loadSprite('dash/pacmanman_eat.png'),
-              await game.loadSprite('dash/pacmanman.png')
-            ], stepTime: pacmanEatingTime / 1000 * 2),
           };
     // The starting state will be that the player is running.
     current = PlayerState.normal;
@@ -253,7 +240,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
     }
     if (!isGhost && current == PlayerState.eating) {
       if (DateTime.now().millisecondsSinceEpoch - playerEatingTimeLatest >
-          2 * pacmanEatingTime) {
+          2 * pacmanEatingResetTime) {
         current = PlayerState.normal;
       }
     }
@@ -310,30 +297,34 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
     handleTwoCharactersMeet(other);
   }
 
-  Paint _paint = Paint()..color = Colors.red;
-  Rect rect = Rect.fromCenter(center: Offset(getSingleSquareWidth()/2,getSingleSquareWidth()/2), width: getSingleSquareWidth(), height: getSingleSquareWidth());
+  final Paint _paint = Paint()..color = Colors.yellowAccent;
+  final Rect rect = Rect.fromCenter(center: Offset(getSingleSquareWidth()/2,getSingleSquareWidth()/2), width: getSingleSquareWidth(), height: getSingleSquareWidth());
 
   @override
   void render(Canvas canvas) {
     super.render(canvas);
     if (!isGhost) {
 
+      double tween = 0;
       bool munching = false;
-      if (DateTime.now().millisecondsSinceEpoch - playerEatingTimeLatest < pacmanEatingTime) {
+      bool dying = false;
+      if (DateTime.now().millisecondsSinceEpoch - playerEatingTimeLatest < pacmanEatingResetTime) {
         munching = true;
       }
 
-      if (DateTime.now().millisecondsSinceEpoch - pacmanDeadTimeLatest < pacmanDeadResetTime) {
+      if (DateTime.now().millisecondsSinceEpoch - pacmanDeadTimeLatest < (pacmanDeadResetTime * 1000)) {
         munching = false;
+        dying = true;
+        tween = (DateTime.now().millisecondsSinceEpoch - pacmanDeadTimeLatest) / (pacmanDeadResetTime * 1000);
       }
-      
 
-      int mouthwidth = 1;
+
+      double mouthwidth = munching ? 0 : !dying ? 5 / 32 : (5 / 32 * (1-tween) + 1 * tween);
 
       canvas.drawArc(
           rect,
-          pi * (3 / 4 + 1/2 - 1/8) ,
-          pi * (munching ? 2 : (6 / 4 + 2* 1/8)),
+          2 * pi * ((mouthwidth / 2) + 0.5),
+          2 * pi * (1 - mouthwidth),
           true,
           _paint
       );

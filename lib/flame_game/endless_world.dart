@@ -111,7 +111,7 @@ class EndlessWorld extends Forge2DWorld
     add(player);
 
     for (int i = 0; i < 3; i++) {
-      //addGhost(this, i);
+      addGhost(this, i);
     }
 
     addPillsAndPowerPills(this);
