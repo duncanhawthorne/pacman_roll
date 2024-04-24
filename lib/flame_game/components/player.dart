@@ -306,12 +306,14 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
       if (DateTime.now().millisecondsSinceEpoch - ghostDeadTimeLatest >
           kGhostResetTimeMillis) {
         if (DateTime.now().millisecondsSinceEpoch - ghostScaredTimeLatest <
-            kGhostChaseTimeMillis) {
-          current = PlayerState.scared;
-        } else if (DateTime.now().millisecondsSinceEpoch - ghostScaredTimeLatest <
+            kGhostChaseTimeMillis && DateTime.now().millisecondsSinceEpoch - ghostScaredTimeLatest >
             kGhostChaseTimeMillis * 2/3) {
           current = PlayerState.scaredIsh;
+        } else if (DateTime.now().millisecondsSinceEpoch - ghostScaredTimeLatest <
+            kGhostChaseTimeMillis * 2/3) {
+          current = PlayerState.scared;
         }
+        else
         {
           current = PlayerState.normal;
         }
