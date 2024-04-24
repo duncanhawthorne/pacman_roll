@@ -2,14 +2,13 @@ import 'package:flutter/foundation.dart';
 import '../audio/audio_controller.dart';
 import 'maze_layout.dart';
 import 'package:flame/components.dart';
-import 'dart:math';
 
 const debugMode = false;
 const bool mazeOn = true;
 const flameGameZoom = 20.0;
 final bool android = defaultTargetPlatform == TargetPlatform.android;
 const mazeLayout = realMazeLayout;
-const bool normaliseGravity = true;
+final bool normaliseGravity = android ? false : true;
 final bool screenRotates = android ? false : true;
 final gameScaleFactor = screenRotates ? 0.9 : 1.0;
 
@@ -27,7 +26,7 @@ final Vector2 kLeftPortalLocation = Vector2(-9 * ksingleSquareWidthProxy, -1 * k
 final Vector2 kRightPortalLocation = Vector2(9 * ksingleSquareWidthProxy, -1 * ksingleSquareWidthProxy);
 
 const int kGhostResetTimeMillis = 1000;
-const int kGhostChaseTimeMillis = 10000;
+const int kGhostChaseTimeMillis = 6000;
 const int kPacmanDeadResetTimeMillis = 1000;
 const int kPacmanHalfEatingResetTimeMillis = 130;
 

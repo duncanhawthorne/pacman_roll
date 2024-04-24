@@ -211,8 +211,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
             ),
             PlayerState.scared: SpriteAnimation.spriteList(
               [
-                await game.loadSprite('dash/ghostscared1.png'),
-                await game.loadSprite('dash/ghostscared2.png')
+                await game.loadSprite('dash/ghostscared1.png')
               ],
               stepTime: 0.1,
             ),
@@ -288,10 +287,15 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
   @override
   void update(double dt) {
     super.update(dt);
+    //TODO when ghosts are moving should play siren sound proportional to movement
+    //TODO try to capture mouse on windows
 
     //FIXME instead of testing this every frame, move into futures, and still test every frame, but only when in the general zone that need to test this
-    if (isGhost && current == PlayerState.scared) {
-      // TODO should be two phases of scared so know when scared is coming to an end
+    if (isGhost && (current == PlayerState.scared || current == PlayerState.scaredIsh)) {
+      if (DateTime.now().millisecondsSinceEpoch - ghostScaredTimeLatest >
+          kGhostChaseTimeMillis * 2/3) {
+        current = PlayerState.scaredIsh;
+      }
       if (DateTime.now().millisecondsSinceEpoch - ghostScaredTimeLatest >
           kGhostChaseTimeMillis) {
         current = PlayerState.normal;
@@ -304,7 +308,11 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
         if (DateTime.now().millisecondsSinceEpoch - ghostScaredTimeLatest <
             kGhostChaseTimeMillis) {
           current = PlayerState.scared;
-        } else {
+        } else if (DateTime.now().millisecondsSinceEpoch - ghostScaredTimeLatest <
+            kGhostChaseTimeMillis * 2/3) {
+          current = PlayerState.scaredIsh;
+        }
+        {
           current = PlayerState.normal;
         }
       }
