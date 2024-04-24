@@ -8,10 +8,11 @@ const bool mazeOn = true;
 const flameGameZoom = 20.0;
 final bool android = defaultTargetPlatform == TargetPlatform.android;
 const mazeLayout = realMazeLayout;
+const bool normaliseGravity = true;
 
 AudioController? globalAudioController; //initial value which immediately gets overridden
-double ksizex = 100; //initial value which immediately gets overridden
-double ksizey = 100; //initial value which immediately gets overridden
+double ksizex = 1700;
+double ksizey = 1700;
 Vector2 globalGravity = Vector2(0, 0); //initial value which immediately gets overridden
 
 const double ksingleSquareWidthProxy = 4.0; //FIXME harcoded, right now approx value of getSingleSquareWidth()
@@ -24,7 +25,7 @@ final Vector2 kRightPortalLocation = Vector2(9 * ksingleSquareWidthProxy, -1 * k
 const int kGhostResetTimeMillis = 1000;
 const int kGhostChaseTimeMillis = 10000;
 const int kPacmanDeadResetTimeMillis = 1000;
-const int kPacmanEatingResetTimeMillis = 130;
+const int kPacmanHalfEatingResetTimeMillis = 130;
 
 bool globalPhysicsLinked = true;
 bool gravityTurnedOn = false;

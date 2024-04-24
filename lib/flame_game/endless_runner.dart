@@ -38,7 +38,7 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
   }) : super(
           world: EndlessWorld(level: level, playerProgress: playerProgress),
           camera: CameraComponent.withFixedResolution(
-              width: 1700, height: 1700), //2800, 1700
+              width: ksizex, height: ksizey), //2800, 1700
           zoom: flameGameZoom,
         );
 
@@ -74,7 +74,7 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
     world.audioController = audioController;
     globalAudioController = audioController;
     if (!debugMode) {
-      createMaze(size.x, size.y, world);
+      createMaze(world);
     }
 
     // With the `TextPaint` we define what properties the text that we are going

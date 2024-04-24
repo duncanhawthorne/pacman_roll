@@ -14,6 +14,7 @@ import 'package:flame/src/events/messages/pointer_move_event.dart'
 
 import 'game_screen.dart';
 import 'components/player.dart';
+import 'components/compass.dart';
 import 'constants.dart';
 import 'helper.dart';
 
@@ -80,8 +81,7 @@ class EndlessWorld extends Forge2DWorld
     pelletsRemaining = getStartingNumberPelletsAndSuperPellets();
 
     WakelockPlus.toggle(enable: true);
-    ksizex = size.x; //FIXME effective hardcoding
-    ksizey = size.y; //FIXME effective hardcoding
+
     // Used to keep track of when the level started, so that we later can
     // calculate how long time it took to finish the level.
     timeStarted = DateTime.now();
@@ -94,6 +94,10 @@ class EndlessWorld extends Forge2DWorld
             gravity = Vector2(event.y, event.x - 5) * 18; //NOTE dimensions flip
             globalGravity.y = event.x - 5; //NOTE dimensions not flip
             globalGravity.x = event.y; //NOTE dimensions not flip
+            if (normaliseGravity) {
+              gravity = globalGravity.normalized()*50;
+              globalGravity = globalGravity.normalized()*50;
+            }
           }
         },
         onError: (error) {
@@ -112,6 +116,8 @@ class EndlessWorld extends Forge2DWorld
     }
 
     addPillsAndPowerPills(this);
+
+    add(Compass());
 
     // When the player takes a new point we check if the score is enough to
     // pass the level and if it is we calculate what time the level was passed
@@ -160,10 +166,16 @@ class EndlessWorld extends Forge2DWorld
     if (!android && globalPhysicsLinked && gravityTurnedOn) {
       //simulate gravity based on pointer position
       gravity = event.localPosition - player.position;
+      //FIXME for some reason you can set gravity, but when you read it is always 100,0
+
       globalGravity.x =
           (event.localPosition - player.position).x; //NOTE dimensions not flip
       globalGravity.y =
           (event.localPosition - player.position).y; //NOTE dimensions not flip
+      if (normaliseGravity) {
+        gravity = globalGravity.normalized()*50;
+        globalGravity = globalGravity.normalized()*50;
+      }
     }
   }
 }

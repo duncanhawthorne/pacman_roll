@@ -7,7 +7,7 @@ import 'wall.dart';
 
 import 'package:flame/extensions.dart';
 
-void createMaze(double sizex, double sizey, world) {
+void createMaze(world) {
   if (mazeOn) {
     int mazelen = getMazeLen();
     for (var i = 0; i < mazelen; i++) {

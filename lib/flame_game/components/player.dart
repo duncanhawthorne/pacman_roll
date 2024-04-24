@@ -10,8 +10,12 @@ import 'point.dart';
 import 'powerpoint.dart';
 import 'ball.dart';
 import 'dart:math';
+import 'dart:ui';
+import 'dart:ui' as ui;
 import 'dart:core';
 import 'package:flutter/material.dart';
+//import 'package:sky_engine/ui/painting.dart'
+//as dh_image;
 
 /// The [RealCharacter] is the component that the physical player of the game is
 /// controlling.
@@ -31,6 +35,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
 
   final bool isGhost;
   Vector2 startPosition;
+  Vector2 vel = Vector2(0, 0);
   Ball underlyingBallReal = Ball(); //to avoid null safety issues
   int ghostNumber = 1;
   int ghostScaredTimeLatest = 0; //a long time ago
@@ -65,7 +70,8 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
             .moveUnderlyingBallToVector(kCageLocation + Vector2.random() / 100);
       }
       Future.delayed(
-          const Duration(milliseconds: kPacmanEatingResetTimeMillis * 2), () {
+          const Duration(milliseconds: kPacmanHalfEatingResetTimeMillis * 2),
+          () {
         game.audioController.playSfx(SfxType.clearedBoard);
       });
     }
@@ -77,12 +83,13 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
       if (other is MiniPellet) {
         if (playerEatingSoundTimeLatest <
             DateTime.now().millisecondsSinceEpoch -
-                kPacmanEatingResetTimeMillis * 2) {
+                kPacmanHalfEatingResetTimeMillis * 2) {
           playerEatingSoundTimeLatest = DateTime.now().millisecondsSinceEpoch;
           game.audioController.playSfx(SfxType.wa);
 
           Future.delayed(
-              const Duration(milliseconds: kPacmanEatingResetTimeMillis), () {
+              const Duration(milliseconds: kPacmanHalfEatingResetTimeMillis),
+              () {
             game.audioController.playSfx(SfxType.ka);
           });
         }
@@ -156,6 +163,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
 
           globalAudioController!.playSfx(SfxType.pacmanDeath);
           pacmanDeadTimeLatest = DateTime.now().millisecondsSinceEpoch;
+          current = PlayerState.deadPacman;
 
           globalPhysicsLinked = false;
 
@@ -210,7 +218,21 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
               stepTime: double.infinity,
             ),
           }
-        : {};
+        : {
+            PlayerState.normal: SpriteAnimation.spriteList(
+              [
+                Sprite(createPacmanStandard())
+              ], //game.loadSprite('dash/pacmanman.png')],
+              stepTime: double.infinity,
+            ),
+            PlayerState.eating: SpriteAnimation.spriteList(
+              [
+                Sprite(createPacmanStandard()),
+                Sprite(createPacmanMouthClosed())
+              ], //game.loadSprite('dash/pacmanman.png')],
+              stepTime: kPacmanHalfEatingResetTimeMillis / 1000,
+            )
+          };
     // The starting state will be that the player is running.
     current = PlayerState.normal;
     _lastPosition.setFrom(position);
@@ -240,14 +262,24 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
     }
     if (!isGhost && current == PlayerState.eating) {
       if (DateTime.now().millisecondsSinceEpoch - playerEatingTimeLatest >
-          2 * kPacmanEatingResetTimeMillis) {
+          2 * kPacmanHalfEatingResetTimeMillis) {
+        current = PlayerState.normal;
+      }
+    }
+    if (!isGhost && current == PlayerState.deadPacman) {
+      if (DateTime.now().millisecondsSinceEpoch - playerEatingTimeLatest >
+          kPacmanDeadResetTimeMillis) {
         current = PlayerState.normal;
       }
     }
 
     if (globalPhysicsLinked) {
-      Vector2 vel = Vector2(underlyingBallReal.body.linearVelocity.x,
-          underlyingBallReal.body.linearVelocity.y);
+      try {
+        vel = Vector2(underlyingBallReal.body.linearVelocity.x,
+            underlyingBallReal.body.linearVelocity.y);
+      } catch (e) {
+        p(e);
+      }
       if (isGhost && current == PlayerState.deadGhost) {
         double timefrac =
             (DateTime.now().millisecondsSinceEpoch - ghostDeadTimeLatest) /
@@ -263,7 +295,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
         }
 
         if (!debugMode) {
-          if (position.x > 36) {
+          if (position.x > 9 * ksingleSquareWidthProxy) {
             //Vector2 vel = (position - _lastPosition)/dt *100;
 
             moveUnderlyingBallToVector(kLeftPortalLocation);
@@ -271,7 +303,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
               //FIXME physical ball not initialised immediately
               underlyingBallReal.body.linearVelocity = vel;
             });
-          } else if (position.x < -36) {
+          } else if (position.x < -9 * ksingleSquareWidthProxy) {
             moveUnderlyingBallToVector(kRightPortalLocation);
             Future.delayed(const Duration(seconds: 0), () {
               //FIXME physical ball not initialised immediately
@@ -297,42 +329,49 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
     handleTwoCharactersMeet(other);
   }
 
-  final Paint _paint = Paint()..color = Colors.yellowAccent;
+  final Paint _pacmanYellowPaint = Paint()..color = Colors.yellowAccent;
   final Rect rect = Rect.fromCenter(
       center: Offset(getSingleSquareWidth() / 2, getSingleSquareWidth() / 2),
       width: getSingleSquareWidth(),
       height: getSingleSquareWidth());
+  final Rect rect100 = Rect.fromCenter(
+      center: const Offset(100 / 2, 100 / 2), width: 100, height: 100);
 
   @override
   void render(Canvas canvas) {
     super.render(canvas);
-    if (!isGhost) {
+    if (!isGhost && current == PlayerState.deadPacman) {
       double tween = 0;
-      bool munching = false;
-      bool dying = false;
-      if (DateTime.now().millisecondsSinceEpoch - playerEatingTimeLatest <
-          kPacmanEatingResetTimeMillis) {
-        munching = true;
-      }
-
-      if (DateTime.now().millisecondsSinceEpoch - pacmanDeadTimeLatest <
-          (kPacmanDeadResetTimeMillis)) {
-        munching = false;
-        dying = true;
+      if (current == PlayerState.deadPacman &&
+          DateTime.now().millisecondsSinceEpoch - pacmanDeadTimeLatest <
+              kPacmanDeadResetTimeMillis) {
         tween = (DateTime.now().millisecondsSinceEpoch - pacmanDeadTimeLatest) /
-            (kPacmanDeadResetTimeMillis);
+            kPacmanDeadResetTimeMillis;
       }
-
-      double mouthWidth = munching
-          ? 0
-          : !dying
-              ? 5 / 32
-              : (5 / 32 * (1 - tween) + 1 * tween);
-
+      double mouthWidth = 5 / 32 * (1 - tween) + 1 * tween;
       canvas.drawArc(rect, 2 * pi * ((mouthWidth / 2) + 0.5),
-          2 * pi * (1 - mouthWidth), true, _paint);
+          2 * pi * (1 - mouthWidth), true, _pacmanYellowPaint);
     }
+  }
+
+  //FIXME draw once and then render rather than drawing each frame
+  ui.Image createPacmanStandard() {
+    final recorder = PictureRecorder();
+    final canvas = Canvas(recorder);
+    const mouthWidth = 5 / 32;
+    canvas.drawArc(rect100, 2 * pi * ((mouthWidth / 2) + 0.5),
+        2 * pi * (1 - mouthWidth), true, _pacmanYellowPaint);
+    return recorder.endRecording().toImageSync(100, 100);
+  }
+
+  ui.Image createPacmanMouthClosed() {
+    final recorder = PictureRecorder();
+    final canvas = Canvas(recorder);
+    const mouthWidth = 0;
+    canvas.drawArc(rect100, 2 * pi * ((mouthWidth / 2) + 0.5),
+        2 * pi * (1 - mouthWidth), true, _pacmanYellowPaint);
+    return recorder.endRecording().toImageSync(100, 100);
   }
 }
 
-enum PlayerState { normal, scared, eating, deadGhost }
+enum PlayerState { normal, scared, eating, deadGhost, deadPacman }

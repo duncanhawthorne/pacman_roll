@@ -53,7 +53,7 @@ int getMagicParity(
 
   WallLocation onWall = WallLocation.bottom;
   bool clockwise = true;
-  Vector2 gravityWeCareAbout = globalGravity;
+  Vector2 gravityWeCareAbout = globalGravity; //world.gravity;
   double small = 4;
 
   if (velx.abs() > small) {
