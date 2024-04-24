@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import '../audio/audio_controller.dart';
 import 'maze_layout.dart';
+import 'helper.dart';
 import 'package:flame/components.dart';
 
 const debugMode = false;
@@ -18,12 +19,12 @@ double ksizey = 1700;
 Vector2 globalGravity = Vector2(0, 0); //initial value which immediately gets overridden
 double transAngle = 0; //2 * pi / 8;
 
-final double ksingleSquareWidthProxy = 4.0 * gameScaleFactor; //FIXME harcoded, right now approx value of getSingleSquareWidth()
-final Vector2 kGhostStartLocation = Vector2(0, -3 * ksingleSquareWidthProxy);
-final Vector2 kPacmanStartLocation = Vector2(0, 5 * ksingleSquareWidthProxy);
-final Vector2 kCageLocation = Vector2(0, -2 * ksingleSquareWidthProxy);
-final Vector2 kLeftPortalLocation = Vector2(-9 * ksingleSquareWidthProxy, -1 * ksingleSquareWidthProxy);
-final Vector2 kRightPortalLocation = Vector2(9 * ksingleSquareWidthProxy, -1 * ksingleSquareWidthProxy);
+//final double ksingleSquareWidthProxy = 4.0 * gameScaleFactor; //FIXME harcoded, right now approx value of getSingleSquareWidth()
+final Vector2 kGhostStartLocation = Vector2(0, -3 * getSingleSquareWidth());
+final Vector2 kPacmanStartLocation = Vector2(0, 5 * getSingleSquareWidth());
+final Vector2 kCageLocation = Vector2(0, -1 * getSingleSquareWidth());
+final Vector2 kLeftPortalLocation = Vector2(-9 * getSingleSquareWidth(), -1 * getSingleSquareWidth());
+final Vector2 kRightPortalLocation = Vector2(9 * getSingleSquareWidth(), -1 * getSingleSquareWidth());
 
 const int kGhostResetTimeMillis = 1000;
 const int kGhostChaseTimeMillis = 6000;

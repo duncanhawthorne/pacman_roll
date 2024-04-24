@@ -348,10 +348,10 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
         position = screenPos(getUnderlyingPosition());
 
         if (!debugMode) {
-          if (getUnderlyingPosition().x > 9 * ksingleSquareWidthProxy) {
+          if (getUnderlyingPosition().x > 9 * getSingleSquareWidth()) {
             moveUnderlyingBallToVector(kLeftPortalLocation);
             setUnderlyingVelocity(vel);
-          } else if (getUnderlyingPosition().x < -9 * ksingleSquareWidthProxy) {
+          } else if (getUnderlyingPosition().x < -9 * getSingleSquareWidth()) {
             moveUnderlyingBallToVector(kRightPortalLocation);
             setUnderlyingVelocity(vel);
           }
