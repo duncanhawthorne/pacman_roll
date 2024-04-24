@@ -46,6 +46,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
   // Used to store the last position of the player, so that we later can
   // determine which direction that the player is moving.
   final Vector2 _lastPosition = Vector2.zero();
+  double _lastTransAngle = 0;
 
   Ball createUnderlyingBall(Vector2 startPosition) {
     Ball underlyingBallRealTmp = Ball();
@@ -129,7 +130,8 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
       if (otherPlayer.current == PlayerState.deadGhost) {
         //nothing, but need to keep if condition
       }
-      if (otherPlayer.current == PlayerState.scared) {
+      if (otherPlayer.current == PlayerState.scared ||
+          otherPlayer.current == PlayerState.scaredIsh) {
         //pacman eats ghost
 
         //pacman visuals
@@ -141,7 +143,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
         //ghost impact
         otherPlayer.current = PlayerState.deadGhost;
         otherPlayer.ghostDeadTimeLatest = DateTime.now().millisecondsSinceEpoch;
-        otherPlayer.ghostDeadPosition = Vector2(position.x, position.y);
+        otherPlayer.ghostDeadPosition = getUnderlyingPosition();
 
         //immediately move into cage where out of the way an no ball interactions
         //FIXME somehow ghost can still kill pacman while in this state
@@ -166,7 +168,9 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
           globalPhysicsLinked = false;
 
           Future.delayed(
-              const Duration(milliseconds: kPacmanDeadResetTimeMillis), () {
+              const Duration(milliseconds: kPacmanDeadResetTimeMillis + 100),
+              () {
+            //100 buffer
             if (!globalPhysicsLinked) {
               //prevent multiple resets
 
@@ -178,6 +182,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
                 ghostPlayersList[i].ghostDeadTimeLatest = 0;
                 ghostPlayersList[i].ghostScaredTimeLatest = 0;
               }
+              current = PlayerState.normal;
               globalPhysicsLinked = true;
             }
           });
@@ -205,6 +210,13 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
               stepTime: double.infinity,
             ),
             PlayerState.scared: SpriteAnimation.spriteList(
+              [
+                await game.loadSprite('dash/ghostscared1.png'),
+                await game.loadSprite('dash/ghostscared2.png')
+              ],
+              stepTime: 0.1,
+            ),
+            PlayerState.scaredIsh: SpriteAnimation.spriteList(
               [
                 await game.loadSprite('dash/ghostscared1.png'),
                 await game.loadSprite('dash/ghostscared2.png')
@@ -241,21 +253,60 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
     add(CircleHitbox());
   }
 
+  Vector2 getUnderlyingPosition() {
+    try {
+      return underlyingBallReal.position;
+    } catch (e) {
+      //FIXME shouldn't need this
+      p(e);
+      return Vector2(0, 0);
+    }
+  }
+
+  Vector2 getUnderlyingVelocity() {
+    try {
+      return Vector2(underlyingBallReal.body.linearVelocity.x,
+          underlyingBallReal.body.linearVelocity.y);
+    } catch (e) {
+      //FIXME shouldn't need this
+      p(e);
+      return Vector2(0, 0);
+    }
+  }
+
+  void setUnderlyingVelocity(Vector2 vel) {
+    try {
+      underlyingBallReal.body.linearVelocity = vel;
+    } catch (e) {
+      Future.delayed(const Duration(seconds: 0), () {
+        //FIXME physical ball not initialised immediately
+        underlyingBallReal.body.linearVelocity = vel;
+      });
+    }
+  }
+
   @override
   void update(double dt) {
     super.update(dt);
 
     //FIXME instead of testing this every frame, move into futures, and still test every frame, but only when in the general zone that need to test this
     if (isGhost && current == PlayerState.scared) {
+      // TODO should be two phases of scared so know when scared is coming to an end
       if (DateTime.now().millisecondsSinceEpoch - ghostScaredTimeLatest >
           kGhostChaseTimeMillis) {
         current = PlayerState.normal;
       }
     }
     if (isGhost && current == PlayerState.deadGhost) {
+      //FIXME possibly when return from dead should still be scared if within timeframe
       if (DateTime.now().millisecondsSinceEpoch - ghostDeadTimeLatest >
           kGhostResetTimeMillis) {
-        current = PlayerState.normal;
+        if (DateTime.now().millisecondsSinceEpoch - ghostScaredTimeLatest <
+            kGhostChaseTimeMillis) {
+          current = PlayerState.scared;
+        } else {
+          current = PlayerState.normal;
+        }
       }
     }
     if (!isGhost && current == PlayerState.eating) {
@@ -264,6 +315,8 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
         current = PlayerState.normal;
       }
     }
+    /*
+    //Handle in collision function to ensure in sync with other changes
     if (!isGhost && current == PlayerState.deadPacman) {
       if (DateTime.now().millisecondsSinceEpoch - playerEatingTimeLatest >
           kPacmanDeadResetTimeMillis) {
@@ -271,51 +324,37 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
       }
     }
 
+     */
+
     if (globalPhysicsLinked) {
-      try {
-        vel = Vector2(underlyingBallReal.body.linearVelocity.x,
-            underlyingBallReal.body.linearVelocity.y);
-      } catch (e) {
-        p(e);
-      }
+      vel = getUnderlyingVelocity();
       if (isGhost && current == PlayerState.deadGhost) {
         double timefrac =
             (DateTime.now().millisecondsSinceEpoch - ghostDeadTimeLatest) /
                 (kGhostResetTimeMillis);
-        position = ghostDeadPosition * (1 - timefrac) +
-            kGhostStartLocation * (timefrac);
+        position = screenPos(ghostDeadPosition * (1 - timefrac) +
+            kGhostStartLocation * (timefrac));
       } else {
-        try {
-          position = screenPos(underlyingBallReal.position);
-        } catch (e) {
-          //effectively leave unchanged and pick up next frame
-          p(e); //FIXME if physical ball not initialised properly
-        }
+        position = screenPos(getUnderlyingPosition());
 
         if (!debugMode) {
-          if (underlyingBallReal.position.x > 9 * ksingleSquareWidthProxy) {
-            //Vector2 vel = (position - _lastPosition)/dt *100;
-
+          if (getUnderlyingPosition().x > 9 * ksingleSquareWidthProxy) {
             moveUnderlyingBallToVector(kLeftPortalLocation);
-            Future.delayed(const Duration(seconds: 0), () {
-              //FIXME physical ball not initialised immediately
-              underlyingBallReal.body.linearVelocity = vel;
-            });
-          } else if (underlyingBallReal.position.x < -9 * ksingleSquareWidthProxy) {
+            setUnderlyingVelocity(vel);
+          } else if (getUnderlyingPosition().x < -9 * ksingleSquareWidthProxy) {
             moveUnderlyingBallToVector(kRightPortalLocation);
-            Future.delayed(const Duration(seconds: 0), () {
-              //FIXME physical ball not initialised immediately
-              underlyingBallReal.body.linearVelocity = vel;
-            });
+            setUnderlyingVelocity(vel);
           }
         }
 
-        angle += (position - _lastPosition).length /
-            (size.x / 2) *
-            getMagicParity(world, this, vel.x, vel.y);
+        angle += (transAngle - _lastTransAngle) +
+            (getUnderlyingPosition() - _lastPosition).length /
+                (size.x / 2) *
+                getMagicParity(world, this, vel.x, vel.y);
       }
     }
-    _lastPosition.setFrom(position);
+    _lastPosition.setFrom(getUnderlyingPosition());
+    _lastTransAngle = transAngle;
   }
 
   @override
@@ -340,12 +379,17 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
     super.render(canvas);
     if (!isGhost && current == PlayerState.deadPacman) {
       double tween = 0;
+      /*
       if (current == PlayerState.deadPacman &&
           DateTime.now().millisecondsSinceEpoch - pacmanDeadTimeLatest <
               kPacmanDeadResetTimeMillis) {
         tween = (DateTime.now().millisecondsSinceEpoch - pacmanDeadTimeLatest) /
             kPacmanDeadResetTimeMillis;
       }
+       */
+      tween = (DateTime.now().millisecondsSinceEpoch - pacmanDeadTimeLatest) /
+          kPacmanDeadResetTimeMillis;
+      tween = min(1, tween);
       double mouthWidth = 5 / 32 * (1 - tween) + 1 * tween;
       canvas.drawArc(rect, 2 * pi * ((mouthWidth / 2) + 0.5),
           2 * pi * (1 - mouthWidth), true, _pacmanYellowPaint);
@@ -372,4 +416,4 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
   }
 }
 
-enum PlayerState { normal, scared, eating, deadGhost, deadPacman }
+enum PlayerState { normal, scared, scaredIsh, eating, deadGhost, deadPacman }

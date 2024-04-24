@@ -166,7 +166,7 @@ class EndlessWorld extends Forge2DWorld
     if (!android && globalPhysicsLinked && gravityTurnedOn) {
       //simulate gravity based on pointer position
       //event.localPosition - Vector2(0,0)
-      double impAngle = (event.localPosition.x / (ksizex/2) * 2* pi) * 20;
+      double impAngle = (-event.localPosition.x / (ksizex/2) * 2* pi) * 20;
       Vector2 tmpGravVect = screenRotates ? Vector2(cos(impAngle), sin(impAngle))  : event.localPosition - player.underlyingBallReal.position;
       gravity = tmpGravVect;
       //FIXME for some reason you can set gravity, but when you read it is always 100,0

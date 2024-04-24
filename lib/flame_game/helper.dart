@@ -26,7 +26,7 @@ int getStartingNumberPelletsAndSuperPellets() {
 }
 
 double getSingleSquareWidth() {
-  return min(ksizex, ksizey) / flameGameZoom / getMazeLen();
+  return min(ksizex, ksizey) / flameGameZoom / getMazeLen() * gameScaleFactor;
 }
 
 int getMazeLen() {

@@ -25,6 +25,7 @@ class Background extends ParallaxComponent {
 
     anchor = Anchor.center;
     position = Vector2(ksizex/2,ksizey/2);
+    scale = Vector2(gameScaleFactor,gameScaleFactor);
     angle = transAngle;
 
     // The base velocity sets the speed of the layer the farthest to the back.
