@@ -14,8 +14,6 @@ import 'dart:ui';
 import 'dart:ui' as ui;
 import 'dart:core';
 import 'package:flutter/material.dart';
-//import 'package:sky_engine/ui/painting.dart'
-//as dh_image;
 
 /// The [RealCharacter] is the component that the physical player of the game is
 /// controlling.
@@ -288,14 +286,14 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
             kGhostStartLocation * (timefrac);
       } else {
         try {
-          position = underlyingBallReal.position;
+          position = screenPos(underlyingBallReal.position);
         } catch (e) {
           //effectively leave unchanged and pick up next frame
           p(e); //FIXME if physical ball not initialised properly
         }
 
         if (!debugMode) {
-          if (position.x > 9 * ksingleSquareWidthProxy) {
+          if (underlyingBallReal.position.x > 9 * ksingleSquareWidthProxy) {
             //Vector2 vel = (position - _lastPosition)/dt *100;
 
             moveUnderlyingBallToVector(kLeftPortalLocation);
@@ -303,7 +301,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
               //FIXME physical ball not initialised immediately
               underlyingBallReal.body.linearVelocity = vel;
             });
-          } else if (position.x < -9 * ksingleSquareWidthProxy) {
+          } else if (underlyingBallReal.position.x < -9 * ksingleSquareWidthProxy) {
             moveUnderlyingBallToVector(kRightPortalLocation);
             Future.delayed(const Duration(seconds: 0), () {
               //FIXME physical ball not initialised immediately

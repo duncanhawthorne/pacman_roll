@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:endless_runner/flame_game/constants.dart';
 import 'package:flame/components.dart';
 import 'package:flame/parallax.dart';
 
@@ -22,6 +23,10 @@ class Background extends ParallaxComponent {
       //ParallaxImageData('scenery/ground.png'),
     ];
 
+    anchor = Anchor.center;
+    position = Vector2(ksizex/2,ksizey/2);
+    angle = transAngle;
+
     // The base velocity sets the speed of the layer the farthest to the back.
     // Since the speed in our game is defined as the speed of the layer in the
     // front, where the player is, we have to calculate what speed the layer in
@@ -36,6 +41,7 @@ class Background extends ParallaxComponent {
     // screen it is.
     final velocityMultiplierDelta = Vector2(2.0, 0.0);
 
+
     parallax = await game.loadParallax(
       layers,
       baseVelocity: baseVelocity,
@@ -43,4 +49,13 @@ class Background extends ParallaxComponent {
       filterQuality: FilterQuality.none,
     );
   }
+
+  @override
+  void update(double dt) {
+    super.update(dt);
+    if (screenRotates) {
+      angle = transAngle;
+    }
+  }
+
 }

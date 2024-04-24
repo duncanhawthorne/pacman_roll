@@ -25,6 +25,6 @@ class Compass extends SpriteAnimationComponent
     super.update(dt);
     Vector2 tmp = globalGravity / 25;
 
-    position = (Vector2(0, -2) + Vector2(max(-0.5,min(0.5,tmp.x)), max(-0.5,min(0.5,tmp.y)))) * getSingleSquareWidth();
+    position = screenPos((Vector2(0, -2) + Vector2(max(-0.5,min(0.5,tmp.x)), max(-0.5,min(0.5,tmp.y)))) * getSingleSquareWidth());
   }
 }

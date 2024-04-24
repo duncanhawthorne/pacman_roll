@@ -15,6 +15,7 @@ import 'components/background.dart';
 import '../../audio/sounds.dart';
 import 'dart:core';
 
+
 /// This is the base of the game which is added to the [GameWidget].
 ///
 /// This class defines a few different properties for the game:
@@ -62,6 +63,8 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
       gravityTurnedOn = true;
     }
   }
+
+
 
   @override
   Future<void> onLoad() async {

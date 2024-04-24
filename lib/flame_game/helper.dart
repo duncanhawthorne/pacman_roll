@@ -45,6 +45,17 @@ void addGhost(world, int number) {
   ghostPlayersList.add(ghost);
 }
 
+Vector2 screenPos(Vector2 absolutePos) {
+  if (!screenRotates) {
+    return absolutePos;
+  } else {
+    Matrix2 mat = Matrix2(
+        cos(transAngle), -sin(transAngle), sin(transAngle), cos(transAngle));
+    return Vector2(mat[0] * absolutePos[0] + mat[1] * absolutePos[1],
+        mat[2] * absolutePos[0] + mat[3] * absolutePos[1]);
+  }
+}
+
 enum WallLocation { bottom, top, left, right }
 
 int getMagicParity(
@@ -141,12 +152,12 @@ void addPillsAndPowerPills(world) {
 
       if (mazeLayout[k] == 0) {
         var pillx = MiniPellet();
-        pillx.position = location;
+        pillx.absPosition = location;
         world.add(pillx);
       }
       if (mazeLayout[k] == 3) {
         var powerpill = SuperPellet();
-        powerpill.position = location;
+        powerpill.absPosition = location;
         world.add(powerpill);
       }
     }
