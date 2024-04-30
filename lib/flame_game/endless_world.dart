@@ -76,6 +76,8 @@ class EndlessWorld extends Forge2DWorld
   /// Where the ground is located in the world and things should stop falling.
   //late final double groundLevel = (size.y / 2) - (size.y / 5);
 
+
+
   @override
   Future<void> onLoad() async {
     pelletsRemaining = getStartingNumberPelletsAndSuperPellets();
@@ -90,15 +92,7 @@ class EndlessWorld extends Forge2DWorld
       accelerometerEventStream().listen(
         //start once and then runs
         (AccelerometerEvent event) {
-          if (android && globalPhysicsLinked && gravityTurnedOn) {
-            gravity = Vector2(event.y, event.x - 5) * 18; //NOTE dimensions flip
-            globalGravity.y = event.x - 5; //NOTE dimensions not flip
-            globalGravity.x = event.y; //NOTE dimensions not flip
-            if (normaliseGravity) {
-              gravity = globalGravity.normalized()*50;
-              globalGravity = globalGravity.normalized()*50;
-            }
-          }
+            setGravity(Vector2(event.y, event.x - 5));
         },
         onError: (error) {
           // Logic to handle error
@@ -164,25 +158,29 @@ class EndlessWorld extends Forge2DWorld
   @override
   void onPointerMove(dhpointer_move_event.PointerMoveEvent event) {
     if (!android && globalPhysicsLinked && gravityTurnedOn) {
-      //simulate gravity based on pointer position
-      //event.localPosition - Vector2(0,0)
-      double impAngle = (-event.localPosition.x / (ksizex/2) * 2* pi) * 20;
-      Vector2 tmpGravVect = screenRotates ? Vector2(cos(impAngle), sin(impAngle))  : event.localPosition - player.underlyingBallReal.position;
-      gravity = tmpGravVect;
-      //FIXME for some reason you can set gravity, but when you read it is always 100,0
-
-      globalGravity = tmpGravVect;
-      //globalGravity.x =
-      //    (event.localPosition - player.underlyingBallReal.position).x; //NOTE dimensions not flip
-      //globalGravity.y =
-      //    (event.localPosition - player.underlyingBallReal.position).y; //NOTE dimensions not flip
-      if (normaliseGravity) {
-        gravity = globalGravity.normalized()*50;
-        globalGravity = globalGravity.normalized()*50;
-      }
+      double impliedAngle = (-event.localPosition.x / (ksizex/2) * 2* pi) * 20;
+      setGravity(screenRotates ? Vector2(cos(impliedAngle), sin(impliedAngle))  : event.localPosition - player.underlyingBallReal.position);
       if (screenRotates) {
-        transAngle = atan2(globalGravity.x, globalGravity.y);
+        transAngle = atan2(getGravity().x, getGravity().y);
       }
     }
   }
+
+  void setGravity(Vector2 gravTarget) {
+    if (globalPhysicsLinked && gravityTurnedOn) {
+      //FIXME for some reason you can set gravity, but when you read it is always 100,0
+      gravity = gravTarget;
+      globalGravity = gravTarget;
+      if (normaliseGravity) {
+        gravity = globalGravity.normalized() * 50;
+        globalGravity = globalGravity.normalized() * 50;
+      }
+    }
+  }
+
+  Vector2 getGravity() {
+    //FIXME for some reason you can set gravity, but when you read it is always 100,0
+    return globalGravity;
+  }
+
 }
