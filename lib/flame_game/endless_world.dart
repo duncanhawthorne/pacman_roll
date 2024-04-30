@@ -157,9 +157,25 @@ class EndlessWorld extends Forge2DWorld
 
   @override
   void onPointerMove(dhpointer_move_event.PointerMoveEvent event) {
+    handlePointerEvent(Vector2(event.localPosition.x, event.localPosition.y));
+  }
+
+  @override
+  void onDragStart(DragStartEvent event) {
+    super.onDragStart(event);
+    handlePointerEvent(Vector2(event.localPosition.x, event.localPosition.y));
+  }
+
+  @override
+  void onDragUpdate(DragUpdateEvent event) {
+    super.onDragUpdate(event);
+    handlePointerEvent(Vector2(event.localStartPosition.x, event.localStartPosition.y));
+  }
+
+  void handlePointerEvent(Vector2 eventVector) {
     if (!android && globalPhysicsLinked && gravityTurnedOn) {
-      double impliedAngle = (-event.localPosition.x / (ksizex/2) * 2* pi) * 20;
-      setGravity(screenRotates ? Vector2(cos(impliedAngle), sin(impliedAngle))  : event.localPosition - player.underlyingBallReal.position);
+      double impliedAngle = (-eventVector.x / (ksizex/2) * 2* pi) * 20;
+      setGravity(screenRotates ? Vector2(cos(impliedAngle), sin(impliedAngle))  : eventVector - player.underlyingBallReal.position);
       if (screenRotates) {
         transAngle = atan2(getGravity().x, getGravity().y);
       }

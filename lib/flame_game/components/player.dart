@@ -14,6 +14,7 @@ import 'dart:ui';
 import 'dart:ui' as ui;
 import 'dart:core';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 
 /// The [RealCharacter] is the component that the physical player of the game is
 /// controlling.
@@ -230,14 +231,14 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
         : {
             PlayerState.normal: SpriteAnimation.spriteList(
               [
-                Sprite(createPacmanStandard())
+    kIsWeb ? await game.loadSprite('dash/pacmanman.png') : Sprite(createPacmanStandard())
               ], //game.loadSprite('dash/pacmanman.png')],
               stepTime: double.infinity,
             ),
             PlayerState.eating: SpriteAnimation.spriteList(
               [
-                Sprite(createPacmanStandard()),
-                Sprite(createPacmanMouthClosed())
+                kIsWeb ? await game.loadSprite('dash/pacmanman.png') : Sprite(createPacmanStandard()),
+    kIsWeb ? await game.loadSprite('dash/pacmanman_eat.png') : Sprite(createPacmanMouthClosed())
               ], //game.loadSprite('dash/pacmanman.png')],
               stepTime: kPacmanHalfEatingResetTimeMillis / 1000,
             )
@@ -360,7 +361,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
         angle += (transAngle - _lastTransAngle) +
             (getUnderlyingPosition() - _lastPosition).length /
                 (size.x / 2) *
-                getMagicParity(world, this, vel.x, vel.y);
+                getMagicParity(world, vel.x, vel.y);
       }
     }
     _lastPosition.setFrom(getUnderlyingPosition());
@@ -389,14 +390,6 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
     super.render(canvas);
     if (!isGhost && current == PlayerState.deadPacman) {
       double tween = 0;
-      /*
-      if (current == PlayerState.deadPacman &&
-          DateTime.now().millisecondsSinceEpoch - pacmanDeadTimeLatest <
-              kPacmanDeadResetTimeMillis) {
-        tween = (DateTime.now().millisecondsSinceEpoch - pacmanDeadTimeLatest) /
-            kPacmanDeadResetTimeMillis;
-      }
-       */
       tween = (DateTime.now().millisecondsSinceEpoch - pacmanDeadTimeLatest) /
           kPacmanDeadResetTimeMillis;
       tween = min(1, tween);

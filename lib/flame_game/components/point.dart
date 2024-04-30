@@ -17,27 +17,10 @@ class MiniPellet extends SpriteAnimationComponent
 
   @override
   Future<void> onLoad() async {
-    /*
-    animation = await game.loadSpriteAnimation(
-      'ember.png',
-      SpriteAnimationData.sequenced(
-        amount: 4,
-        textureSize: Vector2.all(16),
-        stepTime: 0.15,
-      ),
-    );
-
-     */
-
     animation = SpriteAnimation.spriteList(
       [await game.loadSprite('dash/pellet.png')],
       stepTime: double.infinity,
     );
-
-    // Since the original Ember sprite is looking to the right we have to flip
-    // it, so that it is facing the player instead.
-    flipHorizontallyAroundCenter();
-
     // When adding a CircleHitbox without any arguments it automatically
     // fills up the size of the component as much as it can without overflowing
     // it.
