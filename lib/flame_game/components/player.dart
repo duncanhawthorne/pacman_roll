@@ -18,7 +18,7 @@ import 'package:flutter/foundation.dart';
 
 /// The [RealCharacter] is the component that the physical player of the game is
 /// controlling.
-class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
+class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
     with
         CollisionCallbacks,
         HasWorldReference<EndlessWorld>,
@@ -53,10 +53,10 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
   // ignore: prefer_final_fields
   Vector2 _lastUnderlyingVelocity = Vector2.zero();
 
-  Future<Map<PlayerState, SpriteAnimation>?> getAnimations() async {
+  Future<Map<CharacterState, SpriteAnimation>?> getAnimations() async {
     return isGhost
         ? {
-            PlayerState.normal: SpriteAnimation.spriteList(
+            CharacterState.normal: SpriteAnimation.spriteList(
               [
                 await game.loadSprite(ghostNumber == 1
                     ? 'dash/ghost1.png'
@@ -66,24 +66,24 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
               ],
               stepTime: double.infinity,
             ),
-            PlayerState.scared: SpriteAnimation.spriteList(
+            CharacterState.scared: SpriteAnimation.spriteList(
               [await game.loadSprite('dash/ghostscared1.png')],
               stepTime: 0.1,
             ),
-            PlayerState.scaredIsh: SpriteAnimation.spriteList(
+            CharacterState.scaredIsh: SpriteAnimation.spriteList(
               [
                 await game.loadSprite('dash/ghostscared1.png'),
                 await game.loadSprite('dash/ghostscared2.png')
               ],
               stepTime: 0.1,
             ),
-            PlayerState.deadGhost: SpriteAnimation.spriteList(
+            CharacterState.deadGhost: SpriteAnimation.spriteList(
               [await game.loadSprite('dash/eyes.png')],
               stepTime: double.infinity,
             ),
           }
         : {
-            PlayerState.normal: SpriteAnimation.spriteList(
+            CharacterState.normal: SpriteAnimation.spriteList(
               [
                 kIsWeb
                     ? await game.loadSprite('dash/pacmanman.png')
@@ -91,7 +91,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
               ], //game.loadSprite('dash/pacmanman.png')],
               stepTime: double.infinity,
             ),
-            PlayerState.eating: SpriteAnimation.spriteList(
+            CharacterState.eating: SpriteAnimation.spriteList(
               [
                 kIsWeb
                     ? await game.loadSprite('dash/pacmanman.png')
@@ -184,7 +184,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
           });
         }
 
-        current = PlayerState.eating;
+        current = CharacterState.eating;
         playerEatingTimeLatest = DateTime.now().millisecondsSinceEpoch;
 
         other.removeFromParent();
@@ -198,10 +198,10 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
           });
         }
 
-        current = PlayerState.eating;
+        current = CharacterState.eating;
         playerEatingTimeLatest = DateTime.now().millisecondsSinceEpoch;
         for (int i = 0; i < world.ghostPlayersList.length; i++) {
-          world.ghostPlayersList[i].current = PlayerState.scared;
+          world.ghostPlayersList[i].current = CharacterState.scared;
           world.ghostPlayersList[i].ghostScaredTimeLatest =
               DateTime.now().millisecondsSinceEpoch;
         }
@@ -218,20 +218,20 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
   void handlePacmanMeetsGhost(RealCharacter otherPlayer) {
     // ignore: unnecessary_this
     if (!this.isGhost && otherPlayer.isGhost) {
-      if (otherPlayer.current == PlayerState.deadGhost) {
+      if (otherPlayer.current == CharacterState.deadGhost) {
         //nothing, but need to keep if condition
       }
-      if (otherPlayer.current == PlayerState.scared ||
-          otherPlayer.current == PlayerState.scaredIsh) {
+      if (otherPlayer.current == CharacterState.scared ||
+          otherPlayer.current == CharacterState.scaredIsh) {
         //pacman eats ghost
 
         //pacman visuals
         world.audioController.playSfx(SfxType.eatGhost);
-        current = PlayerState.eating;
+        current = CharacterState.eating;
         playerEatingTimeLatest = DateTime.now().millisecondsSinceEpoch;
 
         //ghost impact
-        otherPlayer.current = PlayerState.deadGhost;
+        otherPlayer.current = CharacterState.deadGhost;
         otherPlayer.ghostDeadTimeLatest = DateTime.now().millisecondsSinceEpoch;
         otherPlayer.ghostDeadPosition = otherPlayer.getUnderlyingBallPosition();
 
@@ -254,7 +254,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
 
           world.audioController.playSfx(SfxType.pacmanDeath);
           pacmanDeadTimeLatest = DateTime.now().millisecondsSinceEpoch;
-          current = PlayerState.deadPacman;
+          current = CharacterState.deadPacman;
 
           globalPhysicsLinked = false;
 
@@ -273,7 +273,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
                 world.ghostPlayersList[i].ghostDeadTimeLatest = 0;
                 world.ghostPlayersList[i].ghostScaredTimeLatest = 0;
               }
-              current = PlayerState.normal;
+              current = CharacterState.normal;
               globalPhysicsLinked = true;
             }
           });
@@ -287,7 +287,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
     setUnderlyingBallPosition(startingPosition); //FIXME shouldn't be necessary, but avoid one frame starting glitch
 
     animations = await getAnimations();
-    current = PlayerState.normal;
+    current = CharacterState.normal;
     _lastUnderlyingPosition.setFrom(getUnderlyingBallPosition());
 
     // When adding a CircleHitbox without any arguments it automatically
@@ -299,33 +299,33 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
   void ghostDeadScaredScaredIshNormalSequence() {
 //FIXME instead of testing this every frame, move into futures, and still test every frame, but only when in the general zone that need to test this
     assert(isGhost);
-    if (current == PlayerState.deadGhost) {
+    if (current == CharacterState.deadGhost) {
       if (DateTime.now().millisecondsSinceEpoch - ghostDeadTimeLatest >
           kGhostResetTimeMillis) {
-        current = PlayerState.scared;
+        current = CharacterState.scared;
       }
     }
-    if (current == PlayerState.scared) {
+    if (current == CharacterState.scared) {
       if (DateTime.now().millisecondsSinceEpoch - ghostScaredTimeLatest >
           kGhostChaseTimeMillis * 2 / 3) {
-        current = PlayerState.scaredIsh;
+        current = CharacterState.scaredIsh;
       }
     }
 
-    if (current == PlayerState.scaredIsh) {
+    if (current == CharacterState.scaredIsh) {
       if (DateTime.now().millisecondsSinceEpoch - ghostScaredTimeLatest >
           kGhostChaseTimeMillis) {
-        current = PlayerState.normal;
+        current = CharacterState.normal;
       }
     }
   }
 
   void pacmanEatingNormalSequence() {
     assert(!isGhost);
-    if (current == PlayerState.eating) {
+    if (current == CharacterState.eating) {
       if (DateTime.now().millisecondsSinceEpoch - playerEatingTimeLatest >
           2 * kPacmanHalfEatingResetTimeMillis) {
-        current = PlayerState.normal;
+        current = CharacterState.normal;
       }
     }
   }
@@ -371,7 +371,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
     }
 
     if (globalPhysicsLinked) {
-      if (isGhost && current == PlayerState.deadGhost) {
+      if (isGhost && current == CharacterState.deadGhost) {
         position = getFlyingDeadGhostPosition();
       } else {
         moveUnderlyingBallThroughPipe();
@@ -404,7 +404,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
   @override
   void render(Canvas canvas) {
     super.render(canvas);
-    if (!isGhost && current == PlayerState.deadPacman) {
+    if (!isGhost && current == CharacterState.deadPacman) {
       double tween = 0;
       tween = (DateTime.now().millisecondsSinceEpoch - pacmanDeadTimeLatest) /
           kPacmanDeadResetTimeMillis;
@@ -434,4 +434,4 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
   }
 }
 
-enum PlayerState { normal, scared, scaredIsh, eating, deadGhost, deadPacman }
+enum CharacterState { normal, scared, scaredIsh, eating, deadGhost, deadPacman }

@@ -26,6 +26,8 @@ import 'package:flutter/foundation.dart';
 
 import '../audio/audio_controller.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
+import 'package:audioplayers/audioplayers.dart';
+
 
 /// The world is where you place all the components that should live inside of
 /// the game, like the player, enemies, obstacles and points for example.
@@ -49,6 +51,8 @@ class EndlessWorld extends Forge2DWorld
 
   /// The properties of the current level.
   final GameLevel level;
+
+  final dAudioPlayer = AudioPlayer();
 
   /// Used to see what the current progress of the player is and to update the
   /// progress if a level is finished.
@@ -244,7 +248,7 @@ class EndlessWorld extends Forge2DWorld
     double tmpSirenVolume = 0;
     for (int i = 0; i < 3; i++) {
       tmpSirenVolume +=
-      ghostPlayersList[i].current == PlayerState.normal ? ghostPlayersList[i]
+      ghostPlayersList[i].current == CharacterState.normal ? ghostPlayersList[i]
           .getUnderlyingBallVelocity()
           .length : 0;
     }
