@@ -59,7 +59,9 @@ Vector2 screenPos(Vector2 absolutePos) {
 enum WallLocation { bottom, top, left, right }
 
 int getRollSpinDirection(
-    Forge2DWorld world, double velx, double vely) {
+    Forge2DWorld world, Vector2 vel) {
+  double velx = vel.x;
+  double vely = vel.y;
   //FIXME probably can be dramatically simplified
 
   WallLocation onWall = WallLocation.bottom;
