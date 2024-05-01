@@ -54,7 +54,7 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
   Future<void> startGame() async {
     if (startGameMusic) {
       //gravityTurnedOn = false;
-      audioController.playSfx(SfxType.startMusic);
+      world.play(SfxType.startMusic);
       //Future.delayed(const Duration(milliseconds: 4300), () {
       //  gravityTurnedOn = true;
       //});

@@ -162,7 +162,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
       Future.delayed(
           const Duration(milliseconds: kPacmanHalfEatingResetTimeMillis * 2),
           () {
-        game.audioController.playSfx(SfxType.clearedBoard);
+            world.play(SfxType.clearedBoard);
       });
     }
   }
@@ -175,13 +175,16 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
             DateTime.now().millisecondsSinceEpoch -
                 kPacmanHalfEatingResetTimeMillis * 2) {
           playerEatingSoundTimeLatest = DateTime.now().millisecondsSinceEpoch;
-          game.audioController.playSfx(SfxType.wa);
+          world.play(SfxType.waka);
 
+          /*
           Future.delayed(
               const Duration(milliseconds: kPacmanHalfEatingResetTimeMillis),
               () {
-            game.audioController.playSfx(SfxType.ka);
+                world.play(SfxType.ka);
           });
+
+           */
         }
 
         current = CharacterState.eating;
@@ -191,12 +194,15 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
         world.pelletsRemaining -= 1;
         endOfGameTestAndAct();
       } else if (other is SuperPellet) {
-        for (int i = 0; i < kGhostChaseTimeMillis / 500; i++) {
+        world.play(SfxType.ghostsScared);
+        /*
+        for (int i = 0; i < kGhostChaseTimeMillis / 500; i++) { //
           //FIXME just do as loop
           Future.delayed(Duration(milliseconds: 500 * i), () {
-            game.audioController.playSfx(SfxType.ghostsScared);
+            world.play(SfxType.ghostsScared);
           });
         }
+         */
 
         current = CharacterState.eating;
         playerEatingTimeLatest = DateTime.now().millisecondsSinceEpoch;
@@ -226,7 +232,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
         //pacman eats ghost
 
         //pacman visuals
-        world.audioController.playSfx(SfxType.eatGhost);
+        world.play(SfxType.eatGhost);
         current = CharacterState.eating;
         playerEatingTimeLatest = DateTime.now().millisecondsSinceEpoch;
 
@@ -252,7 +258,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
         if (globalPhysicsLinked) {
           //prevent multiple hits
 
-          world.audioController.playSfx(SfxType.pacmanDeath);
+          world.play(SfxType.pacmanDeath);
           pacmanDeadTimeLatest = DateTime.now().millisecondsSinceEpoch;
           current = CharacterState.deadPacman;
 

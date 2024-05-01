@@ -38,5 +38,5 @@ bool globalPhysicsLinked = true;
 bool gravityTurnedOn = true;
 bool startGameMusic = true;
 
-double sirenVolume = 0;
-const bool sirenOn = false;
+//double sirenVolume = 0;
+const bool sirenOn = true;

@@ -52,7 +52,7 @@ class EndlessWorld extends Forge2DWorld
   /// The properties of the current level.
   final GameLevel level;
 
-  final dAudioPlayer = AudioPlayer();
+
 
   /// Used to see what the current progress of the player is and to update the
   /// progress if a level is finished.
@@ -90,6 +90,58 @@ class EndlessWorld extends Forge2DWorld
 
   List<RealCharacter> ghostPlayersList = [];
 
+  void play(SfxType type) async {
+    // ignore: dead_code
+    if (false) {
+      audioController.playSfx(type);
+    }
+    else {
+      final dAudioPlayer = AudioPlayer();
+      if (type == SfxType.ghostsScared) {
+        dAudioPlayer.setReleaseMode(ReleaseMode.loop);
+        Future.delayed(const Duration(milliseconds: kGhostChaseTimeMillis), () {
+          dAudioPlayer.stop();
+        });
+      }
+      if (type == SfxType.siren) {
+        dAudioPlayer.setReleaseMode(ReleaseMode.loop);
+        updateSirenVolume(dAudioPlayer);
+      }
+      String filename = soundTypeToFilename(type)[0];
+      await dAudioPlayer.setSource(AssetSource('sfx/$filename'));
+      await dAudioPlayer.resume();
+    }
+  }
+
+ double getTargetSirenVolume() {
+    double tmpSirenVolume = 0;
+    try {
+      for (int i = 0; i < 3; i++) {
+        tmpSirenVolume +=
+        ghostPlayersList[i].current == CharacterState.normal
+            ? ghostPlayersList[i]
+            .getUnderlyingBallVelocity()
+            .length
+            : 0;
+      }
+      if (player.current == CharacterState.deadPacman || !globalPhysicsLinked) {
+        tmpSirenVolume = 0;
+      }
+    }
+    // ignore: empty_catches
+    catch(e) {
+
+    }
+    return min(0.4, tmpSirenVolume / 100);
+  }
+
+  void updateSirenVolume(dAudioPlayer) {
+    dAudioPlayer.setVolume(getTargetSirenVolume());
+    Future.delayed(const Duration(milliseconds: 100), () {
+      updateSirenVolume(dAudioPlayer);
+    });
+  }
+
   void addGhost(world, int number) {
     RealCharacter ghost = RealCharacter(
         isGhost: true,
@@ -101,18 +153,21 @@ class EndlessWorld extends Forge2DWorld
   }
 
   void siren() {
+    return;
+    /*
     if (sirenVolume != 0) {
-      audioController.playSfx(SfxType.siren);
+      play(SfxType.siren);
     }
     Future.delayed(const Duration(milliseconds: 400), () {
       siren();
     });
+     */
   }
   
   @override
   Future<void> onLoad() async {
     if (sirenOn) {
-      siren();
+      play(SfxType.siren);
     }
     pelletsRemaining = getStartingNumberPelletsAndSuperPellets(mazeLayout);
 
@@ -244,25 +299,7 @@ class EndlessWorld extends Forge2DWorld
     }
   }
 
-  void setSirenVolume() {
-    double tmpSirenVolume = 0;
-    for (int i = 0; i < 3; i++) {
-      tmpSirenVolume +=
-      ghostPlayersList[i].current == CharacterState.normal ? ghostPlayersList[i]
-          .getUnderlyingBallVelocity()
-          .length : 0;
-    }
-    sirenVolume = min(1, tmpSirenVolume / 30);
-  }
 
-  @override
-  void update(double dt) {
-    super.update(dt);
-
-    if (sirenOn) {
-      setSirenVolume();
-    }
-  }
 
   void setGravity(Vector2 targetGravity) {
     if (globalPhysicsLinked && gravityTurnedOn) {
