@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'dart:ui';
+import '../endless_world.dart';
 
 import 'package:endless_runner/flame_game/constants.dart';
 import 'package:flame/components.dart';
@@ -8,10 +9,11 @@ import 'package:flame/parallax.dart';
 /// The [Background] is a component that is composed of multiple scrolling
 /// images which form a parallax, a way to simulate movement and depth in the
 /// background.
-class Background extends ParallaxComponent {
-  Background({required this.speed});
+class Background extends ParallaxComponent{
+  Background({required this.speed, required this.world});
 
   final double speed;
+  final EndlessWorld world;
 
   @override
   Future<void> onLoad() async {
@@ -26,7 +28,7 @@ class Background extends ParallaxComponent {
     anchor = Anchor.center;
     position = Vector2(ksizex/2,ksizey/2);
     scale = Vector2(gameScaleFactor,gameScaleFactor);
-    angle = worldAngle;
+    angle = 0;
 
     // The base velocity sets the speed of the layer the farthest to the back.
     // Since the speed in our game is defined as the speed of the layer in the
@@ -55,7 +57,7 @@ class Background extends ParallaxComponent {
   void update(double dt) {
     super.update(dt);
     if (screenRotates) {
-      angle = worldAngle;
+      angle = world.getWorldAngle();
     }
   }
 

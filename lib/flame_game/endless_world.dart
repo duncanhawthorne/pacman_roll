@@ -74,11 +74,16 @@ class EndlessWorld extends Forge2DWorld
   /// These pixels are in relation to how big the [FixedResolutionViewport] is.
   @override
   final Vector2 gravity = Vector2(0, 100);
+  Vector2 worldGravity = Vector2(0, 0); //initial value which immediately gets overridden
+  double worldAngle = 0; //2 * pi / 8;
 
   /// Where the ground is located in the world and things should stop falling.
   //late final double groundLevel = (size.y / 2) - (size.y / 5);
 
 
+  double getWorldAngle() {
+    return worldAngle;
+  }
 
   @override
   Future<void> onLoad() async {
@@ -94,7 +99,7 @@ class EndlessWorld extends Forge2DWorld
       accelerometerEventStream().listen(
         //start once and then runs
         (AccelerometerEvent event) {
-            setGravity(Vector2(event.y, event.x - 5) * (android && web ? 5 : 1));
+            setGravity(Vector2(event.y, event.x - 5) * (android && web ? 25 : 1));
         },
         onError: (error) {
           // Logic to handle error
@@ -196,14 +201,14 @@ class EndlessWorld extends Forge2DWorld
     }
   }
 
-  void setGravity(Vector2 gravTarget) {
+  void setGravity(Vector2 newGravity) {
     if (globalPhysicsLinked && gravityTurnedOn) {
       //FIXME for some reason you can set gravity, but when you read it is always 100,0
-      gravity = gravTarget;
-      globalGravity = gravTarget;
+      gravity = newGravity;
+      worldGravity = newGravity;
       if (normaliseGravity) {
-        gravity = globalGravity.normalized() * 50;
-        globalGravity = globalGravity.normalized() * 50;
+        gravity = worldGravity.normalized() * 50;
+        worldGravity = worldGravity.normalized() * 50;
       }
       if (screenRotates) {
         worldAngle = atan2(getGravity().x, getGravity().y);
@@ -213,7 +218,7 @@ class EndlessWorld extends Forge2DWorld
 
   Vector2 getGravity() {
     //FIXME for some reason you can set gravity, but when you read it is always 100,0
-    return globalGravity;
+    return worldGravity;
   }
 
 }

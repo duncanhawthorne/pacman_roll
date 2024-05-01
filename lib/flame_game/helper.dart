@@ -26,10 +26,10 @@ int getStartingNumberPelletsAndSuperPellets() {
 }
 
 double getSingleSquareWidth() {
-  return min(ksizex, ksizey) / flameGameZoom / getMazeLen() * gameScaleFactor;
+  return min(ksizex, ksizey) / flameGameZoom / getMazeWidth() * gameScaleFactor;
 }
 
-int getMazeLen() {
+int getMazeWidth() {
   return sqrt(mazeLayout.length).toInt();
 }
 
@@ -45,7 +45,7 @@ void addGhost(world, int number) {
   ghostPlayersList.add(ghost);
 }
 
-Vector2 screenPos(Vector2 absolutePos) {
+Vector2 screenPos(double worldAngle, Vector2 absolutePos) {
   if (!screenRotates) {
     return absolutePos;
   } else {
@@ -59,14 +59,14 @@ Vector2 screenPos(Vector2 absolutePos) {
 enum WallLocation { bottom, top, left, right }
 
 int getRollSpinDirection(
-    Forge2DWorld world, Vector2 vel) {
+    Forge2DWorld world, Vector2 vel, Vector2 gravityWeCareAbout) {
   double velx = vel.x;
   double vely = vel.y;
   //FIXME probably can be dramatically simplified
 
   WallLocation onWall = WallLocation.bottom;
   bool clockwise = true;
-  Vector2 gravityWeCareAbout = globalGravity; //world.gravity;
+  //Vector2 gravityWeCareAbout = globalGravity; //world.gravity;
   double small = 4;
 
   if (velx.abs() > small) {
@@ -140,7 +140,7 @@ List<Component> createBoundaries(CameraComponent camera) {
 }
 
 void addPillsAndPowerPills(world) {
-  int mazelen = getMazeLen();
+  int mazelen = getMazeWidth();
   for (var i = 0; i < mazelen; i++) {
     for (var j = 0; j < mazelen; j++) {
       int k = j * mazelen + i;

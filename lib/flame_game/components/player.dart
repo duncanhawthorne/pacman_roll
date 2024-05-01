@@ -331,7 +331,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
     double timefrac =
         (DateTime.now().millisecondsSinceEpoch - ghostDeadTimeLatest) /
             (kGhostResetTimeMillis);
-    return screenPos(
+    return screenPos(world.getWorldAngle(),
         ghostDeadPosition * (1 - timefrac) + kGhostStartLocation * (timefrac));
   }
 
@@ -349,10 +349,10 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
 
   double getUpdatedAngle() {
     return angle +
-        (worldAngle - _lastWorldAngle) +
+        (world.getWorldAngle() - _lastWorldAngle) +
         (getUnderlyingBallPosition() - _lastUnderlyingPosition).length /
             (size.x / 2) *
-            getRollSpinDirection(world, getUnderlyingBallVelocity());
+            getRollSpinDirection(world, getUnderlyingBallVelocity(), world.getGravity());
   }
 
   @override
@@ -372,12 +372,12 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
         position = getFlyingDeadGhostPosition();
       } else {
         moveUnderlyingBallThroughPipe();
-        position = screenPos(getUnderlyingBallPosition());
+        position = screenPos(world.getWorldAngle(), getUnderlyingBallPosition());
         angle = getUpdatedAngle();
       }
     }
     _lastUnderlyingPosition.setFrom(getUnderlyingBallPosition());
-    _lastWorldAngle = worldAngle;
+    _lastWorldAngle = world.getWorldAngle();
   }
 
   @override

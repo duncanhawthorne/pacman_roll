@@ -71,7 +71,7 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
     startGame();
     // The backdrop is a static layer behind the world that the camera is
     // looking at, so here we add our parallax background.
-    camera.backdrop.add(Background(speed: 0));
+    camera.backdrop.add(Background(speed: 0, world: world));
 
     world.addAll(createBoundaries(camera));
     world.audioController = audioController;
