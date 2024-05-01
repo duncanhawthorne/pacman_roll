@@ -39,4 +39,4 @@ bool gravityTurnedOn = true;
 bool startGameMusic = true;
 
 //double sirenVolume = 0;
-const bool sirenOn = true;
+final bool sirenOn = iOS ? false : true;

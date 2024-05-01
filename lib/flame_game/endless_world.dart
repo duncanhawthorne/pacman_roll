@@ -130,12 +130,14 @@ class EndlessWorld extends Forge2DWorld
     }
     // ignore: empty_catches
     catch(e) {
-
+      tmpSirenVolume = 0;
+      p("tmpSirenVolume zero");
     }
     return min(0.4, tmpSirenVolume / 100);
   }
 
   void updateSirenVolume(dAudioPlayer) {
+    //FIXME NOTE disabled on iOS for bug
     dAudioPlayer.setVolume(getTargetSirenVolume());
     Future.delayed(const Duration(milliseconds: 100), () {
       updateSirenVolume(dAudioPlayer);
