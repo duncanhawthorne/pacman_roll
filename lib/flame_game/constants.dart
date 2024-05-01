@@ -24,7 +24,7 @@ AudioController? globalAudioController; //initial value which immediately gets o
 double ksizex = 1700;
 double ksizey = 1700;
 Vector2 globalGravity = Vector2(0, 0); //initial value which immediately gets overridden
-double transAngle = 0; //2 * pi / 8;
+double worldAngle = 0; //2 * pi / 8;
 
 //final double ksingleSquareWidthProxy = 4.0 * gameScaleFactor; //FIXME harcoded, right now approx value of getSingleSquareWidth()
 final Vector2 kGhostStartLocation = Vector2(0, -3 * getSingleSquareWidth());

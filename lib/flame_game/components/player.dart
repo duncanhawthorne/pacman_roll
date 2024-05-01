@@ -46,8 +46,8 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
 
   // Used to store the last position of the player, so that we later can
   // determine which direction that the player is moving.
-  final Vector2 _lastPosition = Vector2.zero();
-  double _lastTransAngle = 0;
+  final Vector2 _lastUnderlyingPosition = Vector2.zero();
+  double _lastWorldAngle = 0;
 
   Ball createUnderlyingBall(Vector2 startPosition) {
     Ball underlyingBallRealTmp = Ball();
@@ -144,7 +144,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
         //ghost impact
         otherPlayer.current = PlayerState.deadGhost;
         otherPlayer.ghostDeadTimeLatest = DateTime.now().millisecondsSinceEpoch;
-        otherPlayer.ghostDeadPosition = getUnderlyingPosition();
+        otherPlayer.ghostDeadPosition = getUnderlyingBallPosition();
 
         //immediately move into cage where out of the way an no ball interactions
         //FIXME somehow ghost can still kill pacman while in this state
@@ -211,9 +211,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
               stepTime: double.infinity,
             ),
             PlayerState.scared: SpriteAnimation.spriteList(
-              [
-                await game.loadSprite('dash/ghostscared1.png')
-              ],
+              [await game.loadSprite('dash/ghostscared1.png')],
               stepTime: 0.1,
             ),
             PlayerState.scaredIsh: SpriteAnimation.spriteList(
@@ -231,21 +229,27 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
         : {
             PlayerState.normal: SpriteAnimation.spriteList(
               [
-    kIsWeb ? await game.loadSprite('dash/pacmanman.png') : Sprite(createPacmanStandard())
+                kIsWeb
+                    ? await game.loadSprite('dash/pacmanman.png')
+                    : Sprite(createPacmanStandard())
               ], //game.loadSprite('dash/pacmanman.png')],
               stepTime: double.infinity,
             ),
             PlayerState.eating: SpriteAnimation.spriteList(
               [
-                kIsWeb ? await game.loadSprite('dash/pacmanman.png') : Sprite(createPacmanStandard()),
-    kIsWeb ? await game.loadSprite('dash/pacmanman_eat.png') : Sprite(createPacmanMouthClosed())
+                kIsWeb
+                    ? await game.loadSprite('dash/pacmanman.png')
+                    : Sprite(createPacmanStandard()),
+                kIsWeb
+                    ? await game.loadSprite('dash/pacmanman_eat.png')
+                    : Sprite(createPacmanMouthClosed())
               ], //game.loadSprite('dash/pacmanman.png')],
               stepTime: kPacmanHalfEatingResetTimeMillis / 1000,
             )
           };
     // The starting state will be that the player is running.
     current = PlayerState.normal;
-    _lastPosition.setFrom(position);
+    _lastUnderlyingPosition.setFrom(position);
 
     // When adding a CircleHitbox without any arguments it automatically
     // fills up the size of the component as much as it can without overflowing
@@ -253,7 +257,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
     add(CircleHitbox());
   }
 
-  Vector2 getUnderlyingPosition() {
+  Vector2 getUnderlyingBallPosition() {
     try {
       return underlyingBallReal.position;
     } catch (e) {
@@ -285,87 +289,91 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
     }
   }
 
-  @override
-  void update(double dt) {
-    super.update(dt);
-    //TODO when ghosts are moving should play siren sound proportional to movement
-    //TODO try to capture mouse on windows
-
-    //FIXME instead of testing this every frame, move into futures, and still test every frame, but only when in the general zone that need to test this
-    if (isGhost && (current == PlayerState.scared || current == PlayerState.scaredIsh)) {
+  void ghostDeadScaredScaredIshNormalSequence() {
+//FIXME instead of testing this every frame, move into futures, and still test every frame, but only when in the general zone that need to test this
+    assert(isGhost);
+    if (current == PlayerState.deadGhost) {
+      if (DateTime.now().millisecondsSinceEpoch - ghostDeadTimeLatest >
+          kGhostResetTimeMillis) {
+        current = PlayerState.scared;
+      }
+    }
+    if (current == PlayerState.scared) {
       if (DateTime.now().millisecondsSinceEpoch - ghostScaredTimeLatest >
-          kGhostChaseTimeMillis * 2/3) {
+          kGhostChaseTimeMillis * 2 / 3) {
         current = PlayerState.scaredIsh;
       }
+    }
+
+    if (current == PlayerState.scaredIsh) {
       if (DateTime.now().millisecondsSinceEpoch - ghostScaredTimeLatest >
           kGhostChaseTimeMillis) {
         current = PlayerState.normal;
       }
     }
-    if (isGhost && current == PlayerState.deadGhost) {
-      //FIXME possibly when return from dead should still be scared if within timeframe
-      if (DateTime.now().millisecondsSinceEpoch - ghostDeadTimeLatest >
-          kGhostResetTimeMillis) {
-        if (DateTime.now().millisecondsSinceEpoch - ghostScaredTimeLatest <
-            kGhostChaseTimeMillis && DateTime.now().millisecondsSinceEpoch - ghostScaredTimeLatest >
-            kGhostChaseTimeMillis * 2/3) {
-          current = PlayerState.scaredIsh;
-        } else if (DateTime.now().millisecondsSinceEpoch - ghostScaredTimeLatest <
-            kGhostChaseTimeMillis * 2/3) {
-          current = PlayerState.scared;
-        }
-        else
-        {
-          current = PlayerState.normal;
-        }
-      }
-    }
-    if (!isGhost && current == PlayerState.eating) {
+  }
+
+  void pacmanEatingNormalSequence() {
+    assert(!isGhost);
+    if (current == PlayerState.eating) {
       if (DateTime.now().millisecondsSinceEpoch - playerEatingTimeLatest >
           2 * kPacmanHalfEatingResetTimeMillis) {
         current = PlayerState.normal;
       }
     }
-    /*
-    //Handle in collision function to ensure in sync with other changes
-    if (!isGhost && current == PlayerState.deadPacman) {
-      if (DateTime.now().millisecondsSinceEpoch - playerEatingTimeLatest >
-          kPacmanDeadResetTimeMillis) {
-        current = PlayerState.normal;
+  }
+
+  Vector2 getFlyingDeadGhostPosition() {
+    double timefrac =
+        (DateTime.now().millisecondsSinceEpoch - ghostDeadTimeLatest) /
+            (kGhostResetTimeMillis);
+    return screenPos(ghostDeadPosition * (1 - timefrac) +
+        kGhostStartLocation * (timefrac));
+  }
+
+  void moveUnderlyingBallThroughPipe() {
+    if (!debugMode) {
+      if (getUnderlyingBallPosition().x > 10 * getSingleSquareWidth()) {
+        moveUnderlyingBallToVector(kLeftPortalLocation);
+        setUnderlyingVelocity(vel);
+      } else if (getUnderlyingBallPosition().x < -10 * getSingleSquareWidth()) {
+        moveUnderlyingBallToVector(kRightPortalLocation);
+        setUnderlyingVelocity(vel);
       }
     }
+  }
 
-     */
+  double getUpdatedAngle() {
+    return angle + (worldAngle - _lastWorldAngle) +
+        (getUnderlyingBallPosition() - _lastUnderlyingPosition).length /
+            (size.x / 2) *
+            getRollSpinDirection(world, vel.x, vel.y);
+  }
+
+  @override
+  void update(double dt) {
+    super.update(dt);
+    //TODO when ghosts are moving should play siren sound proportional to movement
+    //TODO try to capture mouse on windows
+    if (isGhost) {
+      ghostDeadScaredScaredIshNormalSequence();
+    }
+    if (!isGhost) {
+      pacmanEatingNormalSequence();
+    }
 
     if (globalPhysicsLinked) {
       vel = getUnderlyingVelocity();
       if (isGhost && current == PlayerState.deadGhost) {
-        double timefrac =
-            (DateTime.now().millisecondsSinceEpoch - ghostDeadTimeLatest) /
-                (kGhostResetTimeMillis);
-        position = screenPos(ghostDeadPosition * (1 - timefrac) +
-            kGhostStartLocation * (timefrac));
+        position = getFlyingDeadGhostPosition();
       } else {
-        position = screenPos(getUnderlyingPosition());
-
-        if (!debugMode) {
-          if (getUnderlyingPosition().x > 9 * getSingleSquareWidth()) {
-            moveUnderlyingBallToVector(kLeftPortalLocation);
-            setUnderlyingVelocity(vel);
-          } else if (getUnderlyingPosition().x < -9 * getSingleSquareWidth()) {
-            moveUnderlyingBallToVector(kRightPortalLocation);
-            setUnderlyingVelocity(vel);
-          }
-        }
-
-        angle += (transAngle - _lastTransAngle) +
-            (getUnderlyingPosition() - _lastPosition).length /
-                (size.x / 2) *
-                getRollSpinDirection(world, vel.x, vel.y);
+        moveUnderlyingBallThroughPipe();
+        position = screenPos(getUnderlyingBallPosition());
+        angle = getUpdatedAngle();
       }
     }
-    _lastPosition.setFrom(getUnderlyingPosition());
-    _lastTransAngle = transAngle;
+    _lastUnderlyingPosition.setFrom(getUnderlyingBallPosition());
+    _lastWorldAngle = worldAngle;
   }
 
   @override

@@ -50,7 +50,7 @@ Vector2 screenPos(Vector2 absolutePos) {
     return absolutePos;
   } else {
     Matrix2 mat = Matrix2(
-        cos(transAngle), -sin(transAngle), sin(transAngle), cos(transAngle));
+        cos(worldAngle), -sin(worldAngle), sin(worldAngle), cos(worldAngle));
     return Vector2(mat[0] * absolutePos[0] + mat[1] * absolutePos[1],
         mat[2] * absolutePos[0] + mat[3] * absolutePos[1]);
   }

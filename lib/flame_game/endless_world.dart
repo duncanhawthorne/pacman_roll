@@ -206,7 +206,7 @@ class EndlessWorld extends Forge2DWorld
         globalGravity = globalGravity.normalized() * 50;
       }
       if (screenRotates) {
-        transAngle = atan2(getGravity().x, getGravity().y);
+        worldAngle = atan2(getGravity().x, getGravity().y);
       }
     }
   }
