@@ -66,7 +66,7 @@ class EndlessWorld extends Forge2DWorld
   get getAudioController => audioController;
   int pelletsRemaining = 1;
   Vector2 dragLastPosition = Vector2(0,0);
-  Vector2 targetFromLastDrag = Vector2(0,0);
+  Vector2 targetFromLastDrag = Vector2(-50,0); //makes smooth start for drag
 
   /// The random number generator that is used to spawn periodic components.
   // ignore: unused_field
@@ -183,7 +183,13 @@ class EndlessWorld extends Forge2DWorld
   void onDragStart(DragStartEvent event) {
     super.onDragStart(event);
     if (clickAndDrag) {
-      dragLastPosition = Vector2(event.localPosition.x, event.localPosition.y);
+      if (iOS) {
+        dragLastPosition = Vector2(0,0);
+      }
+      else {
+        dragLastPosition =
+            Vector2(event.localPosition.x, event.localPosition.y);
+      }
     }
     else if (followCursor) {
       handlePointerEvent(Vector2(event.localPosition.x, event.localPosition.y));
@@ -194,13 +200,23 @@ class EndlessWorld extends Forge2DWorld
   void onDragUpdate(DragUpdateEvent event) {
     super.onDragUpdate(event);
     if (clickAndDrag) {
-      Vector2 dragDelta = - (event.localStartPosition - dragLastPosition);
+      if (dragLastPosition != Vector2(0,0)) {
+        Vector2 dragDelta = -(event.localStartPosition - dragLastPosition);
+        handlePointerEvent(targetFromLastDrag + dragDelta);
+        targetFromLastDrag = targetFromLastDrag + dragDelta;
+      }
       dragLastPosition = Vector2(event.localStartPosition.x, event.localStartPosition.y);
-      handlePointerEvent(targetFromLastDrag + dragDelta);
-      targetFromLastDrag = targetFromLastDrag + dragDelta;
     }
     else if (followCursor) {
       handlePointerEvent(Vector2(event.localStartPosition.x, event.localStartPosition.y));
+    }
+  }
+
+  @override
+  void onDragEnd(DragEndEvent event) {
+    super.onDragEnd(event);
+    if (clickAndDrag) {
+      dragLastPosition = Vector2(0, 0);
     }
   }
 

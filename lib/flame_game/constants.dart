@@ -16,8 +16,8 @@ const mazeLayout = realMazeLayout;
 final bool normaliseGravity = android ? false : true;
 final bool screenRotates = android ? false : true;
 final useGyro = !screenRotates;
-final followCursor = windows;
-final clickAndDrag = !windows && !useGyro;
+final followCursor = false; //windows;
+final clickAndDrag = true; //!windows && !useGyro;
 final gameScaleFactor = screenRotates ? 0.9 : 1.0;
 
 double ksizex = 1700;
