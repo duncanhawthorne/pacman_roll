@@ -6,7 +6,7 @@ import 'player.dart';
 import '../helper.dart';
 
 class Ball extends BodyComponent with TapCallbacks, ContactCallbacks {
-  Ball({Vector2? initialPosition, double? size, Color? color})
+  Ball({Vector2? initialPosition, required RealCharacter realCharacter, double? size, Color? color})
       : super(
             fixtureDefs: [
               FixtureDef(
@@ -29,6 +29,7 @@ class Ball extends BodyComponent with TapCallbacks, ContactCallbacks {
 
   RealCharacter? realCharacter;
 
+  /*
   @override
   Body createBody() {
     if (bodyDef!.userData != null) {
@@ -36,6 +37,8 @@ class Ball extends BodyComponent with TapCallbacks, ContactCallbacks {
     }
     return super.createBody();
   }
+
+   */
 
   @override
   void beginContact(Object other, Contact contact) {

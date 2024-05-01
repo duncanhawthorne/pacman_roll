@@ -34,7 +34,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
 
   final bool isGhost;
   Vector2 startPosition;
-  Ball underlyingBallReal = Ball(); //to avoid null safety issues
+  late Ball underlyingBallReal = Ball(realCharacter: this, initialPosition: startPosition); //to avoid null safety issues
   int ghostNumber = 1;
   int ghostScaredTimeLatest = 0; //a long time ago
   int ghostDeadTimeLatest = 0; //a long time ago
@@ -45,8 +45,11 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
 
   // Used to store the last position of the player, so that we later can
   // determine which direction that the player is moving.
-  final Vector2 _lastUnderlyingPosition = Vector2.zero();
+  // ignore: prefer_final_fields
+  Vector2 _lastUnderlyingPosition = Vector2.zero();
   double _lastWorldAngle = 0;
+  // ignore: prefer_final_fields
+  Vector2 _lastUnderlyingVelocity = Vector2.zero();
 
   Future<Map<PlayerState, SpriteAnimation>?> getAnimations() async {
     return isGhost
@@ -100,11 +103,12 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
           };
   }
 
-  Ball createUnderlyingBall(Vector2 startPosition) {
-    Ball underlyingBallRealTmp = Ball();
-    underlyingBallRealTmp.realCharacter =
-        this; //FIXME should do this in the initiator, but didn't work
-    underlyingBallRealTmp.bodyDef!.position = startPosition;
+  Ball createUnderlyingBall(Vector2 targetPosition) {
+    Ball underlyingBallRealTmp = Ball(realCharacter: this, initialPosition: targetPosition);
+    //underlyingBallRealTmp.realCharacter =
+    //    this; //FIXME should do this in the initiator, but didn't work
+    //underlyingBallRealTmp.createBody();
+    //underlyingBallRealTmp.bodyDef!.position = startPosition;
     return underlyingBallRealTmp;
   }
 
@@ -114,7 +118,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
     } catch (e) {
       //FIXME shouldn't need this
       p(e);
-      return Vector2(0, 0);
+      return _lastUnderlyingPosition; //Vector2(10, 0);
     }
   }
 
@@ -132,7 +136,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
     } catch (e) {
       //FIXME shouldn't need this
       p(e);
-      return Vector2(0, 0);
+      return _lastUnderlyingVelocity;
     }
   }
 
@@ -378,6 +382,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
     }
     _lastUnderlyingPosition.setFrom(getUnderlyingBallPosition());
     _lastWorldAngle = world.getWorldAngle();
+    _lastUnderlyingVelocity.setFrom(getUnderlyingBallVelocity());
   }
 
   @override
