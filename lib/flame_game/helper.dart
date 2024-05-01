@@ -1,7 +1,6 @@
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 import 'components/wall.dart';
-import 'components/player.dart';
 import 'components/powerpoint.dart';
 import 'components/point.dart';
 import 'constants.dart';
@@ -33,17 +32,7 @@ int getMazeWidth() {
   return sqrt(mazeLayout.length).toInt();
 }
 
-List<RealCharacter> ghostPlayersList = [];
 
-void addGhost(world, int number) {
-  RealCharacter ghost = RealCharacter(
-      isGhost: true,
-      startingPosition: kGhostStartLocation +
-          Vector2(getSingleSquareWidth() * (number - 1), 0));
-  ghost.ghostNumber = number;
-  world.add(ghost);
-  ghostPlayersList.add(ghost);
-}
 
 Vector2 screenPos(double worldAngle, Vector2 absolutePos) {
   if (!screenRotates) {

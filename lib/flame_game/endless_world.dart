@@ -82,6 +82,18 @@ class EndlessWorld extends Forge2DWorld
   /// Where the ground is located in the world and things should stop falling.
   //late final double groundLevel = (size.y / 2) - (size.y / 5);
 
+  List<RealCharacter> ghostPlayersList = [];
+
+  void addGhost(world, int number) {
+    RealCharacter ghost = RealCharacter(
+        isGhost: true,
+        startingPosition: kGhostStartLocation +
+            Vector2(getSingleSquareWidth() * (number - 1), 0));
+    ghost.ghostNumber = number;
+    world.add(ghost);
+    ghostPlayersList.add(ghost);
+  }
+
   @override
   Future<void> onLoad() async {
     pelletsRemaining = getStartingNumberPelletsAndSuperPellets();

@@ -155,8 +155,8 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
 
   void endOfGameTestAndAct() {
     if (world.pelletsRemaining == 0) {
-      for (int i = 0; i < ghostPlayersList.length; i++) {
-        ghostPlayersList[i]
+      for (int i = 0; i < world.ghostPlayersList.length; i++) {
+        world.ghostPlayersList[i]
             .setUnderlyingBallPosition(kCageLocation + Vector2.random() / 100);
       }
       Future.delayed(
@@ -200,9 +200,9 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
 
         current = PlayerState.eating;
         playerEatingTimeLatest = DateTime.now().millisecondsSinceEpoch;
-        for (int i = 0; i < ghostPlayersList.length; i++) {
-          ghostPlayersList[i].current = PlayerState.scared;
-          ghostPlayersList[i].ghostScaredTimeLatest =
+        for (int i = 0; i < world.ghostPlayersList.length; i++) {
+          world.ghostPlayersList[i].current = PlayerState.scared;
+          world.ghostPlayersList[i].ghostScaredTimeLatest =
               DateTime.now().millisecondsSinceEpoch;
         }
         other.removeFromParent();
@@ -267,11 +267,11 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
 
               world.addScore(); //score counting deaths
               setUnderlyingBallPosition(kPacmanStartLocation);
-              for (var i = 0; i < ghostPlayersList.length; i++) {
-                ghostPlayersList[i].setUnderlyingBallPosition(
+              for (var i = 0; i < world.ghostPlayersList.length; i++) {
+                world.ghostPlayersList[i].setUnderlyingBallPosition(
                     kGhostStartLocation + Vector2.random() / 100);
-                ghostPlayersList[i].ghostDeadTimeLatest = 0;
-                ghostPlayersList[i].ghostScaredTimeLatest = 0;
+                world.ghostPlayersList[i].ghostDeadTimeLatest = 0;
+                world.ghostPlayersList[i].ghostScaredTimeLatest = 0;
               }
               current = PlayerState.normal;
               globalPhysicsLinked = true;
