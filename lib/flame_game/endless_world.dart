@@ -15,6 +15,7 @@ import 'package:flame/src/events/messages/pointer_move_event.dart'
 import 'game_screen.dart';
 import 'components/player.dart';
 import 'components/compass.dart';
+import 'components/maze.dart';
 import 'constants.dart';
 import 'helper.dart';
 
@@ -96,7 +97,7 @@ class EndlessWorld extends Forge2DWorld
 
   @override
   Future<void> onLoad() async {
-    pelletsRemaining = getStartingNumberPelletsAndSuperPellets();
+    pelletsRemaining = getStartingNumberPelletsAndSuperPellets(mazeLayout);
 
     WakelockPlus.toggle(enable: true);
 
