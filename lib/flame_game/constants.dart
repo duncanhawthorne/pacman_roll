@@ -8,9 +8,16 @@ const debugMode = false;
 const bool mazeOn = true;
 const flameGameZoom = 20.0;
 final bool android = defaultTargetPlatform == TargetPlatform.android;
+final bool iOS = defaultTargetPlatform == TargetPlatform.iOS;
+final bool windows = defaultTargetPlatform == TargetPlatform.windows;
+const bool web = kIsWeb;
+
 const mazeLayout = realMazeLayout;
 final bool normaliseGravity = android ? false : true;
 final bool screenRotates = android ? false : true;
+final useGyro = !screenRotates;
+final followCursor = windows;
+final clickAndDrag = !windows && !useGyro;
 final gameScaleFactor = screenRotates ? 0.9 : 1.0;
 
 AudioController? globalAudioController; //initial value which immediately gets overridden

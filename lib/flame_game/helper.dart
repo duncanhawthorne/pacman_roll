@@ -58,7 +58,7 @@ Vector2 screenPos(Vector2 absolutePos) {
 
 enum WallLocation { bottom, top, left, right }
 
-int getMagicParity(
+int getRollSpinDirection(
     Forge2DWorld world, double velx, double vely) {
   //FIXME probably can be dramatically simplified
 

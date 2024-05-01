@@ -63,6 +63,8 @@ class EndlessWorld extends Forge2DWorld
   late final AudioController audioController;
   get getAudioController => audioController;
   int pelletsRemaining = 1;
+  Vector2 dragLastPosition = Vector2(0,0);
+  Vector2 targetFromLastDrag = Vector2(0,0);
 
   /// The random number generator that is used to spawn periodic components.
   // ignore: unused_field
@@ -88,11 +90,11 @@ class EndlessWorld extends Forge2DWorld
     // calculate how long time it took to finish the level.
     timeStarted = DateTime.now();
 
-    if (android) {
+    if (useGyro) {
       accelerometerEventStream().listen(
         //start once and then runs
         (AccelerometerEvent event) {
-            setGravity(Vector2(event.y, event.x - 5));
+            setGravity(Vector2(event.y, event.x - 5) * (android && web ? 5 : 1));
         },
         onError: (error) {
           // Logic to handle error
@@ -157,28 +159,40 @@ class EndlessWorld extends Forge2DWorld
 
   @override
   void onPointerMove(dhpointer_move_event.PointerMoveEvent event) {
-    handlePointerEvent(Vector2(event.localPosition.x, event.localPosition.y));
+    if (followCursor) {
+      handlePointerEvent(Vector2(event.localPosition.x, event.localPosition.y));
+    }
   }
 
   @override
   void onDragStart(DragStartEvent event) {
     super.onDragStart(event);
-    handlePointerEvent(Vector2(event.localPosition.x, event.localPosition.y));
+    if (clickAndDrag) {
+      dragLastPosition = Vector2(event.localPosition.x, event.localPosition.y);
+    }
+    else if (followCursor) {
+      handlePointerEvent(Vector2(event.localPosition.x, event.localPosition.y));
+    }
   }
 
   @override
   void onDragUpdate(DragUpdateEvent event) {
     super.onDragUpdate(event);
-    handlePointerEvent(Vector2(event.localStartPosition.x, event.localStartPosition.y));
+    if (clickAndDrag) {
+      Vector2 dragDelta = - (event.localStartPosition - dragLastPosition);
+      dragLastPosition = Vector2(event.localStartPosition.x, event.localStartPosition.y);
+      handlePointerEvent(targetFromLastDrag + dragDelta);
+      targetFromLastDrag = targetFromLastDrag + dragDelta;
+    }
+    else if (followCursor) {
+      handlePointerEvent(Vector2(event.localStartPosition.x, event.localStartPosition.y));
+    }
   }
 
   void handlePointerEvent(Vector2 eventVector) {
-    if (!android && globalPhysicsLinked && gravityTurnedOn) {
+    if (globalPhysicsLinked && gravityTurnedOn) {
       double impliedAngle = (-eventVector.x / (ksizex/2) * 2* pi) * 20;
       setGravity(screenRotates ? Vector2(cos(impliedAngle), sin(impliedAngle))  : eventVector - player.underlyingBallReal.position);
-      if (screenRotates) {
-        transAngle = atan2(getGravity().x, getGravity().y);
-      }
     }
   }
 
@@ -190,6 +204,9 @@ class EndlessWorld extends Forge2DWorld
       if (normaliseGravity) {
         gravity = globalGravity.normalized() * 50;
         globalGravity = globalGravity.normalized() * 50;
+      }
+      if (screenRotates) {
+        transAngle = atan2(getGravity().x, getGravity().y);
       }
     }
   }

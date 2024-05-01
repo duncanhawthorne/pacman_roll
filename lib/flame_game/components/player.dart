@@ -361,7 +361,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
         angle += (transAngle - _lastTransAngle) +
             (getUnderlyingPosition() - _lastPosition).length /
                 (size.x / 2) *
-                getMagicParity(world, vel.x, vel.y);
+                getRollSpinDirection(world, vel.x, vel.y);
       }
     }
     _lastPosition.setFrom(getUnderlyingPosition());
