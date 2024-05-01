@@ -16,8 +16,8 @@ const mazeLayout = realMazeLayout;
 final bool normaliseGravity = android ? false : true;
 final bool screenRotates = android ? false : true;
 final useGyro = !screenRotates;
-final followCursor = false; //windows;
-final clickAndDrag = true; //!windows && !useGyro;
+final followCursor = windows;
+final clickAndDrag = !windows && !useGyro;
 final gameScaleFactor = screenRotates ? 0.9 : 1.0;
 
 double ksizex = 1700;
@@ -35,6 +35,8 @@ const int kPacmanDeadResetTimeMillis = 1000;
 const int kPacmanHalfEatingResetTimeMillis = 130;
 
 bool globalPhysicsLinked = true;
-bool gravityTurnedOn = false;
-bool startGameMusic =
-    false; //FIXME need to detect if settings have turned sound off, else slow down game when no sound playing
+bool gravityTurnedOn = true;
+bool startGameMusic = true;
+
+double sirenVolume = 0;
+const bool sirenOn = false;

@@ -30,6 +30,10 @@ List<String> soundTypeToFilename(SfxType type) {
       return const [
         'pacman_beginning.mp3',
       ];
+    case SfxType.siren:
+      return const [
+        'ghosts_siren.mp3',
+      ];
     case SfxType.buttonTap:
       return const [
         'click1.mp3',
@@ -49,6 +53,7 @@ double soundTypeToVolume(SfxType type) {
     case SfxType.ghostsScared:
     case SfxType.clearedBoard:
     case SfxType.pacmanDeath:
+    case SfxType.siren:
     case SfxType.eatGhost:
       return 0.4;
     case SfxType.buttonTap:
@@ -65,4 +70,5 @@ enum SfxType {
   eatGhost,
   pacmanDeath,
   buttonTap,
+  siren
 }

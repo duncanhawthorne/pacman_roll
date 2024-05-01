@@ -11,6 +11,7 @@ import '../app_lifecycle/app_lifecycle.dart';
 import '../settings/settings.dart';
 import 'songs.dart';
 import 'sounds.dart';
+import '../flame_game/constants.dart';
 
 /// Allows playing music and sound. A facade to `package:audioplayers`.
 class AudioController {
@@ -41,7 +42,7 @@ class AudioController {
   ///
   /// Background music does not count into the [polyphony] limit. Music will
   /// never be overridden by sound effects because that would be silly.
-  AudioController({int polyphony = 10})
+  AudioController({int polyphony = 100})
       : assert(polyphony >= 1),
         _musicPlayer = AudioPlayer(playerId: 'musicPlayer'),
         _sfxPlayers = Iterable.generate(
@@ -95,7 +96,7 @@ class AudioController {
 
     final currentPlayer = _sfxPlayers[_currentSfxPlayer];
     currentPlayer.play(AssetSource('sfx/$filename'),
-        volume: soundTypeToVolume(type));
+        volume: type == SfxType.siren ? sirenVolume : soundTypeToVolume(type));
     _currentSfxPlayer = (_currentSfxPlayer + 1) % _sfxPlayers.length;
   }
 

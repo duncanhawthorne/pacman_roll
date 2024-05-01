@@ -53,14 +53,15 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
 
   Future<void> startGame() async {
     if (startGameMusic) {
-      gravityTurnedOn = false;
+      //gravityTurnedOn = false;
       audioController.playSfx(SfxType.startMusic);
-      Future.delayed(const Duration(milliseconds: 4300), () {
-        gravityTurnedOn = true;
-      });
+      //Future.delayed(const Duration(milliseconds: 4300), () {
+      //  gravityTurnedOn = true;
+      //});
     } else {
-      gravityTurnedOn = true;
+      //gravityTurnedOn = true;
     }
+    gravityTurnedOn = true;
   }
 
 

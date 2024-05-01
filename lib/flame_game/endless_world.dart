@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flame/src/events/messages/pointer_move_event.dart'
     as dhpointer_move_event;
 
+import '../../audio/sounds.dart';
 import 'game_screen.dart';
 import 'components/player.dart';
 import 'components/compass.dart';
@@ -95,8 +96,20 @@ class EndlessWorld extends Forge2DWorld
     ghostPlayersList.add(ghost);
   }
 
+  void siren() {
+    if (sirenVolume != 0) {
+      audioController.playSfx(SfxType.siren);
+    }
+    Future.delayed(const Duration(milliseconds: 400), () {
+      siren();
+    });
+  }
+  
   @override
   Future<void> onLoad() async {
+    if (sirenOn) {
+      siren();
+    }
     pelletsRemaining = getStartingNumberPelletsAndSuperPellets(mazeLayout);
 
     WakelockPlus.toggle(enable: true);
@@ -224,6 +237,26 @@ class EndlessWorld extends Forge2DWorld
     if (globalPhysicsLinked && gravityTurnedOn) {
       double impliedAngle = (-eventVector.x / (ksizex/2) * 2* pi) * 20;
       setGravity(screenRotates ? Vector2(cos(impliedAngle), sin(impliedAngle))  : eventVector - player.underlyingBallReal.position);
+    }
+  }
+
+  void setSirenVolume() {
+    double tmpSirenVolume = 0;
+    for (int i = 0; i < 3; i++) {
+      tmpSirenVolume +=
+      ghostPlayersList[i].current == PlayerState.normal ? ghostPlayersList[i]
+          .getUnderlyingBallVelocity()
+          .length : 0;
+    }
+    sirenVolume = min(1, tmpSirenVolume / 30);
+  }
+
+  @override
+  void update(double dt) {
+    super.update(dt);
+
+    if (sirenOn) {
+      setSirenVolume();
     }
   }
 
