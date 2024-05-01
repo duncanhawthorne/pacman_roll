@@ -23,8 +23,8 @@ class Compass extends SpriteAnimationComponent
   @override
   void update(double dt) {
     super.update(dt);
-    Vector2 tmp = world.getGravity() / 25 * (android ? 4 : 1);
+    Vector2 tmp = world.gravity / 25 * (android ? 4 : 1);
 
-    position = screenPos(world.getWorldAngle(), (Vector2(0, -2) + Vector2(max(-0.5,min(0.5,tmp.x)), max(-0.5,min(0.5,tmp.y)))) * getSingleSquareWidth());
+    position = screenPos(world.worldAngle, (Vector2(0, -2) + Vector2(max(-0.5,min(0.5,tmp.x)), max(-0.5,min(0.5,tmp.y)))) * getSingleSquareWidth());
   }
 }

@@ -75,7 +75,7 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
 
     world.addAll(createBoundaries(camera));
     world.audioController = audioController;
-    globalAudioController = audioController;
+    //globalAudioController = audioController;
     if (!debugMode) {
       createMaze(world);
     }

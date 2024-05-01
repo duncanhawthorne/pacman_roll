@@ -57,7 +57,7 @@ class Background extends ParallaxComponent{
   void update(double dt) {
     super.update(dt);
     if (screenRotates) {
-      angle = world.getWorldAngle();
+      angle = world.worldAngle;
     }
   }
 

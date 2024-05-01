@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import '../audio/audio_controller.dart';
+//import '../audio/audio_controller.dart';
 import 'maze_layout.dart';
 import 'helper.dart';
 import 'package:flame/components.dart';
@@ -20,7 +20,7 @@ final followCursor = windows;
 final clickAndDrag = !windows && !useGyro;
 final gameScaleFactor = screenRotates ? 0.9 : 1.0;
 
-AudioController? globalAudioController; //initial value which immediately gets overridden
+//AudioController? globalAudioController; //initial value which immediately gets overridden
 double ksizex = 1700;
 double ksizey = 1700;
 

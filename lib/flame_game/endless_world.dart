@@ -59,6 +59,7 @@ class EndlessWorld extends Forge2DWorld
   late RealCharacter player;
   late final DateTime timeStarted;
   Vector2 get size => (parent as FlameGame).size;
+
   int levelCompletedIn = 0;
   late final AudioController audioController;
   get getAudioController => audioController;
@@ -72,18 +73,14 @@ class EndlessWorld extends Forge2DWorld
 
   /// The gravity is defined in virtual pixels per second squared.
   /// These pixels are in relation to how big the [FixedResolutionViewport] is.
-  @override
-  final Vector2 gravity = Vector2(0, 100);
-  Vector2 worldGravity = Vector2(0, 0); //initial value which immediately gets overridden
+  //@override
+  //final Vector2 gravity = Vector2(0, 100);
+  //Vector2 get worldGravity => gravity; //_worldGravity;
+  //Vector2 _worldGravity = Vector2(0, 0); //initial value which immediately gets overridden
   double worldAngle = 0; //2 * pi / 8;
 
   /// Where the ground is located in the world and things should stop falling.
   //late final double groundLevel = (size.y / 2) - (size.y / 5);
-
-
-  double getWorldAngle() {
-    return worldAngle;
-  }
 
   @override
   Future<void> onLoad() async {
@@ -205,20 +202,14 @@ class EndlessWorld extends Forge2DWorld
     if (globalPhysicsLinked && gravityTurnedOn) {
       //FIXME for some reason you can set gravity, but when you read it is always 100,0
       gravity = newGravity;
-      worldGravity = newGravity;
+      //_worldGravity = newGravity;
       if (normaliseGravity) {
-        gravity = worldGravity.normalized() * 50;
-        worldGravity = worldGravity.normalized() * 50;
+        gravity = gravity.normalized() * 50;
+        //_worldGravity = _worldGravity.normalized() * 50;
       }
       if (screenRotates) {
-        worldAngle = atan2(getGravity().x, getGravity().y);
+        worldAngle = atan2(gravity.x, gravity.y);
       }
     }
   }
-
-  Vector2 getGravity() {
-    //FIXME for some reason you can set gravity, but when you read it is always 100,0
-    return worldGravity;
-  }
-
 }

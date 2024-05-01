@@ -29,6 +29,6 @@ class SuperPellet extends SpriteAnimationComponent
   @override
   void update(double dt) {
     super.update(dt);
-    position = screenPos(world.getWorldAngle(), absPosition);
+    position = screenPos(world.worldAngle, absPosition);
   }
 }

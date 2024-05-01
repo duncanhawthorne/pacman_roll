@@ -226,7 +226,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
         //pacman eats ghost
 
         //pacman visuals
-        globalAudioController!.playSfx(SfxType.eatGhost);
+        world.audioController.playSfx(SfxType.eatGhost);
         current = PlayerState.eating;
         playerEatingTimeLatest = DateTime.now().millisecondsSinceEpoch;
 
@@ -252,7 +252,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
         if (globalPhysicsLinked) {
           //prevent multiple hits
 
-          globalAudioController!.playSfx(SfxType.pacmanDeath);
+          world.audioController.playSfx(SfxType.pacmanDeath);
           pacmanDeadTimeLatest = DateTime.now().millisecondsSinceEpoch;
           current = PlayerState.deadPacman;
 
@@ -337,7 +337,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
     double timefrac =
         (DateTime.now().millisecondsSinceEpoch - ghostDeadTimeLatest) /
             (kGhostResetTimeMillis);
-    return screenPos(world.getWorldAngle(),
+    return screenPos(world.worldAngle,
         ghostDeadPosition * (1 - timefrac) + kGhostStartLocation * (timefrac));
   }
 
@@ -355,10 +355,10 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
 
   double getUpdatedAngle() {
     return angle +
-        (world.getWorldAngle() - _lastWorldAngle) +
+        (world.worldAngle - _lastWorldAngle) +
         (getUnderlyingBallPosition() - _lastUnderlyingPosition).length /
             (size.x / 2) *
-            getRollSpinDirection(world, getUnderlyingBallVelocity(), world.getGravity());
+            getRollSpinDirection(world, getUnderlyingBallVelocity(), world.gravity);
   }
 
   @override
@@ -378,12 +378,12 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
         position = getFlyingDeadGhostPosition();
       } else {
         moveUnderlyingBallThroughPipe();
-        position = screenPos(world.getWorldAngle(), getUnderlyingBallPosition());
+        position = screenPos(world.worldAngle, getUnderlyingBallPosition());
         angle = getUpdatedAngle();
       }
     }
     _lastUnderlyingPosition.setFrom(getUnderlyingBallPosition());
-    _lastWorldAngle = world.getWorldAngle();
+    _lastWorldAngle = world.worldAngle;
     _lastUnderlyingVelocity.setFrom(getUnderlyingBallVelocity());
   }
 
