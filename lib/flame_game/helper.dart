@@ -38,7 +38,7 @@ List<RealCharacter> ghostPlayersList = [];
 void addGhost(world, int number) {
   RealCharacter ghost = RealCharacter(
       isGhost: true,
-      startPosition: kGhostStartLocation +
+      startingPosition: kGhostStartLocation +
           Vector2(getSingleSquareWidth() * (number - 1), 0));
   ghost.ghostNumber = number;
   world.add(ghost);

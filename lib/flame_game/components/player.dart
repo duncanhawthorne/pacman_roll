@@ -25,7 +25,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
         HasGameReference<EndlessRunner> {
   RealCharacter({
     required this.isGhost,
-    required this.startPosition,
+    required this.startingPosition,
     super.position,
   }) : super(
             size: Vector2.all(getSingleSquareWidth()),
@@ -33,9 +33,11 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
             priority: 1);
 
   final bool isGhost;
-  Vector2 startPosition;
-  late Ball underlyingBallReal = Ball(realCharacter: this, initialPosition: startPosition); //to avoid null safety issues
   int ghostNumber = 1;
+
+  final Vector2 startingPosition;
+  late Ball underlyingBallReal = Ball(realCharacter: this, initialPosition: startingPosition); //to avoid null safety issues
+
   int ghostScaredTimeLatest = 0; //a long time ago
   int ghostDeadTimeLatest = 0; //a long time ago
   int pacmanDeadTimeLatest = 0; //a long time ago
@@ -117,7 +119,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
       return underlyingBallReal.position;
     } catch (e) {
       //FIXME shouldn't need this
-      p(e);
+      p(["getUnderlyingBallPosition", e]);
       return _lastUnderlyingPosition; //Vector2(10, 0);
     }
   }
@@ -135,7 +137,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
           underlyingBallReal.body.linearVelocity.y);
     } catch (e) {
       //FIXME shouldn't need this
-      p(e);
+      p(["getUnderlyingBallVelocity", e]);
       return _lastUnderlyingVelocity;
     }
   }
@@ -282,7 +284,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
 
   @override
   Future<void> onLoad() async {
-    setUnderlyingBallPosition(startPosition);
+    setUnderlyingBallPosition(startingPosition);
     //world.add(underlyingBallReal);
 
     // This defines the different animation states that the player can be in.

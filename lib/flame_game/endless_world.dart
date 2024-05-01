@@ -109,7 +109,7 @@ class EndlessWorld extends Forge2DWorld
       );
     }
 
-    player = RealCharacter(isGhost: false, startPosition: kPacmanStartLocation);
+    player = RealCharacter(isGhost: false, startingPosition: kPacmanStartLocation);
     add(player);
 
     for (int i = 0; i < 3; i++) {
