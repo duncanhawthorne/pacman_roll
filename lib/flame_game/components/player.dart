@@ -367,7 +367,6 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
   @override
   void update(double dt) {
     super.update(dt);
-    //TODO when ghosts are moving should play siren sound proportional to movement
     //TODO try to capture mouse on windows
     if (isGhost) {
       ghostDeadScaredScaredIshNormalSequence();

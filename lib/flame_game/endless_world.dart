@@ -183,7 +183,7 @@ class EndlessWorld extends Forge2DWorld
       accelerometerEventStream().listen(
         //start once and then runs
         (AccelerometerEvent event) {
-            setGravity(Vector2(event.y, event.x - 5) * (android && web ? 25 : 1));
+            setGravity(Vector2(event.y, event.x - 5) * (android && web ? 5 : 1));
         },
         onError: (error) {
           // Logic to handle error
