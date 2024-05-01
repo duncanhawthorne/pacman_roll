@@ -2,6 +2,7 @@ import '../constants.dart';
 import '../helper.dart';
 import 'package:flame/components.dart';
 import 'wall.dart';
+import 'package:flame_forge2d/flame_forge2d.dart';
 import 'dart:math';
 import 'powerpoint.dart';
 import 'point.dart';
@@ -12,7 +13,7 @@ int getMazeWidth() {
   return sqrt(mazeLayout.length).toInt();
 }
 
-void addPillsAndPowerPills(world) {
+void addPillsAndPowerPills(Forge2DWorld world) {
   int mazelen = getMazeWidth();
   for (var i = 0; i < mazelen; i++) {
     for (var j = 0; j < mazelen; j++) {

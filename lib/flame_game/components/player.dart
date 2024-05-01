@@ -108,7 +108,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
   Ball createUnderlyingBall(Vector2 targetPosition) {
     Ball underlyingBallRealTmp = Ball(realCharacter: this, initialPosition: targetPosition);
     //underlyingBallRealTmp.realCharacter =
-    //    this; //FIXME should do this in the initiator, but didn't work
+    //    this;
     //underlyingBallRealTmp.createBody();
     //underlyingBallRealTmp.bodyDef!.position = startPosition;
     return underlyingBallRealTmp;
@@ -126,7 +126,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
 
   void setUnderlyingBallPosition(Vector2 targetLoc) {
     underlyingBallReal
-        .removeFromParent(); //FIXME possible bug that may try to remove a ball that isn't in the world
+        .removeFromParent(); //note possible risk that may try to remove a ball that isn't in the world
     underlyingBallReal = createUnderlyingBall(targetLoc);
     world.add(underlyingBallReal);
   }
@@ -284,12 +284,9 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
 
   @override
   Future<void> onLoad() async {
-    setUnderlyingBallPosition(startingPosition);
-    //world.add(underlyingBallReal);
+    setUnderlyingBallPosition(startingPosition); //FIXME shouldn't be necessary, but avoid one frame starting glitch
 
-    // This defines the different animation states that the player can be in.
     animations = await getAnimations();
-    // The starting state will be that the player is running.
     current = PlayerState.normal;
     _lastUnderlyingPosition.setFrom(getUnderlyingBallPosition());
 
@@ -418,7 +415,6 @@ class RealCharacter extends SpriteAnimationGroupComponent<PlayerState>
     }
   }
 
-  //FIXME draw once and then render rather than drawing each frame
   ui.Image createPacmanStandard() {
     final recorder = PictureRecorder();
     final canvas = Canvas(recorder);

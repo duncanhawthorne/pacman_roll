@@ -211,14 +211,11 @@ class EndlessWorld extends Forge2DWorld
     }
   }
 
-  void setGravity(Vector2 newGravity) {
+  void setGravity(Vector2 targetGravity) {
     if (globalPhysicsLinked && gravityTurnedOn) {
-      //FIXME for some reason you can set gravity, but when you read it is always 100,0
-      gravity = newGravity;
-      //_worldGravity = newGravity;
+      gravity = targetGravity;
       if (normaliseGravity) {
         gravity = gravity.normalized() * 50;
-        //_worldGravity = _worldGravity.normalized() * 50;
       }
       if (screenRotates) {
         worldAngle = atan2(gravity.x, gravity.y);
