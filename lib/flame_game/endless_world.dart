@@ -72,6 +72,8 @@ class EndlessWorld extends Forge2DWorld
   int pelletsRemaining = 1;
   Vector2 dragLastPosition = Vector2(0,0);
   Vector2 targetFromLastDrag = Vector2(-50,0); //makes smooth start for drag
+  double dragLastAngle = 10;
+  double targetAngle = 2 * pi / 4;
 
   /// The random number generator that is used to spawn periodic components.
   // ignore: unused_field
@@ -259,10 +261,12 @@ class EndlessWorld extends Forge2DWorld
     if (clickAndDrag) {
       if (iOS) {
         dragLastPosition = Vector2(0,0);
+        dragLastAngle = 10;
       }
       else {
         dragLastPosition =
             Vector2(event.localPosition.x, event.localPosition.y);
+        dragLastAngle = atan2(event.localPosition.x, event.localPosition.y);
       }
     }
     else if (followCursor) {
@@ -274,12 +278,19 @@ class EndlessWorld extends Forge2DWorld
   void onDragUpdate(DragUpdateEvent event) {
     super.onDragUpdate(event);
     if (clickAndDrag) {
-      if (dragLastPosition != Vector2(0,0)) {
+      if (false && dragLastPosition != Vector2(0,0)) {
         Vector2 dragDelta = -(event.localStartPosition - dragLastPosition);
         handlePointerEvent(targetFromLastDrag + dragDelta);
         targetFromLastDrag = targetFromLastDrag + dragDelta;
       }
+      if (dragLastAngle != 10) {
+        double currentAngleTmp = atan2(event.localStartPosition.x, event.localStartPosition.y);
+        double angleDelta = currentAngleTmp - dragLastAngle;
+        targetAngle = targetAngle + angleDelta * 4;
+        setGravity(Vector2(cos(targetAngle), sin(targetAngle)));
+      }
       dragLastPosition = Vector2(event.localStartPosition.x, event.localStartPosition.y);
+      dragLastAngle = atan2(event.localStartPosition.x, event.localStartPosition.y);
     }
     else if (followCursor) {
       handlePointerEvent(Vector2(event.localStartPosition.x, event.localStartPosition.y));
@@ -291,6 +302,7 @@ class EndlessWorld extends Forge2DWorld
     super.onDragEnd(event);
     if (clickAndDrag) {
       dragLastPosition = Vector2(0, 0);
+      dragLastAngle = 10;
     }
   }
 
