@@ -32,11 +32,12 @@ final Vector2 kRightPortalLocation = Vector2(9, -1) * getSingleSquareWidth();
 const int kGhostResetTimeMillis = 1000;
 const int kGhostChaseTimeMillis = 6000;
 const int kPacmanDeadResetTimeMillis = 1000;
-const int kPacmanHalfEatingResetTimeMillis = 130;
+const int kPacmanHalfEatingResetTimeMillis = 150;
 
 bool globalPhysicsLinked = true;
 bool gravityTurnedOn = true;
 bool startGameMusic = true;
+const bool soundsOn = true;
 
 //double sirenVolume = 0;
 final bool sirenOn = iOS ? false : true;

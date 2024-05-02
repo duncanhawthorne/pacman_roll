@@ -24,17 +24,6 @@ int getStartingNumberPelletsAndSuperPellets(List mazeLayout) {
   return c;
 }
 
-Vector2 screenPos(double worldAngle, Vector2 absolutePos) {
-  if (!screenRotates) {
-    return absolutePos;
-  } else {
-    Matrix2 mat = Matrix2(
-        cos(worldAngle), -sin(worldAngle), sin(worldAngle), cos(worldAngle));
-    return Vector2(mat[0] * absolutePos[0] + mat[1] * absolutePos[1],
-        mat[2] * absolutePos[0] + mat[3] * absolutePos[1]);
-  }
-}
-
 enum WallLocation { bottom, top, left, right }
 
 int getRollSpinDirection(

@@ -2,7 +2,6 @@ import '../endless_world.dart';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import '../constants.dart';
-import '../helper.dart';
 
 /// The [Point] components are the components that the [Player] should collect
 /// to finish a level. The points are represented by Flame's mascot; Ember.
@@ -29,6 +28,6 @@ class SuperPellet extends SpriteAnimationComponent
   @override
   void update(double dt) {
     super.update(dt);
-    position = screenPos(world.worldAngle, absPosition);
+    position = world.screenPos(absPosition);
   }
 }

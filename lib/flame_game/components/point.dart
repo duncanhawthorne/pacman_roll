@@ -1,4 +1,3 @@
-import 'package:endless_runner/flame_game/helper.dart';
 
 import '../endless_world.dart';
 import 'package:flame/collisions.dart';
@@ -30,6 +29,6 @@ class MiniPellet extends SpriteAnimationComponent
   @override
   void update(double dt) {
     super.update(dt);
-    position = screenPos(world.worldAngle, absPosition);
+    position = world.screenPos(absPosition);
   }
 }

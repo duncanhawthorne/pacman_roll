@@ -74,6 +74,7 @@ class EndlessWorld extends Forge2DWorld
   Vector2 targetFromLastDrag = Vector2(-50,0); //makes smooth start for drag
   double dragLastAngle = 10;
   double targetAngle = 2 * pi / 4;
+  int now = 1;
 
   /// The random number generator that is used to spawn periodic components.
   // ignore: unused_field
@@ -86,6 +87,8 @@ class EndlessWorld extends Forge2DWorld
   //Vector2 get worldGravity => gravity; //_worldGravity;
   //Vector2 _worldGravity = Vector2(0, 0); //initial value which immediately gets overridden
   double worldAngle = 0; //2 * pi / 8;
+  double worldCos = 1;
+  double worldSin = 0;
 
   /// Where the ground is located in the world and things should stop falling.
   //late final double groundLevel = (size.y / 2) - (size.y / 5);
@@ -93,25 +96,28 @@ class EndlessWorld extends Forge2DWorld
   List<RealCharacter> ghostPlayersList = [];
 
   void play(SfxType type) async {
-    // ignore: dead_code
-    if (false) {
-      audioController.playSfx(type);
-    }
-    else {
-      final dAudioPlayer = AudioPlayer();
-      if (type == SfxType.ghostsScared) {
-        dAudioPlayer.setReleaseMode(ReleaseMode.loop);
-        Future.delayed(const Duration(milliseconds: kGhostChaseTimeMillis), () {
-          dAudioPlayer.stop();
-        });
+    if (soundsOn) {
+      // ignore: dead_code
+      if (false) {
+        audioController.playSfx(type);
       }
-      if (type == SfxType.siren) {
-        dAudioPlayer.setReleaseMode(ReleaseMode.loop);
-        updateSirenVolume(dAudioPlayer);
+      else {
+        final dAudioPlayer = AudioPlayer();
+        if (type == SfxType.ghostsScared) {
+          dAudioPlayer.setReleaseMode(ReleaseMode.loop);
+          Future.delayed(
+              const Duration(milliseconds: kGhostChaseTimeMillis), () {
+            dAudioPlayer.stop();
+          });
+        }
+        if (type == SfxType.siren) {
+          dAudioPlayer.setReleaseMode(ReleaseMode.loop);
+          updateSirenVolume(dAudioPlayer);
+        }
+        String filename = soundTypeToFilename(type)[0];
+        await dAudioPlayer.setSource(AssetSource('sfx/$filename'));
+        await dAudioPlayer.resume();
       }
-      String filename = soundTypeToFilename(type)[0];
-      await dAudioPlayer.setSource(AssetSource('sfx/$filename'));
-      await dAudioPlayer.resume();
     }
   }
 
@@ -141,9 +147,20 @@ class EndlessWorld extends Forge2DWorld
   void updateSirenVolume(dAudioPlayer) {
     //FIXME NOTE disabled on iOS for bug
     dAudioPlayer.setVolume(getTargetSirenVolume());
-    Future.delayed(const Duration(milliseconds: 100), () {
+    Future.delayed(const Duration(milliseconds: 500), () {
       updateSirenVolume(dAudioPlayer);
     });
+  }
+
+  Vector2 screenPos(Vector2 absolutePos) {
+    if (!screenRotates) {
+      return absolutePos;
+    } else {
+      //Matrix2 mat = Matrix2(
+      //    worldCos, -worldSin, worldSin, worldCos);
+      return Vector2(worldCos * absolutePos[0] + -worldSin * absolutePos[1],
+          worldSin * absolutePos[0] + worldCos * absolutePos[1]);
+    }
   }
 
   void addGhost(world, int number) {
@@ -212,7 +229,7 @@ class EndlessWorld extends Forge2DWorld
     // the player passed the level.
     scoreNotifier.addListener(() {
       if (scoreNotifier.value >= level.winScore) {
-        final levelTime = (DateTime.now().millisecondsSinceEpoch -
+        final levelTime = (getNow() -
                 timeStarted.millisecondsSinceEpoch) /
             1000;
 
@@ -255,6 +272,16 @@ class EndlessWorld extends Forge2DWorld
     }
   }
 
+  int getNow() {
+    return now;
+  }
+
+  @override
+  void update(double dt) {
+    super.update(dt);
+    now = DateTime.now().millisecondsSinceEpoch;
+  }
+
   @override
   void onDragStart(DragStartEvent event) {
     super.onDragStart(event);
@@ -278,6 +305,7 @@ class EndlessWorld extends Forge2DWorld
   void onDragUpdate(DragUpdateEvent event) {
     super.onDragUpdate(event);
     if (clickAndDrag) {
+      // ignore: dead_code
       if (false && dragLastPosition != Vector2(0,0)) {
         Vector2 dragDelta = -(event.localStartPosition - dragLastPosition);
         handlePointerEvent(targetFromLastDrag + dragDelta);
@@ -323,6 +351,8 @@ class EndlessWorld extends Forge2DWorld
       }
       if (screenRotates) {
         worldAngle = atan2(gravity.x, gravity.y);
+        worldCos = cos(worldAngle);
+        worldSin = sin(worldAngle);
       }
     }
   }
