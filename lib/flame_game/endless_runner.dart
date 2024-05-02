@@ -1,3 +1,4 @@
+import 'package:flame/camera.dart';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
@@ -12,6 +13,10 @@ import 'constants.dart';
 import 'components/maze.dart';
 import '../../audio/sounds.dart';
 import 'dart:core';
+import 'package:flame/src/camera/viewport.dart'
+as dhviewport;
+import 'package:flame/camera.dart'
+as dhFlameCamera;
 
 
 /// This is the base of the game which is added to the [GameWidget].
@@ -36,8 +41,7 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
     required this.audioController,
   }) : super(
           world: EndlessWorld(level: level, playerProgress: playerProgress),
-          camera: CameraComponent.withFixedResolution(
-              width: ksizex, height: ksizey), //2800, 1700
+          camera: CameraComponent.withFixedResolution(width: ksizex, height: ksizey), //2800, 1700 //CameraComponent(),//
           zoom: flameGameZoom,
         );
 

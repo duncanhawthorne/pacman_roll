@@ -242,11 +242,11 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
         otherPlayer.ghostDeadTimeLatest = world.getNow();
         otherPlayer.ghostDeadPosition = otherPlayer.getUnderlyingBallPosition();
 
-        //immediately move into cage where out of the way an no ball interactions
-        //FIXME somehow ghost can still kill pacman while in this state
+        //Move ball way offscreen. Stops any physics interactions or collisions
         otherPlayer
-            .setUnderlyingBallPosition(kCageLocation + Vector2.random() / 100);
+            .setUnderlyingBallPosition(kOffScreenLocation + Vector2.random() / 100);
 
+        /*
         Future.delayed(const Duration(milliseconds: kGhostResetTimeMillis - 5),
             () {
           //-5 buffer
@@ -254,6 +254,8 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
           otherPlayer.setUnderlyingBallPosition(
               kGhostStartLocation + Vector2.random() / 100);
         });
+
+         */
       } else {
         //ghost kills pacman
         if (globalPhysicsLinked) {
@@ -309,6 +311,8 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
     if (current == CharacterState.deadGhost) {
       if (world.getNow() - ghostDeadTimeLatest >
           kGhostResetTimeMillis) {
+        setUnderlyingBallPosition(
+            kGhostStartLocation + Vector2.random() / 100);
         current = CharacterState.scared;
       }
     }
@@ -341,6 +345,8 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
     double timefrac =
         (world.getNow() - ghostDeadTimeLatest) /
             (kGhostResetTimeMillis);
+    timefrac = min(1,timefrac);
+
     return world.screenPos(ghostDeadPosition * (1 - timefrac) + kGhostStartLocation * (timefrac));
   }
 

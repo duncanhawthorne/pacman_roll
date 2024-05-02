@@ -22,7 +22,7 @@ final clickAndDrag = !windows && !useGyro;
 final gameScaleFactor = screenRotates ? 0.9 : 1.0;
 
 double ksizex = 1700;
-double ksizey = 1700;
+double ksizey = 1700;//2800; //1700;
 
 final Vector2 kGhostStartLocation = Vector2(0, -3) * getSingleSquareWidth();
 final Vector2 kPacmanStartLocation = Vector2(0, 5) * getSingleSquareWidth();
@@ -30,6 +30,7 @@ final Vector2 kCageLocation = Vector2(0, -1) * getSingleSquareWidth();
 final Vector2 kLeftPortalLocation = Vector2(-9, -1) * getSingleSquareWidth();
 final Vector2 kRightPortalLocation = Vector2(9, -1) * getSingleSquareWidth();
 final Vector2 kCompassLocation = Vector2(0, 0) * getSingleSquareWidth();
+final Vector2 kOffScreenLocation = Vector2(0, 1000) * getSingleSquareWidth();
 
 const int kGhostResetTimeMillis = 1000;
 const int kGhostChaseTimeMillis = 6000;

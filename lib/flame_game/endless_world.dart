@@ -362,7 +362,7 @@ class EndlessWorld extends Forge2DWorld
 
   void handlePointerEvent(Vector2 eventVector) {
     if (globalPhysicsLinked) {
-      double impliedAngle = (-eventVector.x / (ksizex/2) * 2* pi) * 20 * (actuallyRotateSprites ? 1 : min(game.canvasSize.x, game.canvasSize.y) / ksizex);
+      double impliedAngle = (-eventVector.x / (min(ksizex,ksizey)/2) * 2* pi) * 20 * min(ksizex,ksizey) / 1700 * (actuallyRotateSprites ? 1 : min(game.canvasSize.x, game.canvasSize.y) / min(ksizex,ksizey) * 0.4);
       setGravity(screenRotates ? Vector2(cos(impliedAngle), sin(impliedAngle))  : eventVector - player.underlyingBallReal.position);
     }
   }
