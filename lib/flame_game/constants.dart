@@ -50,7 +50,7 @@ bool startGameMusic = true;
 const bool soundsOn = true;
 const bool actuallyRotateSprites = false;
 //final spriteRotationFudgeFactor = actuallyRotateSprites ? kSquareNotionalSize / 80 : 1; //FIXME shouldn't be necessary
-final spriteRotationFudgerFactor =  80 / 1700 * kSquareNotionalSize;
+const spriteRotationFudgerFactor =  80 / 1700 * kSquareNotionalSize;
 
 //double sirenVolume = 0;
-const bool sirenOn = true; //iOS ? false : true;
+final bool sirenOn = iOS ? false : true;
