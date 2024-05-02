@@ -18,6 +18,7 @@ final bool screenRotates = android ? false : true;
 final useGyro = !screenRotates;
 final followCursor = windows;
 final clickAndDrag = !windows && !useGyro;
+//final dragBasedOnAngles = iOS;
 final gameScaleFactor = screenRotates ? 0.9 : 1.0;
 
 double ksizex = 1700;
@@ -35,9 +36,10 @@ const int kPacmanDeadResetTimeMillis = 1000;
 const int kPacmanHalfEatingResetTimeMillis = 150;
 
 bool globalPhysicsLinked = true;
-bool gravityTurnedOn = true;
+//bool gravityTurnedOn = true;
 bool startGameMusic = true;
 const bool soundsOn = true;
+const bool actuallyRotateSprites = false;
 
 //double sirenVolume = 0;
 final bool sirenOn = iOS ? false : true;

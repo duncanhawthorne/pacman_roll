@@ -44,12 +44,13 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
   int playerEatingTimeLatest = 0; //a long time ago
   int playerEatingSoundTimeLatest = 0; //a long time ago
   Vector2 ghostDeadPosition = Vector2(0, 0);
+  double underlyingAngle = 0;
 
   // Used to store the last position of the player, so that we later can
   // determine which direction that the player is moving.
   // ignore: prefer_final_fields
   Vector2 _lastUnderlyingPosition = Vector2.zero();
-  double _lastWorldAngle = 0;
+  //double _lastWorldAngle = 0;
   // ignore: prefer_final_fields
   Vector2 _lastUnderlyingVelocity = Vector2.zero();
 
@@ -355,13 +356,29 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
     }
   }
 
-  double getUpdatedAngle() {
+  /*
+  double oldGetUpdatedAngle() {
     return angle +
         (world.worldAngle - _lastWorldAngle) +
         (getUnderlyingBallPosition() - _lastUnderlyingPosition).length /
             (size.x / 2) *
             getRollSpinDirection(world, getUnderlyingBallVelocity(), world.gravity);
   }
+   */
+
+  void updateUnderlyingAngle() {
+    underlyingAngle = underlyingAngle +
+        (getUnderlyingBallPosition() - _lastUnderlyingPosition).length /
+            (size.x / 2) *
+            getRollSpinDirection(world, getUnderlyingBallVelocity(), world.gravity);
+  }
+
+  double getUpdatedAngle() {
+    updateUnderlyingAngle();
+    return underlyingAngle + (actuallyRotateSprites ? world.worldAngle : 0);
+  }
+
+
 
   @override
   void update(double dt) {
@@ -384,7 +401,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
       }
     }
     _lastUnderlyingPosition.setFrom(getUnderlyingBallPosition());
-    _lastWorldAngle = world.worldAngle;
+    //_lastWorldAngle = world.worldAngle;
     _lastUnderlyingVelocity.setFrom(getUnderlyingBallVelocity());
   }
 

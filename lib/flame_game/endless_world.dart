@@ -87,6 +87,8 @@ class EndlessWorld extends Forge2DWorld
   //final Vector2 gravity = Vector2(0, 100);
   //Vector2 get worldGravity => gravity; //_worldGravity;
   //Vector2 _worldGravity = Vector2(0, 0); //initial value which immediately gets overridden
+  //double get worldAngle => _worldAngle;
+  //set worldAngle(double value) {_worldAngle = value;};
   double worldAngle = 0; //2 * pi / 8;
   double worldCos = 1;
   double worldSin = 0;
@@ -120,7 +122,7 @@ class EndlessWorld extends Forge2DWorld
         String filename = soundTypeToFilename(type)[0];
         await dAudioPlayer.setSource(AssetSource('sfx/$filename'));
         await dAudioPlayer.resume();
-        if (type != SfxType.ghostsScared && type != SfxType.siren) {
+        if (type != SfxType.ghostsScared && type != SfxType.siren && type != SfxType.startMusic && type != SfxType.clearedBoard) {
           Future.delayed(
               const Duration(milliseconds: 2 * 1000), () {
                 //clean up audio players after suitable delay, may not be necessary
@@ -163,13 +165,18 @@ class EndlessWorld extends Forge2DWorld
   }
 
   Vector2 screenPos(Vector2 absolutePos) {
-    if (!screenRotates) {
+    if (!actuallyRotateSprites) {
       return absolutePos;
-    } else {
-      //Matrix2 mat = Matrix2(
-      //    worldCos, -worldSin, worldSin, worldCos);
-      return Vector2(worldCos * absolutePos[0] + -worldSin * absolutePos[1],
-          worldSin * absolutePos[0] + worldCos * absolutePos[1]);
+    }
+    else {
+      if (!screenRotates) {
+        return absolutePos;
+      } else {
+        //Matrix2 mat = Matrix2(
+        //    worldCos, -worldSin, worldSin, worldCos);
+        return Vector2(worldCos * absolutePos[0] + -worldSin * absolutePos[1],
+            worldSin * absolutePos[0] + worldCos * absolutePos[1]);
+      }
     }
   }
 
@@ -283,8 +290,9 @@ class EndlessWorld extends Forge2DWorld
 
   @override
   void onPointerMove(dhpointer_move_event.PointerMoveEvent event) {
+    Vector2 eventVector = actuallyRotateSprites ? event.localPosition : event.canvasPosition - game.canvasSize/2;
     if (followCursor) {
-      handlePointerEvent(Vector2(event.localPosition.x, event.localPosition.y));
+      handlePointerEvent(Vector2(eventVector.x, eventVector.y));
     }
   }
 
@@ -301,6 +309,7 @@ class EndlessWorld extends Forge2DWorld
   @override
   void onDragStart(DragStartEvent event) {
     super.onDragStart(event);
+    Vector2 eventVector = actuallyRotateSprites ? event.localPosition : event.canvasPosition - game.canvasSize/2;
     if (clickAndDrag) {
       if (iOS) {
         dragLastPosition = Vector2(0,0);
@@ -308,36 +317,37 @@ class EndlessWorld extends Forge2DWorld
       }
       else {
         dragLastPosition =
-            Vector2(event.localPosition.x, event.localPosition.y);
-        dragLastAngle = atan2(event.localPosition.x, event.localPosition.y);
+            Vector2(eventVector.x, eventVector.y);
+        dragLastAngle = atan2(eventVector.x, eventVector.y);
       }
     }
     else if (followCursor) {
-      handlePointerEvent(Vector2(event.localPosition.x, event.localPosition.y));
+      handlePointerEvent(Vector2(eventVector.x, eventVector.y));
     }
   }
 
   @override
   void onDragUpdate(DragUpdateEvent event) {
     super.onDragUpdate(event);
+    Vector2 eventVector = actuallyRotateSprites ? event.localStartPosition : event.canvasStartPosition - game.canvasSize/2;
     if (clickAndDrag) {
       // ignore: dead_code
       if (false && dragLastPosition != Vector2(0,0)) {
-        Vector2 dragDelta = -(event.localStartPosition - dragLastPosition);
+        Vector2 dragDelta = -(eventVector - dragLastPosition);
         handlePointerEvent(targetFromLastDrag + dragDelta);
         targetFromLastDrag = targetFromLastDrag + dragDelta;
       }
       if (dragLastAngle != 10) {
-        double currentAngleTmp = atan2(event.localStartPosition.x, event.localStartPosition.y);
+        double currentAngleTmp = atan2(eventVector.x, eventVector.y);
         double angleDelta = currentAngleTmp - dragLastAngle;
         targetAngle = targetAngle + angleDelta * 4;
         setGravity(Vector2(cos(targetAngle), sin(targetAngle)));
       }
-      dragLastPosition = Vector2(event.localStartPosition.x, event.localStartPosition.y);
-      dragLastAngle = atan2(event.localStartPosition.x, event.localStartPosition.y);
+      dragLastPosition = Vector2(eventVector.x, eventVector.y);
+      dragLastAngle = atan2(eventVector.x, eventVector.y);
     }
     else if (followCursor) {
-      handlePointerEvent(Vector2(event.localStartPosition.x, event.localStartPosition.y));
+      handlePointerEvent(Vector2(eventVector.x, eventVector.y));
     }
   }
 
@@ -351,8 +361,8 @@ class EndlessWorld extends Forge2DWorld
   }
 
   void handlePointerEvent(Vector2 eventVector) {
-    if (globalPhysicsLinked && gravityTurnedOn) {
-      double impliedAngle = (-eventVector.x / (ksizex/2) * 2* pi) * 20;
+    if (globalPhysicsLinked) {
+      double impliedAngle = (-eventVector.x / (ksizex/2) * 2* pi) * 20 * (actuallyRotateSprites ? 1 : game.canvasSize.x / ksizex);
       setGravity(screenRotates ? Vector2(cos(impliedAngle), sin(impliedAngle))  : eventVector - player.underlyingBallReal.position);
     }
   }
@@ -360,7 +370,7 @@ class EndlessWorld extends Forge2DWorld
 
 
   void setGravity(Vector2 targetGravity) {
-    if (globalPhysicsLinked && gravityTurnedOn) {
+    if (globalPhysicsLinked) {
       gravity = targetGravity;
       if (normaliseGravity) {
         gravity = gravity.normalized() * 50;

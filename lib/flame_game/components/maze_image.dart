@@ -3,9 +3,8 @@ import 'package:endless_runner/flame_game/components/maze.dart';
 import 'package:endless_runner/flame_game/helper.dart';
 
 import '../endless_world.dart';
-import 'package:flame/collisions.dart';
-import 'package:flame/components.dart';
 import '../constants.dart';
+import 'package:flame/components.dart';
 
 /// The [MiniPellet] components are the components that the [Player] should collect
 /// to finish a level. The points are represented by Flame's mascot; Ember.
@@ -29,6 +28,8 @@ class MazeImage extends SpriteAnimationComponent
   void update(double dt) {
     super.update(dt);
     position = world.screenPos(absPosition);
-    angle = world.worldAngle;
+    if (actuallyRotateSprites) {
+      angle = world.worldAngle;
+    }
   }
 }

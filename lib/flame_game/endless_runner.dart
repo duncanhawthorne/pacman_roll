@@ -10,7 +10,6 @@ import '../player_progress/player_progress.dart';
 import 'endless_world.dart';
 import 'constants.dart';
 import 'components/maze.dart';
-import 'components/background.dart';
 import '../../audio/sounds.dart';
 import 'dart:core';
 
@@ -61,7 +60,7 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
     } else {
       //gravityTurnedOn = true;
     }
-    gravityTurnedOn = true;
+    //gravityTurnedOn = true;
   }
 
 
@@ -102,6 +101,7 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
     // camera's viewfinder move around and looks at different positions in the
     // world, the score is always static to the viewport.
     camera.viewport.add(scoreComponent);
+    camera.viewfinder.angle = 0;
 
     // Here we add a listener to the notifier that is updated when the player
     // gets a new point, in the callback we update the text of the
@@ -111,4 +111,13 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
           scoreText.replaceFirst('3', '${3 - world.scoreNotifier.value}');
     });
   }
+
+  @override
+  void update(double dt) {
+    super.update(dt);
+    if (!actuallyRotateSprites) {
+      camera.viewfinder.angle = -world.worldAngle;
+    }
+  }
+
 }
