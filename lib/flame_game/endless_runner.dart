@@ -33,6 +33,8 @@ as dhFlameCamera;
 /// Note that both of the last are passed in to the super constructor, they
 /// could also be set inside of `onLoad` for example.
 
+
+
 class EndlessRunner extends Forge2DGame<EndlessWorld>
     with HasCollisionDetection {
   EndlessRunner({
@@ -41,7 +43,7 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
     required this.audioController,
   }) : super(
           world: EndlessWorld(level: level, playerProgress: playerProgress),
-          camera: CameraComponent.withFixedResolution(width: ksizex, height: ksizey), //2800, 1700 //CameraComponent(),//
+          camera: CameraComponent.withFixedResolution(width: dx, height: dy), //2800, 1700 //CameraComponent(),//
           zoom: flameGameZoom,
         );
 

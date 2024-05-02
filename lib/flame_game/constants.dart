@@ -24,6 +24,9 @@ final gameScaleFactor = screenRotates ? 0.9 : 1.0;
 double ksizex = 1700;
 double ksizey = 1700;//2800; //1700;
 
+double dx = 0;
+double dy = 0;
+
 final Vector2 kGhostStartLocation = Vector2(0, -3) * getSingleSquareWidth();
 final Vector2 kPacmanStartLocation = Vector2(0, 5) * getSingleSquareWidth();
 final Vector2 kCageLocation = Vector2(0, -1) * getSingleSquareWidth();

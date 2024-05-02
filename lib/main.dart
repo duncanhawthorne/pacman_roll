@@ -5,6 +5,7 @@ import 'package:nes_ui/nes_ui.dart';
 import 'package:provider/provider.dart';
 
 import 'router.dart';
+import 'flame_game/constants.dart';
 import 'app_lifecycle/app_lifecycle.dart';
 import 'audio/audio_controller.dart';
 import 'player_progress/player_progress.dart';
@@ -18,11 +19,26 @@ void main() async {
   runApp(const MyGame());
 }
 
+void saveViewPortSize(BuildContext context) {
+  //FIXME total hack. Purpose is to set max viewport but still have fixed size underneath at ksizex and ksizey
+  double x = MediaQuery.of(context).size.width;
+  double y = MediaQuery.of(context).size.height;
+  if (x > y) {
+    dx = (ksizex * x / y);
+    dy = ksizey;
+  }
+  else {
+    dx = ksizex;
+    dy = (ksizey * y / x);
+  }
+}
+
 class MyGame extends StatelessWidget {
   const MyGame({super.key});
 
   @override
   Widget build(BuildContext context) {
+    saveViewPortSize(context);
     return AppLifecycleObserver(
       child: MultiProvider(
         providers: [
