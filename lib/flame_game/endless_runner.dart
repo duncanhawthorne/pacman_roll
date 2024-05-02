@@ -10,6 +10,7 @@ import '../player_progress/player_progress.dart';
 
 import 'endless_world.dart';
 import 'constants.dart';
+import 'helper.dart';
 import 'components/maze.dart';
 import '../../audio/sounds.dart';
 import 'dart:core';
@@ -55,6 +56,8 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
 
   /// In the [onLoad] method you load different type of assets and set things
   /// that only needs to be set once when the level starts up.
+  double dxLast = 0;
+  double dyLast = 0;
 
   Future<void> startGame() async {
     if (startGameMusic) {
@@ -123,6 +126,11 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
     super.update(dt);
     if (!actuallyRotateSprites) {
       camera.viewfinder.angle = -world.worldAngle;
+    }
+    if (dxLast != dx || dyLast != dy) {
+      camera.viewport = FixedResolutionViewport(resolution: Vector2(dx, dy));
+      dxLast = dx;
+      dyLast = dy;
     }
   }
 
