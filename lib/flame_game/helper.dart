@@ -1,11 +1,10 @@
 import 'components/maze.dart';
 import 'constants.dart';
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 
 double getSingleSquareWidth() {
-  return min(ksizex, ksizey) / flameGameZoom / getMazeWidth() * gameScaleFactor;
+  return kSquareNotionalSize / flameGameZoom / getMazeWidth() * gameScaleFactor;
 }
 
 void p(x) {

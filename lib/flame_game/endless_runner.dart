@@ -10,14 +10,9 @@ import '../player_progress/player_progress.dart';
 
 import 'endless_world.dart';
 import 'constants.dart';
-import 'helper.dart';
 import 'components/maze.dart';
 import '../../audio/sounds.dart';
 import 'dart:core';
-import 'package:flame/src/camera/viewport.dart'
-as dhviewport;
-import 'package:flame/camera.dart'
-as dhFlameCamera;
 
 
 /// This is the base of the game which is added to the [GameWidget].

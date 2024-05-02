@@ -292,7 +292,7 @@ class EndlessWorld extends Forge2DWorld
   void onPointerMove(dhpointer_move_event.PointerMoveEvent event) {
     Vector2 eventVector = actuallyRotateSprites ? event.localPosition : event.canvasPosition - game.canvasSize/2;
     if (followCursor) {
-      handlePointerEvent(Vector2(eventVector.x, eventVector.y));
+      linearCursorMoveToGravity(Vector2(eventVector.x, eventVector.y));
     }
   }
 
@@ -322,7 +322,7 @@ class EndlessWorld extends Forge2DWorld
       }
     }
     else if (followCursor) {
-      handlePointerEvent(Vector2(eventVector.x, eventVector.y));
+      linearCursorMoveToGravity(Vector2(eventVector.x, eventVector.y));
     }
   }
 
@@ -334,7 +334,7 @@ class EndlessWorld extends Forge2DWorld
       // ignore: dead_code
       if (false && dragLastPosition != Vector2(0,0)) {
         Vector2 dragDelta = -(eventVector - dragLastPosition);
-        handlePointerEvent(targetFromLastDrag + dragDelta);
+        linearCursorMoveToGravity(targetFromLastDrag + dragDelta);
         targetFromLastDrag = targetFromLastDrag + dragDelta;
       }
       if (dragLastAngle != 10) {
@@ -347,7 +347,7 @@ class EndlessWorld extends Forge2DWorld
       dragLastAngle = atan2(eventVector.x, eventVector.y);
     }
     else if (followCursor) {
-      handlePointerEvent(Vector2(eventVector.x, eventVector.y));
+      linearCursorMoveToGravity(Vector2(eventVector.x, eventVector.y));
     }
   }
 
@@ -360,10 +360,11 @@ class EndlessWorld extends Forge2DWorld
     }
   }
 
-  void handlePointerEvent(Vector2 eventVector) {
+  void linearCursorMoveToGravity(Vector2 eventVector) {
+    assert(screenRotates);
     if (globalPhysicsLinked) {
-      double impliedAngle = (-eventVector.x / (min(ksizex,ksizey)/2) * 2* pi) * 20 * min(ksizex,ksizey) / 1700 * (actuallyRotateSprites ? 1 : min(game.canvasSize.x, game.canvasSize.y) / min(ksizex,ksizey) * 0.4);
-      setGravity(screenRotates ? Vector2(cos(impliedAngle), sin(impliedAngle))  : eventVector - player.underlyingBallReal.position);
+      double impliedAngle = -eventVector.x / (actuallyRotateSprites ? spriteRotationFudgerFactor : min(game.canvasSize.x, game.canvasSize.y)) * pointerRotationSpeed;
+      setGravity(Vector2(cos(impliedAngle), sin(impliedAngle)));
     }
   }
 

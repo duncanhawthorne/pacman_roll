@@ -2,6 +2,7 @@ import '../endless_world.dart';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import '../constants.dart';
+import '../helper.dart';
 import 'dart:math';
 
 /// The [Point] components are the components that the [Player] should collect
@@ -10,7 +11,7 @@ class SuperPellet extends SpriteAnimationComponent
     with HasGameReference, HasWorldReference<EndlessWorld> {
   SuperPellet() : super(size: spriteSize, anchor: Anchor.center);
 
-  static final Vector2 spriteSize = Vector2.all(100 / 3 / flameGameZoom * min(ksizex,ksizey) / 1700);
+  static final Vector2 spriteSize = Vector2.all(getSingleSquareWidth() * miniPelletAndSuperPelletScaleFactor);
   final speed = 0;
   Vector2 absPosition = Vector2(0,0);
 

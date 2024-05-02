@@ -13,16 +13,17 @@ final bool windows = defaultTargetPlatform == TargetPlatform.windows;
 const bool web = kIsWeb;
 
 const mazeLayout = realMazeLayout;
-final bool normaliseGravity = android ? false : true;
-final bool screenRotates = android ? false : true;
-final useGyro = !screenRotates;
+const bool normaliseGravity = true; //android ? false : true;
+const bool screenRotates = true; //android ? false : true;
+const useGyro = !screenRotates;
 final followCursor = windows;
 final clickAndDrag = !windows && !useGyro;
 //final dragBasedOnAngles = iOS;
-final gameScaleFactor = screenRotates ? 0.9 : 1.0;
+const gameScaleFactor = screenRotates ? 0.9 : 1.0;
 
-double ksizex = 1700;
-double ksizey = 1700;//2800; //1700;
+//double ksizex = 1700;
+//double ksizey = 1700;//2800; //1700;
+const double kSquareNotionalSize = 1700;
 
 double dx = 0;
 double dy = 0;
@@ -34,6 +35,9 @@ final Vector2 kLeftPortalLocation = Vector2(-9, -1) * getSingleSquareWidth();
 final Vector2 kRightPortalLocation = Vector2(9, -1) * getSingleSquareWidth();
 final Vector2 kCompassLocation = Vector2(0, 0) * getSingleSquareWidth();
 final Vector2 kOffScreenLocation = Vector2(0, 1000) * getSingleSquareWidth();
+const double miniPelletAndSuperPelletScaleFactor = 0.46;
+const pointerRotationSpeed = 8;
+
 
 const int kGhostResetTimeMillis = 1000;
 const int kGhostChaseTimeMillis = 6000;
@@ -45,6 +49,8 @@ bool globalPhysicsLinked = true;
 bool startGameMusic = true;
 const bool soundsOn = true;
 const bool actuallyRotateSprites = false;
+//final spriteRotationFudgeFactor = actuallyRotateSprites ? kSquareNotionalSize / 80 : 1; //FIXME shouldn't be necessary
+final spriteRotationFudgerFactor =  80 / 1700 * kSquareNotionalSize;
 
 //double sirenVolume = 0;
-final bool sirenOn = iOS ? false : true;
+const bool sirenOn = true; //iOS ? false : true;

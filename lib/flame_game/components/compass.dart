@@ -10,7 +10,7 @@ class Compass extends SpriteAnimationComponent
     with HasGameReference, HasWorldReference<EndlessWorld> {
   Compass() : super(size: spriteSize, anchor: Anchor.center);
 
-  static final Vector2 spriteSize = Vector2.all(100 / 3 / flameGameZoom);
+  static final Vector2 spriteSize = Vector2.all(getSingleSquareWidth() * miniPelletAndSuperPelletScaleFactor  / 2);
   Vector2 absPosition = kCompassLocation;
 
   @override
