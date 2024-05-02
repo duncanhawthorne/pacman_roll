@@ -17,6 +17,7 @@ import 'game_screen.dart';
 import 'components/player.dart';
 import 'components/compass.dart';
 import 'components/maze.dart';
+import 'components/maze_image.dart';
 import 'constants.dart';
 import 'helper.dart';
 
@@ -103,6 +104,8 @@ class EndlessWorld extends Forge2DWorld
       }
       else {
         final dAudioPlayer = AudioPlayer();
+        AudioLogger.logLevel = AudioLogLevel.info;
+        dAudioPlayer.setPlayerMode(PlayerMode.lowLatency);
         if (type == SfxType.ghostsScared) {
           dAudioPlayer.setReleaseMode(ReleaseMode.loop);
           Future.delayed(
@@ -117,6 +120,13 @@ class EndlessWorld extends Forge2DWorld
         String filename = soundTypeToFilename(type)[0];
         await dAudioPlayer.setSource(AssetSource('sfx/$filename'));
         await dAudioPlayer.resume();
+        if (type != SfxType.ghostsScared && type != SfxType.siren) {
+          Future.delayed(
+              const Duration(milliseconds: 2 * 1000), () {
+                //clean up audio players after suitable delay, may not be necessary
+            dAudioPlayer.stop();
+          });
+        }
       }
     }
   }
@@ -219,9 +229,15 @@ class EndlessWorld extends Forge2DWorld
       addGhost(this, i);
     }
 
+    if (!debugMode) {
+      createMaze(this);
+    }
+
+    add(MazeImage());
     addPillsAndPowerPills(this);
 
     add(Compass());
+
 
     // When the player takes a new point we check if the score is enough to
     // pass the level and if it is we calculate what time the level was passed

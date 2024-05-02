@@ -71,14 +71,12 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
     startGame();
     // The backdrop is a static layer behind the world that the camera is
     // looking at, so here we add our parallax background.
-    camera.backdrop.add(Background(speed: 0, world: world));
+    //camera.backdrop.add(Background(speed: 0, world: world));
 
     world.addAll(createBoundaries(camera));
     world.audioController = audioController;
     //globalAudioController = audioController;
-    if (!debugMode) {
-      createMaze(world);
-    }
+
 
     // With the `TextPaint` we define what properties the text that we are going
     // to render will have, like font family, size and color in this instance.
