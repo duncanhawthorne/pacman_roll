@@ -29,6 +29,7 @@ final Vector2 kPacmanStartLocation = Vector2(0, 5) * getSingleSquareWidth();
 final Vector2 kCageLocation = Vector2(0, -1) * getSingleSquareWidth();
 final Vector2 kLeftPortalLocation = Vector2(-9, -1) * getSingleSquareWidth();
 final Vector2 kRightPortalLocation = Vector2(9, -1) * getSingleSquareWidth();
+final Vector2 kCompassLocation = Vector2(0, 0) * getSingleSquareWidth();
 
 const int kGhostResetTimeMillis = 1000;
 const int kGhostChaseTimeMillis = 6000;

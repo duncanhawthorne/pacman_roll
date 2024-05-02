@@ -29,11 +29,13 @@ void addPillsAndPowerPills(Forge2DWorld world) {
       if (mazeLayout[k] == 0) {
         var pillx = MiniPellet();
         pillx.absPosition = location;
+        pillx.position = location; //initial set
         world.add(pillx);
       }
       if (mazeLayout[k] == 3) {
         var powerpill = SuperPellet();
         powerpill.absPosition = location;
+        powerpill.position = location; //initial set
         world.add(powerpill);
       }
     }

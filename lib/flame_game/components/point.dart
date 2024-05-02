@@ -29,6 +29,8 @@ class MiniPellet extends SpriteAnimationComponent
   @override
   void update(double dt) {
     super.update(dt);
-    position = world.screenPos(absPosition);
+    if (actuallyRotateSprites) {
+      position = world.screenPos(absPosition);
+    }
   }
 }
