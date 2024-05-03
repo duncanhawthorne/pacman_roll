@@ -381,7 +381,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
 
   double getUpdatedAngle() {
     updateUnderlyingAngle();
-    return underlyingAngle + (actuallyRotateSprites ? world.worldAngle : 0);
+    return underlyingAngle + (actuallyMoveSpritesToScreenPos ? world.worldAngle : 0);
   }
 
 

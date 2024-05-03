@@ -28,7 +28,7 @@ class MazeImage extends SpriteAnimationComponent
   void update(double dt) {
     super.update(dt);
     position = world.screenPos(absPosition);
-    if (actuallyRotateSprites) {
+    if (actuallyMoveSpritesToScreenPos) {
       angle = world.worldAngle;
     }
   }

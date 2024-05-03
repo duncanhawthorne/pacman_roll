@@ -119,7 +119,7 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
   @override
   void update(double dt) {
     super.update(dt);
-    if (!actuallyRotateSprites) {
+    if (!actuallyMoveSpritesToScreenPos) {
       camera.viewfinder.angle = -world.worldAngle;
     }
     if (dxLast != dx || dyLast != dy) {

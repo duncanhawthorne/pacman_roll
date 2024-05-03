@@ -45,6 +45,7 @@ const int kPacmanHalfEatingResetTimeMillis = 180;
 bool globalPhysicsLinked = true;
 bool startGameMusic = true;
 const bool soundsOn = true;
-const bool actuallyRotateSprites = true;//false;
+const bool rotateCamera = true;
+const bool actuallyMoveSpritesToScreenPos = !rotateCamera;
 
 final bool sirenOn = iOS ? false : true;

@@ -190,7 +190,7 @@ class EndlessWorld extends Forge2DWorld
   }
 
   Vector2 screenPos(Vector2 absolutePos) {
-    if (!actuallyRotateSprites) {
+    if (!actuallyMoveSpritesToScreenPos) {
       return absolutePos;
     } else {
       if (!screenRotates) {
@@ -313,7 +313,7 @@ class EndlessWorld extends Forge2DWorld
 
   @override
   void onPointerMove(dhpointer_move_event.PointerMoveEvent event) {
-    Vector2 eventVector = actuallyRotateSprites
+    Vector2 eventVector = actuallyMoveSpritesToScreenPos
         ? event.localPosition
         : event.canvasPosition - game.canvasSize / 2;
     if (followCursor) {
@@ -334,7 +334,7 @@ class EndlessWorld extends Forge2DWorld
   @override
   void onDragStart(DragStartEvent event) {
     super.onDragStart(event);
-    Vector2 eventVector = actuallyRotateSprites
+    Vector2 eventVector = actuallyMoveSpritesToScreenPos
         ? event.localPosition
         : event.canvasPosition - game.canvasSize / 2;
     if (clickAndDrag) {
@@ -353,7 +353,7 @@ class EndlessWorld extends Forge2DWorld
   @override
   void onDragUpdate(DragUpdateEvent event) {
     super.onDragUpdate(event);
-    Vector2 eventVector = actuallyRotateSprites
+    Vector2 eventVector = actuallyMoveSpritesToScreenPos
         ? event.localStartPosition
         : event.canvasStartPosition - game.canvasSize / 2;
     if (clickAndDrag) {
@@ -389,7 +389,7 @@ class EndlessWorld extends Forge2DWorld
     assert(screenRotates);
     if (globalPhysicsLinked) {
       double impliedAngle = -eventVector.x /
-          (actuallyRotateSprites
+          (actuallyMoveSpritesToScreenPos
               ? inGameVectorPixels
               : min(game.canvasSize.x, game.canvasSize.y)) *
           pointerRotationSpeed;

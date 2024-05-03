@@ -37,7 +37,7 @@ class MainMenuScreen extends StatelessWidget {
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 500),
                   child: const Text(
-                    'Pacman',
+                    'pacman roll',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontFamily: 'Press Start 2P',
