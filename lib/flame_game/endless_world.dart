@@ -209,7 +209,7 @@ class EndlessWorld extends Forge2DWorld
           await dAudioPlayer.setSource(AssetSource('sfx/$filename'));
         }
         if (dAudioPlayer.state != PlayerState.playing) {
-          dAudioPlayer.seek(Duration(milliseconds: 0));
+          dAudioPlayer.seek(const Duration(milliseconds: 0));
           await dAudioPlayer.resume();
         }
         /*
@@ -250,7 +250,7 @@ class EndlessWorld extends Forge2DWorld
     return min(0.4, tmpSirenVolume / 100);
   }
 
-  void updateSirenVolume(dAudioPlayer) {
+  void updateSirenVolume(dAudioPlayer) async {
     //FIXME NOTE disabled on iOS for bug
     if (isGameLive()) {
       dAudioPlayer.setVolume(getTargetSirenVolume());
@@ -368,6 +368,8 @@ class EndlessWorld extends Forge2DWorld
     //    RealCharacter(isGhost: false, startingPosition: kPacmanStartLocation);
     //add(player);
     addPacman(this, kPacmanStartLocation);
+    //addPacman(this, kPacmanStartLocation + Vector2.random() / 100);
+    //addPacman(this, kPacmanStartLocation + Vector2.random() / 100);
 
     for (int i = 0; i < 3; i++) {
       addGhost(this, i);
