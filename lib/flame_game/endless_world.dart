@@ -97,13 +97,13 @@ class EndlessWorld extends Forge2DWorld
 
   List<RealCharacter> ghostPlayersList = [];
 
-  void stopSiren(dAudioPlayer) async {
+  void stopGhostScaredSiren(dAudioPlayer) async {
     if (getNow() - ghostPlayersList[0].ghostScaredTimeLatest <
         kGhostChaseTimeMillis) {
       //in case second superpellet eaten, must wait for both to clear
       Future.delayed(const Duration(milliseconds: 25),
               () {
-        stopSiren(dAudioPlayer);
+        stopGhostScaredSiren(dAudioPlayer);
       });
     } else {
       dAudioPlayer.stop();
@@ -129,7 +129,7 @@ class EndlessWorld extends Forge2DWorld
           ghostScaredPlaying = true;
           Future.delayed(const Duration(milliseconds: kGhostChaseTimeMillis),
               () {
-                stopSiren(dAudioPlayer);
+                stopGhostScaredSiren(dAudioPlayer);
           });
         }
         if (type == SfxType.siren) {
