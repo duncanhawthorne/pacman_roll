@@ -15,7 +15,6 @@ import 'package:flame/src/events/messages/pointer_move_event.dart'
 import '../../audio/sounds.dart';
 import 'game_screen.dart';
 import 'components/player.dart';
-import 'components/compass.dart';
 import 'components/maze.dart';
 import 'components/maze_image.dart';
 import 'constants.dart';
@@ -98,7 +97,8 @@ class EndlessWorld extends Forge2DWorld
   List<RealCharacter> ghostPlayersList = [];
 
   void stopGhostScaredSiren(dAudioPlayer) async {
-    if (getNow() - ghostPlayersList[0].ghostScaredTimeLatest <
+    //p(gameRunning);
+    if (gameRunning && ghostPlayersList.length > 0 && getNow() - ghostPlayersList[0].ghostScaredTimeLatest <
         kGhostChaseTimeMillis) {
       //in case second superpellet eaten, must wait for both to clear
       Future.delayed(const Duration(milliseconds: 25),
@@ -164,7 +164,7 @@ class EndlessWorld extends Forge2DWorld
   double getTargetSirenVolume() {
     double tmpSirenVolume = 0;
     try {
-      for (int i = 0; i < 3; i++) {
+      for (int i = 0; i < ghostPlayersList.length; i++) {
         tmpSirenVolume += ghostPlayersList[i].current == CharacterState.normal
             ? ghostPlayersList[i].getUnderlyingBallVelocity().length
             : 0;
@@ -183,10 +183,18 @@ class EndlessWorld extends Forge2DWorld
 
   void updateSirenVolume(dAudioPlayer) {
     //FIXME NOTE disabled on iOS for bug
-    dAudioPlayer.setVolume(getTargetSirenVolume());
-    Future.delayed(const Duration(milliseconds: 500), () {
-      updateSirenVolume(dAudioPlayer);
-    });
+    if (gameRunning) {
+      dAudioPlayer.setVolume(getTargetSirenVolume());
+      Future.delayed(const Duration(milliseconds: 500), () {
+        updateSirenVolume(dAudioPlayer);
+      });
+    }
+    else {
+      //p("turn off siren");
+      //dAudioPlayer.setVolume(0);
+      dAudioPlayer.stop();
+      //dAudioPlayer.release();
+    }
   }
 
   Vector2 screenPos(Vector2 absolutePos) {
@@ -228,6 +236,7 @@ class EndlessWorld extends Forge2DWorld
 
   @override
   Future<void> onLoad() async {
+    gameRunning = true;
     if (sirenOn) {
       play(SfxType.siren);
     }
@@ -293,11 +302,13 @@ class EndlessWorld extends Forge2DWorld
     super.onMount();
     // When the world is mounted in the game we add a back button widget as an
     // overlay so that the player can go back to the previous screen.
+    gameRunning = true;
     game.overlays.add(GameScreen.backButtonKey);
   }
 
   @override
   void onRemove() {
+    gameRunning = false;
     game.overlays.remove(GameScreen.backButtonKey);
   }
 
@@ -350,12 +361,22 @@ class EndlessWorld extends Forge2DWorld
     }
   }
 
+  double convertToSmallestDeltaAngle(double angleDelta) {
+    //avoid indicating  +2*pi-delta jump when go around the circle, instead give -delta
+    angleDelta = angleDelta + 2 * pi / 2;
+    angleDelta = angleDelta % (2 * pi);
+    return angleDelta - 2 * pi / 2;
+  }
+
   @override
   void onDragUpdate(DragUpdateEvent event) {
     super.onDragUpdate(event);
     Vector2 eventVector = actuallyMoveSpritesToScreenPos
         ? event.localStartPosition
         : event.canvasStartPosition - game.canvasSize / 2;
+    double eventVectorLengthProportion = actuallyMoveSpritesToScreenPos
+        ? event.localStartPosition.length / (inGameVectorPixels /2)
+        : (event.canvasStartPosition - game.canvasSize / 2).length / (min(game.canvasSize.x, game.canvasSize.y)/2);
     if (clickAndDrag) {
       // ignore: dead_code
       if (false && dragLastPosition != Vector2(0, 0)) {
@@ -365,8 +386,8 @@ class EndlessWorld extends Forge2DWorld
       }
       if (dragLastAngle != 10) {
         double currentAngleTmp = atan2(eventVector.x, eventVector.y);
-        double angleDelta = currentAngleTmp - dragLastAngle;
-        targetAngle = targetAngle + angleDelta * 4;
+        double angleDelta = convertToSmallestDeltaAngle(currentAngleTmp - dragLastAngle);
+        targetAngle = targetAngle + angleDelta * 4 * min(1,eventVectorLengthProportion/0.75);
         setGravity(Vector2(cos(targetAngle), sin(targetAngle)));
       }
       dragLastPosition = Vector2(eventVector.x, eventVector.y);

@@ -9,6 +9,8 @@ import '../settings/settings.dart';
 import '../style/wobbly_button.dart';
 import '../style/palette.dart';
 import '../style/responsive_screen.dart';
+import '../flame_game/constants.dart';
+import '../flame_game/helper.dart';
 
 class MainMenuScreen extends StatelessWidget {
   const MainMenuScreen({super.key});
@@ -19,7 +21,7 @@ class MainMenuScreen extends StatelessWidget {
     final settingsController = context.watch<SettingsController>();
     // ignore: unused_local_variable
     final audioController = context.watch<AudioController>();
-
+    gameRunning = false;
     return Scaffold(
       backgroundColor: palette.backgroundMain.color,
       body: ResponsiveScreen(

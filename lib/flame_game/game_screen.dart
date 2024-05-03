@@ -1,5 +1,8 @@
 import '../audio/audio_controller.dart';
 import 'endless_runner.dart';
+import 'constants.dart';
+import 'helper.dart';
+
 import '../level_selection/levels.dart';
 import '../player_progress/player_progress.dart';
 import 'package:flame/game.dart';
@@ -41,7 +44,8 @@ class GameScreen extends StatelessWidget {
               right: 10,
               child: NesButton(
                 type: NesButtonType.normal,
-                onPressed: () => GoRouter.of(context).go("/"),
+                onPressed: () =>
+                    {GoRouter.of(context).go("/"), gameRunning = false},
                 child: NesIcon(iconData: NesIcons.leftArrowIndicator),
               ),
             );

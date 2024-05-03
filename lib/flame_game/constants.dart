@@ -15,8 +15,8 @@ const mazeLayout = realMazeLayout;
 const bool normaliseGravity = true; //android ? false : true;
 const bool screenRotates = true; //android ? false : true;
 const useGyro = !screenRotates;
-final followCursor = windows;
-final clickAndDrag = !windows && !useGyro;
+final followCursor = false; //windows;
+final clickAndDrag = true; //!windows && !useGyro;
 //final dragBasedOnAngles = iOS;
 
 const gameScaleFactor = screenRotates ? 0.9 : 1.0;
@@ -35,6 +35,7 @@ final Vector2 kCompassLocation = Vector2(0, 0) * getSingleSquareWidth();
 final Vector2 kOffScreenLocation = Vector2(0, 1000) * getSingleSquareWidth();
 const double miniPelletAndSuperPelletScaleFactor = 0.46;
 const pointerRotationSpeed = 10;
+bool gameRunning = false;
 
 
 const int kGhostResetTimeMillis = 1000;
