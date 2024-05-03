@@ -268,7 +268,7 @@ class EndlessWorld extends Forge2DWorld
     add(MazeImage());
     addPillsAndPowerPills(this);
 
-    add(Compass());
+    //add(Compass());
 
     // When the player takes a new point we check if the score is enough to
     // pass the level and if it is we calculate what time the level was passed
