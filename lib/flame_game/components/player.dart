@@ -244,7 +244,11 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
 
         //Move ball way offscreen. Stops any physics interactions or collisions
         otherPlayer
-            .setUnderlyingBallPosition(kOffScreenLocation + Vector2.random() / 100);
+            .setUnderlyingBallPosition(kOffScreenLocation + Vector2.random() / 100); //will get moved to right position later by other code in sequence checker
+        if (multiplePacmans) {
+          world.addPacman(
+              world, getUnderlyingBallPosition() + Vector2.random() / 100);
+        }
 
         /*
         Future.delayed(const Duration(milliseconds: kGhostResetTimeMillis - 5),
@@ -265,7 +269,14 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
           pacmanDeadTimeLatest = world.getNow();
           current = CharacterState.deadPacman;
 
-          globalPhysicsLinked = false;
+          if (world.pacmanPlayersList.length == 1) {
+            globalPhysicsLinked = false;
+          }
+          else {
+            //setUnderlyingBallPosition(kPacmanStartLocation);
+            assert(multiplePacmans);
+            world.removePacman(world, this);
+          }
 
           Future.delayed(
               const Duration(milliseconds: kPacmanDeadResetTimeMillis + 100),

@@ -59,7 +59,7 @@ class EndlessWorld extends Forge2DWorld
   /// other parts of the code is interested in when the score is updated they
   /// can listen to it and act on the updated value.
   final scoreNotifier = ValueNotifier(0);
-  late RealCharacter player;
+  //late RealCharacter player;
   late final DateTime timeStarted;
   Vector2 get size => (parent as FlameGame).size;
 
@@ -90,19 +90,46 @@ class EndlessWorld extends Forge2DWorld
   double worldSin = 0;
   bool wakaParity = true;
   bool ghostScaredPlaying = false;
+  Map<SfxType, AudioPlayer> audioPlayerMap = {};
 
   /// Where the ground is located in the world and things should stop falling.
   //late final double groundLevel = (size.y / 2) - (size.y / 5);
 
   List<RealCharacter> ghostPlayersList = [];
+  List<RealCharacter> pacmanPlayersList = [];
+
+  Future<bool> loadUpAudioFiles() async {
+    for (var type in SfxType.values) {
+      loadUpAudioFilesForKey(type);
+    }
+    return true;
+  }
+
+  Future<bool> loadUpAudioFilesForKey(SfxType type) async {
+    if (!audioPlayerMap.keys.contains(type)) {
+      String filename = soundTypeToFilename(type)[0];
+      AudioPlayer dAudioPlayerTmp = AudioPlayer();
+      await dAudioPlayerTmp.setSource(AssetSource('sfx/$filename'));
+      if (true || iOS) {
+        dAudioPlayerTmp.setVolume(0);
+        await dAudioPlayerTmp.resume();
+        await dAudioPlayerTmp.pause();
+        dAudioPlayerTmp.seek(const Duration(milliseconds: 0));
+        dAudioPlayerTmp.setVolume(1);
+        audioPlayerMap[type] = dAudioPlayerTmp;
+      }
+    }
+    return true;
+  }
 
   void stopGhostScaredSiren(dAudioPlayer) async {
     //p(gameRunning);
-    if (isGameLive() && ghostPlayersList.isNotEmpty && getNow() - ghostPlayersList[0].ghostScaredTimeLatest <
-        kGhostChaseTimeMillis) {
+    if (isGameLive() &&
+        ghostPlayersList.isNotEmpty &&
+        getNow() - ghostPlayersList[0].ghostScaredTimeLatest <
+            kGhostChaseTimeMillis) {
       //in case second superpellet eaten, must wait for both to clear
-      Future.delayed(const Duration(milliseconds: 25),
-              () {
+      Future.delayed(const Duration(milliseconds: 25), () {
         stopGhostScaredSiren(dAudioPlayer);
       });
     } else {
@@ -121,9 +148,30 @@ class EndlessWorld extends Forge2DWorld
       if (false) {
         audioController.playSfx(type);
       } else {
-        final dAudioPlayer = AudioPlayer();
-        AudioLogger.logLevel = AudioLogLevel.info;
-        dAudioPlayer.setPlayerMode(PlayerMode.lowLatency);
+        if (centralisedAudio) {
+          if (!audioPlayerMap.keys.contains(type)) {
+            await loadUpAudioFilesForKey(type);
+            Future.delayed(const Duration(milliseconds: 10),
+                    () {
+                      play(type);
+                });
+            return;
+          }
+        }
+        AudioPlayer dAudioPlayer = AudioPlayer();
+        if (!centralisedAudio) {
+          dAudioPlayer = AudioPlayer();
+          AudioLogger.logLevel = AudioLogLevel.info;
+          dAudioPlayer.setPlayerMode(PlayerMode.lowLatency);
+        } else {
+          if (audioPlayerMap[type] != null) {
+            dAudioPlayer = audioPlayerMap[type] ?? AudioPlayer();
+            AudioLogger.logLevel = AudioLogLevel.info;
+            dAudioPlayer.setPlayerMode(PlayerMode.lowLatency);
+          } else {
+            p(["audioPlayerMap[type] null", type]);
+          }
+        }
         if (type == SfxType.ghostsScared) {
           if (ghostScaredPlaying) {
             //only play once
@@ -133,7 +181,7 @@ class EndlessWorld extends Forge2DWorld
           ghostScaredPlaying = true;
           Future.delayed(const Duration(milliseconds: kGhostChaseTimeMillis),
               () {
-                stopGhostScaredSiren(dAudioPlayer);
+            stopGhostScaredSiren(dAudioPlayer);
           });
         }
         if (type == SfxType.siren) {
@@ -149,12 +197,19 @@ class EndlessWorld extends Forge2DWorld
             wakaParity = true;
           }
         }
-        if (!pelletEatSoundOn && (type == SfxType.waka || type == SfxType.waka2)) {
+        if (!pelletEatSoundOn &&
+            (type == SfxType.waka || type == SfxType.waka2)) {
           return;
         }
-        String filename = soundTypeToFilename(type)[0];
-        await dAudioPlayer.setSource(AssetSource('sfx/$filename'));
-        await dAudioPlayer.resume();
+        if (!centralisedAudio) {
+          String filename = soundTypeToFilename(type)[0];
+          await dAudioPlayer.setSource(AssetSource('sfx/$filename'));
+        }
+        if (dAudioPlayer.state != PlayerState.playing) {
+          dAudioPlayer.seek(Duration(milliseconds: 0));
+          await dAudioPlayer.resume();
+        }
+        /*
         if (type != SfxType.ghostsScared &&
             type != SfxType.siren &&
             type != SfxType.startMusic &&
@@ -164,6 +219,8 @@ class EndlessWorld extends Forge2DWorld
             stopSpecificAudio(dAudioPlayer);
           });
         }
+
+         */
       }
     }
   }
@@ -176,14 +233,16 @@ class EndlessWorld extends Forge2DWorld
             ? ghostPlayersList[i].getUnderlyingBallVelocity().length
             : 0;
       }
-      if (player.current == CharacterState.deadPacman || !globalPhysicsLinked) {
+      if ((pacmanPlayersList.isNotEmpty &&
+              pacmanPlayersList[0].current == CharacterState.deadPacman) ||
+          !globalPhysicsLinked) {
         tmpSirenVolume = 0;
       }
     }
     // ignore: empty_catches
     catch (e) {
       tmpSirenVolume = 0;
-      p("tmpSirenVolume zero");
+      p([e, "tmpSirenVolume zero"]);
     }
     return min(0.4, tmpSirenVolume / 100);
   }
@@ -192,20 +251,24 @@ class EndlessWorld extends Forge2DWorld
     //FIXME NOTE disabled on iOS for bug
     if (isGameLive()) {
       dAudioPlayer.setVolume(getTargetSirenVolume());
+      dAudioPlayer.resume();
       Future.delayed(const Duration(milliseconds: 500), () {
         updateSirenVolume(dAudioPlayer);
       });
-    }
-    else {
+    } else {
       //p("turn off siren");
       stopSpecificAudio(dAudioPlayer);
     }
   }
 
   void stopSpecificAudio(AudioPlayer dAudioPlayer) {
-    //dAudioPlayer.setVolume(0);
-    dAudioPlayer.stop();
-    dAudioPlayer.release();
+    if (!centralisedAudio) {
+      //dAudioPlayer.setVolume(0);
+      dAudioPlayer.stop();
+      dAudioPlayer.release();
+    } else {
+      dAudioPlayer.pause();
+    }
   }
 
   Vector2 screenPos(Vector2 absolutePos) {
@@ -233,6 +296,19 @@ class EndlessWorld extends Forge2DWorld
     ghostPlayersList.add(ghost);
   }
 
+  void addPacman(world, Vector2 startPosition) {
+    RealCharacter tmpPlayer =
+        RealCharacter(isGhost: false, startingPosition: startPosition);
+    world.add(tmpPlayer);
+    pacmanPlayersList.add(tmpPlayer);
+  }
+
+  void removePacman(world, RealCharacter pacman) {
+    world.remove(pacman.underlyingBallReal);
+    world.remove(pacman);
+    pacmanPlayersList.remove(pacman);
+  }
+
   void siren() {
     return;
     /*
@@ -248,8 +324,13 @@ class EndlessWorld extends Forge2DWorld
   @override
   Future<void> onLoad() async {
     gameRunning = true;
+    //loadUpAudioFiles();
     if (sirenOn) {
       play(SfxType.siren);
+      //Future.delayed(const Duration(milliseconds: 1000),
+      //        () {
+      //          play(SfxType.siren);
+      //    });
     }
     pelletsRemaining = getStartingNumberPelletsAndSuperPellets(mazeLayout);
 
@@ -273,9 +354,10 @@ class EndlessWorld extends Forge2DWorld
       );
     }
 
-    player =
-        RealCharacter(isGhost: false, startingPosition: kPacmanStartLocation);
-    add(player);
+    //player =
+    //    RealCharacter(isGhost: false, startingPosition: kPacmanStartLocation);
+    //add(player);
+    addPacman(this, kPacmanStartLocation);
 
     for (int i = 0; i < 3; i++) {
       addGhost(this, i);
@@ -386,8 +468,9 @@ class EndlessWorld extends Forge2DWorld
         ? event.localStartPosition
         : event.canvasStartPosition - game.canvasSize / 2;
     double eventVectorLengthProportion = actuallyMoveSpritesToScreenPos
-        ? event.localStartPosition.length / (inGameVectorPixels /2)
-        : (event.canvasStartPosition - game.canvasSize / 2).length / (min(game.canvasSize.x, game.canvasSize.y)/2);
+        ? event.localStartPosition.length / (inGameVectorPixels / 2)
+        : (event.canvasStartPosition - game.canvasSize / 2).length /
+            (min(game.canvasSize.x, game.canvasSize.y) / 2);
     if (clickAndDrag) {
       // ignore: dead_code
       if (false && dragLastPosition != Vector2(0, 0)) {
@@ -396,9 +479,11 @@ class EndlessWorld extends Forge2DWorld
         targetFromLastDrag = targetFromLastDrag + dragDelta;
       }
       if (dragLastAngle != 10) {
+        double spinMultiplier = 4 * min(1, eventVectorLengthProportion / 0.75);
         double currentAngleTmp = atan2(eventVector.x, eventVector.y);
-        double angleDelta = convertToSmallestDeltaAngle(currentAngleTmp - dragLastAngle);
-        targetAngle = targetAngle + angleDelta * 4 * min(1,eventVectorLengthProportion/0.75);
+        double angleDelta =
+            convertToSmallestDeltaAngle(currentAngleTmp - dragLastAngle);
+        targetAngle = targetAngle + angleDelta * spinMultiplier;
         setGravity(Vector2(cos(targetAngle), sin(targetAngle)));
       }
       dragLastPosition = Vector2(eventVector.x, eventVector.y);

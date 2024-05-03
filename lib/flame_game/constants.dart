@@ -51,3 +51,5 @@ const bool actuallyMoveSpritesToScreenPos = !rotateCamera;
 
 final bool sirenOn = iOS ? false : true;
 final bool pelletEatSoundOn = iOS ? false : true;
+const multiplePacmans = false;
+const centralisedAudio = true;
