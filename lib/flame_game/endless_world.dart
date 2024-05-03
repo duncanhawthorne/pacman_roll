@@ -98,7 +98,7 @@ class EndlessWorld extends Forge2DWorld
 
   void stopGhostScaredSiren(dAudioPlayer) async {
     //p(gameRunning);
-    if (gameRunning && ghostPlayersList.isNotEmpty && getNow() - ghostPlayersList[0].ghostScaredTimeLatest <
+    if (isGameLive() && ghostPlayersList.isNotEmpty && getNow() - ghostPlayersList[0].ghostScaredTimeLatest <
         kGhostChaseTimeMillis) {
       //in case second superpellet eaten, must wait for both to clear
       Future.delayed(const Duration(milliseconds: 25),
@@ -106,9 +106,13 @@ class EndlessWorld extends Forge2DWorld
         stopGhostScaredSiren(dAudioPlayer);
       });
     } else {
-      dAudioPlayer.stop();
+      stopSpecificAudio(dAudioPlayer);
       ghostScaredPlaying = false;
     }
+  }
+
+  bool isGameLive() {
+    return gameRunning && !game.paused && game.isLoaded && game.isMounted;
   }
 
   void play(SfxType type) async {
@@ -145,6 +149,9 @@ class EndlessWorld extends Forge2DWorld
             wakaParity = true;
           }
         }
+        if (!pelletEatSoundOn && (type == SfxType.waka || type == SfxType.waka2)) {
+          return;
+        }
         String filename = soundTypeToFilename(type)[0];
         await dAudioPlayer.setSource(AssetSource('sfx/$filename'));
         await dAudioPlayer.resume();
@@ -154,7 +161,7 @@ class EndlessWorld extends Forge2DWorld
             type != SfxType.clearedBoard) {
           Future.delayed(const Duration(milliseconds: 2 * 1000), () {
             //clean up audio players after suitable delay, may not be necessary
-            dAudioPlayer.stop();
+            stopSpecificAudio(dAudioPlayer);
           });
         }
       }
@@ -183,7 +190,7 @@ class EndlessWorld extends Forge2DWorld
 
   void updateSirenVolume(dAudioPlayer) {
     //FIXME NOTE disabled on iOS for bug
-    if (gameRunning) {
+    if (isGameLive()) {
       dAudioPlayer.setVolume(getTargetSirenVolume());
       Future.delayed(const Duration(milliseconds: 500), () {
         updateSirenVolume(dAudioPlayer);
@@ -191,10 +198,14 @@ class EndlessWorld extends Forge2DWorld
     }
     else {
       //p("turn off siren");
-      //dAudioPlayer.setVolume(0);
-      dAudioPlayer.stop();
-      //dAudioPlayer.release();
+      stopSpecificAudio(dAudioPlayer);
     }
+  }
+
+  void stopSpecificAudio(AudioPlayer dAudioPlayer) {
+    //dAudioPlayer.setVolume(0);
+    dAudioPlayer.stop();
+    dAudioPlayer.release();
   }
 
   Vector2 screenPos(Vector2 absolutePos) {

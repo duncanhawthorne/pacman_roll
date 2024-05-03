@@ -50,3 +50,4 @@ const bool rotateCamera = true;
 const bool actuallyMoveSpritesToScreenPos = !rotateCamera;
 
 final bool sirenOn = iOS ? false : true;
+final bool pelletEatSoundOn = iOS ? false : true;
