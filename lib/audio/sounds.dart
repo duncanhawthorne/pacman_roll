@@ -26,6 +26,10 @@ List<String> soundTypeToFilename(SfxType type) {
       return const [
         'pacman_waka_waka.mp3',
       ];
+    case SfxType.waka2:
+      return const [
+        'pacman_waka_waka-copy.mp3',
+      ];
     case SfxType.ka:
       return const [
         'pacman_waka_ka.mp3',
@@ -54,6 +58,7 @@ double soundTypeToVolume(SfxType type) {
     case SfxType.wa:
     case SfxType.ka:
     case SfxType.waka:
+    case SfxType.waka2:
     case SfxType.startMusic:
     case SfxType.ghostsScared:
     case SfxType.clearedBoard:
@@ -70,6 +75,7 @@ enum SfxType {
   wa,
   ka,
   waka,
+  waka2,
   startMusic,
   ghostsScared,
   clearedBoard,

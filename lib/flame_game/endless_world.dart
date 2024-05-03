@@ -29,7 +29,6 @@ import '../audio/audio_controller.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:audioplayers/audioplayers.dart';
 
-
 /// The world is where you place all the components that should live inside of
 /// the game, like the player, enemies, obstacles and points for example.
 /// The world can be much bigger than what the camera is currently looking at,
@@ -53,8 +52,6 @@ class EndlessWorld extends Forge2DWorld
   /// The properties of the current level.
   final GameLevel level;
 
-
-
   /// Used to see what the current progress of the player is and to update the
   /// progress if a level is finished.
   final PlayerProgress playerProgress;
@@ -71,8 +68,8 @@ class EndlessWorld extends Forge2DWorld
   late final AudioController audioController;
   get getAudioController => audioController;
   int pelletsRemaining = 1;
-  Vector2 dragLastPosition = Vector2(0,0);
-  Vector2 targetFromLastDrag = Vector2(-50,0); //makes smooth start for drag
+  Vector2 dragLastPosition = Vector2(0, 0);
+  Vector2 targetFromLastDrag = Vector2(-50, 0); //makes smooth start for drag
   double dragLastAngle = 10;
   double targetAngle = 2 * pi / 4;
   int now = 1;
@@ -92,40 +89,71 @@ class EndlessWorld extends Forge2DWorld
   double worldAngle = 0; //2 * pi / 8;
   double worldCos = 1;
   double worldSin = 0;
+  bool wakaParity = true;
+  bool ghostScaredPlaying = false;
 
   /// Where the ground is located in the world and things should stop falling.
   //late final double groundLevel = (size.y / 2) - (size.y / 5);
 
   List<RealCharacter> ghostPlayersList = [];
 
+  void stopSiren(dAudioPlayer) async {
+    if (getNow() - ghostPlayersList[0].ghostScaredTimeLatest <
+        kGhostChaseTimeMillis) {
+      //in case second superpellet eaten, must wait for both to clear
+      Future.delayed(const Duration(milliseconds: 25),
+              () {
+        stopSiren(dAudioPlayer);
+      });
+    } else {
+      dAudioPlayer.stop();
+      ghostScaredPlaying = false;
+    }
+  }
+
   void play(SfxType type) async {
     if (soundsOn) {
       // ignore: dead_code
       if (false) {
         audioController.playSfx(type);
-      }
-      else {
+      } else {
         final dAudioPlayer = AudioPlayer();
         AudioLogger.logLevel = AudioLogLevel.info;
         dAudioPlayer.setPlayerMode(PlayerMode.lowLatency);
         if (type == SfxType.ghostsScared) {
+          if (ghostScaredPlaying) {
+            //only play once
+            return;
+          }
           dAudioPlayer.setReleaseMode(ReleaseMode.loop);
-          Future.delayed(
-              const Duration(milliseconds: kGhostChaseTimeMillis), () {
-            dAudioPlayer.stop();
+          ghostScaredPlaying = true;
+          Future.delayed(const Duration(milliseconds: kGhostChaseTimeMillis),
+              () {
+                stopSiren(dAudioPlayer);
           });
         }
         if (type == SfxType.siren) {
           dAudioPlayer.setReleaseMode(ReleaseMode.loop);
           updateSirenVolume(dAudioPlayer);
         }
+        if (type == SfxType.waka) {
+          if (wakaParity) {
+            wakaParity = false;
+          } else {
+            //FIXME to work around potential problems quickly reusing the same sound file, have two identical files that switch between
+            type = SfxType.waka2;
+            wakaParity = true;
+          }
+        }
         String filename = soundTypeToFilename(type)[0];
         await dAudioPlayer.setSource(AssetSource('sfx/$filename'));
         await dAudioPlayer.resume();
-        if (type != SfxType.ghostsScared && type != SfxType.siren && type != SfxType.startMusic && type != SfxType.clearedBoard) {
-          Future.delayed(
-              const Duration(milliseconds: 2 * 1000), () {
-                //clean up audio players after suitable delay, may not be necessary
+        if (type != SfxType.ghostsScared &&
+            type != SfxType.siren &&
+            type != SfxType.startMusic &&
+            type != SfxType.clearedBoard) {
+          Future.delayed(const Duration(milliseconds: 2 * 1000), () {
+            //clean up audio players after suitable delay, may not be necessary
             dAudioPlayer.stop();
           });
         }
@@ -133,15 +161,12 @@ class EndlessWorld extends Forge2DWorld
     }
   }
 
- double getTargetSirenVolume() {
+  double getTargetSirenVolume() {
     double tmpSirenVolume = 0;
     try {
       for (int i = 0; i < 3; i++) {
-        tmpSirenVolume +=
-        ghostPlayersList[i].current == CharacterState.normal
-            ? ghostPlayersList[i]
-            .getUnderlyingBallVelocity()
-            .length
+        tmpSirenVolume += ghostPlayersList[i].current == CharacterState.normal
+            ? ghostPlayersList[i].getUnderlyingBallVelocity().length
             : 0;
       }
       if (player.current == CharacterState.deadPacman || !globalPhysicsLinked) {
@@ -149,7 +174,7 @@ class EndlessWorld extends Forge2DWorld
       }
     }
     // ignore: empty_catches
-    catch(e) {
+    catch (e) {
       tmpSirenVolume = 0;
       p("tmpSirenVolume zero");
     }
@@ -167,8 +192,7 @@ class EndlessWorld extends Forge2DWorld
   Vector2 screenPos(Vector2 absolutePos) {
     if (!actuallyRotateSprites) {
       return absolutePos;
-    }
-    else {
+    } else {
       if (!screenRotates) {
         return absolutePos;
       } else {
@@ -201,7 +225,7 @@ class EndlessWorld extends Forge2DWorld
     });
      */
   }
-  
+
   @override
   Future<void> onLoad() async {
     if (sirenOn) {
@@ -219,7 +243,7 @@ class EndlessWorld extends Forge2DWorld
       accelerometerEventStream().listen(
         //start once and then runs
         (AccelerometerEvent event) {
-            setGravity(Vector2(event.y, event.x - 5) * (android && web ? 5 : 1));
+          setGravity(Vector2(event.y, event.x - 5) * (android && web ? 5 : 1));
         },
         onError: (error) {
           // Logic to handle error
@@ -229,7 +253,8 @@ class EndlessWorld extends Forge2DWorld
       );
     }
 
-    player = RealCharacter(isGhost: false, startingPosition: kPacmanStartLocation);
+    player =
+        RealCharacter(isGhost: false, startingPosition: kPacmanStartLocation);
     add(player);
 
     for (int i = 0; i < 3; i++) {
@@ -245,16 +270,14 @@ class EndlessWorld extends Forge2DWorld
 
     add(Compass());
 
-
     // When the player takes a new point we check if the score is enough to
     // pass the level and if it is we calculate what time the level was passed
     // in, update the player's progress and open up a dialog that shows that
     // the player passed the level.
     scoreNotifier.addListener(() {
       if (scoreNotifier.value >= level.winScore) {
-        final levelTime = (getNow() -
-                timeStarted.millisecondsSinceEpoch) /
-            1000;
+        final levelTime =
+            (getNow() - timeStarted.millisecondsSinceEpoch) / 1000;
 
         levelCompletedIn = levelTime.round();
 
@@ -290,7 +313,9 @@ class EndlessWorld extends Forge2DWorld
 
   @override
   void onPointerMove(dhpointer_move_event.PointerMoveEvent event) {
-    Vector2 eventVector = actuallyRotateSprites ? event.localPosition : event.canvasPosition - game.canvasSize/2;
+    Vector2 eventVector = actuallyRotateSprites
+        ? event.localPosition
+        : event.canvasPosition - game.canvasSize / 2;
     if (followCursor) {
       linearCursorMoveToGravity(Vector2(eventVector.x, eventVector.y));
     }
@@ -309,19 +334,18 @@ class EndlessWorld extends Forge2DWorld
   @override
   void onDragStart(DragStartEvent event) {
     super.onDragStart(event);
-    Vector2 eventVector = actuallyRotateSprites ? event.localPosition : event.canvasPosition - game.canvasSize/2;
+    Vector2 eventVector = actuallyRotateSprites
+        ? event.localPosition
+        : event.canvasPosition - game.canvasSize / 2;
     if (clickAndDrag) {
       if (iOS) {
-        dragLastPosition = Vector2(0,0);
+        dragLastPosition = Vector2(0, 0);
         dragLastAngle = 10;
-      }
-      else {
-        dragLastPosition =
-            Vector2(eventVector.x, eventVector.y);
+      } else {
+        dragLastPosition = Vector2(eventVector.x, eventVector.y);
         dragLastAngle = atan2(eventVector.x, eventVector.y);
       }
-    }
-    else if (followCursor) {
+    } else if (followCursor) {
       linearCursorMoveToGravity(Vector2(eventVector.x, eventVector.y));
     }
   }
@@ -329,10 +353,12 @@ class EndlessWorld extends Forge2DWorld
   @override
   void onDragUpdate(DragUpdateEvent event) {
     super.onDragUpdate(event);
-    Vector2 eventVector = actuallyRotateSprites ? event.localStartPosition : event.canvasStartPosition - game.canvasSize/2;
+    Vector2 eventVector = actuallyRotateSprites
+        ? event.localStartPosition
+        : event.canvasStartPosition - game.canvasSize / 2;
     if (clickAndDrag) {
       // ignore: dead_code
-      if (false && dragLastPosition != Vector2(0,0)) {
+      if (false && dragLastPosition != Vector2(0, 0)) {
         Vector2 dragDelta = -(eventVector - dragLastPosition);
         linearCursorMoveToGravity(targetFromLastDrag + dragDelta);
         targetFromLastDrag = targetFromLastDrag + dragDelta;
@@ -345,8 +371,7 @@ class EndlessWorld extends Forge2DWorld
       }
       dragLastPosition = Vector2(eventVector.x, eventVector.y);
       dragLastAngle = atan2(eventVector.x, eventVector.y);
-    }
-    else if (followCursor) {
+    } else if (followCursor) {
       linearCursorMoveToGravity(Vector2(eventVector.x, eventVector.y));
     }
   }
@@ -363,12 +388,14 @@ class EndlessWorld extends Forge2DWorld
   void linearCursorMoveToGravity(Vector2 eventVector) {
     assert(screenRotates);
     if (globalPhysicsLinked) {
-      double impliedAngle = -eventVector.x / (actuallyRotateSprites ? spriteRotationFudgerFactor : min(game.canvasSize.x, game.canvasSize.y)) * pointerRotationSpeed;
+      double impliedAngle = -eventVector.x /
+          (actuallyRotateSprites
+              ? inGameVectorPixels
+              : min(game.canvasSize.x, game.canvasSize.y)) *
+          pointerRotationSpeed;
       setGravity(Vector2(cos(impliedAngle), sin(impliedAngle)));
     }
   }
-
-
 
   void setGravity(Vector2 targetGravity) {
     if (globalPhysicsLinked) {

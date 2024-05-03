@@ -4,12 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 
 double getSingleSquareWidth() {
-  return kSquareNotionalSize / flameGameZoom / getMazeWidth() * gameScaleFactor;
+  return inGameVectorPixels / getMazeWidth() * gameScaleFactor;
 }
 
 void p(x) {
   // ignore: prefer_interpolation_to_compose_strings
   debugPrint("///// A " + DateTime.now().toString() + " " + x.toString());
+}
+
+Future<void> sleep(int delayAfterMult) async {
+  await Future.delayed(Duration(milliseconds: delayAfterMult), () {});
 }
 
 int getStartingNumberPelletsAndSuperPellets(List mazeLayout) {
