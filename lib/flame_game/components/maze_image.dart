@@ -1,6 +1,6 @@
 
-import 'package:endless_runner/flame_game/components/maze.dart';
-import 'package:endless_runner/flame_game/helper.dart';
+import 'maze.dart';
+import '../helper.dart';
 
 import '../endless_world.dart';
 import '../constants.dart';

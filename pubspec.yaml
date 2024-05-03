@@ -1,5 +1,5 @@
-name: endless_runner
-description: A Flame game template built with Flutter.
+name: pacman_roll
+description: pacman_roll
 
 # Prevent accidental publishing to pub.dev.
 publish_to: 'none'
@@ -14,9 +14,9 @@ dependencies:
   flutter:
     sdk: flutter
 
-  audioplayers: ^5.2.1
+  audioplayers: ^6.0.0
   cupertino_icons: ^1.0.6
-  flame_audio: ^2.1.7
+#  flame_audio: ^2.1.7
   go_router: ^14.0.2
   provider: ^6.1.1
   shared_preferences: ^2.2.2
