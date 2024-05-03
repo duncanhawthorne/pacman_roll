@@ -116,8 +116,8 @@ class EndlessWorld extends Forge2DWorld
         await dAudioPlayerTmp.pause();
         dAudioPlayerTmp.seek(const Duration(milliseconds: 0));
         dAudioPlayerTmp.setVolume(1);
-        audioPlayerMap[type] = dAudioPlayerTmp;
       }
+      audioPlayerMap[type] = dAudioPlayerTmp;
     }
     return true;
   }
@@ -135,6 +135,9 @@ class EndlessWorld extends Forge2DWorld
     } else {
       stopSpecificAudio(dAudioPlayer);
       ghostScaredPlaying = false;
+      if (!isGameLive()) {
+        stopAllAudio(); //for good measure
+      }
     }
   }
 
@@ -258,6 +261,7 @@ class EndlessWorld extends Forge2DWorld
     } else {
       //p("turn off siren");
       stopSpecificAudio(dAudioPlayer);
+      stopAllAudio(); //for good measure
     }
   }
 
@@ -268,6 +272,12 @@ class EndlessWorld extends Forge2DWorld
       dAudioPlayer.release();
     } else {
       dAudioPlayer.pause();
+    }
+  }
+
+  void stopAllAudio() {
+    for (SfxType key in audioPlayerMap.keys) {
+      stopSpecificAudio(audioPlayerMap[key] ?? AudioPlayer());
     }
   }
 
