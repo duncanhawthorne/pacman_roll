@@ -10,7 +10,6 @@ import '../style/wobbly_button.dart';
 import '../style/palette.dart';
 import '../style/responsive_screen.dart';
 import '../flame_game/constants.dart';
-import '../flame_game/helper.dart';
 
 class MainMenuScreen extends StatelessWidget {
   const MainMenuScreen({super.key});

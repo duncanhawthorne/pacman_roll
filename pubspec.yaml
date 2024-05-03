@@ -170,7 +170,7 @@ flutter_launcher_icons:
   image_path: "assets/Icon-512.png"
   image_path_android: "assets/Icon-512.png"
   adaptive_icon_background: "#222222" # only available for Android 8.0 devices and above
-  adaptive_icon_foreground: "assets/Icon-512.png" # only available for Android 8.0 devices and above
+  adaptive_icon_foreground: "assets/Icon-512-adaptive.png" # only available for Android 8.0 devices and above
   min_sdk_android: 21 # android min sdk min:16, default 21
   web:
     generate: true

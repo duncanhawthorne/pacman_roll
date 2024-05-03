@@ -1,7 +1,6 @@
 import '../audio/audio_controller.dart';
 import 'endless_runner.dart';
 import 'constants.dart';
-import 'helper.dart';
 
 import '../level_selection/levels.dart';
 import '../player_progress/player_progress.dart';

@@ -98,7 +98,7 @@ class EndlessWorld extends Forge2DWorld
 
   void stopGhostScaredSiren(dAudioPlayer) async {
     //p(gameRunning);
-    if (gameRunning && ghostPlayersList.length > 0 && getNow() - ghostPlayersList[0].ghostScaredTimeLatest <
+    if (gameRunning && ghostPlayersList.isNotEmpty && getNow() - ghostPlayersList[0].ghostScaredTimeLatest <
         kGhostChaseTimeMillis) {
       //in case second superpellet eaten, must wait for both to clear
       Future.delayed(const Duration(milliseconds: 25),
