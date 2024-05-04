@@ -33,7 +33,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
             priority: 1);
 
   final bool isGhost;
-  int ghostNumber = 1;
+  int ghostNumberForSprite = 1;
 
   final Vector2 startingPosition;
   late Ball underlyingBallReal = Ball(
@@ -61,11 +61,11 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
         ? {
             CharacterState.normal: SpriteAnimation.spriteList(
               [
-                await game.loadSprite(ghostNumber == 0
+                await game.loadSprite(ghostNumberForSprite == 0
                     ? 'dash/ghost1.png'
-                    : ghostNumber == 1
+                    : ghostNumberForSprite == 1
                         ? 'dash/ghost2.png'
-                        : ghostNumber == 2
+                        : ghostNumberForSprite == 2
                             ? 'dash/ghost3.png'
                             : [
                                 'dash/ghost1.png',
@@ -128,8 +128,8 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
     try {
       return underlyingBallReal.position;
     } catch (e) {
-      //FIXME shouldn't need this
-      p(["getUnderlyingBallPosition", e]);
+      //FIXME shouldn't need this, hid error
+      //p(["getUnderlyingBallPosition", e]);
       return _lastUnderlyingPosition; //Vector2(10, 0);
     }
   }
@@ -146,8 +146,8 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
       return Vector2(underlyingBallReal.body.linearVelocity.x,
           underlyingBallReal.body.linearVelocity.y);
     } catch (e) {
-      //FIXME shouldn't need this
-      p(["getUnderlyingBallVelocity", e]);
+      //FIXME shouldn't need this, hid error
+      //p(["getUnderlyingBallVelocity", e]);
       return _lastUnderlyingVelocity;
     }
   }
@@ -163,18 +163,34 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
     }
   }
 
+  void trimToThreeGhosts() {
+    int origNumGhosts = world.ghostPlayersList.length;
+    for (int i = 0; i < origNumGhosts; i++) {
+      int j = origNumGhosts - 1 - i;
+      if (j < 3) {
+
+      } else {
+        assert(multiGhost);
+        world.removeGhost(world.ghostPlayersList[j]);
+      }
+    }
+  }
+
   void endOfGameTestAndAct() {
     if (world.pelletsRemaining == 0) {
-      for (int i = 0; i < world.ghostPlayersList.length; i++) {
-        world.ghostPlayersList[i].ghostScaredTimeLatest = 0;
-        if (i < 3) {
-          world.ghostPlayersList[i].setUnderlyingBallPosition(
+      world.levelCompleteTimeMillis = world.getNow();
+      int origNumGhosts = world.ghostPlayersList.length;
+      for (int i = 0; i < origNumGhosts; i++) {
+        int j = origNumGhosts - 1 - i;
+        world.ghostPlayersList[j].ghostScaredTimeLatest = 0;
+        if (j < 3) {
+          world.ghostPlayersList[j].setUnderlyingBallPosition(
               kCageLocation + Vector2.random() / 100);
         } else {
-          world.removeGhost(world.ghostPlayersList[i]);
+          assert(multiGhost);
+          world.removeGhost(world.ghostPlayersList[j]);
         }
       }
-      world.levelCompleteTimeMillis = world.getNow();
       Future.delayed(
           const Duration(milliseconds: kPacmanHalfEatingResetTimeMillis * 2),
           () {
@@ -276,6 +292,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
 
               world.addScore(); //score counting deaths
               setUnderlyingBallPosition(kPacmanStartLocation);
+              trimToThreeGhosts();
               for (var i = 0; i < world.ghostPlayersList.length; i++) {
                 world.ghostPlayersList[i].setUnderlyingBallPosition(
                     kGhostStartLocation + Vector2.random() / 100);
@@ -297,7 +314,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
         startingPosition); //FIXME shouldn't be necessary, but avoid one frame starting glitch
 
     animations = await getAnimations();
-    current = CharacterState.normal;
+    current = isGhost ? CharacterState.deadGhost : CharacterState.normal;
     _lastUnderlyingPosition.setFrom(getUnderlyingBallPosition());
 
     // When adding a CircleHitbox without any arguments it automatically
@@ -328,7 +345,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
     if (current == CharacterState.scaredIsh) {
       if (world.getNow() - ghostScaredTimeLatest > kGhostChaseTimeMillis) {
         current = CharacterState.normal;
-        world.stopSpecificAudio(SfxType.ghostsScared);
+        stopSpecificAudio(SfxType.ghostsScared);
       }
     }
   }

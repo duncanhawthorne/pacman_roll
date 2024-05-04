@@ -73,6 +73,8 @@ class EndlessWorld extends Forge2DWorld
   double targetAngle = 2 * pi / 4;
   int now = 1;
   int levelCompleteTimeMillis = 0;
+  int lastNewGhostTimeMillis = 0;
+  int lastSirenVolumeUpdateTimeMillis = 0;
 
   /// The random number generator that is used to spawn periodic components.
   // ignore: unused_field
@@ -89,7 +91,6 @@ class EndlessWorld extends Forge2DWorld
   double worldAngle = 0; //2 * pi / 8;
   double worldCos = 1;
   double worldSin = 0;
-  Map<SfxType, AudioPlayer> audioPlayerMap = {};
 
   /// Where the ground is located in the world and things should stop falling.
   //late final double groundLevel = (size.y / 2) - (size.y / 5);
@@ -117,7 +118,9 @@ class EndlessWorld extends Forge2DWorld
         dAudioPlayerTmp.pause();
         dAudioPlayerTmp.setVolume(1);
       }
-      audioPlayerMap[type] = dAudioPlayerTmp;
+      if (!audioPlayerMap.keys.contains(type)) {
+        audioPlayerMap[type] = dAudioPlayerTmp;
+      }
     }
     return true;
   }
@@ -163,7 +166,8 @@ class EndlessWorld extends Forge2DWorld
     try {
       for (int i = 0; i < ghostPlayersList.length; i++) {
         tmpSirenVolume += ghostPlayersList[i].current == CharacterState.normal
-            ? ghostPlayersList[i].getUnderlyingBallVelocity().length
+            ? ghostPlayersList[i].getUnderlyingBallVelocity().length /
+                ghostPlayersList.length
             : 0;
       }
       if ((pacmanPlayersList.isNotEmpty &&
@@ -177,33 +181,31 @@ class EndlessWorld extends Forge2DWorld
       tmpSirenVolume = 0;
       p([e, "tmpSirenVolume zero"]);
     }
-    return min(0.4, tmpSirenVolume / 100);
+    tmpSirenVolume = tmpSirenVolume / 30;
+    if (tmpSirenVolume < 0.05) {
+      tmpSirenVolume = 0;
+    }
+    tmpSirenVolume = min(0.4, tmpSirenVolume);
+    if (!isGameLive()) {
+      tmpSirenVolume = 0;
+    }
+    //p(tmpSirenVolume);
+    return tmpSirenVolume;
   }
 
   void updateSirenVolume() async {
     //FIXME NOTE disabled on iOS for bug
+    audioPlayerMap[SfxType.siren]!.setVolume(getTargetSirenVolume());
+  }
+
+  void deadMansSwitch() async {
     //FIXME note works as separate thread to stop all audio too, so dont disable
     if (isGameLive()) {
-      audioPlayerMap[SfxType.siren]!.setVolume(getTargetSirenVolume());
-      audioPlayerMap[SfxType.siren]!.resume();
       Future.delayed(const Duration(milliseconds: 500), () {
-        updateSirenVolume();
+        deadMansSwitch();
       });
     } else {
-      //p("turn off siren");
-      stopSpecificAudio(SfxType.siren);
       stopAllAudio(); //for good measure
-    }
-  }
-
-  void stopSpecificAudio(SfxType type) {
-    audioPlayerMap[type]!.stop();
-    audioPlayerMap[type]!.release();
-  }
-
-  void stopAllAudio() {
-    for (SfxType key in audioPlayerMap.keys) {
-      stopSpecificAudio(key);
     }
   }
 
@@ -226,10 +228,18 @@ class EndlessWorld extends Forge2DWorld
     RealCharacter ghost = RealCharacter(
         isGhost: true,
         startingPosition: kGhostStartLocation +
-            Vector2(getSingleSquareWidth() * number <= 2 ? (number - 1) : 0, 0));
-    ghost.ghostNumber = number;
+            Vector2(
+                getSingleSquareWidth() * number <= 2 ? (number - 1) : 0, 0));
+    ghost.ghostNumberForSprite = number;
+    if (multiGhost && ghostPlayersList.isNotEmpty) {
+      //new ghosts are also scared
+      ghost.ghostScaredTimeLatest = ghostPlayersList[0].ghostScaredTimeLatest;
+      ghost.current = CharacterState
+          .deadGhost; //and then will get sequenced to correct state
+    }
     add(ghost);
     ghostPlayersList.add(ghost);
+    lastNewGhostTimeMillis = getNow();
   }
 
   void addPacman(Vector2 startPosition) {
@@ -251,18 +261,10 @@ class EndlessWorld extends Forge2DWorld
     ghostPlayersList.remove(ghost);
   }
 
-  addExtraGhost() {
-    if (pelletsRemaining > 0) {
-      addGhost(ghostPlayersList.length);
-      Future.delayed(const Duration(milliseconds: 5000), () {
-        //FIXME physical ball not initialised immediately
-        addExtraGhost();
-      });
-    }
-  }
-
   @override
   Future<void> onLoad() async {
+    //stopAllAudio();
+    now = DateTime.now().millisecondsSinceEpoch;
     gameRunning = true;
     loadAllAudioFiles();
     levelCompleteTimeMillis = 0;
@@ -270,13 +272,8 @@ class EndlessWorld extends Forge2DWorld
     if (sirenOn) {
       play(SfxType.siren);
     }
-    if (multiGhost) {
-      Future.delayed(const Duration(milliseconds: 5000), () {
-        //FIXME physical ball not initialised immediately
-        addExtraGhost();
-      });
-    }
     pelletsRemaining = getStartingNumberPelletsAndSuperPellets(mazeLayout);
+    deadMansSwitch();
 
     WakelockPlus.toggle(enable: true);
 
@@ -324,8 +321,7 @@ class EndlessWorld extends Forge2DWorld
     // the player passed the level.
     scoreNotifier.addListener(() {
       if (scoreNotifier.value >= level.winScore) {
-        final levelTime =
-        getLevelTime();
+        final levelTime = getLevelTime();
 
         levelCompletedIn = levelTime.round();
 
@@ -337,7 +333,11 @@ class EndlessWorld extends Forge2DWorld
   }
 
   double getLevelTime() {
-    return ((levelCompleteTimeMillis == 0 ? getNow() : levelCompleteTimeMillis) - timeStarted.millisecondsSinceEpoch) / 1000;
+    return ((levelCompleteTimeMillis == 0
+                ? getNow()
+                : levelCompleteTimeMillis) -
+            timeStarted.millisecondsSinceEpoch) /
+        1000;
   }
 
   @override
@@ -383,6 +383,17 @@ class EndlessWorld extends Forge2DWorld
   void update(double dt) {
     super.update(dt);
     now = DateTime.now().millisecondsSinceEpoch;
+
+    if (multiGhost &&
+        pelletsRemaining > 0 &&
+        lastNewGhostTimeMillis != 0 &&
+        getNow() - lastNewGhostTimeMillis > 5000) {
+      addGhost(100);
+    }
+    if (getNow() - lastSirenVolumeUpdateTimeMillis > 500) {
+      lastSirenVolumeUpdateTimeMillis = getNow();
+      updateSirenVolume();
+    }
   }
 
   @override

@@ -62,11 +62,14 @@ class MainMenuScreen extends StatelessWidget {
               child: const Text('Play'),
             ),
             _gap,
+            /*
             WobblyButton(
               onPressed: () => GoRouter.of(context).push('/settings'),
               child: const Text('Settings'),
             ),
             _gap,
+             */
+            /*
             Padding(
               padding: const EdgeInsets.only(top: 32),
               child: ValueListenableBuilder<bool>(
@@ -80,6 +83,8 @@ class MainMenuScreen extends StatelessWidget {
               ),
             ),
             _gap,
+
+             */
             //const Text('Built with Flame'),
           ],
         ),

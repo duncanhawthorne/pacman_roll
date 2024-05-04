@@ -9,6 +9,9 @@ import 'package:flutter/material.dart';
 import 'dart:core';
 import "dart:math";
 
+import '../../audio/sounds.dart';
+import 'package:audioplayers/audioplayers.dart';
+
 const debugMode = false;
 const bool mazeOn = true;
 
@@ -69,3 +72,17 @@ final textRenderer = TextPaint(
 final random = Random();
 
 const multiGhost = true;
+Map<SfxType, AudioPlayer> audioPlayerMap = {};
+
+void stopAllAudio() {
+  for (SfxType key in audioPlayerMap.keys) {
+    stopSpecificAudio(key);
+  }
+}
+
+void stopSpecificAudio(SfxType type) {
+  if (audioPlayerMap.keys.contains(type)) {
+    audioPlayerMap[type]!.stop();
+    audioPlayerMap[type]!.release();
+  }
+}
