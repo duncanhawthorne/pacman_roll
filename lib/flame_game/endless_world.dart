@@ -195,7 +195,9 @@ class EndlessWorld extends Forge2DWorld
 
   void updateSirenVolume() async {
     //FIXME NOTE disabled on iOS for bug
-    audioPlayerMap[SfxType.siren]!.setVolume(getTargetSirenVolume());
+    if (audioPlayerMap.keys.contains(SfxType.siren)) {
+      audioPlayerMap[SfxType.siren]!.setVolume(getTargetSirenVolume());
+    }
   }
 
   void deadMansSwitch() async {
@@ -390,7 +392,7 @@ class EndlessWorld extends Forge2DWorld
         getNow() - lastNewGhostTimeMillis > 5000) {
       addGhost(100);
     }
-    if (getNow() - lastSirenVolumeUpdateTimeMillis > 500) {
+    if (sirenOn && getNow() - lastSirenVolumeUpdateTimeMillis > 500) {
       lastSirenVolumeUpdateTimeMillis = getNow();
       updateSirenVolume();
     }

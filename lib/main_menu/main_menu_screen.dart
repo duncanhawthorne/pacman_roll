@@ -17,6 +17,7 @@ class MainMenuScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = context.watch<Palette>();
+    // ignore: unused_local_variable
     final settingsController = context.watch<SettingsController>();
     // ignore: unused_local_variable
     final audioController = context.watch<AudioController>();
