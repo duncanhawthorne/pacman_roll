@@ -4,6 +4,10 @@ import 'maze_layout.dart';
 import 'helper.dart';
 import 'package:flame/components.dart';
 
+import 'package:flame/game.dart';
+import 'package:flutter/material.dart';
+import 'dart:core';
+
 const debugMode = false;
 const bool mazeOn = true;
 
@@ -52,3 +56,11 @@ final bool sirenOn = iOS ? false : true;
 const bool pelletEatSoundOn = true; //iOS ? false : true;
 const multiplePacmans = false;
 const centralisedAudio = true;
+
+final textRenderer = TextPaint(
+  style: const TextStyle(
+    fontSize: 30,
+    color: Colors.white,
+    fontFamily: 'Press Start 2P',
+  ),
+);

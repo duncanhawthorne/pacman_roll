@@ -2,7 +2,6 @@ import 'package:flame/camera.dart';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
-import 'package:flutter/material.dart';
 
 import '../audio/audio_controller.dart';
 import '../level_selection/levels.dart';
@@ -85,40 +84,32 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
 
   }
 
+
+
+  final scoreComponent = TextComponent(
+    text: "Lives: 3",
+    position: Vector2.all(30),
+    textRenderer: textRenderer,
+  );
+
+
   @override
   void update(double dt) {
     super.update(dt);
     if (!actuallyMoveSpritesToScreenPos) {
       camera.viewfinder.angle = -world.worldAngle;
     }
+    scoreComponent.text = 'Lives: ${3 - world.scoreNotifier.value} \n\nTime: ${world.getLevelTime().toStringAsFixed(1)}';
     if (dxLast != dx || dyLast != dy) {
       camera.viewport = FixedResolutionViewport(resolution: Vector2(dx, dy));
 
-
-
-
-
-      final textRenderer = TextPaint(
-        style: const TextStyle(
-          fontSize: 30,
-          color: Colors.white,
-          fontFamily: 'Press Start 2P',
-        ),
-      );
-
-      const scoreText = "Lives: 3";
-
       // The component that is responsible for rendering the text that contains
       // the current score.
-      final scoreComponent = TextComponent(
-        text: scoreText,
-        position: Vector2.all(30),
-        textRenderer: textRenderer,
-      );
+
 
       world.scoreNotifier.addListener(() {
-        scoreComponent.text =
-            scoreText.replaceFirst('3', '${3 - world.scoreNotifier.value}');
+        scoreComponent.text = 'Lives: ${3 - world.scoreNotifier.value}';
+            //scoreText.replaceFirst('3', '${3 - world.scoreNotifier.value}');
       });
 
       camera.viewport.add(scoreComponent);

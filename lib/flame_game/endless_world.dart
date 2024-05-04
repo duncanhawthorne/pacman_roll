@@ -72,6 +72,7 @@ class EndlessWorld extends Forge2DWorld
   double dragLastAngle = 10;
   double targetAngle = 2 * pi / 4;
   int now = 1;
+  int levelCompleteTimeMillis = 0;
 
   /// The random number generator that is used to spawn periodic components.
   // ignore: unused_field
@@ -247,6 +248,8 @@ class EndlessWorld extends Forge2DWorld
   @override
   Future<void> onLoad() async {
     gameRunning = true;
+    loadAllAudioFiles();
+    levelCompleteTimeMillis = 0;
     AudioLogger.logLevel = AudioLogLevel.info;
     if (sirenOn) {
       play(SfxType.siren);
@@ -300,7 +303,7 @@ class EndlessWorld extends Forge2DWorld
     scoreNotifier.addListener(() {
       if (scoreNotifier.value >= level.winScore) {
         final levelTime =
-            (getNow() - timeStarted.millisecondsSinceEpoch) / 1000;
+        getLevelTime();
 
         levelCompletedIn = levelTime.round();
 
@@ -309,6 +312,10 @@ class EndlessWorld extends Forge2DWorld
         game.overlays.add(GameScreen.winDialogKey);
       }
     });
+  }
+
+  double getLevelTime() {
+    return ((levelCompleteTimeMillis == 0 ? getNow() : levelCompleteTimeMillis) - timeStarted.millisecondsSinceEpoch) / 1000;
   }
 
   @override

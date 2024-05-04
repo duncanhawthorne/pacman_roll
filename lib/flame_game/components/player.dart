@@ -162,7 +162,9 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
       for (int i = 0; i < world.ghostPlayersList.length; i++) {
         world.ghostPlayersList[i]
             .setUnderlyingBallPosition(kCageLocation + Vector2.random() / 100);
+        world.ghostPlayersList[i].ghostScaredTimeLatest = 0;
       }
+      world.levelCompleteTimeMillis = world.getNow();
       Future.delayed(
           const Duration(milliseconds: kPacmanHalfEatingResetTimeMillis * 2),
           () {
