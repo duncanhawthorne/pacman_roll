@@ -12,10 +12,6 @@ void p(x) {
   debugPrint("///// A " + DateTime.now().toString() + " " + x.toString());
 }
 
-Future<void> sleep(int delayAfterMult) async {
-  await Future.delayed(Duration(milliseconds: delayAfterMult), () {});
-}
-
 int getStartingNumberPelletsAndSuperPellets(List mazeLayout) {
   int c = 0;
   c += mazeLayout
@@ -94,5 +90,3 @@ int getRollSpinDirection(
     return -1;
   }
 }
-
-

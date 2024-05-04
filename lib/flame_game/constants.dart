@@ -37,7 +37,6 @@ const double miniPelletAndSuperPelletScaleFactor = 0.46;
 const pointerRotationSpeed = 10;
 bool gameRunning = false;
 
-
 const int kGhostResetTimeMillis = 1000;
 const int kGhostChaseTimeMillis = 6000;
 const int kPacmanDeadResetTimeMillis = 1000;
@@ -50,6 +49,6 @@ const bool rotateCamera = true;
 const bool actuallyMoveSpritesToScreenPos = !rotateCamera;
 
 final bool sirenOn = iOS ? false : true;
-const bool pelletEatSoundOn = true;//iOS ? false : true;
+const bool pelletEatSoundOn = true; //iOS ? false : true;
 const multiplePacmans = false;
 const centralisedAudio = true;

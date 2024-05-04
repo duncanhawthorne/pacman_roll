@@ -14,7 +14,6 @@ import 'components/maze.dart';
 import '../../audio/sounds.dart';
 import 'dart:core';
 
-
 /// This is the base of the game which is added to the [GameWidget].
 ///
 /// This class defines a few different properties for the game:
@@ -29,8 +28,6 @@ import 'dart:core';
 /// Note that both of the last are passed in to the super constructor, they
 /// could also be set inside of `onLoad` for example.
 
-
-
 class EndlessRunner extends Forge2DGame<EndlessWorld>
     with HasCollisionDetection {
   EndlessRunner({
@@ -39,7 +36,8 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
     required this.audioController,
   }) : super(
           world: EndlessWorld(level: level, playerProgress: playerProgress),
-          camera: CameraComponent.withFixedResolution(width: dx, height: dy), //2800, 1700 //CameraComponent(),//
+          camera: CameraComponent.withFixedResolution(
+              width: dx, height: dy), //2800, 1700 //CameraComponent(),//
           zoom: flameGameZoom,
         );
 
@@ -56,18 +54,9 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
 
   Future<void> startGame() async {
     if (startGameMusic) {
-      //gravityTurnedOn = false;
       world.play(SfxType.startMusic);
-      //Future.delayed(const Duration(milliseconds: 4300), () {
-      //  gravityTurnedOn = true;
-      //});
-    } else {
-      //gravityTurnedOn = true;
     }
-    //gravityTurnedOn = true;
   }
-
-
 
   @override
   Future<void> onLoad() async {
@@ -79,7 +68,6 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
     world.addAll(createBoundaries(camera));
     world.audioController = audioController;
     //globalAudioController = audioController;
-
 
     // With the `TextPaint` we define what properties the text that we are going
     // to render will have, like font family, size and color in this instance.
@@ -128,5 +116,4 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
       dyLast = dy;
     }
   }
-
 }

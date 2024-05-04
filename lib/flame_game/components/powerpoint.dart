@@ -11,9 +11,10 @@ class SuperPellet extends SpriteAnimationComponent
     with HasGameReference, HasWorldReference<EndlessWorld> {
   SuperPellet() : super(size: spriteSize, anchor: Anchor.center);
 
-  static final Vector2 spriteSize = Vector2.all(getSingleSquareWidth() * miniPelletAndSuperPelletScaleFactor);
+  static final Vector2 spriteSize =
+      Vector2.all(getSingleSquareWidth() * miniPelletAndSuperPelletScaleFactor);
   final speed = 0;
-  Vector2 absPosition = Vector2(0,0);
+  Vector2 absPosition = Vector2(0, 0);
 
   @override
   Future<void> onLoad() async {

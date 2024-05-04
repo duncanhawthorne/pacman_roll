@@ -56,7 +56,9 @@ void createMaze(world) {
         double E = 1.0 * scaley;
         if (k + 1 < mazeLayout.length &&
             (mazeLayout[k] == 1 && mazeLayout[k + 1] != 1 ||
-                mazeLayout[k] != 1 && mazeLayout[k + 1] == 1 && (k + 1) % mazeWidth !=  0)) {
+                mazeLayout[k] != 1 &&
+                    mazeLayout[k + 1] == 1 &&
+                    (k + 1) % mazeWidth != 0)) {
           //wall on right
           //world.add(Wall(Vector2(A,B),Vector2(A+D,B)));
           world.add(Wall(Vector2(A + D, B), Vector2(A + D, B + E)));

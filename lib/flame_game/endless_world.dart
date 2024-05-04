@@ -88,8 +88,6 @@ class EndlessWorld extends Forge2DWorld
   double worldAngle = 0; //2 * pi / 8;
   double worldCos = 1;
   double worldSin = 0;
-  bool wakaParity = true;
-  bool ghostScaredPlaying = false;
   Map<SfxType, AudioPlayer> audioPlayerMap = {};
 
   /// Where the ground is located in the world and things should stop falling.
@@ -98,47 +96,29 @@ class EndlessWorld extends Forge2DWorld
   List<RealCharacter> ghostPlayersList = [];
   List<RealCharacter> pacmanPlayersList = [];
 
-  Future<bool> loadUpAudioFiles() async {
+  Future<bool> loadAllAudioFiles() async {
     for (var type in SfxType.values) {
-      loadUpAudioFilesForKey(type);
+      loadAudioFile(type);
     }
     return true;
   }
 
-  Future<bool> loadUpAudioFilesForKey(SfxType type) async {
+  Future<bool> loadAudioFile(SfxType type) async {
     if (!audioPlayerMap.keys.contains(type)) {
       String filename = soundTypeToFilename(type)[0];
       AudioPlayer dAudioPlayerTmp = AudioPlayer();
       await dAudioPlayerTmp.setSource(AssetSource('sfx/$filename'));
-      if (true || iOS) {
+      if (true) {
+        //HACK to try to get around web sites not being able to play audio on delay
         dAudioPlayerTmp.setVolume(0);
-        await dAudioPlayerTmp.resume();
-        await dAudioPlayerTmp.pause();
-        dAudioPlayerTmp.seek(const Duration(milliseconds: 0));
+        await dAudioPlayerTmp.stop();
+        dAudioPlayerTmp.resume();
+        dAudioPlayerTmp.pause();
         dAudioPlayerTmp.setVolume(1);
       }
       audioPlayerMap[type] = dAudioPlayerTmp;
     }
     return true;
-  }
-
-  void stopGhostScaredSiren(dAudioPlayer) async {
-    //p(gameRunning);
-    if (isGameLive() &&
-        ghostPlayersList.isNotEmpty &&
-        getNow() - ghostPlayersList[0].ghostScaredTimeLatest <
-            kGhostChaseTimeMillis) {
-      //in case second superpellet eaten, must wait for both to clear
-      Future.delayed(const Duration(milliseconds: 25), () {
-        stopGhostScaredSiren(dAudioPlayer);
-      });
-    } else {
-      stopSpecificAudio(dAudioPlayer);
-      ghostScaredPlaying = false;
-      if (!isGameLive()) {
-        stopAllAudio(); //for good measure
-      }
-    }
   }
 
   bool isGameLive() {
@@ -147,83 +127,32 @@ class EndlessWorld extends Forge2DWorld
 
   void play(SfxType type) async {
     if (soundsOn) {
-      // ignore: dead_code
-      if (false) {
-        audioController.playSfx(type);
+      if (!audioPlayerMap.keys.contains(type)) {
+        await loadAudioFile(type);
+        Future.delayed(const Duration(milliseconds: 10), () {
+          play(type);
+        });
+        return;
+      }
+      if (audioPlayerMap[type] != null) {
+        audioPlayerMap[type]!.setPlayerMode(PlayerMode.lowLatency);
       } else {
-        if (centralisedAudio) {
-          if (!audioPlayerMap.keys.contains(type)) {
-            await loadUpAudioFilesForKey(type);
-            Future.delayed(const Duration(milliseconds: 10),
-                    () {
-                      play(type);
-                });
-            return;
-          }
-        }
-        AudioPlayer dAudioPlayer = AudioPlayer();
-        if (!centralisedAudio) {
-          dAudioPlayer = AudioPlayer();
-          AudioLogger.logLevel = AudioLogLevel.info;
-          dAudioPlayer.setPlayerMode(PlayerMode.lowLatency);
-        } else {
-          if (audioPlayerMap[type] != null) {
-            dAudioPlayer = audioPlayerMap[type] ?? AudioPlayer();
-            AudioLogger.logLevel = AudioLogLevel.info;
-            dAudioPlayer.setPlayerMode(PlayerMode.lowLatency);
-          } else {
-            p(["audioPlayerMap[type] null", type]);
-          }
-        }
-        if (type == SfxType.ghostsScared) {
-          if (ghostScaredPlaying) {
-            //only play once
-            return;
-          }
-          dAudioPlayer.setReleaseMode(ReleaseMode.loop);
-          ghostScaredPlaying = true;
-          Future.delayed(const Duration(milliseconds: kGhostChaseTimeMillis),
-              () {
-            stopGhostScaredSiren(dAudioPlayer);
-          });
-        }
-        if (type == SfxType.siren) {
-          dAudioPlayer.setReleaseMode(ReleaseMode.loop);
-          updateSirenVolume(dAudioPlayer);
-        }
-        if (type == SfxType.waka) {
-          if (wakaParity) {
-            wakaParity = false;
-          } else {
-            //FIXME to work around potential problems quickly reusing the same sound file, have two identical files that switch between
-            type = SfxType.waka2;
-            wakaParity = true;
-          }
-        }
-        if (!pelletEatSoundOn &&
-            (type == SfxType.waka || type == SfxType.waka2)) {
-          return;
-        }
-        if (!centralisedAudio) {
-          String filename = soundTypeToFilename(type)[0];
-          await dAudioPlayer.setSource(AssetSource('sfx/$filename'));
-        }
-        if (dAudioPlayer.state != PlayerState.playing) {
-          dAudioPlayer.seek(const Duration(milliseconds: 0));
-          await dAudioPlayer.resume();
-        }
-        /*
-        if (type != SfxType.ghostsScared &&
-            type != SfxType.siren &&
-            type != SfxType.startMusic &&
-            type != SfxType.clearedBoard) {
-          Future.delayed(const Duration(milliseconds: 2 * 1000), () {
-            //clean up audio players after suitable delay, may not be necessary
-            stopSpecificAudio(dAudioPlayer);
-          });
-        }
-
-         */
+        p(["audioPlayerMap[type] null", type]);
+      }
+      if (type == SfxType.ghostsScared) {
+        audioPlayerMap[type]!.setReleaseMode(ReleaseMode.loop);
+      }
+      if (type == SfxType.siren) {
+        audioPlayerMap[type]!.setReleaseMode(ReleaseMode.loop);
+        updateSirenVolume();
+      }
+      if (!pelletEatSoundOn && type == SfxType.waka ||
+          !sirenOn && type == SfxType.siren) {
+        return;
+      }
+      if (audioPlayerMap[type]!.state != PlayerState.playing) {
+        audioPlayerMap[type]!.seek(const Duration(milliseconds: 0));
+        await audioPlayerMap[type]!.resume();
       }
     }
   }
@@ -250,34 +179,30 @@ class EndlessWorld extends Forge2DWorld
     return min(0.4, tmpSirenVolume / 100);
   }
 
-  void updateSirenVolume(dAudioPlayer) async {
+  void updateSirenVolume() async {
     //FIXME NOTE disabled on iOS for bug
+    //FIXME note works as separate thread to stop all audio too, so dont disable
     if (isGameLive()) {
-      dAudioPlayer.setVolume(getTargetSirenVolume());
-      dAudioPlayer.resume();
+      audioPlayerMap[SfxType.siren]!.setVolume(getTargetSirenVolume());
+      audioPlayerMap[SfxType.siren]!.resume();
       Future.delayed(const Duration(milliseconds: 500), () {
-        updateSirenVolume(dAudioPlayer);
+        updateSirenVolume();
       });
     } else {
       //p("turn off siren");
-      stopSpecificAudio(dAudioPlayer);
+      stopSpecificAudio(SfxType.siren);
       stopAllAudio(); //for good measure
     }
   }
 
-  void stopSpecificAudio(AudioPlayer dAudioPlayer) {
-    if (!centralisedAudio) {
-      //dAudioPlayer.setVolume(0);
-      dAudioPlayer.stop();
-      dAudioPlayer.release();
-    } else {
-      dAudioPlayer.pause();
-    }
+  void stopSpecificAudio(SfxType type) {
+    audioPlayerMap[type]!.stop();
+    audioPlayerMap[type]!.release();
   }
 
   void stopAllAudio() {
     for (SfxType key in audioPlayerMap.keys) {
-      stopSpecificAudio(audioPlayerMap[key] ?? AudioPlayer());
+      stopSpecificAudio(key);
     }
   }
 
@@ -319,28 +244,12 @@ class EndlessWorld extends Forge2DWorld
     pacmanPlayersList.remove(pacman);
   }
 
-  void siren() {
-    return;
-    /*
-    if (sirenVolume != 0) {
-      play(SfxType.siren);
-    }
-    Future.delayed(const Duration(milliseconds: 400), () {
-      siren();
-    });
-     */
-  }
-
   @override
   Future<void> onLoad() async {
     gameRunning = true;
-    //loadUpAudioFiles();
+    AudioLogger.logLevel = AudioLogLevel.info;
     if (sirenOn) {
       play(SfxType.siren);
-      //Future.delayed(const Duration(milliseconds: 1000),
-      //        () {
-      //          play(SfxType.siren);
-      //    });
     }
     pelletsRemaining = getStartingNumberPelletsAndSuperPellets(mazeLayout);
 

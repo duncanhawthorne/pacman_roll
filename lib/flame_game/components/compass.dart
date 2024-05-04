@@ -10,7 +10,8 @@ class Compass extends SpriteAnimationComponent
     with HasGameReference, HasWorldReference<EndlessWorld> {
   Compass() : super(size: spriteSize, anchor: Anchor.center);
 
-  static final Vector2 spriteSize = Vector2.all(getSingleSquareWidth() * miniPelletAndSuperPelletScaleFactor  / 2);
+  static final Vector2 spriteSize = Vector2.all(
+      getSingleSquareWidth() * miniPelletAndSuperPelletScaleFactor / 2);
   Vector2 absPosition = kCompassLocation;
 
   @override
@@ -22,13 +23,14 @@ class Compass extends SpriteAnimationComponent
   }
 
   Vector2 capVector(Vector2 tmp) {
-    return Vector2(max(-0.5,min(0.5,tmp.x)), max(-0.5,min(0.5,tmp.y)));
+    return Vector2(max(-0.5, min(0.5, tmp.x)), max(-0.5, min(0.5, tmp.y)));
   }
 
   @override
   void update(double dt) {
     super.update(dt);
-    absPosition = kCompassLocation + capVector(world.gravity / 25) * getSingleSquareWidth();
+    absPosition = kCompassLocation +
+        capVector(world.gravity / 25) * getSingleSquareWidth();
     position = world.screenPos(absPosition);
   }
 }

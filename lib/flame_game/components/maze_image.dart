@@ -1,4 +1,3 @@
-
 import 'maze.dart';
 import '../helper.dart';
 
@@ -12,9 +11,10 @@ class MazeImage extends SpriteAnimationComponent
     with HasGameReference, HasWorldReference<EndlessWorld> {
   MazeImage() : super(size: spriteSize, anchor: Anchor.center);
 
-  static final Vector2 spriteSize = Vector2.all(getSingleSquareWidth() * getMazeWidth());
+  static final Vector2 spriteSize =
+      Vector2.all(getSingleSquareWidth() * getMazeWidth());
   //final speed = 0;
-  Vector2 absPosition = Vector2(0,0);
+  Vector2 absPosition = Vector2(0, 0);
 
   @override
   Future<void> onLoad() async {
