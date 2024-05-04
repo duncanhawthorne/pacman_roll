@@ -61,11 +61,17 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
         ? {
             CharacterState.normal: SpriteAnimation.spriteList(
               [
-                await game.loadSprite(ghostNumber == 1
+                await game.loadSprite(ghostNumber == 0
                     ? 'dash/ghost1.png'
-                    : ghostNumber == 2
+                    : ghostNumber == 1
                         ? 'dash/ghost2.png'
-                        : 'dash/ghost3.png')
+                        : ghostNumber == 2
+                            ? 'dash/ghost3.png'
+                            : [
+                                'dash/ghost1.png',
+                                'dash/ghost2.png',
+                                'dash/ghost3.png'
+                              ][random.nextInt(3)])
               ],
               stepTime: double.infinity,
             ),
@@ -160,9 +166,13 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
   void endOfGameTestAndAct() {
     if (world.pelletsRemaining == 0) {
       for (int i = 0; i < world.ghostPlayersList.length; i++) {
-        world.ghostPlayersList[i]
-            .setUnderlyingBallPosition(kCageLocation + Vector2.random() / 100);
         world.ghostPlayersList[i].ghostScaredTimeLatest = 0;
+        if (i < 3) {
+          world.ghostPlayersList[i].setUnderlyingBallPosition(
+              kCageLocation + Vector2.random() / 100);
+        } else {
+          world.removeGhost(world.ghostPlayersList[i]);
+        }
       }
       world.levelCompleteTimeMillis = world.getNow();
       Future.delayed(
@@ -223,17 +233,22 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
         playerEatingTimeLatest = world.getNow();
 
         //ghost impact
-        otherPlayer.current = CharacterState.deadGhost;
-        otherPlayer.ghostDeadTimeLatest = world.getNow();
-        otherPlayer.ghostDeadPosition = otherPlayer.getUnderlyingBallPosition();
+        if (multiGhost) {
+          world.removeGhost(otherPlayer);
+        } else {
+          otherPlayer.current = CharacterState.deadGhost;
+          otherPlayer.ghostDeadTimeLatest = world.getNow();
+          otherPlayer.ghostDeadPosition =
+              otherPlayer.getUnderlyingBallPosition();
 
-        //Move ball way offscreen. Stops any physics interactions or collisions
-        otherPlayer.setUnderlyingBallPosition(kOffScreenLocation +
-            Vector2.random() /
-                100); //will get moved to right position later by other code in sequence checker
-        if (multiplePacmans) {
-          world.addPacman(
-              world, getUnderlyingBallPosition() + Vector2.random() / 100);
+          //Move ball way offscreen. Stops any physics interactions or collisions
+          otherPlayer.setUnderlyingBallPosition(kOffScreenLocation +
+              Vector2.random() /
+                  100); //will get moved to right position later by other code in sequence checker
+          if (multiplePacmans) {
+            world.addPacman(
+                getUnderlyingBallPosition() + Vector2.random() / 100);
+          }
         }
       } else {
         //ghost kills pacman
@@ -249,7 +264,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
           } else {
             //setUnderlyingBallPosition(kPacmanStartLocation);
             assert(multiplePacmans);
-            world.removePacman(world, this);
+            world.removePacman(this);
           }
 
           Future.delayed(
@@ -296,7 +311,10 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
     assert(isGhost);
     if (current == CharacterState.deadGhost) {
       if (world.getNow() - ghostDeadTimeLatest > kGhostResetTimeMillis) {
-        setUnderlyingBallPosition(kGhostStartLocation + Vector2.random() / 100);
+        if (world.pelletsRemaining > 0) {
+          setUnderlyingBallPosition(
+              kGhostStartLocation + Vector2.random() / 100);
+        }
         current = CharacterState.scared;
       }
     }

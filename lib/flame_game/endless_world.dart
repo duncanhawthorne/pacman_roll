@@ -222,27 +222,43 @@ class EndlessWorld extends Forge2DWorld
     }
   }
 
-  void addGhost(world, int number) {
+  void addGhost(int number) {
     RealCharacter ghost = RealCharacter(
         isGhost: true,
         startingPosition: kGhostStartLocation +
-            Vector2(getSingleSquareWidth() * (number - 1), 0));
+            Vector2(getSingleSquareWidth() * number <= 2 ? (number - 1) : 0, 0));
     ghost.ghostNumber = number;
-    world.add(ghost);
+    add(ghost);
     ghostPlayersList.add(ghost);
   }
 
-  void addPacman(world, Vector2 startPosition) {
+  void addPacman(Vector2 startPosition) {
     RealCharacter tmpPlayer =
         RealCharacter(isGhost: false, startingPosition: startPosition);
-    world.add(tmpPlayer);
+    add(tmpPlayer);
     pacmanPlayersList.add(tmpPlayer);
   }
 
-  void removePacman(world, RealCharacter pacman) {
-    world.remove(pacman.underlyingBallReal);
-    world.remove(pacman);
+  void removePacman(RealCharacter pacman) {
+    remove(pacman.underlyingBallReal);
+    remove(pacman);
     pacmanPlayersList.remove(pacman);
+  }
+
+  void removeGhost(RealCharacter ghost) {
+    remove(ghost.underlyingBallReal);
+    remove(ghost);
+    ghostPlayersList.remove(ghost);
+  }
+
+  addExtraGhost() {
+    if (pelletsRemaining > 0) {
+      addGhost(ghostPlayersList.length);
+      Future.delayed(const Duration(milliseconds: 5000), () {
+        //FIXME physical ball not initialised immediately
+        addExtraGhost();
+      });
+    }
   }
 
   @override
@@ -253,6 +269,12 @@ class EndlessWorld extends Forge2DWorld
     AudioLogger.logLevel = AudioLogLevel.info;
     if (sirenOn) {
       play(SfxType.siren);
+    }
+    if (multiGhost) {
+      Future.delayed(const Duration(milliseconds: 5000), () {
+        //FIXME physical ball not initialised immediately
+        addExtraGhost();
+      });
     }
     pelletsRemaining = getStartingNumberPelletsAndSuperPellets(mazeLayout);
 
@@ -279,12 +301,12 @@ class EndlessWorld extends Forge2DWorld
     //player =
     //    RealCharacter(isGhost: false, startingPosition: kPacmanStartLocation);
     //add(player);
-    addPacman(this, kPacmanStartLocation);
+    addPacman(kPacmanStartLocation);
     //addPacman(this, kPacmanStartLocation + Vector2.random() / 100);
     //addPacman(this, kPacmanStartLocation + Vector2.random() / 100);
 
     for (int i = 0; i < 3; i++) {
-      addGhost(this, i);
+      addGhost(i);
     }
 
     if (!debugMode) {

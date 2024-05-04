@@ -7,6 +7,7 @@ import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'dart:core';
+import "dart:math";
 
 const debugMode = false;
 const bool mazeOn = true;
@@ -64,3 +65,7 @@ final textRenderer = TextPaint(
     fontFamily: 'Press Start 2P',
   ),
 );
+
+final random = Random();
+
+const multiGhost = true;
