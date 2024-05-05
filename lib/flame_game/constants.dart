@@ -71,7 +71,7 @@ final textRenderer = TextPaint(
 
 final random = Random();
 
-const multiGhost = true;
+const multiGhost = false;
 Map<SfxType, AudioPlayer> audioPlayerMap = {};
 
 void stopAllAudio() {
