@@ -18,21 +18,9 @@ List<String> soundTypeToFilename(SfxType type) {
         'pacman_death.mp3'
         //'damage2.mp3',
       ];
-    case SfxType.wa:
-      return const [
-        'pacman_waka_wa.mp3',
-      ];
     case SfxType.waka:
       return const [
         'pacman_waka_waka.mp3',
-      ];
-    case SfxType.waka2:
-      return const [
-        'pacman_waka_waka-copy.mp3',
-      ];
-    case SfxType.ka:
-      return const [
-        'pacman_waka_ka.mp3',
       ];
     case SfxType.startMusic:
       return const [
@@ -42,6 +30,21 @@ List<String> soundTypeToFilename(SfxType type) {
       return const [
         'ghosts_siren.mp3',
       ];
+    /*
+    case SfxType.wa:
+      return const [
+        'pacman_waka_wa.mp3',
+      ];
+
+    case SfxType.waka2:
+      return const [
+        'pacman_waka_waka-copy.mp3',
+      ];
+    case SfxType.ka:
+      return const [
+        'pacman_waka_ka.mp3',
+      ];
+
     case SfxType.buttonTap:
       return const [
         'click1.mp3',
@@ -49,16 +52,17 @@ List<String> soundTypeToFilename(SfxType type) {
         'click3.mp3',
         'click4.mp3',
       ];
+
+     */
   }
 }
 
 /// Allows control over loudness of different SFX types.
 double soundTypeToVolume(SfxType type) {
   switch (type) {
-    case SfxType.wa:
-    case SfxType.ka:
+
     case SfxType.waka:
-    case SfxType.waka2:
+
     case SfxType.startMusic:
     case SfxType.ghostsScared:
     case SfxType.clearedBoard:
@@ -66,21 +70,29 @@ double soundTypeToVolume(SfxType type) {
     case SfxType.siren:
     case SfxType.eatGhost:
       return 0.4;
+      /*
+    case SfxType.wa:
+    case SfxType.ka:
+    case SfxType.waka2:
     case SfxType.buttonTap:
       return 1.0;
+
+       */
   }
 }
 
 enum SfxType {
-  wa,
-  ka,
   waka,
-  waka2,
   startMusic,
   ghostsScared,
   clearedBoard,
   eatGhost,
   pacmanDeath,
+  siren,
+  /*
+  waka2,
   buttonTap,
-  siren
+  wa,
+  ka,
+   */
 }

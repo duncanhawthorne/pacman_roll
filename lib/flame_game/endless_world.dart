@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flame_forge2d/flame_forge2d.dart';
@@ -107,38 +108,45 @@ class EndlessWorld extends Forge2DWorld
   }
 
 
-  void warmUpAudioFiles() async {
-    if (getNow() - lastWarmedUpAudio > 2000) {
-      p("warm up");
+  /*
+  void warmUpAudioFile(SfxType type) {
+    if (audioPlayerMap.keys.contains(type) &&
+        audioPlayerMap[type]!.state == PlayerState.stopped) {
+      audioPlayerMap[type]!.setVolume(0.0);
+      audioPlayerMap[type]!.resume();
+      StreamSubscription<PlayerState>? stream;
+      stream = audioPlayerMap[type]!.onPlayerStateChanged.listen((state) {
+        if (state == PlayerState.playing) {
+          audioPlayerMap[type]!.pause();
+          stream!.cancel();
+        }
+      });
+    }
+  }
+
+   */
+
+  /*
+  void warmUpAudioFiles() {
+    if (getNow() - lastWarmedUpAudio > 5000) {
+      //p("warm up");
       lastWarmedUpAudio = getNow();
       for (var type in SfxType.values) {
-        if (audioPlayerMap.keys.contains(type) &&
-            audioPlayerMap[type]!.state != PlayerState.playing) {
-          audioPlayerMap[type]!.setVolume(0);
-          await audioPlayerMap[type]!.stop();
-          await audioPlayerMap[type]!.resume();
-          await audioPlayerMap[type]!.pause();
-          audioPlayerMap[type]!.setVolume(1);
-        }
+        //p([type,audioPlayerMap[type]!.state]);
+        warmUpAudioFile(type);
       }
     }
   }
 
-  Future<bool> loadAudioFile(SfxType type, bool forImmediatePlayback) async {
+   */
+
+  bool loadAudioFile(SfxType type, bool forImmediatePlayback) {
     if (!audioPlayerMap.keys.contains(type)) {
       p(["load", type]);
       String filename = soundTypeToFilename(type)[0];
       AudioPlayer dAudioPlayerTmp = AudioPlayer();
-      await dAudioPlayerTmp.setSource(AssetSource('sfx/$filename'));
-      dAudioPlayerTmp.setPlayerMode(PlayerMode.lowLatency);
-      if (!forImmediatePlayback) {
-        //HACK to try to get around web sites not being able to play audio on delay
-        dAudioPlayerTmp.setVolume(0);
-        await dAudioPlayerTmp.stop();
-        await dAudioPlayerTmp.resume();
-        await dAudioPlayerTmp.pause();
-        dAudioPlayerTmp.setVolume(1);
-      }
+      dAudioPlayerTmp.setSource(AssetSource('sfx/$filename'));
+      //dAudioPlayerTmp.setPlayerMode(PlayerMode.lowLatency);
       if (type == SfxType.ghostsScared) {
         dAudioPlayerTmp.setReleaseMode(ReleaseMode.loop);
       }
@@ -149,6 +157,17 @@ class EndlessWorld extends Forge2DWorld
       if (!audioPlayerMap.keys.contains(type)) {
         audioPlayerMap[type] = dAudioPlayerTmp;
       }
+      if (!forImmediatePlayback) {
+        //HACK to try to get around web sites not being able to play audio on delay
+        //warmUpAudioFile(type);
+        /*
+        dAudioPlayerTmp.setVolume(0);
+        await dAudioPlayerTmp.stop();
+        await dAudioPlayerTmp.resume();
+        await dAudioPlayerTmp.pause();
+        dAudioPlayerTmp.setVolume(1);
+         */
+      }
     }
     return true;
   }
@@ -157,10 +176,10 @@ class EndlessWorld extends Forge2DWorld
     return gameRunning && !game.paused && game.isLoaded && game.isMounted;
   }
 
-  void play(SfxType type) async {
+  void play(SfxType type) {
     if (soundsOn) {
       if (!audioPlayerMap.keys.contains(type)) {
-        await loadAudioFile(type, true);
+        loadAudioFile(type, true);
         if (!audioPlayerMap.keys.contains(type)) {
           Future.delayed(const Duration(milliseconds: 10), () {
             p(["delayed file load", type]);
@@ -176,7 +195,16 @@ class EndlessWorld extends Forge2DWorld
       if (audioPlayerMap[type]!.state != PlayerState.playing) {
         audioPlayerMap[type]!.seek(const Duration(milliseconds: 0));
         audioPlayerMap[type]!.setVolume(1);
-        await audioPlayerMap[type]!.resume();
+        audioPlayerMap[type]!.resume();
+
+        StreamSubscription<PlayerState>? stream;
+        stream = audioPlayerMap[type]!.onPlayerStateChanged.listen((state) {
+          if (state == PlayerState.completed) {
+            audioPlayerMap[type]!.pause();
+            stream!.cancel();
+          }
+        });
+
       }
     }
   }
@@ -389,7 +417,7 @@ class EndlessWorld extends Forge2DWorld
 
   @override
   void onPointerMove(dhpointer_move_event.PointerMoveEvent event) {
-    warmUpAudioFiles();
+    //warmUpAudioFiles();
     Vector2 eventVector = actuallyMoveSpritesToScreenPos
         ? event.localPosition
         : event.canvasPosition - game.canvasSize / 2;
@@ -422,7 +450,7 @@ class EndlessWorld extends Forge2DWorld
   @override
   void onDragStart(DragStartEvent event) {
     super.onDragStart(event);
-    warmUpAudioFiles();
+    //warmUpAudioFiles();
     Vector2 eventVector = actuallyMoveSpritesToScreenPos
         ? event.localPosition
         : event.canvasPosition - game.canvasSize / 2;
@@ -449,7 +477,7 @@ class EndlessWorld extends Forge2DWorld
   @override
   void onDragUpdate(DragUpdateEvent event) {
     super.onDragUpdate(event);
-    warmUpAudioFiles();
+    //warmUpAudioFiles();
     Vector2 eventVector = actuallyMoveSpritesToScreenPos
         ? event.localStartPosition
         : event.canvasStartPosition - game.canvasSize / 2;
