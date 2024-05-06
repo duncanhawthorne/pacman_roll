@@ -14,6 +14,15 @@ class Ball extends BodyComponent with TapCallbacks, ContactCallbacks {
       : super(
             fixtureDefs: [
               FixtureDef(
+                /*
+                PolygonShape()..set([
+                  Vector2(0.0, getSingleSquareWidth() / 2 * 0.99), // Middle of top wall
+                  Vector2(getSingleSquareWidth() / 2 * 0.99, 0.0), // Middle of right wall
+                  Vector2(0.0, -getSingleSquareWidth() / 2 * 0.99), // Middle of bottom wall
+                  Vector2(-getSingleSquareWidth() / 2 * 0.99, 0.0), // Middle of left wall
+                ]),
+
+                 */
                 CircleShape()
                   ..radius = size ?? getSingleSquareWidth() / 2 * 0.99, //0.95
                 restitution: 0.0,

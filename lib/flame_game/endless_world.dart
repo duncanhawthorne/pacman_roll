@@ -356,11 +356,12 @@ class EndlessWorld extends Forge2DWorld
       addGhost(i);
     }
 
+    add(MazeImage());
     if (!debugMode) {
       createMaze(this);
     }
 
-    add(MazeImage());
+
     addPillsAndPowerPills(this);
 
     //add(Compass());
