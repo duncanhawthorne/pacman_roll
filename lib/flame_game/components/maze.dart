@@ -66,7 +66,7 @@ void createMaze(world) {
         Vector2 topRight = Vector2(A + D, B);
         Vector2 bottomRight = Vector2(A + D, B + E);
         Vector2 bottomLeft = Vector2(A, B + E);
-        double rounding = 0.3;
+        double rounding = 0.2;
         Vector2 vertBit = Vector2(0, rounding * scale);
         Vector2 horiBit = Vector2(rounding * scale, 0);
         if (wallNeededBetween(k, k+1)) {

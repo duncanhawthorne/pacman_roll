@@ -25,9 +25,11 @@ import 'package:sensors_plus/sensors_plus.dart';
 
 import 'package:flutter/foundation.dart';
 
-import '../audio/audio_controller.dart';
+//import '../audio/audio_controller.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:audioplayers/audioplayers.dart';
+//import 'package:just_audio/just_audio.dart';
+//import 'package:just_audio/just_audio.dart' as justAudio;
 
 /// The world is where you place all the components that should live inside of
 /// the game, like the player, enemies, obstacles and points for example.
@@ -65,8 +67,8 @@ class EndlessWorld extends Forge2DWorld
   Vector2 get size => (parent as FlameGame).size;
 
   int levelCompletedIn = 0;
-  late final AudioController audioController;
-  get getAudioController => audioController;
+  //late final AudioController audioController;
+  //getAudioController => audioController;
   int pelletsRemaining = 1;
   Vector2 dragLastPosition = Vector2(0, 0);
   Vector2 targetFromLastDrag = Vector2(-50, 0); //makes smooth start for drag
@@ -102,11 +104,10 @@ class EndlessWorld extends Forge2DWorld
 
   Future<bool> loadAllAudioFiles() async {
     for (var type in SfxType.values) {
-      loadAudioFile(type, false);
+      loadAudioFile(type, false, false);
     }
     return true;
   }
-
 
   /*
   void warmUpAudioFile(SfxType type) {
@@ -140,21 +141,28 @@ class EndlessWorld extends Forge2DWorld
 
    */
 
-  bool loadAudioFile(SfxType type, bool forImmediatePlayback) {
-    if (!audioPlayerMap.keys.contains(type)) {
+  bool loadAudioFile(SfxType type, bool forImmediatePlayback, bool force) {
+    if (force || !audioPlayerMap.keys.contains(type)) {
       p(["load", type]);
       String filename = soundTypeToFilename(type)[0];
       AudioPlayer dAudioPlayerTmp = AudioPlayer();
+      //dAudioPlayerTmp.setAsset('sfx/$filename');
       dAudioPlayerTmp.setSource(AssetSource('sfx/$filename'));
       //dAudioPlayerTmp.setPlayerMode(PlayerMode.lowLatency);
+      //dAudioPlayerTmp.setLoopMode(LoopMode.all);
+      if (iosAudioHack) {
+        dAudioPlayerTmp.setReleaseMode(ReleaseMode.loop);
+      }
       if (type == SfxType.ghostsScared) {
+        //dAudioPlayerTmp.setLoopMode(LoopMode.all);
         dAudioPlayerTmp.setReleaseMode(ReleaseMode.loop);
       }
       if (type == SfxType.siren) {
+        //dAudioPlayerTmp.setLoopMode(LoopMode.all);
         dAudioPlayerTmp.setReleaseMode(ReleaseMode.loop);
-        updateSirenVolume();
+        //updateSirenVolume(); //not needed here as done in update
       }
-      if (!audioPlayerMap.keys.contains(type)) {
+      if (force || !audioPlayerMap.keys.contains(type)) {
         audioPlayerMap[type] = dAudioPlayerTmp;
       }
       if (!forImmediatePlayback) {
@@ -176,10 +184,17 @@ class EndlessWorld extends Forge2DWorld
     return gameRunning && !game.paused && game.isLoaded && game.isMounted;
   }
 
+  void playEverything() {
+    for (SfxType key in audioPlayerMap.keys) {
+      play(key);
+    }
+  }
+
   void play(SfxType type) {
+    //p(["play1: ", type, audioPlayerMap[type]!.playing, audioPlayerMap[type]!.processingState]);
     if (soundsOn) {
       if (!audioPlayerMap.keys.contains(type)) {
-        loadAudioFile(type, true);
+        loadAudioFile(type, true, false);
         if (!audioPlayerMap.keys.contains(type)) {
           Future.delayed(const Duration(milliseconds: 10), () {
             p(["delayed file load", type]);
@@ -192,11 +207,45 @@ class EndlessWorld extends Forge2DWorld
           !sirenOn && type == SfxType.siren) {
         return;
       }
-      if (audioPlayerMap[type]!.state != PlayerState.playing) {
-        audioPlayerMap[type]!.seek(const Duration(milliseconds: 0));
-        audioPlayerMap[type]!.setVolume(1);
-        audioPlayerMap[type]!.resume();
+      if (true) {
+        /*
+        if (audioPlayerMap[type]!.processingState == ProcessingState.buffering || audioPlayerMap[type]!.processingState == ProcessingState.completed) {
+          loadAudioFile(type, false, true);
+        }
 
+         */
+        //if (!(audioPlayerMap[type]!.playing && audioPlayerMap[type]!.processingState == ProcessingState.ready)) {
+        //if (audioPlayerMap[type]!.state != PlayerState.playing) {
+        //p(["play2: ", type]);
+        //audioPlayerMap[type]!.seek(const Duration(milliseconds: 0));
+        //audioPlayerMap[type]!.setVolume(1);
+        p(["play", type]);
+        audioPlayerMap[type]!.seek(const Duration(milliseconds: 0));
+        audioPlayerMap[type]!.setVolume(1.0);
+        if (!iosAudioHack) {
+          audioPlayerMap[type]!.resume();
+        }
+        else {//looping so no action required
+           }
+
+        //if (!(audioPlayerMap[type]!.playing)) {
+        if (iosAudioHack && audioPlayerMap[type]!.state != PlayerState.playing) {
+          p(["really play", type]);
+          //audioPlayerMap[type]!.play();
+          audioPlayerMap[type]!.resume();
+        }
+
+        if (iosAudioHack) {
+          Future.delayed(const Duration(seconds: 2), () {
+            //FIXME physical ball not initialised immediately
+            pauseSpecificAudio(type);
+          });
+        }
+
+        //p(["play3: ", type, audioPlayerMap[type]!.playing, audioPlayerMap[type]!.processingState]);
+        //audioPlayerMap[type]!.resume();
+
+        /*
         StreamSubscription<PlayerState>? stream;
         stream = audioPlayerMap[type]!.onPlayerStateChanged.listen((state) {
           if (state == PlayerState.completed) {
@@ -204,7 +253,7 @@ class EndlessWorld extends Forge2DWorld
             stream!.cancel();
           }
         });
-
+         */
       }
     }
   }
@@ -245,6 +294,7 @@ class EndlessWorld extends Forge2DWorld
     //FIXME NOTE disabled on iOS for bug
     if (audioPlayerMap.keys.contains(SfxType.siren)) {
       audioPlayerMap[SfxType.siren]!.setVolume(getTargetSirenVolume());
+      //p(["set siren volume", getTargetSirenVolume()]);
     }
   }
 
@@ -317,8 +367,11 @@ class EndlessWorld extends Forge2DWorld
     now = DateTime.now().millisecondsSinceEpoch;
     gameRunning = true;
     loadAllAudioFiles();
+    if (iosAudioHack) {
+      playEverything();
+    }
     levelCompleteTimeMillis = 0;
-    AudioLogger.logLevel = AudioLogLevel.info;
+    //AudioLogger.logLevel = AudioLogLevel.info;
     if (sirenOn) {
       play(SfxType.siren);
     }
@@ -360,7 +413,6 @@ class EndlessWorld extends Forge2DWorld
     if (!debugMode) {
       createMaze(this);
     }
-
 
     addPillsAndPowerPills(this);
 

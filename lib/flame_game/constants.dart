@@ -11,6 +11,7 @@ import "dart:math";
 
 import '../../audio/sounds.dart';
 import 'package:audioplayers/audioplayers.dart';
+//import 'package:just_audio/just_audio.dart';
 
 const debugMode = false;
 const bool mazeOn = true;
@@ -57,9 +58,10 @@ const bool rotateCamera = true;
 const bool actuallyMoveSpritesToScreenPos = !rotateCamera;
 
 final bool sirenOn = iOS ? false : true;
-const bool pelletEatSoundOn = true; //iOS ? false : true;
+const bool pelletEatSoundOn = true;//false;//true; //iOS ? false : true;
 const multiplePacmans = false;
 const centralisedAudio = true;
+const bool justAudio = true;
 
 final textRenderer = TextPaint(
   style: const TextStyle(
@@ -81,8 +83,24 @@ void stopAllAudio() {
 }
 
 void stopSpecificAudio(SfxType type) {
+  p(["stop", type]);
   if (audioPlayerMap.keys.contains(type)) {
     audioPlayerMap[type]!.stop();
-    audioPlayerMap[type]!.release();
+    //audioPlayerMap[type]!.release();
   }
 }
+
+void pauseSpecificAudio(SfxType type) {
+  p(["pause", type]);
+  if (audioPlayerMap.keys.contains(type)) {
+    if (iosAudioHack) {
+      audioPlayerMap[type]!.setVolume(0.0);
+    }
+    else {
+      audioPlayerMap[type]!.pause();
+      //audioPlayerMap[type]!.release();
+    }
+  }
+}
+
+bool iosAudioHack = false;//iOS;

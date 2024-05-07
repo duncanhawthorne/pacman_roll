@@ -1,11 +1,11 @@
 {
-    "name": "pacman roll",
-    "short_name": "pacman roll",
+    "name": "Pacman ROLL",
+    "short_name": "Pacman ROLL",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#222222",
     "theme_color": "#222222",
-    "description": "pacman roll",
+    "description": "Pacman ROLL",
     "prefer_related_applications": false,
     "icons": [
         {

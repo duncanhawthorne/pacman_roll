@@ -1,5 +1,5 @@
 name: pacman_roll
-description: pacman_roll
+description: Pacman ROLL
 
 # Prevent accidental publishing to pub.dev.
 publish_to: 'none'
@@ -27,6 +27,7 @@ dependencies:
   sensors_plus: ^5.0.1
   wakelock_plus: ^1.2.4
   flutter_native_splash: ^2.4.0
+  just_audio: ^0.9.37
 
 dev_dependencies:
   flame_test: ^1.15.3

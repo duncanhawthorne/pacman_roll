@@ -65,7 +65,7 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
     //camera.backdrop.add(Background(speed: 0, world: world));
 
     world.addAll(createBoundaries(camera));
-    world.audioController = audioController;
+    //world.audioController = audioController;
     //globalAudioController = audioController;
 
     // With the `TextPaint` we define what properties the text that we are going

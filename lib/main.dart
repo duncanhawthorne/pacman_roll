@@ -62,7 +62,7 @@ class MyGame extends StatelessWidget {
           final palette = context.watch<Palette>();
 
           return MaterialApp.router(
-            title: 'pacman roll',
+            title: 'Pacman ROLL',
             theme: flutterNesTheme().copyWith(
               colorScheme: ColorScheme.fromSeed(
                 seedColor: palette.seed.color,
