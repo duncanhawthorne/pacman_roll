@@ -9,7 +9,8 @@ import '../player_progress/player_progress.dart';
 
 import 'endless_world.dart';
 import 'constants.dart';
-import 'components/maze.dart';
+import 'helper.dart';
+import 'components/maze_walls.dart';
 import '../../audio/sounds.dart';
 import 'dart:core';
 

@@ -16,8 +16,8 @@ import 'package:flame/src/events/messages/pointer_move_event.dart'
 import '../../audio/sounds.dart';
 import 'game_screen.dart';
 import 'endless_runner.dart';
-import 'components/player.dart';
-import 'components/maze.dart';
+import 'components/game_character.dart';
+import 'components/maze_walls.dart';
 import 'components/maze_image.dart';
 import 'constants.dart';
 import 'helper.dart';
@@ -70,11 +70,11 @@ class EndlessWorld extends Forge2DWorld
   Vector2 targetFromLastDrag = Vector2(-50, 0); //makes smooth start for drag
   double dragLastAngle = 10;
   double targetAngle = 2 * pi / 4;
-  int now = 1;
+  int now = DateTime.now().millisecondsSinceEpoch;
   int levelCompleteTimeMillis = 0;
   int lastNewGhostTimeMillis = 0;
   int lastSirenVolumeUpdateTimeMillis = 0;
-  int lastWarmedUpAudio = 0;
+  //int lastWarmedUpAudio = 0;
 
   /// The random number generator that is used to spawn periodic components.
   final Random random;
@@ -85,8 +85,8 @@ class EndlessWorld extends Forge2DWorld
   double worldCos = 1;
   double worldSin = 0;
 
-  List<RealCharacter> ghostPlayersList = [];
-  List<RealCharacter> pacmanPlayersList = [];
+  List<GameCharacter> ghostPlayersList = [];
+  List<GameCharacter> pacmanPlayersList = [];
 
   bool isGameLive() {
     return gameRunning && !game.paused && game.isLoaded && game.isMounted;
@@ -129,7 +129,10 @@ class EndlessWorld extends Forge2DWorld
 
   void updateSirenVolume() async {
     //FIXME NOTE disabled on iOS for bug
-    game.audioController.setSirenVolume(getTargetSirenVolume());
+    if (sirenOn && now - lastSirenVolumeUpdateTimeMillis > 500) {
+      lastSirenVolumeUpdateTimeMillis = now;
+      game.audioController.setSirenVolume(getTargetSirenVolume());
+    }
   }
 
   void deadMansSwitch() async {
@@ -159,7 +162,7 @@ class EndlessWorld extends Forge2DWorld
   }
 
   void addGhost(int number) {
-    RealCharacter ghost = RealCharacter(
+    GameCharacter ghost = GameCharacter(
         isGhost: true,
         startingPosition: kGhostStartLocation +
             Vector2(
@@ -173,23 +176,23 @@ class EndlessWorld extends Forge2DWorld
     }
     add(ghost);
     ghostPlayersList.add(ghost);
-    lastNewGhostTimeMillis = getNow();
+    lastNewGhostTimeMillis = now;
   }
 
   void addPacman(Vector2 startPosition) {
-    RealCharacter tmpPlayer =
-        RealCharacter(isGhost: false, startingPosition: startPosition);
+    GameCharacter tmpPlayer =
+        GameCharacter(isGhost: false, startingPosition: startPosition);
     add(tmpPlayer);
     pacmanPlayersList.add(tmpPlayer);
   }
 
-  void removePacman(RealCharacter pacman) {
+  void removePacman(GameCharacter pacman) {
     remove(pacman.underlyingBallReal);
     remove(pacman);
     pacmanPlayersList.remove(pacman);
   }
 
-  void removeGhost(RealCharacter ghost) {
+  void removeGhost(GameCharacter ghost) {
     remove(ghost.underlyingBallReal);
     remove(ghost);
     ghostPlayersList.remove(ghost);
@@ -204,7 +207,7 @@ class EndlessWorld extends Forge2DWorld
     if (sirenOn) {
       play(SfxType.ghostsRoamingSiren);
     }
-    pelletsRemaining = getStartingNumberPelletsAndSuperPellets(mazeLayout);
+    pelletsRemaining = getStartingNumberPelletsAndSuperPellets(flatMazeLayout);
     deadMansSwitch();
 
     WakelockPlus.toggle(enable: true);
@@ -255,9 +258,7 @@ class EndlessWorld extends Forge2DWorld
   }
 
   double getLevelTime() {
-    return ((levelCompleteTimeMillis == 0
-                ? getNow()
-                : levelCompleteTimeMillis) -
+    return ((levelCompleteTimeMillis == 0 ? now : levelCompleteTimeMillis) -
             timeStarted.millisecondsSinceEpoch) /
         1000;
   }
@@ -297,25 +298,21 @@ class EndlessWorld extends Forge2DWorld
     }
   }
 
-  int getNow() {
-    return now;
+  void handleMultiGhost() {
+    if (multiGhost &&
+        pelletsRemaining > 0 &&
+        lastNewGhostTimeMillis != 0 &&
+        now - lastNewGhostTimeMillis > 5000) {
+      addGhost(100);
+    }
   }
 
   @override
   void update(double dt) {
     super.update(dt);
     now = DateTime.now().millisecondsSinceEpoch;
-
-    if (multiGhost &&
-        pelletsRemaining > 0 &&
-        lastNewGhostTimeMillis != 0 &&
-        getNow() - lastNewGhostTimeMillis > 5000) {
-      addGhost(100);
-    }
-    if (sirenOn && getNow() - lastSirenVolumeUpdateTimeMillis > 500) {
-      lastSirenVolumeUpdateTimeMillis = getNow();
-      updateSirenVolume();
-    }
+    handleMultiGhost();
+    updateSirenVolume();
   }
 
   @override
@@ -392,8 +389,10 @@ class EndlessWorld extends Forge2DWorld
       }
       if (screenRotates) {
         worldAngle = atan2(gravity.x, gravity.y);
-        worldCos = cos(worldAngle);
-        worldSin = sin(worldAngle);
+        if (actuallyMoveSpritesToScreenPos) {
+          worldCos = cos(worldAngle);
+          worldSin = sin(worldAngle);
+        }
       }
     }
   }

@@ -6,22 +6,22 @@ import '../endless_runner.dart';
 import '../endless_world.dart';
 import '../constants.dart';
 import '../helper.dart';
-import 'point.dart';
-import 'powerpoint.dart';
-import 'ball.dart';
+import 'mini_pellet.dart';
+import 'super_pellet.dart';
+import 'physics_ball.dart';
 import 'dart:math';
 import 'dart:ui';
 import 'dart:core';
 import 'package:flutter/foundation.dart';
 
-/// The [RealCharacter] is the component that the physical player of the game is
+/// The [GameCharacter] is the component that the physical player of the game is
 /// controlling.
-class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
+class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     with
         CollisionCallbacks,
         HasWorldReference<EndlessWorld>,
         HasGameReference<EndlessRunner> {
-  RealCharacter({
+  GameCharacter({
     required this.isGhost,
     required this.startingPosition,
     super.position,
@@ -34,7 +34,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
   int ghostNumberForSprite = 1;
 
   final Vector2 startingPosition;
-  late Ball underlyingBallReal = Ball(
+  late PhysicsBall underlyingBallReal = PhysicsBall(
       realCharacter: this,
       initialPosition: startingPosition); //to avoid null safety issues
 
@@ -111,9 +111,9 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
           };
   }
 
-  Ball createUnderlyingBall(Vector2 targetPosition) {
-    Ball underlyingBallRealTmp =
-        Ball(realCharacter: this, initialPosition: targetPosition);
+  PhysicsBall createUnderlyingBall(Vector2 targetPosition) {
+    PhysicsBall underlyingBallRealTmp =
+        PhysicsBall(realCharacter: this, initialPosition: targetPosition);
     //underlyingBallRealTmp.realCharacter =
     //    this;
     //underlyingBallRealTmp.createBody();
@@ -174,7 +174,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
 
   void endOfGameTestAndAct() {
     if (world.pelletsRemaining == 0) {
-      world.levelCompleteTimeMillis = world.getNow();
+      world.levelCompleteTimeMillis = world.now;
       int origNumGhosts = world.ghostPlayersList.length;
       for (int i = 0; i < origNumGhosts; i++) {
         int j = origNumGhosts - 1 - i;
@@ -200,13 +200,13 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
       //only pacman
       if (other is MiniPellet) {
         if (playerEatingSoundTimeLatest <
-            world.getNow() - kPacmanHalfEatingResetTimeMillis * 2) {
-          playerEatingSoundTimeLatest = world.getNow();
+            world.now - kPacmanHalfEatingResetTimeMillis * 2) {
+          playerEatingSoundTimeLatest = world.now;
           world.play(SfxType.waka);
         }
 
         current = CharacterState.eating;
-        playerEatingTimeLatest = world.getNow();
+        playerEatingTimeLatest = world.now;
 
         other.removeFromParent();
         world.pelletsRemaining -= 1;
@@ -214,22 +214,22 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
       } else if (other is SuperPellet) {
         world.play(SfxType.ghostsScared);
         current = CharacterState.eating;
-        playerEatingTimeLatest = world.getNow();
+        playerEatingTimeLatest = world.now;
         for (int i = 0; i < world.ghostPlayersList.length; i++) {
           world.ghostPlayersList[i].current = CharacterState.scared;
-          world.ghostPlayersList[i].ghostScaredTimeLatest = world.getNow();
+          world.ghostPlayersList[i].ghostScaredTimeLatest = world.now;
         }
         other.removeFromParent();
         world.pelletsRemaining -= 1;
         endOfGameTestAndAct();
-      } else if (other is RealCharacter) {
+      } else if (other is GameCharacter) {
         //belts and braces. Already handled by physics collisions in Ball
         handlePacmanMeetsGhost(other);
       }
     }
   }
 
-  void handlePacmanMeetsGhost(RealCharacter otherPlayer) {
+  void handlePacmanMeetsGhost(GameCharacter otherPlayer) {
     // ignore: unnecessary_this
     if (!this.isGhost && otherPlayer.isGhost) {
       if (otherPlayer.current == CharacterState.deadGhost) {
@@ -242,14 +242,14 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
         //pacman visuals
         world.play(SfxType.eatGhost);
         current = CharacterState.eating;
-        playerEatingTimeLatest = world.getNow();
+        playerEatingTimeLatest = world.now;
 
         //ghost impact
         if (multiGhost) {
           world.removeGhost(otherPlayer);
         } else {
           otherPlayer.current = CharacterState.deadGhost;
-          otherPlayer.ghostDeadTimeLatest = world.getNow();
+          otherPlayer.ghostDeadTimeLatest = world.now;
           otherPlayer.ghostDeadPosition =
               otherPlayer.getUnderlyingBallPosition();
 
@@ -268,7 +268,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
           //prevent multiple hits
 
           world.play(SfxType.pacmanDeath);
-          pacmanDeadTimeLatest = world.getNow();
+          pacmanDeadTimeLatest = world.now;
           current = CharacterState.deadPacman;
 
           if (world.pacmanPlayersList.length == 1) {
@@ -308,7 +308,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
 //FIXME instead of testing this every frame, move into futures, and still test every frame, but only when in the general zone that need to test this
     assert(isGhost);
     if (current == CharacterState.deadGhost) {
-      if (world.getNow() - ghostDeadTimeLatest > kGhostResetTimeMillis) {
+      if (world.now - ghostDeadTimeLatest > kGhostResetTimeMillis) {
         if (world.pelletsRemaining > 0) {
           setUnderlyingBallPosition(
               kGhostStartLocation + Vector2.random() / 100);
@@ -317,14 +317,13 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
       }
     }
     if (current == CharacterState.scared) {
-      if (world.getNow() - ghostScaredTimeLatest >
-          kGhostChaseTimeMillis * 2 / 3) {
+      if (world.now - ghostScaredTimeLatest > kGhostChaseTimeMillis * 2 / 3) {
         current = CharacterState.scaredIsh;
       }
     }
 
     if (current == CharacterState.scaredIsh) {
-      if (world.getNow() - ghostScaredTimeLatest > kGhostChaseTimeMillis) {
+      if (world.now - ghostScaredTimeLatest > kGhostChaseTimeMillis) {
         current = CharacterState.normal;
         game.audioController.pauseSfx(SfxType.ghostsScared);
       }
@@ -334,7 +333,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
   void pacmanEatingNormalSequence() {
     assert(!isGhost);
     if (current == CharacterState.eating) {
-      if (world.getNow() - playerEatingTimeLatest >
+      if (world.now - playerEatingTimeLatest >
           2 * kPacmanHalfEatingResetTimeMillis) {
         current = CharacterState.normal;
       }
@@ -343,7 +342,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
 
   Vector2 getFlyingDeadGhostPosition() {
     double timefrac =
-        (world.getNow() - ghostDeadTimeLatest) / (kGhostResetTimeMillis);
+        (world.now - ghostDeadTimeLatest) / (kGhostResetTimeMillis);
     timefrac = min(1, timefrac);
 
     return world.screenPos(
@@ -429,8 +428,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
     super.render(canvas);
     if (!isGhost && current == CharacterState.deadPacman) {
       double tween = 0;
-      tween =
-          (world.getNow() - pacmanDeadTimeLatest) / kPacmanDeadResetTimeMillis;
+      tween = (world.now - pacmanDeadTimeLatest) / kPacmanDeadResetTimeMillis;
       tween = min(1, tween);
       double mouthWidth = 5 / 32 * (1 - tween) + 1 * tween;
       canvas.drawArc(rectSingleSquare, 2 * pi * ((mouthWidth / 2) + 0.5),

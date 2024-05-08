@@ -4,13 +4,13 @@ import 'package:flame/components.dart';
 import 'wall.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 import 'dart:math';
-import 'powerpoint.dart';
-import 'point.dart';
+import 'super_pellet.dart';
+import 'mini_pellet.dart';
 
 import 'package:flame/extensions.dart';
 
 int getMazeWidth() {
-  return sqrt(mazeLayout.length).toInt();
+  return sqrt(flatMazeLayout.length).toInt();
 }
 
 void addPelletsAndSuperPellets(Forge2DWorld world) {
@@ -26,13 +26,13 @@ void addPelletsAndSuperPellets(Forge2DWorld world) {
       double E = 1.0 * scaley;
       Vector2 location = Vector2(A + D / 2, B + E / 2);
 
-      if (mazeLayout[k] == 0) {
+      if (flatMazeLayout[k] == 0) {
         var pillx = MiniPellet();
         pillx.absPosition = location;
         pillx.position = location; //initial set
         world.add(pillx);
       }
-      if (mazeLayout[k] == 3) {
+      if (flatMazeLayout[k] == 3) {
         var powerpill = SuperPellet();
         powerpill.absPosition = location;
         powerpill.position = location; //initial set
@@ -44,9 +44,9 @@ void addPelletsAndSuperPellets(Forge2DWorld world) {
 
 bool wallNeededBetween(int k, int l) {
   int mazeWidth = getMazeWidth();
-  return (l < mazeLayout.length &&
-      (mazeLayout[k] == 1 && mazeLayout[l] != 1 ||
-          mazeLayout[k] != 1 && mazeLayout[l] == 1 && (l) % mazeWidth != 0));
+  return (l < flatMazeLayout.length &&
+      (flatMazeLayout[k] == 1 && flatMazeLayout[l] != 1 ||
+          flatMazeLayout[k] != 1 && flatMazeLayout[l] == 1 && (l) % mazeWidth != 0));
 }
 
 void addMazeWalls(world) {

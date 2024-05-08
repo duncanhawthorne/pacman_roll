@@ -2,13 +2,13 @@ import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flame/events.dart';
 import 'package:flutter/material.dart';
 import '../constants.dart';
-import 'player.dart';
+import 'game_character.dart';
 import '../helper.dart';
 
-class Ball extends BodyComponent with TapCallbacks, ContactCallbacks {
-  Ball(
+class PhysicsBall extends BodyComponent with TapCallbacks, ContactCallbacks {
+  PhysicsBall(
       {Vector2? initialPosition,
-      required RealCharacter realCharacter,
+      required GameCharacter realCharacter,
       double? size,
       Color? color})
       : super(
@@ -27,20 +27,20 @@ class Ball extends BodyComponent with TapCallbacks, ContactCallbacks {
                   ..radius = size ?? getSingleSquareWidth() / 2 * 0.99, //0.95
                 restitution: 0.0,
                 friction: 0.1,
-                userData: Ball,
+                userData: PhysicsBall,
               ),
             ],
             bodyDef: BodyDef(
               angularDamping: 0.1,
               position: initialPosition ?? kPacmanStartLocation,
               type: BodyType.dynamic,
-              userData: Ball,
+              userData: PhysicsBall,
             ),
             paint: Paint()
               ..color = color ?? Colors.transparent
               ..style = PaintingStyle.fill);
 
-  RealCharacter? realCharacter;
+  GameCharacter? realCharacter;
 
   /*
   @override
@@ -57,7 +57,7 @@ class Ball extends BodyComponent with TapCallbacks, ContactCallbacks {
   void beginContact(Object other, Contact contact) {
     super.beginContact(other, contact);
 
-    if (other is Ball && other.realCharacter != null) {
+    if (other is PhysicsBall && other.realCharacter != null) {
       if (other.realCharacter != null && realCharacter != null) {
         realCharacter!.handlePacmanMeetsGhost(other.realCharacter!);
       } else {
