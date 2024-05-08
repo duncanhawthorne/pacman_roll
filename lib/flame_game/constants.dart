@@ -66,7 +66,6 @@ final textRenderer = TextPaint(
 
 const multiGhost = false;
 
-
 final Paint pacmanYellowPaint = Paint()
   ..color = Colors.yellowAccent; //blue; //yellowAccent;
 final Rect rectSingleSquare = Rect.fromCenter(
@@ -93,4 +92,3 @@ ui.Image pacmanMouthClosedImage() {
       2 * pi * (1 - mouthWidth), true, pacmanYellowPaint);
   return recorder.endRecording().toImageSync(100, 100);
 }
-

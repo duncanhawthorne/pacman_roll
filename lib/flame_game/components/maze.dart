@@ -46,11 +46,8 @@ bool wallNeededBetween(int k, int l) {
   int mazeWidth = getMazeWidth();
   return (l < mazeLayout.length &&
       (mazeLayout[k] == 1 && mazeLayout[l] != 1 ||
-          mazeLayout[k] != 1 &&
-              mazeLayout[l] == 1 &&
-              (l) % mazeWidth != 0));
+          mazeLayout[k] != 1 && mazeLayout[l] == 1 && (l) % mazeWidth != 0));
 }
-
 
 void addMazeWalls(world) {
   if (mazeOn) {
@@ -81,20 +78,26 @@ void addMazeWalls(world) {
 
          */
 
-
-
-        if (wallNeededBetween(k, k+1)) {
+        if (wallNeededBetween(k, k + 1)) {
           //wall on right
           //world.add(Wall(Vector2(A,B),Vector2(A+D,B)));
-          Vector2 a = !wallNeededBetween(k+mazeWidth, k+1+mazeWidth) ? vertBit : Vector2(0,0);
-          Vector2 b = !wallNeededBetween(k-mazeWidth, k+1-mazeWidth) ? vertBit : Vector2(0,0);
+          Vector2 a = !wallNeededBetween(k + mazeWidth, k + 1 + mazeWidth)
+              ? vertBit
+              : Vector2(0, 0);
+          Vector2 b = !wallNeededBetween(k - mazeWidth, k + 1 - mazeWidth)
+              ? vertBit
+              : Vector2(0, 0);
           world.add(Wall(topRight + b, bottomRight - a));
           //world.add(Wall(Vector2(A + D, B + E), Vector2(A, B + E)));
           //world.add(Wall(Vector2(A,B+E),Vector2(A,B)));
         }
-        if (wallNeededBetween(k, k+mazeWidth)) {
-          Vector2 a = !wallNeededBetween(k+1, k+1+mazeWidth) ? horiBit : Vector2(0,0);
-          Vector2 b = !wallNeededBetween(k-1, k-1+mazeWidth) ? horiBit : Vector2(0,0);
+        if (wallNeededBetween(k, k + mazeWidth)) {
+          Vector2 a = !wallNeededBetween(k + 1, k + 1 + mazeWidth)
+              ? horiBit
+              : Vector2(0, 0);
+          Vector2 b = !wallNeededBetween(k - 1, k - 1 + mazeWidth)
+              ? horiBit
+              : Vector2(0, 0);
           //world.add(Wall(Vector2(A,B),Vector2(A+D,B)));
           //world.add(Wall(Vector2(A + D, B), Vector2(A + D, B + E)));
           world.add(Wall(bottomRight - a, bottomLeft + b));

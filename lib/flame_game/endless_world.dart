@@ -38,7 +38,11 @@ import 'package:wakelock_plus/wakelock_plus.dart';
 ///  `game`, which is a reference to the game class that the world is attached
 ///  to.
 class EndlessWorld extends Forge2DWorld
-    with TapCallbacks, HasGameReference<EndlessRunner>, DragCallbacks, PointerMoveCallbacks {
+    with
+        TapCallbacks,
+        HasGameReference<EndlessRunner>,
+        DragCallbacks,
+        PointerMoveCallbacks {
   EndlessWorld({
     required this.level,
     required this.playerProgress,
@@ -107,8 +111,7 @@ class EndlessWorld extends Forge2DWorld
           !globalPhysicsLinked) {
         tmpSirenVolume = 0;
       }
-    }
-    catch (e) {
+    } catch (e) {
       tmpSirenVolume = 0;
       p([e, "tmpSirenVolume zero"]);
     }
@@ -333,8 +336,6 @@ class EndlessWorld extends Forge2DWorld
       linearCursorMoveToGravity(Vector2(eventVector.x, eventVector.y));
     }
   }
-
-
 
   @override
   void onDragUpdate(DragUpdateEvent event) {

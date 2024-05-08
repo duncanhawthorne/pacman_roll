@@ -9,13 +9,9 @@ List<String> soundTypeToFilename(SfxType type) {
         'win.mp3',
       ];
     case SfxType.eatGhost:
-      return const [
-        'eat_ghost.mp3'
-      ];
+      return const ['eat_ghost.mp3'];
     case SfxType.pacmanDeath:
-      return const [
-        'pacman_death.mp3'
-      ];
+      return const ['pacman_death.mp3'];
     case SfxType.waka:
       return const [
         'pacman_waka_waka.mp3',

@@ -70,7 +70,8 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
     if (!actuallyMoveSpritesToScreenPos) {
       camera.viewfinder.angle = -world.worldAngle;
     }
-    scoreComponent.text = 'Lives: ${3 - world.scoreNotifier.value} \n\nTime: ${world.getLevelTime().toStringAsFixed(1)}';
+    scoreComponent.text =
+        'Lives: ${3 - world.scoreNotifier.value} \n\nTime: ${world.getLevelTime().toStringAsFixed(1)}';
     if (dxLast != dx || dyLast != dy) {
       camera.viewport = FixedResolutionViewport(resolution: Vector2(dx, dy));
       camera.viewport.add(scoreComponent);
