@@ -110,41 +110,14 @@ class AudioController {
 
   void pauseSfx(SfxType type) {
     _sfxPlayersNew[type]!.pause();
-    /*
-    for (int i = 0; i < _sfxPlayersTypes.length; i++) {
-      SfxType sfxPlayerType = _sfxPlayersTypes[i];
-      if (sfxPlayerType == type) {
-        AudioPlayer sfxPlayer = _sfxPlayersOld[i];
-        sfxPlayer.pause();
-      }
-    }
-
-     */
   }
 
   void setSirenVolume(double volume) {
     _sfxPlayersNew[SfxType.ghostsRoamingSiren]!.setVolume(volume);
-    /*
-    for (int i = 0; i < _sfxPlayersTypes.length; i++) {
-      SfxType sfxPlayerType = _sfxPlayersTypes[i];
-      if (sfxPlayerType == SfxType.siren) {
-        AudioPlayer sfxPlayer = _sfxPlayersOld[i];
-        sfxPlayer.setVolume(volume);
-      }
-    }
-
-     */
   }
 
   void stopAllSfx() {
     _stopAllSound();
-    /*
-    for (int i = 0; i < _sfxPlayers.length; i++) {
-        AudioPlayer sfxPlayer = _sfxPlayers[i];
-        sfxPlayer.stop();
-    }
-
-     */
   }
 
   /// Enables the [AudioController] to listen to [AppLifecycleState] events,
