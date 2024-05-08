@@ -11,7 +11,7 @@ import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 // ignore: implementation_imports
 import 'package:flame/src/events/messages/pointer_move_event.dart'
-    as dhpointer_move_event;
+    as flame_pointer_move_event;
 
 import '../../audio/sounds.dart';
 import 'game_screen.dart';
@@ -288,7 +288,7 @@ class EndlessWorld extends Forge2DWorld
   }
 
   @override
-  void onPointerMove(dhpointer_move_event.PointerMoveEvent event) {
+  void onPointerMove(flame_pointer_move_event.PointerMoveEvent event) {
     Vector2 eventVector = actuallyMoveSpritesToScreenPos
         ? event.localPosition
         : event.canvasPosition - game.canvasSize / 2;
