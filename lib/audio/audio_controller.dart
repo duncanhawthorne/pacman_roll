@@ -21,10 +21,9 @@ class AudioController {
 
   /// This is a list of [AudioPlayer] instances which are rotated to play
   /// sound effects.
-  final List<AudioPlayer> _sfxPlayers;
-  final List<SfxType> _sfxPlayersTypes;
+  Map<SfxType, AudioPlayer> _sfxPlayersNew = {};
 
-  int _currentSfxPlayer = 0;
+  //int _currentSfxPlayer = 0;
 
   final Queue<Song> _playlist;
 
@@ -39,18 +38,16 @@ class AudioController {
   /// Use [polyphony] to configure the number of sound effects (SFX) that can
   /// play at the same time. A [polyphony] of `1` will always only play one
   /// sound (a new sound will stop the previous one). See discussion
-  /// of [_sfxPlayers] to learn why this is the case.
+  /// of [_sfxPlayersOld] to learn why this is the case.
   ///
   /// Background music does not count into the [polyphony] limit. Music will
   /// never be overridden by sound effects because that would be silly.
-  AudioController({int polyphony = 4})
+  AudioController({int polyphony = 10})
       : assert(polyphony >= 1),
         _musicPlayer = AudioPlayer(playerId: 'musicPlayer'),
-        _sfxPlayers = Iterable.generate(
-                polyphony, (i) => AudioPlayer(playerId: 'sfxPlayer#$i'))
-            .toList(growable: false),
-        _sfxPlayersTypes = Iterable.generate(polyphony, (i) => SfxType.waka)
-            .toList(growable: false),
+        _sfxPlayersNew = Map<SfxType, AudioPlayer>.fromIterable(List<int>.generate(SfxType.values.length, (i) => i),
+            key: (item) => SfxType.values[item],
+            value: (item) => AudioPlayer(playerId: 'sfxPlayer#$item')),
         _playlist = Queue.of(List<Song>.of(songs)..shuffle()) {
     _musicPlayer.onPlayerComplete.listen(_handleSongFinished);
     unawaited(_preloadSfx());
@@ -69,7 +66,7 @@ class AudioController {
     _lifecycleNotifier?.removeListener(_handleAppLifecycle);
     _stopAllSound();
     _musicPlayer.dispose();
-    for (final player in _sfxPlayers) {
+    for (final player in _sfxPlayersNew.values) {
       player.dispose();
     }
   }
@@ -97,41 +94,46 @@ class AudioController {
     final filename = options[_random.nextInt(options.length)];
     _log.fine(() => '- Chosen filename: $filename');
 
-    final currentPlayer = _sfxPlayers[_currentSfxPlayer];
-    _sfxPlayersTypes[_currentSfxPlayer] = type;
+    final AudioPlayer currentPlayer = _sfxPlayersNew[type] ?? AudioPlayer();
 
     //exta code
     if (type == SfxType.ghostsScared || type == SfxType.siren) {
       currentPlayer.setReleaseMode(ReleaseMode.loop);
-    }
-    else {
+    } else {
       currentPlayer.setReleaseMode(ReleaseMode.stop);
     }
 
     currentPlayer.play(AssetSource('sfx/$filename'),
         volume: soundTypeToVolume(type));
-    _currentSfxPlayer = (_currentSfxPlayer + 1) % _sfxPlayers.length;
   }
 
   void pauseSfx(SfxType type) {
+    _sfxPlayersNew[type]!.pause();
+    /*
     for (int i = 0; i < _sfxPlayersTypes.length; i++) {
       SfxType sfxPlayerType = _sfxPlayersTypes[i];
       if (sfxPlayerType == type) {
-        AudioPlayer sfxPlayer = _sfxPlayers[i];
+        AudioPlayer sfxPlayer = _sfxPlayersOld[i];
         sfxPlayer.pause();
       }
     }
+
+     */
   }
 
-    void setSirenVolume(double volume) {
-      for (int i = 0; i < _sfxPlayersTypes.length; i++) {
-        SfxType sfxPlayerType = _sfxPlayersTypes[i];
-        if (sfxPlayerType == SfxType.siren) {
-          AudioPlayer sfxPlayer = _sfxPlayers[i];
-          sfxPlayer.setVolume(volume);
-        }
+  void setSirenVolume(double volume) {
+    _sfxPlayersNew[SfxType.siren]!.setVolume(volume);
+    /*
+    for (int i = 0; i < _sfxPlayersTypes.length; i++) {
+      SfxType sfxPlayerType = _sfxPlayersTypes[i];
+      if (sfxPlayerType == SfxType.siren) {
+        AudioPlayer sfxPlayer = _sfxPlayersOld[i];
+        sfxPlayer.setVolume(volume);
       }
     }
+
+     */
+  }
 
   void stopAllSfx() {
     _stopAllSound();
@@ -143,7 +145,6 @@ class AudioController {
 
      */
   }
-
 
   /// Enables the [AudioController] to listen to [AppLifecycleState] events,
   /// and therefore do things like stopping playback when the game
@@ -277,7 +278,7 @@ class AudioController {
   }
 
   void _soundsOnHandler() {
-    for (final player in _sfxPlayers) {
+    for (final player in _sfxPlayersNew.values) {
       if (player.state == PlayerState.playing) {
         player.stop();
       }
@@ -306,7 +307,7 @@ class AudioController {
   void _stopAllSound() {
     _log.info('Stopping all sound');
     _musicPlayer.pause();
-    for (final player in _sfxPlayers) {
+    for (final player in _sfxPlayersNew.values) {
       player.stop();
     }
   }
