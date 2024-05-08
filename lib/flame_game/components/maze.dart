@@ -69,6 +69,20 @@ void createMaze(world) {
         double rounding = 0.2;
         Vector2 vertBit = Vector2(0, rounding * scale);
         Vector2 horiBit = Vector2(rounding * scale, 0);
+
+        /*
+        if (mazeLayout[k] == 1) {
+          if (wallNeededBetween(k, k+1)) {
+            Vector2 a = !wallNeededBetween(k+mazeWidth, k+1+mazeWidth) ? vertBit : Vector2(0,0);
+            Vector2 b = !wallNeededBetween(k-mazeWidth, k+1-mazeWidth) ? vertBit : Vector2(0,0);
+            world.add(Wall(topRight + b, bottomRight - a));
+          }
+        }
+
+         */
+
+
+
         if (wallNeededBetween(k, k+1)) {
           //wall on right
           //world.add(Wall(Vector2(A,B),Vector2(A+D,B)));

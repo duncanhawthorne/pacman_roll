@@ -60,9 +60,7 @@ List<String> soundTypeToFilename(SfxType type) {
 /// Allows control over loudness of different SFX types.
 double soundTypeToVolume(SfxType type) {
   switch (type) {
-
     case SfxType.waka:
-
     case SfxType.startMusic:
     case SfxType.ghostsScared:
     case SfxType.clearedBoard:

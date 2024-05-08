@@ -346,7 +346,8 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
       if (world.getNow() - ghostScaredTimeLatest > kGhostChaseTimeMillis) {
         current = CharacterState.normal;
         //stopSpecificAudio(SfxType.ghostsScared);
-        pauseSpecificAudio(SfxType.ghostsScared);
+        //pauseSpecificAudio(SfxType.ghostsScared);
+        game.audioController.pauseSfx(SfxType.ghostsScared);
       }
     }
   }

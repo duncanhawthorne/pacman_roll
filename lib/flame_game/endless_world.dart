@@ -15,6 +15,7 @@ import 'package:flame/src/events/messages/pointer_move_event.dart'
 
 import '../../audio/sounds.dart';
 import 'game_screen.dart';
+import 'endless_runner.dart';
 import 'components/player.dart';
 import 'components/maze.dart';
 import 'components/maze_image.dart';
@@ -25,7 +26,7 @@ import 'package:sensors_plus/sensors_plus.dart';
 
 import 'package:flutter/foundation.dart';
 
-//import '../audio/audio_controller.dart';
+import '../audio/audio_controller.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:audioplayers/audioplayers.dart';
 //import 'package:just_audio/just_audio.dart';
@@ -44,7 +45,7 @@ import 'package:audioplayers/audioplayers.dart';
 ///  `game`, which is a reference to the game class that the world is attached
 ///  to.
 class EndlessWorld extends Forge2DWorld
-    with TapCallbacks, HasGameReference, DragCallbacks, PointerMoveCallbacks {
+    with TapCallbacks, HasGameReference<EndlessRunner>, DragCallbacks, PointerMoveCallbacks {
   EndlessWorld({
     required this.level,
     required this.playerProgress,
@@ -63,12 +64,12 @@ class EndlessWorld extends Forge2DWorld
   /// can listen to it and act on the updated value.
   final scoreNotifier = ValueNotifier(0);
   //late RealCharacter player;
-  late final DateTime timeStarted;
+  late final DateTime timeStarted = DateTime.now();
   Vector2 get size => (parent as FlameGame).size;
 
   int levelCompletedIn = 0;
-  //late final AudioController audioController;
-  //getAudioController => audioController;
+  //late final AudioController audioController = AudioController();
+  //get audioController => game.audioController;
   int pelletsRemaining = 1;
   Vector2 dragLastPosition = Vector2(0, 0);
   Vector2 targetFromLastDrag = Vector2(-50, 0); //makes smooth start for drag
@@ -148,7 +149,7 @@ class EndlessWorld extends Forge2DWorld
       AudioPlayer dAudioPlayerTmp = AudioPlayer();
       //dAudioPlayerTmp.setAsset('sfx/$filename');
       dAudioPlayerTmp.setSource(AssetSource('sfx/$filename'));
-      //dAudioPlayerTmp.setPlayerMode(PlayerMode.lowLatency);
+      dAudioPlayerTmp.setPlayerMode(PlayerMode.lowLatency);
       //dAudioPlayerTmp.setLoopMode(LoopMode.all);
       if (iosAudioHack) {
         dAudioPlayerTmp.setReleaseMode(ReleaseMode.loop);
@@ -191,6 +192,8 @@ class EndlessWorld extends Forge2DWorld
   }
 
   void play(SfxType type) {
+    game.daudioController.playSfx(type);
+    return;
     //p(["play1: ", type, audioPlayerMap[type]!.playing, audioPlayerMap[type]!.processingState]);
     if (soundsOn) {
       if (!audioPlayerMap.keys.contains(type)) {
@@ -223,6 +226,7 @@ class EndlessWorld extends Forge2DWorld
         audioPlayerMap[type]!.seek(const Duration(milliseconds: 0));
         audioPlayerMap[type]!.setVolume(1.0);
         if (!iosAudioHack) {
+          p(["resume", type]);
           audioPlayerMap[type]!.resume();
         }
         else {//looping so no action required
@@ -292,10 +296,15 @@ class EndlessWorld extends Forge2DWorld
 
   void updateSirenVolume() async {
     //FIXME NOTE disabled on iOS for bug
+    game.audioController.setSirenVolume(getTargetSirenVolume());
+    /*
+
     if (audioPlayerMap.keys.contains(SfxType.siren)) {
       audioPlayerMap[SfxType.siren]!.setVolume(getTargetSirenVolume());
       //p(["set siren volume", getTargetSirenVolume()]);
     }
+
+     */
   }
 
   void deadMansSwitch() async {
@@ -305,7 +314,8 @@ class EndlessWorld extends Forge2DWorld
         deadMansSwitch();
       });
     } else {
-      stopAllAudio(); //for good measure
+      game.audioController.stopAllSfx();
+      //stopAllAudio(); //for good measure
     }
   }
 
@@ -382,7 +392,7 @@ class EndlessWorld extends Forge2DWorld
 
     // Used to keep track of when the level started, so that we later can
     // calculate how long time it took to finish the level.
-    timeStarted = DateTime.now();
+    //timeStarted = DateTime.now();
 
     if (useGyro) {
       accelerometerEventStream().listen(

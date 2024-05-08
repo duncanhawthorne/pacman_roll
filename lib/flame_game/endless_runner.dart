@@ -45,6 +45,7 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
 
   /// A helper for playing sound effects and background audio.
   final AudioController audioController;
+  get daudioController => audioController;
 
   /// In the [onLoad] method you load different type of assets and set things
   /// that only needs to be set once when the level starts up.

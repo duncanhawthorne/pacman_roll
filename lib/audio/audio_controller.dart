@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:collection';
+//import 'dart:js_interop';
 import 'dart:math';
 
 import 'package:audioplayers/audioplayers.dart';
@@ -21,6 +22,7 @@ class AudioController {
   /// This is a list of [AudioPlayer] instances which are rotated to play
   /// sound effects.
   final List<AudioPlayer> _sfxPlayers;
+  final List<SfxType> _sfxPlayersTypes;
 
   int _currentSfxPlayer = 0;
 
@@ -41,11 +43,13 @@ class AudioController {
   ///
   /// Background music does not count into the [polyphony] limit. Music will
   /// never be overridden by sound effects because that would be silly.
-  AudioController({int polyphony = 100})
+  AudioController({int polyphony = 4})
       : assert(polyphony >= 1),
         _musicPlayer = AudioPlayer(playerId: 'musicPlayer'),
         _sfxPlayers = Iterable.generate(
                 polyphony, (i) => AudioPlayer(playerId: 'sfxPlayer#$i'))
+            .toList(growable: false),
+        _sfxPlayersTypes = Iterable.generate(polyphony, (i) => SfxType.waka)
             .toList(growable: false),
         _playlist = Queue.of(List<Song>.of(songs)..shuffle()) {
     _musicPlayer.onPlayerComplete.listen(_handleSongFinished);
@@ -94,10 +98,52 @@ class AudioController {
     _log.fine(() => '- Chosen filename: $filename');
 
     final currentPlayer = _sfxPlayers[_currentSfxPlayer];
+    _sfxPlayersTypes[_currentSfxPlayer] = type;
+
+    //exta code
+    if (type == SfxType.ghostsScared || type == SfxType.siren) {
+      currentPlayer.setReleaseMode(ReleaseMode.loop);
+    }
+    else {
+      currentPlayer.setReleaseMode(ReleaseMode.stop);
+    }
+
     currentPlayer.play(AssetSource('sfx/$filename'),
         volume: soundTypeToVolume(type));
     _currentSfxPlayer = (_currentSfxPlayer + 1) % _sfxPlayers.length;
   }
+
+  void pauseSfx(SfxType type) {
+    for (int i = 0; i < _sfxPlayersTypes.length; i++) {
+      SfxType sfxPlayerType = _sfxPlayersTypes[i];
+      if (sfxPlayerType == type) {
+        AudioPlayer sfxPlayer = _sfxPlayers[i];
+        sfxPlayer.pause();
+      }
+    }
+  }
+
+    void setSirenVolume(double volume) {
+      for (int i = 0; i < _sfxPlayersTypes.length; i++) {
+        SfxType sfxPlayerType = _sfxPlayersTypes[i];
+        if (sfxPlayerType == SfxType.siren) {
+          AudioPlayer sfxPlayer = _sfxPlayers[i];
+          sfxPlayer.setVolume(volume);
+        }
+      }
+    }
+
+  void stopAllSfx() {
+    _stopAllSound();
+    /*
+    for (int i = 0; i < _sfxPlayers.length; i++) {
+        AudioPlayer sfxPlayer = _sfxPlayers[i];
+        sfxPlayer.stop();
+    }
+
+     */
+  }
+
 
   /// Enables the [AudioController] to listen to [AppLifecycleState] events,
   /// and therefore do things like stopping playback when the game
@@ -193,6 +239,7 @@ class AudioController {
   }
 
   Future<void> _playCurrentSongInPlaylist() async {
+    return;
     _log.info(() => 'Playing ${_playlist.first} now.');
     try {
       await _musicPlayer.play(AssetSource('music/${_playlist.first.filename}'));
