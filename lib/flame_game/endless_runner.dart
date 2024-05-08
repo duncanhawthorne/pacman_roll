@@ -45,51 +45,9 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
 
   /// A helper for playing sound effects and background audio.
   final AudioController audioController;
-  //get daudioController => audioController;
 
-  /// In the [onLoad] method you load different type of assets and set things
-  /// that only needs to be set once when the level starts up.
   double dxLast = 0;
   double dyLast = 0;
-
-  Future<void> startGame() async {
-    world.play(SfxType.startMusic);
-    /*
-    if (startGameMusic) {
-      world.play(SfxType.startMusic);
-    }
-
-     */
-  }
-
-  @override
-  Future<void> onLoad() async {
-    startGame();
-    // The backdrop is a static layer behind the world that the camera is
-    // looking at, so here we add our parallax background.
-    //camera.backdrop.add(Background(speed: 0, world: world));
-
-    world.addAll(createBoundaries(camera));
-    //world.audioController = audioController;
-    //globalAudioController = audioController;
-
-    // With the `TextPaint` we define what properties the text that we are going
-    // to render will have, like font family, size and color in this instance.
-
-
-    // The scoreComponent is added to the viewport, which means that even if the
-    // camera's viewfinder move around and looks at different positions in the
-    // world, the score is always static to the viewport.
-
-    camera.viewfinder.angle = 0;
-
-    // Here we add a listener to the notifier that is updated when the player
-    // gets a new point, in the callback we update the text of the
-    // `scoreComponent`.
-
-  }
-
-
 
   final scoreComponent = TextComponent(
     text: "Lives: 3",
@@ -97,6 +55,14 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
     textRenderer: textRenderer,
   );
 
+  /// In the [onLoad] method you load different type of assets and set things
+  /// that only needs to be set once when the level starts up.
+  @override
+  Future<void> onLoad() async {
+    world.play(SfxType.startMusic);
+    world.addAll(createBoundaries(camera));
+    //camera.viewfinder.angle = 0;
+  }
 
   @override
   void update(double dt) {
@@ -107,20 +73,7 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
     scoreComponent.text = 'Lives: ${3 - world.scoreNotifier.value} \n\nTime: ${world.getLevelTime().toStringAsFixed(1)}';
     if (dxLast != dx || dyLast != dy) {
       camera.viewport = FixedResolutionViewport(resolution: Vector2(dx, dy));
-
-      // The component that is responsible for rendering the text that contains
-      // the current score.
-
-
-      world.scoreNotifier.addListener(() {
-        scoreComponent.text = 'Lives: ${3 - world.scoreNotifier.value}';
-            //scoreText.replaceFirst('3', '${3 - world.scoreNotifier.value}');
-      });
-
       camera.viewport.add(scoreComponent);
-
-
-
       dxLast = dx;
       dyLast = dy;
     }

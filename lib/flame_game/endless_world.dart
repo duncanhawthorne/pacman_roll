@@ -50,7 +50,7 @@ class EndlessWorld extends Forge2DWorld
     required this.level,
     required this.playerProgress,
     Random? random,
-  }) : _random = random ?? Random();
+  }) : random = random ?? Random();
 
   /// The properties of the current level.
   final GameLevel level;
@@ -64,12 +64,10 @@ class EndlessWorld extends Forge2DWorld
   /// can listen to it and act on the updated value.
   final scoreNotifier = ValueNotifier(0);
   //late RealCharacter player;
-  late final DateTime timeStarted = DateTime.now();
+  DateTime timeStarted = DateTime.now();
   Vector2 get size => (parent as FlameGame).size;
 
   int levelCompletedIn = 0;
-  //late final AudioController audioController = AudioController();
-  //get audioController => game.audioController;
   int pelletsRemaining = 1;
   Vector2 dragLastPosition = Vector2(0, 0);
   Vector2 targetFromLastDrag = Vector2(-50, 0); //makes smooth start for drag
@@ -82,196 +80,24 @@ class EndlessWorld extends Forge2DWorld
   int lastWarmedUpAudio = 0;
 
   /// The random number generator that is used to spawn periodic components.
-  // ignore: unused_field
-  final Random _random;
+  final Random random;
 
   /// The gravity is defined in virtual pixels per second squared.
   /// These pixels are in relation to how big the [FixedResolutionViewport] is.
-  //@override
-  //final Vector2 gravity = Vector2(0, 100);
-  //Vector2 get worldGravity => gravity; //_worldGravity;
-  //Vector2 _worldGravity = Vector2(0, 0); //initial value which immediately gets overridden
-  //double get worldAngle => _worldAngle;
-  //set worldAngle(double value) {_worldAngle = value;};
   double worldAngle = 0; //2 * pi / 8;
   double worldCos = 1;
   double worldSin = 0;
 
-  /// Where the ground is located in the world and things should stop falling.
-  //late final double groundLevel = (size.y / 2) - (size.y / 5);
-
   List<RealCharacter> ghostPlayersList = [];
   List<RealCharacter> pacmanPlayersList = [];
-
-  /*
-  Future<bool> loadAllAudioFiles() async {
-    for (var type in SfxType.values) {
-      loadAudioFile(type, false, false);
-    }
-    return true;
-  }
-
-   */
-
-  /*
-  void warmUpAudioFile(SfxType type) {
-    if (audioPlayerMap.keys.contains(type) &&
-        audioPlayerMap[type]!.state == PlayerState.stopped) {
-      audioPlayerMap[type]!.setVolume(0.0);
-      audioPlayerMap[type]!.resume();
-      StreamSubscription<PlayerState>? stream;
-      stream = audioPlayerMap[type]!.onPlayerStateChanged.listen((state) {
-        if (state == PlayerState.playing) {
-          audioPlayerMap[type]!.pause();
-          stream!.cancel();
-        }
-      });
-    }
-  }
-
-   */
-
-  /*
-  void warmUpAudioFiles() {
-    if (getNow() - lastWarmedUpAudio > 5000) {
-      //p("warm up");
-      lastWarmedUpAudio = getNow();
-      for (var type in SfxType.values) {
-        //p([type,audioPlayerMap[type]!.state]);
-        warmUpAudioFile(type);
-      }
-    }
-  }
-
-   */
-
-  /*
-  bool loadAudioFile(SfxType type, bool forImmediatePlayback, bool force) {
-    if (force || !audioPlayerMap.keys.contains(type)) {
-      p(["load", type]);
-      String filename = soundTypeToFilename(type)[0];
-      AudioPlayer dAudioPlayerTmp = AudioPlayer();
-      //dAudioPlayerTmp.setAsset('sfx/$filename');
-      dAudioPlayerTmp.setSource(AssetSource('sfx/$filename'));
-      dAudioPlayerTmp.setPlayerMode(PlayerMode.lowLatency);
-      //dAudioPlayerTmp.setLoopMode(LoopMode.all);
-      if (iosAudioHack) {
-        dAudioPlayerTmp.setReleaseMode(ReleaseMode.loop);
-      }
-      if (type == SfxType.ghostsScared) {
-        //dAudioPlayerTmp.setLoopMode(LoopMode.all);
-        dAudioPlayerTmp.setReleaseMode(ReleaseMode.loop);
-      }
-      if (type == SfxType.siren) {
-        //dAudioPlayerTmp.setLoopMode(LoopMode.all);
-        dAudioPlayerTmp.setReleaseMode(ReleaseMode.loop);
-        //updateSirenVolume(); //not needed here as done in update
-      }
-      if (force || !audioPlayerMap.keys.contains(type)) {
-        audioPlayerMap[type] = dAudioPlayerTmp;
-      }
-      if (!forImmediatePlayback) {
-        //HACK to try to get around web sites not being able to play audio on delay
-        //warmUpAudioFile(type);
-        /*
-        dAudioPlayerTmp.setVolume(0);
-        await dAudioPlayerTmp.stop();
-        await dAudioPlayerTmp.resume();
-        await dAudioPlayerTmp.pause();
-        dAudioPlayerTmp.setVolume(1);
-         */
-      }
-    }
-    return true;
-  }
-
-   */
 
   bool isGameLive() {
     return gameRunning && !game.paused && game.isLoaded && game.isMounted;
   }
 
-  /*
-  void playEverything() {
-    for (SfxType key in audioPlayerMap.keys) {
-      play(key);
-    }
-  }
-
-   */
-
   void play(SfxType type) {
     game.audioController.playSfx(type);
     return;
-    /*
-    //p(["play1: ", type, audioPlayerMap[type]!.playing, audioPlayerMap[type]!.processingState]);
-    if (soundsOn) {
-      if (!audioPlayerMap.keys.contains(type)) {
-        loadAudioFile(type, true, false);
-        if (!audioPlayerMap.keys.contains(type)) {
-          Future.delayed(const Duration(milliseconds: 10), () {
-            p(["delayed file load", type]);
-            play(type);
-          });
-          return;
-        }
-      }
-      if (!pelletEatSoundOn && type == SfxType.waka ||
-          !sirenOn && type == SfxType.siren) {
-        return;
-      }
-      if (true) {
-        /*
-        if (audioPlayerMap[type]!.processingState == ProcessingState.buffering || audioPlayerMap[type]!.processingState == ProcessingState.completed) {
-          loadAudioFile(type, false, true);
-        }
-
-         */
-        //if (!(audioPlayerMap[type]!.playing && audioPlayerMap[type]!.processingState == ProcessingState.ready)) {
-        //if (audioPlayerMap[type]!.state != PlayerState.playing) {
-        //p(["play2: ", type]);
-        //audioPlayerMap[type]!.seek(const Duration(milliseconds: 0));
-        //audioPlayerMap[type]!.setVolume(1);
-        p(["play", type]);
-        audioPlayerMap[type]!.seek(const Duration(milliseconds: 0));
-        audioPlayerMap[type]!.setVolume(1.0);
-        if (!iosAudioHack) {
-          p(["resume", type]);
-          audioPlayerMap[type]!.resume();
-        }
-        else {//looping so no action required
-           }
-
-        //if (!(audioPlayerMap[type]!.playing)) {
-        if (iosAudioHack && audioPlayerMap[type]!.state != PlayerState.playing) {
-          p(["really play", type]);
-          //audioPlayerMap[type]!.play();
-          audioPlayerMap[type]!.resume();
-        }
-
-        if (iosAudioHack) {
-          Future.delayed(const Duration(seconds: 2), () {
-            //FIXME physical ball not initialised immediately
-            pauseSpecificAudio(type);
-          });
-        }
-
-        //p(["play3: ", type, audioPlayerMap[type]!.playing, audioPlayerMap[type]!.processingState]);
-        //audioPlayerMap[type]!.resume();
-
-        /*
-        StreamSubscription<PlayerState>? stream;
-        stream = audioPlayerMap[type]!.onPlayerStateChanged.listen((state) {
-          if (state == PlayerState.completed) {
-            audioPlayerMap[type]!.pause();
-            stream!.cancel();
-          }
-        });
-         */
-      }
-    }
-
-     */
   }
 
   double getTargetSirenVolume() {
@@ -289,7 +115,6 @@ class EndlessWorld extends Forge2DWorld
         tmpSirenVolume = 0;
       }
     }
-    // ignore: empty_catches
     catch (e) {
       tmpSirenVolume = 0;
       p([e, "tmpSirenVolume zero"]);
@@ -309,14 +134,6 @@ class EndlessWorld extends Forge2DWorld
   void updateSirenVolume() async {
     //FIXME NOTE disabled on iOS for bug
     game.audioController.setSirenVolume(getTargetSirenVolume());
-    /*
-
-    if (audioPlayerMap.keys.contains(SfxType.siren)) {
-      audioPlayerMap[SfxType.siren]!.setVolume(getTargetSirenVolume());
-      //p(["set siren volume", getTargetSirenVolume()]);
-    }
-
-     */
   }
 
   void deadMansSwitch() async {
@@ -327,7 +144,6 @@ class EndlessWorld extends Forge2DWorld
       });
     } else {
       game.audioController.stopAllSfx();
-      //stopAllAudio(); //for good measure
     }
   }
 
@@ -385,16 +201,8 @@ class EndlessWorld extends Forge2DWorld
 
   @override
   Future<void> onLoad() async {
-    //stopAllAudio();
     now = DateTime.now().millisecondsSinceEpoch;
     gameRunning = true;
-    //loadAllAudioFiles();
-    /*
-    if (iosAudioHack) {
-      playEverything();
-    }
-
-     */
     levelCompleteTimeMillis = 0;
     //AudioLogger.logLevel = AudioLogLevel.info;
     if (sirenOn) {
@@ -407,7 +215,7 @@ class EndlessWorld extends Forge2DWorld
 
     // Used to keep track of when the level started, so that we later can
     // calculate how long time it took to finish the level.
-    //timeStarted = DateTime.now();
+    timeStarted = DateTime.now();
 
     if (useGyro) {
       accelerometerEventStream().listen(
@@ -423,24 +231,14 @@ class EndlessWorld extends Forge2DWorld
       );
     }
 
-    //player =
-    //    RealCharacter(isGhost: false, startingPosition: kPacmanStartLocation);
-    //add(player);
     addPacman(kPacmanStartLocation);
-    //addPacman(this, kPacmanStartLocation + Vector2.random() / 100);
-    //addPacman(this, kPacmanStartLocation + Vector2.random() / 100);
-
     for (int i = 0; i < 3; i++) {
       addGhost(i);
     }
 
     add(MazeImage());
-    if (!debugMode) {
-      createMaze(this);
-    }
-
-    addPillsAndPowerPills(this);
-
+    addMazeWalls(this);
+    addPelletsAndSuperPellets(this);
     //add(Compass());
 
     // When the player takes a new point we check if the score is enough to
@@ -495,7 +293,6 @@ class EndlessWorld extends Forge2DWorld
 
   @override
   void onPointerMove(dhpointer_move_event.PointerMoveEvent event) {
-    //warmUpAudioFiles();
     Vector2 eventVector = actuallyMoveSpritesToScreenPos
         ? event.localPosition
         : event.canvasPosition - game.canvasSize / 2;
@@ -528,7 +325,6 @@ class EndlessWorld extends Forge2DWorld
   @override
   void onDragStart(DragStartEvent event) {
     super.onDragStart(event);
-    //warmUpAudioFiles();
     Vector2 eventVector = actuallyMoveSpritesToScreenPos
         ? event.localPosition
         : event.canvasPosition - game.canvasSize / 2;
@@ -555,7 +351,6 @@ class EndlessWorld extends Forge2DWorld
   @override
   void onDragUpdate(DragUpdateEvent event) {
     super.onDragUpdate(event);
-    //warmUpAudioFiles();
     Vector2 eventVector = actuallyMoveSpritesToScreenPos
         ? event.localStartPosition
         : event.canvasStartPosition - game.canvasSize / 2;
@@ -564,12 +359,6 @@ class EndlessWorld extends Forge2DWorld
         : (event.canvasStartPosition - game.canvasSize / 2).length /
             (min(game.canvasSize.x, game.canvasSize.y) / 2);
     if (clickAndDrag) {
-      // ignore: dead_code
-      if (false && dragLastPosition != Vector2(0, 0)) {
-        Vector2 dragDelta = -(eventVector - dragLastPosition);
-        linearCursorMoveToGravity(targetFromLastDrag + dragDelta);
-        targetFromLastDrag = targetFromLastDrag + dragDelta;
-      }
       if (dragLastAngle != 10) {
         double spinMultiplier = 4 * min(1, eventVectorLengthProportion / 0.75);
         double currentAngleTmp = atan2(eventVector.x, eventVector.y);

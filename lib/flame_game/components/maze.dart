@@ -13,7 +13,7 @@ int getMazeWidth() {
   return sqrt(mazeLayout.length).toInt();
 }
 
-void addPillsAndPowerPills(Forge2DWorld world) {
+void addPelletsAndSuperPellets(Forge2DWorld world) {
   int mazelen = getMazeWidth();
   for (var i = 0; i < mazelen; i++) {
     for (var j = 0; j < mazelen; j++) {
@@ -52,7 +52,7 @@ bool wallNeededBetween(int k, int l) {
 }
 
 
-void createMaze(world) {
+void addMazeWalls(world) {
   if (mazeOn) {
     int mazeWidth = getMazeWidth();
     for (var i = 0; i < mazeWidth; i++) {

@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-//import '../audio/audio_controller.dart';
 import 'maze_layout.dart';
 import 'helper.dart';
 import 'package:flame/components.dart';
@@ -7,11 +6,6 @@ import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'dart:core';
-import "dart:math";
-
-//import '../../audio/sounds.dart';
-//import 'package:audioplayers/audioplayers.dart';
-//import 'package:just_audio/just_audio.dart';
 
 const debugMode = false;
 const bool mazeOn = true;
@@ -26,7 +20,6 @@ const bool screenRotates = true; //android ? false : true;
 const useGyro = !screenRotates;
 final followCursor = windows;
 final clickAndDrag = !windows && !useGyro;
-//final dragBasedOnAngles = iOS;
 
 const gameScaleFactor = screenRotates ? 0.9 : 1.0;
 const flameGameZoom = 20.0;
@@ -52,17 +45,15 @@ const int kPacmanDeadResetTimeMillis = 1000;
 const int kPacmanHalfEatingResetTimeMillis = 180;
 
 bool globalPhysicsLinked = true;
-//bool startGameMusic = true;
-//const bool soundsOn = true;
 const bool rotateCamera = true;
 const bool actuallyMoveSpritesToScreenPos = !rotateCamera;
 
 final bool sirenOn = iOS ? false : true;
-const bool pelletEatSoundOn = true;//false;//true; //iOS ? false : true;
+const bool pelletEatSoundOn = true; //iOS ? false : true;
 const multiplePacmans = false;
-//const centralisedAudio = true;
-//const bool justAudio = true;
 
+// With the `TextPaint` we define what properties the text that we are going
+// to render will have, like font family, size and color in this instance.
 final textRenderer = TextPaint(
   style: const TextStyle(
     fontSize: 30,
@@ -71,40 +62,4 @@ final textRenderer = TextPaint(
   ),
 );
 
-final random = Random();
-
 const multiGhost = false;
-
-/*
-Map<SfxType, AudioPlayer> audioPlayerMap = {};
-
-void stopAllAudio() {
-  for (SfxType key in audioPlayerMap.keys) {
-    stopSpecificAudio(key);
-  }
-}
-
-void stopSpecificAudio(SfxType type) {
-  p(["stop", type]);
-  if (audioPlayerMap.keys.contains(type)) {
-    audioPlayerMap[type]!.stop();
-    //audioPlayerMap[type]!.release();
-  }
-}
-
-void pauseSpecificAudio(SfxType type) {
-  p(["pause", type]);
-  if (audioPlayerMap.keys.contains(type)) {
-    if (iosAudioHack) {
-      audioPlayerMap[type]!.setVolume(0.0);
-    }
-    else {
-      audioPlayerMap[type]!.pause();
-      //audioPlayerMap[type]!.release();
-    }
-  }
-}
-
- */
-
-//bool iosAudioHack = false;//iOS;

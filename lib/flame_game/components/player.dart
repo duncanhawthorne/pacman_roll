@@ -52,7 +52,6 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
   // determine which direction that the player is moving.
   // ignore: prefer_final_fields
   Vector2 _lastUnderlyingPosition = Vector2.zero();
-  //double _lastWorldAngle = 0;
   // ignore: prefer_final_fields
   Vector2 _lastUnderlyingVelocity = Vector2.zero();
 
@@ -71,7 +70,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
                                 'dash/ghost1.png',
                                 'dash/ghost2.png',
                                 'dash/ghost3.png'
-                              ][random.nextInt(3)])
+                              ][world.random.nextInt(3)])
               ],
               stepTime: double.infinity,
             ),
