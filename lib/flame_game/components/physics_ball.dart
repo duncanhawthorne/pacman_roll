@@ -26,7 +26,7 @@ class PhysicsBall extends BodyComponent with TapCallbacks, ContactCallbacks {
                 CircleShape()
                   ..radius = size ?? getSingleSquareWidth() / 2 * 0.99, //0.95
                 restitution: 0.0,
-                friction: 0.1,
+                friction: useForgeRotation ? 1 : 0,
                 userData: PhysicsBall,
               ),
             ],

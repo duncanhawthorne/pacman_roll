@@ -128,7 +128,7 @@ class EndlessWorld extends Forge2DWorld
   }
 
   void updateSirenVolume() async {
-    //FIXME NOTE disabled on iOS for bug
+    //NOTE disabled on iOS for bug
     if (sirenOn && now - lastSirenVolumeUpdateTimeMillis > 500) {
       lastSirenVolumeUpdateTimeMillis = now;
       game.audioController.setSirenVolume(getTargetSirenVolume());
@@ -136,7 +136,7 @@ class EndlessWorld extends Forge2DWorld
   }
 
   void deadMansSwitch() async {
-    //FIXME note works as separate thread to stop all audio too, so dont disable
+    //Wworks as separate thread to stop all audio when game stops
     if (isGameLive()) {
       Future.delayed(const Duration(milliseconds: 500), () {
         deadMansSwitch();
@@ -290,6 +290,7 @@ class EndlessWorld extends Forge2DWorld
 
   @override
   void onPointerMove(flame_pointer_move_event.PointerMoveEvent event) {
+    //TODO try to capture mouse on windows
     Vector2 eventVector = actuallyMoveSpritesToScreenPos
         ? event.localPosition
         : event.canvasPosition - game.canvasSize / 2;

@@ -13,6 +13,7 @@ final bool iOS = defaultTargetPlatform == TargetPlatform.iOS;
 final bool windows = defaultTargetPlatform == TargetPlatform.windows;
 const bool web = kIsWeb;
 final flatMazeLayout = flatten(wrappedMazeLayout);
+const useForgeRotation = false;
 const bool normaliseGravity = true; //android ? false : true;
 const bool screenRotates = true; //android ? false : true;
 const useGyro = !screenRotates;

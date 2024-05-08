@@ -125,7 +125,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     try {
       return underlyingBallReal.position;
     } catch (e) {
-      //FIXME shouldn't need this, hid error
+      //FIXME body not initialised. Shouldn't need this, hid error
       //p(["getUnderlyingBallPosition", e]);
       return _lastUnderlyingPosition; //Vector2(10, 0);
     }
@@ -143,7 +143,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
       return Vector2(underlyingBallReal.body.linearVelocity.x,
           underlyingBallReal.body.linearVelocity.y);
     } catch (e) {
-      //FIXME shouldn't need this, hid error
+      //FIXME body not initialised. Shouldn't need this, hid error
       //p(["getUnderlyingBallVelocity", e]);
       return _lastUnderlyingVelocity;
     }
@@ -154,7 +154,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
       underlyingBallReal.body.linearVelocity = vel;
     } catch (e) {
       Future.delayed(const Duration(seconds: 0), () {
-        //FIXME physical ball not initialised immediately
+        //FIXME body not initialised. Shouldn't need this, hid error
         underlyingBallReal.body.linearVelocity = vel;
       });
     }
@@ -305,7 +305,6 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   }
 
   void ghostDeadScaredScaredIshNormalSequence() {
-//FIXME instead of testing this every frame, move into futures, and still test every frame, but only when in the general zone that need to test this
     assert(isGhost);
     if (current == CharacterState.deadGhost) {
       if (world.now - ghostDeadTimeLatest > kGhostResetTimeMillis) {
@@ -362,11 +361,19 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   }
 
   void updateUnderlyingAngle() {
-    underlyingAngle = underlyingAngle +
-        (getUnderlyingBallPosition() - _lastUnderlyingPosition).length /
-            (size.x / 2) *
-            getRollSpinDirection(
-                world, getUnderlyingBallVelocity(), world.gravity);
+    if (useForgeRotation) {
+      try {
+        underlyingAngle = underlyingBallReal.angle;
+      } catch (e) {
+        //FIXME body not initialised. Shouldn't need this, hid error
+      }
+    } else {
+      underlyingAngle = underlyingAngle +
+          (getUnderlyingBallPosition() - _lastUnderlyingPosition).length /
+              (size.x / 2) *
+              getRollSpinDirection(
+                  world, getUnderlyingBallVelocity(), world.gravity);
+    }
   }
 
   double getUpdatedAngle() {
@@ -387,7 +394,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   @override
   Future<void> onLoad() async {
     setUnderlyingBallPosition(
-        startingPosition); //FIXME shouldn't be necessary, but avoid one frame starting glitch
+        startingPosition); //FIXME shouldn't be necessary, but avoids one frame starting glitch
 
     animations = await getAnimations();
     current = isGhost ? CharacterState.deadGhost : CharacterState.normal;
@@ -402,7 +409,6 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   @override
   void update(double dt) {
     super.update(dt);
-    //TODO try to capture mouse on windows
     if (isGhost) {
       ghostDeadScaredScaredIshNormalSequence();
     }
