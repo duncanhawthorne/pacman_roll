@@ -44,8 +44,8 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
   int playerEatingTimeLatest = 0; //a long time ago
   int playerEatingSoundTimeLatest = 0; //a long time ago
   Vector2 ghostDeadPosition = Vector2(0, 0);
-  double underlyingAngle = 0;
 
+  double underlyingAngle = 0;
   // Used to store the last position of the player, so that we later can
   // determine which direction that the player is moving.
   // ignore: prefer_final_fields
@@ -94,7 +94,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
                 kIsWeb
                     ? await game.loadSprite('dash/pacmanman.png')
                     : Sprite(pacmanStandardImage())
-              ], //game.loadSprite('dash/pacmanman.png')],
+              ],
               stepTime: double.infinity,
             ),
             CharacterState.eating: SpriteAnimation.spriteList(
@@ -105,7 +105,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
                 kIsWeb
                     ? await game.loadSprite('dash/pacmanman_eat.png')
                     : Sprite(pacmanMouthClosedImage())
-              ], //game.loadSprite('dash/pacmanman.png')],
+              ],
               stepTime: kPacmanHalfEatingResetTimeMillis / 1000,
             )
           };
@@ -165,7 +165,6 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
     for (int i = 0; i < origNumGhosts; i++) {
       int j = origNumGhosts - 1 - i;
       if (j < 3) {
-
       } else {
         assert(multiGhost);
         world.removeGhost(world.ghostPlayersList[j]);
@@ -305,21 +304,6 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
     }
   }
 
-  @override
-  Future<void> onLoad() async {
-    setUnderlyingBallPosition(
-        startingPosition); //FIXME shouldn't be necessary, but avoid one frame starting glitch
-
-    animations = await getAnimations();
-    current = isGhost ? CharacterState.deadGhost : CharacterState.normal;
-    _lastUnderlyingPosition.setFrom(getUnderlyingBallPosition());
-
-    // When adding a CircleHitbox without any arguments it automatically
-    // fills up the size of the component as much as it can without overflowing
-    // it.
-    add(CircleHitbox());
-  }
-
   void ghostDeadScaredScaredIshNormalSequence() {
 //FIXME instead of testing this every frame, move into futures, and still test every frame, but only when in the general zone that need to test this
     assert(isGhost);
@@ -393,6 +377,30 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
   }
 
   @override
+  void onCollisionStart(
+    Set<Vector2> intersectionPoints,
+    PositionComponent other,
+  ) {
+    super.onCollisionStart(intersectionPoints, other);
+    handleTwoCharactersMeet(other);
+  }
+
+  @override
+  Future<void> onLoad() async {
+    setUnderlyingBallPosition(
+        startingPosition); //FIXME shouldn't be necessary, but avoid one frame starting glitch
+
+    animations = await getAnimations();
+    current = isGhost ? CharacterState.deadGhost : CharacterState.normal;
+    _lastUnderlyingPosition.setFrom(getUnderlyingBallPosition());
+
+    // When adding a CircleHitbox without any arguments it automatically
+    // fills up the size of the component as much as it can without overflowing
+    // it.
+    add(CircleHitbox());
+  }
+
+  @override
   void update(double dt) {
     super.update(dt);
     //TODO try to capture mouse on windows
@@ -417,18 +425,6 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
   }
 
   @override
-  void onCollisionStart(
-    Set<Vector2> intersectionPoints,
-    PositionComponent other,
-  ) {
-    super.onCollisionStart(intersectionPoints, other);
-    handleTwoCharactersMeet(other);
-  }
-
-
-
-
-  @override
   void render(Canvas canvas) {
     super.render(canvas);
     if (!isGhost && current == CharacterState.deadPacman) {
@@ -441,8 +437,6 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
           2 * pi * (1 - mouthWidth), true, pacmanYellowPaint);
     }
   }
-
-
 }
 
 enum CharacterState { normal, scared, scaredIsh, eating, deadGhost, deadPacman }

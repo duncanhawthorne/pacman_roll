@@ -67,7 +67,7 @@ double soundTypeToVolume(SfxType type) {
     case SfxType.pacmanDeath:
     case SfxType.siren:
     case SfxType.eatGhost:
-      return 0.4;
+      return 1;
       /*
     case SfxType.wa:
     case SfxType.ka:
