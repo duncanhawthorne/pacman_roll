@@ -26,9 +26,9 @@ import 'package:sensors_plus/sensors_plus.dart';
 
 import 'package:flutter/foundation.dart';
 
-import '../audio/audio_controller.dart';
+//import '../audio/audio_controller.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
-import 'package:audioplayers/audioplayers.dart';
+//import 'package:audioplayers/audioplayers.dart';
 //import 'package:just_audio/just_audio.dart';
 //import 'package:just_audio/just_audio.dart' as justAudio;
 
@@ -103,12 +103,15 @@ class EndlessWorld extends Forge2DWorld
   List<RealCharacter> ghostPlayersList = [];
   List<RealCharacter> pacmanPlayersList = [];
 
+  /*
   Future<bool> loadAllAudioFiles() async {
     for (var type in SfxType.values) {
       loadAudioFile(type, false, false);
     }
     return true;
   }
+
+   */
 
   /*
   void warmUpAudioFile(SfxType type) {
@@ -142,6 +145,7 @@ class EndlessWorld extends Forge2DWorld
 
    */
 
+  /*
   bool loadAudioFile(SfxType type, bool forImmediatePlayback, bool force) {
     if (force || !audioPlayerMap.keys.contains(type)) {
       p(["load", type]);
@@ -181,19 +185,25 @@ class EndlessWorld extends Forge2DWorld
     return true;
   }
 
+   */
+
   bool isGameLive() {
     return gameRunning && !game.paused && game.isLoaded && game.isMounted;
   }
 
+  /*
   void playEverything() {
     for (SfxType key in audioPlayerMap.keys) {
       play(key);
     }
   }
 
+   */
+
   void play(SfxType type) {
-    game.daudioController.playSfx(type);
+    game.audioController.playSfx(type);
     return;
+    /*
     //p(["play1: ", type, audioPlayerMap[type]!.playing, audioPlayerMap[type]!.processingState]);
     if (soundsOn) {
       if (!audioPlayerMap.keys.contains(type)) {
@@ -260,6 +270,8 @@ class EndlessWorld extends Forge2DWorld
          */
       }
     }
+
+     */
   }
 
   double getTargetSirenVolume() {
@@ -376,10 +388,13 @@ class EndlessWorld extends Forge2DWorld
     //stopAllAudio();
     now = DateTime.now().millisecondsSinceEpoch;
     gameRunning = true;
-    loadAllAudioFiles();
+    //loadAllAudioFiles();
+    /*
     if (iosAudioHack) {
       playEverything();
     }
+
+     */
     levelCompleteTimeMillis = 0;
     //AudioLogger.logLevel = AudioLogLevel.info;
     if (sirenOn) {

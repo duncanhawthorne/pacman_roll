@@ -9,8 +9,8 @@ import 'package:flutter/material.dart';
 import 'dart:core';
 import "dart:math";
 
-import '../../audio/sounds.dart';
-import 'package:audioplayers/audioplayers.dart';
+//import '../../audio/sounds.dart';
+//import 'package:audioplayers/audioplayers.dart';
 //import 'package:just_audio/just_audio.dart';
 
 const debugMode = false;
@@ -52,16 +52,16 @@ const int kPacmanDeadResetTimeMillis = 1000;
 const int kPacmanHalfEatingResetTimeMillis = 180;
 
 bool globalPhysicsLinked = true;
-bool startGameMusic = true;
-const bool soundsOn = true;
+//bool startGameMusic = true;
+//const bool soundsOn = true;
 const bool rotateCamera = true;
 const bool actuallyMoveSpritesToScreenPos = !rotateCamera;
 
 final bool sirenOn = iOS ? false : true;
 const bool pelletEatSoundOn = true;//false;//true; //iOS ? false : true;
 const multiplePacmans = false;
-const centralisedAudio = true;
-const bool justAudio = true;
+//const centralisedAudio = true;
+//const bool justAudio = true;
 
 final textRenderer = TextPaint(
   style: const TextStyle(
@@ -74,6 +74,8 @@ final textRenderer = TextPaint(
 final random = Random();
 
 const multiGhost = false;
+
+/*
 Map<SfxType, AudioPlayer> audioPlayerMap = {};
 
 void stopAllAudio() {
@@ -103,4 +105,6 @@ void pauseSpecificAudio(SfxType type) {
   }
 }
 
-bool iosAudioHack = false;//iOS;
+ */
+
+//bool iosAudioHack = false;//iOS;

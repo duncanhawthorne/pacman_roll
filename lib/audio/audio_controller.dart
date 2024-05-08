@@ -21,7 +21,7 @@ class AudioController {
 
   /// This is a list of [AudioPlayer] instances which are rotated to play
   /// sound effects.
-  Map<SfxType, AudioPlayer> _sfxPlayersNew = {};
+  final Map<SfxType, AudioPlayer> _sfxPlayersNew;
 
   //int _currentSfxPlayer = 0;
 
@@ -45,9 +45,7 @@ class AudioController {
   AudioController({int polyphony = 10})
       : assert(polyphony >= 1),
         _musicPlayer = AudioPlayer(playerId: 'musicPlayer'),
-        _sfxPlayersNew = Map<SfxType, AudioPlayer>.fromIterable(List<int>.generate(SfxType.values.length, (i) => i),
-            key: (item) => SfxType.values[item],
-            value: (item) => AudioPlayer(playerId: 'sfxPlayer#$item')),
+        _sfxPlayersNew = { for (var item in List<int>.generate(SfxType.values.length, (i) => i)) SfxType.values[item] : AudioPlayer(playerId: 'sfxPlayer#$item') },
         _playlist = Queue.of(List<Song>.of(songs)..shuffle()) {
     _musicPlayer.onPlayerComplete.listen(_handleSongFinished);
     unawaited(_preloadSfx());
@@ -77,12 +75,12 @@ class AudioController {
   /// [SettingsController.audioOn] is `true` or if its
   /// [SettingsController.soundsOn] is `false`.
   void playSfx(SfxType type) {
-    final audioOn = _settings?.audioOn.value ?? false;
+    final audioOn = _settings?.audioOn.value ?? true;
     if (!audioOn) {
       _log.fine(() => 'Ignoring playing sound ($type) because audio is muted.');
       return;
     }
-    final soundsOn = _settings?.soundsOn.value ?? false;
+    final soundsOn = _settings?.soundsOn.value ?? true;
     if (!soundsOn) {
       _log.fine(() =>
           'Ignoring playing sound ($type) because sounds are turned off.');
@@ -241,6 +239,7 @@ class AudioController {
 
   Future<void> _playCurrentSongInPlaylist() async {
     return;
+    /*
     _log.info(() => 'Playing ${_playlist.first} now.');
     try {
       await _musicPlayer.play(AssetSource('music/${_playlist.first.filename}'));
@@ -263,6 +262,7 @@ class AudioController {
         _log.severe('Could not pause music player', e);
       }
     }
+    */
   }
 
   /// Preloads all sound effects.
