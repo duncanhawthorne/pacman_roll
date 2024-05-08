@@ -190,7 +190,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
       Future.delayed(
           const Duration(milliseconds: kPacmanHalfEatingResetTimeMillis * 2),
           () {
-        world.play(SfxType.clearedBoard);
+        world.play(SfxType.endMusic);
       });
     }
   }

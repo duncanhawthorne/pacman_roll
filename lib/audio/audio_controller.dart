@@ -95,7 +95,7 @@ class AudioController {
     final AudioPlayer currentPlayer = _sfxPlayersNew[type] ?? AudioPlayer();
 
     //exta code
-    if (type == SfxType.ghostsScared || type == SfxType.siren) {
+    if (type == SfxType.ghostsScared || type == SfxType.ghostsRoamingSiren) {
       currentPlayer.setReleaseMode(ReleaseMode.loop);
     } else {
       currentPlayer.setReleaseMode(ReleaseMode.stop);
@@ -120,7 +120,7 @@ class AudioController {
   }
 
   void setSirenVolume(double volume) {
-    _sfxPlayersNew[SfxType.siren]!.setVolume(volume);
+    _sfxPlayersNew[SfxType.ghostsRoamingSiren]!.setVolume(volume);
     /*
     for (int i = 0; i < _sfxPlayersTypes.length; i++) {
       SfxType sfxPlayerType = _sfxPlayersTypes[i];

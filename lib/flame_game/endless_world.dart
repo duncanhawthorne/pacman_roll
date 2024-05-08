@@ -199,7 +199,7 @@ class EndlessWorld extends Forge2DWorld
     levelCompleteTimeMillis = 0;
     //AudioLogger.logLevel = AudioLogLevel.info;
     if (sirenOn) {
-      play(SfxType.siren);
+      play(SfxType.ghostsRoamingSiren);
     }
     pelletsRemaining = getStartingNumberPelletsAndSuperPellets(mazeLayout);
     deadMansSwitch();

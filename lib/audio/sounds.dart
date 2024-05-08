@@ -4,19 +4,17 @@ List<String> soundTypeToFilename(SfxType type) {
       return const [
         'ghosts_runaway.mp3',
       ];
-    case SfxType.clearedBoard:
+    case SfxType.endMusic:
       return const [
         'win.mp3',
       ];
     case SfxType.eatGhost:
       return const [
         'eat_ghost.mp3'
-        //'hit2.mp3',
       ];
     case SfxType.pacmanDeath:
       return const [
         'pacman_death.mp3'
-        //'damage2.mp3',
       ];
     case SfxType.waka:
       return const [
@@ -26,34 +24,10 @@ List<String> soundTypeToFilename(SfxType type) {
       return const [
         'pacman_beginning.mp3',
       ];
-    case SfxType.siren:
+    case SfxType.ghostsRoamingSiren:
       return const [
         'ghosts_siren.mp3',
       ];
-    /*
-    case SfxType.wa:
-      return const [
-        'pacman_waka_wa.mp3',
-      ];
-
-    case SfxType.waka2:
-      return const [
-        'pacman_waka_waka-copy.mp3',
-      ];
-    case SfxType.ka:
-      return const [
-        'pacman_waka_ka.mp3',
-      ];
-
-    case SfxType.buttonTap:
-      return const [
-        'click1.mp3',
-        'click2.mp3',
-        'click3.mp3',
-        'click4.mp3',
-      ];
-
-     */
   }
 }
 
@@ -63,19 +37,11 @@ double soundTypeToVolume(SfxType type) {
     case SfxType.waka:
     case SfxType.startMusic:
     case SfxType.ghostsScared:
-    case SfxType.clearedBoard:
+    case SfxType.endMusic:
     case SfxType.pacmanDeath:
-    case SfxType.siren:
+    case SfxType.ghostsRoamingSiren:
     case SfxType.eatGhost:
       return 1;
-      /*
-    case SfxType.wa:
-    case SfxType.ka:
-    case SfxType.waka2:
-    case SfxType.buttonTap:
-      return 1.0;
-
-       */
   }
 }
 
@@ -83,14 +49,8 @@ enum SfxType {
   waka,
   startMusic,
   ghostsScared,
-  clearedBoard,
+  endMusic,
   eatGhost,
   pacmanDeath,
-  siren,
-  /*
-  waka2,
-  buttonTap,
-  wa,
-  ka,
-   */
+  ghostsRoamingSiren,
 }
