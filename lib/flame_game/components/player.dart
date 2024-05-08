@@ -11,9 +11,7 @@ import 'powerpoint.dart';
 import 'ball.dart';
 import 'dart:math';
 import 'dart:ui';
-import 'dart:ui' as ui;
 import 'dart:core';
-import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 
 /// The [RealCharacter] is the component that the physical player of the game is
@@ -95,7 +93,7 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
               [
                 kIsWeb
                     ? await game.loadSprite('dash/pacmanman.png')
-                    : Sprite(createPacmanStandard())
+                    : Sprite(pacmanStandardImage())
               ], //game.loadSprite('dash/pacmanman.png')],
               stepTime: double.infinity,
             ),
@@ -103,10 +101,10 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
               [
                 kIsWeb
                     ? await game.loadSprite('dash/pacmanman.png')
-                    : Sprite(createPacmanStandard()),
+                    : Sprite(pacmanStandardImage()),
                 kIsWeb
                     ? await game.loadSprite('dash/pacmanman_eat.png')
-                    : Sprite(createPacmanMouthClosed())
+                    : Sprite(pacmanMouthClosedImage())
               ], //game.loadSprite('dash/pacmanman.png')],
               stepTime: kPacmanHalfEatingResetTimeMillis / 1000,
             )
@@ -344,8 +342,6 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
     if (current == CharacterState.scaredIsh) {
       if (world.getNow() - ghostScaredTimeLatest > kGhostChaseTimeMillis) {
         current = CharacterState.normal;
-        //stopSpecificAudio(SfxType.ghostsScared);
-        //pauseSpecificAudio(SfxType.ghostsScared);
         game.audioController.pauseSfx(SfxType.ghostsScared);
       }
     }
@@ -382,16 +378,6 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
     }
   }
 
-  /*
-  double oldGetUpdatedAngle() {
-    return angle +
-        (world.worldAngle - _lastWorldAngle) +
-        (getUnderlyingBallPosition() - _lastUnderlyingPosition).length /
-            (size.x / 2) *
-            getRollSpinDirection(world, getUnderlyingBallVelocity(), world.gravity);
-  }
-   */
-
   void updateUnderlyingAngle() {
     underlyingAngle = underlyingAngle +
         (getUnderlyingBallPosition() - _lastUnderlyingPosition).length /
@@ -427,7 +413,6 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
       }
     }
     _lastUnderlyingPosition.setFrom(getUnderlyingBallPosition());
-    //_lastWorldAngle = world.worldAngle;
     _lastUnderlyingVelocity.setFrom(getUnderlyingBallVelocity());
   }
 
@@ -440,14 +425,8 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
     handleTwoCharactersMeet(other);
   }
 
-  final Paint _pacmanYellowPaint = Paint()
-    ..color = Colors.yellowAccent; //blue; //yellowAccent;
-  final Rect rectSingleSquare = Rect.fromCenter(
-      center: Offset(getSingleSquareWidth() / 2, getSingleSquareWidth() / 2),
-      width: getSingleSquareWidth(),
-      height: getSingleSquareWidth());
-  final Rect rect100 = Rect.fromCenter(
-      center: const Offset(100 / 2, 100 / 2), width: 100, height: 100);
+
+
 
   @override
   void render(Canvas canvas) {
@@ -459,27 +438,11 @@ class RealCharacter extends SpriteAnimationGroupComponent<CharacterState>
       tween = min(1, tween);
       double mouthWidth = 5 / 32 * (1 - tween) + 1 * tween;
       canvas.drawArc(rectSingleSquare, 2 * pi * ((mouthWidth / 2) + 0.5),
-          2 * pi * (1 - mouthWidth), true, _pacmanYellowPaint);
+          2 * pi * (1 - mouthWidth), true, pacmanYellowPaint);
     }
   }
 
-  ui.Image createPacmanStandard() {
-    final recorder = PictureRecorder();
-    final canvas = Canvas(recorder);
-    const mouthWidth = 5 / 32;
-    canvas.drawArc(rect100, 2 * pi * ((mouthWidth / 2) + 0.5),
-        2 * pi * (1 - mouthWidth), true, _pacmanYellowPaint);
-    return recorder.endRecording().toImageSync(100, 100);
-  }
 
-  ui.Image createPacmanMouthClosed() {
-    final recorder = PictureRecorder();
-    final canvas = Canvas(recorder);
-    const mouthWidth = 0;
-    canvas.drawArc(rect100, 2 * pi * ((mouthWidth / 2) + 0.5),
-        2 * pi * (1 - mouthWidth), true, _pacmanYellowPaint);
-    return recorder.endRecording().toImageSync(100, 100);
-  }
 }
 
 enum CharacterState { normal, scared, scaredIsh, eating, deadGhost, deadPacman }

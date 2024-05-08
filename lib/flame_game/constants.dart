@@ -2,10 +2,12 @@ import 'package:flutter/foundation.dart';
 import 'maze_layout.dart';
 import 'helper.dart';
 import 'package:flame/components.dart';
-
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'dart:core';
+import 'dart:ui' as ui;
+import 'dart:math';
+import 'dart:ui';
 
 const debugMode = false;
 const bool mazeOn = true;
@@ -63,3 +65,32 @@ final textRenderer = TextPaint(
 );
 
 const multiGhost = false;
+
+
+final Paint pacmanYellowPaint = Paint()
+  ..color = Colors.yellowAccent; //blue; //yellowAccent;
+final Rect rectSingleSquare = Rect.fromCenter(
+    center: Offset(getSingleSquareWidth() / 2, getSingleSquareWidth() / 2),
+    width: getSingleSquareWidth(),
+    height: getSingleSquareWidth());
+final Rect rect100 = Rect.fromCenter(
+    center: const Offset(100 / 2, 100 / 2), width: 100, height: 100);
+
+ui.Image pacmanStandardImage() {
+  final recorder = PictureRecorder();
+  final canvas = Canvas(recorder);
+  const mouthWidth = 5 / 32;
+  canvas.drawArc(rect100, 2 * pi * ((mouthWidth / 2) + 0.5),
+      2 * pi * (1 - mouthWidth), true, pacmanYellowPaint);
+  return recorder.endRecording().toImageSync(100, 100);
+}
+
+ui.Image pacmanMouthClosedImage() {
+  final recorder = PictureRecorder();
+  final canvas = Canvas(recorder);
+  const mouthWidth = 0;
+  canvas.drawArc(rect100, 2 * pi * ((mouthWidth / 2) + 0.5),
+      2 * pi * (1 - mouthWidth), true, pacmanYellowPaint);
+  return recorder.endRecording().toImageSync(100, 100);
+}
+

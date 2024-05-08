@@ -2,6 +2,7 @@ import 'components/maze.dart';
 import 'constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
+import 'dart:math';
 
 double getSingleSquareWidth() {
   return inGameVectorPixels / getMazeWidth() * gameScaleFactor;
@@ -89,4 +90,11 @@ int getRollSpinDirection(
   } else {
     return -1;
   }
+}
+
+double convertToSmallestDeltaAngle(double angleDelta) {
+  //avoid indicating  +2*pi-delta jump when go around the circle, instead give -delta
+  angleDelta = angleDelta + 2 * pi / 2;
+  angleDelta = angleDelta % (2 * pi);
+  return angleDelta - 2 * pi / 2;
 }

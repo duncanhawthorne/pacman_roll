@@ -21,16 +21,9 @@ import 'components/maze.dart';
 import 'components/maze_image.dart';
 import 'constants.dart';
 import 'helper.dart';
-
 import 'package:sensors_plus/sensors_plus.dart';
-
 import 'package:flutter/foundation.dart';
-
-//import '../audio/audio_controller.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
-//import 'package:audioplayers/audioplayers.dart';
-//import 'package:just_audio/just_audio.dart';
-//import 'package:just_audio/just_audio.dart' as justAudio;
 
 /// The world is where you place all the components that should live inside of
 /// the game, like the player, enemies, obstacles and points for example.
@@ -341,12 +334,7 @@ class EndlessWorld extends Forge2DWorld
     }
   }
 
-  double convertToSmallestDeltaAngle(double angleDelta) {
-    //avoid indicating  +2*pi-delta jump when go around the circle, instead give -delta
-    angleDelta = angleDelta + 2 * pi / 2;
-    angleDelta = angleDelta % (2 * pi);
-    return angleDelta - 2 * pi / 2;
-  }
+
 
   @override
   void onDragUpdate(DragUpdateEvent event) {
