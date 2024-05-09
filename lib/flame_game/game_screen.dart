@@ -40,12 +40,15 @@ class GameScreen extends StatelessWidget {
           backButtonKey: (BuildContext context, EndlessRunner game) {
             return Positioned(
               top: 20,
-              right: 10,
-              child: NesButton(
-                type: NesButtonType.normal,
-                onPressed: () =>
-                    {GoRouter.of(context).go("/"), gameRunning = false},
-                child: NesIcon(iconData: NesIcons.leftArrowIndicator),
+              left: 10,
+              child: Transform.scale(
+                scale: 0.6,
+                child: NesButton(
+                  type: NesButtonType.normal,
+                  onPressed: () =>
+                      {GoRouter.of(context).go("/"), gameRunning = false},
+                  child: NesIcon(iconData: NesIcons.leftArrowIndicator),
+                ),
               ),
             );
           },

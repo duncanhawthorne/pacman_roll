@@ -29,9 +29,12 @@ class MainMenuScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset(
-                'assets/images/dash/ghost1.png',
-                filterQuality: FilterQuality.none,
+              Transform.scale(
+                scale: 0.6,
+                child: Image.asset(
+                  'assets/images/dash/ghost1.png',
+                  filterQuality: FilterQuality.none,
+                ),
               ),
               _gap,
               Transform.rotate(
@@ -62,6 +65,11 @@ class MainMenuScreen extends StatelessWidget {
               },
               child: const Text('Play'),
             ),
+            _gap,
+            _gap,
+            _gap,
+            _gap,
+            _gap,
             _gap,
             /*
             WobblyButton(

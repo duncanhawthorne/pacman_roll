@@ -66,15 +66,13 @@ class EndlessWorld extends Forge2DWorld
 
   int levelCompletedIn = 0;
   int pelletsRemaining = 1;
-  Vector2 dragLastPosition = Vector2(0, 0);
-  Vector2 targetFromLastDrag = Vector2(-50, 0); //makes smooth start for drag
-  double dragLastAngle = 10;
-  double targetAngle = 2 * pi / 4;
+  Vector2 lastDragPosition = Vector2(0, 0);
+  double _lastDragAngle = 10;
+  double gravityTargetAngle = 2 * pi / 4;
   int now = DateTime.now().millisecondsSinceEpoch;
   int levelCompleteTimeMillis = 0;
   int lastNewGhostTimeMillis = 0;
   int lastSirenVolumeUpdateTimeMillis = 0;
-  //int lastWarmedUpAudio = 0;
 
   /// The random number generator that is used to spawn periodic components.
   final Random random;
@@ -98,6 +96,10 @@ class EndlessWorld extends Forge2DWorld
   }
 
   double getTargetSirenVolume() {
+    if (!isGameLive()) {
+      p("siren 0: game not live");
+      return 0;
+    }
     double tmpSirenVolume = 0;
     try {
       for (int i = 0; i < ghostPlayersList.length; i++) {
@@ -113,17 +115,13 @@ class EndlessWorld extends Forge2DWorld
       }
     } catch (e) {
       tmpSirenVolume = 0;
-      p([e, "tmpSirenVolume zero"]);
+      p([e, "tmpSirenVolume error"]);
     }
     tmpSirenVolume = tmpSirenVolume / 30;
     if (tmpSirenVolume < 0.05) {
       tmpSirenVolume = 0;
     }
     tmpSirenVolume = min(0.4, tmpSirenVolume);
-    if (!isGameLive()) {
-      tmpSirenVolume = 0;
-    }
-    //p(tmpSirenVolume);
     return tmpSirenVolume;
   }
 
@@ -168,7 +166,7 @@ class EndlessWorld extends Forge2DWorld
             Vector2(
                 getSingleSquareWidth() * number <= 2 ? (number - 1) : 0, 0));
     ghost.ghostNumberForSprite = number;
-    if (multiGhost && ghostPlayersList.isNotEmpty) {
+    if (multipleSpawningGhosts && ghostPlayersList.isNotEmpty) {
       //new ghosts are also scared
       ghost.ghostScaredTimeLatest = ghostPlayersList[0].ghostScaredTimeLatest;
       ghost.current = CharacterState
@@ -300,7 +298,7 @@ class EndlessWorld extends Forge2DWorld
   }
 
   void handleMultiGhost() {
-    if (multiGhost &&
+    if (multipleSpawningGhosts &&
         pelletsRemaining > 0 &&
         lastNewGhostTimeMillis != 0 &&
         now - lastNewGhostTimeMillis > 5000) {
@@ -324,11 +322,11 @@ class EndlessWorld extends Forge2DWorld
         : event.canvasPosition - game.canvasSize / 2;
     if (clickAndDrag) {
       if (iOS) {
-        dragLastPosition = Vector2(0, 0);
-        dragLastAngle = 10;
+        lastDragPosition = Vector2(0, 0);
+        _lastDragAngle = 10;
       } else {
-        dragLastPosition = Vector2(eventVector.x, eventVector.y);
-        dragLastAngle = atan2(eventVector.x, eventVector.y);
+        lastDragPosition = Vector2(eventVector.x, eventVector.y);
+        _lastDragAngle = atan2(eventVector.x, eventVector.y);
       }
     } else if (followCursor) {
       linearCursorMoveToGravity(Vector2(eventVector.x, eventVector.y));
@@ -346,16 +344,16 @@ class EndlessWorld extends Forge2DWorld
         : (event.canvasStartPosition - game.canvasSize / 2).length /
             (min(game.canvasSize.x, game.canvasSize.y) / 2);
     if (clickAndDrag) {
-      if (dragLastAngle != 10) {
+      if (_lastDragAngle != 10) {
         double spinMultiplier = 4 * min(1, eventVectorLengthProportion / 0.75);
         double currentAngleTmp = atan2(eventVector.x, eventVector.y);
         double angleDelta =
-            convertToSmallestDeltaAngle(currentAngleTmp - dragLastAngle);
-        targetAngle = targetAngle + angleDelta * spinMultiplier;
-        setGravity(Vector2(cos(targetAngle), sin(targetAngle)));
+            convertToSmallestDeltaAngle(currentAngleTmp - _lastDragAngle);
+        gravityTargetAngle = gravityTargetAngle + angleDelta * spinMultiplier;
+        setGravity(Vector2(cos(gravityTargetAngle), sin(gravityTargetAngle)));
       }
-      dragLastPosition = Vector2(eventVector.x, eventVector.y);
-      dragLastAngle = atan2(eventVector.x, eventVector.y);
+      lastDragPosition = Vector2(eventVector.x, eventVector.y);
+      _lastDragAngle = atan2(eventVector.x, eventVector.y);
     } else if (followCursor) {
       linearCursorMoveToGravity(Vector2(eventVector.x, eventVector.y));
     }
@@ -365,8 +363,8 @@ class EndlessWorld extends Forge2DWorld
   void onDragEnd(DragEndEvent event) {
     super.onDragEnd(event);
     if (clickAndDrag) {
-      dragLastPosition = Vector2(0, 0);
-      dragLastAngle = 10;
+      lastDragPosition = Vector2(0, 0);
+      _lastDragAngle = 10;
     }
   }
 

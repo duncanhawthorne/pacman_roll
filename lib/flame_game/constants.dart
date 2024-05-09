@@ -13,7 +13,7 @@ final bool iOS = defaultTargetPlatform == TargetPlatform.iOS;
 final bool windows = defaultTargetPlatform == TargetPlatform.windows;
 const bool web = kIsWeb;
 final flatMazeLayout = flatten(wrappedMazeLayout);
-const useForgeRotation = false;
+const useForgePhysicsBallRotation = false;
 const bool normaliseGravity = true; //android ? false : true;
 const bool screenRotates = true; //android ? false : true;
 const useGyro = !screenRotates;
@@ -40,7 +40,7 @@ bool gameRunning = false;
 
 const int kGhostResetTimeMillis = 1000;
 const int kGhostChaseTimeMillis = 6000;
-const int kPacmanDeadResetTimeMillis = 1000;
+const int kPacmanDeadResetTimeMillis = 1700;
 const int kPacmanHalfEatingResetTimeMillis = 180;
 
 bool globalPhysicsLinked = true;
@@ -49,5 +49,5 @@ const bool actuallyMoveSpritesToScreenPos = !rotateCamera;
 
 final bool sirenOn = iOS ? false : true;
 const bool pelletEatSoundOn = true; //iOS ? false : true;
-const multiplePacmans = false;
-const multiGhost = false;
+const multipleSpawningPacmans = false;
+const multipleSpawningGhosts = false;

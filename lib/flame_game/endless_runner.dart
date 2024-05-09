@@ -52,7 +52,7 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
 
   final scoreComponent = TextComponent(
     text: "Lives: 3",
-    position: Vector2.all(30),
+    position: Vector2(dx - 30 - 300, 30),
     textRenderer: textRenderer,
   );
 
@@ -73,11 +73,13 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
     }
     scoreComponent.text =
         'Lives: ${3 - world.scoreNotifier.value} \n\nTime: ${world.getLevelTime().toStringAsFixed(1)}';
+
     if (dxLast != dx || dyLast != dy) {
       camera.viewport = FixedResolutionViewport(resolution: Vector2(dx, dy));
       camera.viewport.add(scoreComponent);
       dxLast = dx;
       dyLast = dy;
+      scoreComponent.position = Vector2(dx - 30 - 350, 30);
     }
   }
 }

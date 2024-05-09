@@ -166,7 +166,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
       int j = origNumGhosts - 1 - i;
       if (j < 3) {
       } else {
-        assert(multiGhost);
+        assert(multipleSpawningGhosts);
         world.removeGhost(world.ghostPlayersList[j]);
       }
     }
@@ -183,7 +183,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
           world.ghostPlayersList[j].setUnderlyingBallPosition(
               kCageLocation + Vector2.random() / 100);
         } else {
-          assert(multiGhost);
+          assert(multipleSpawningGhosts);
           world.removeGhost(world.ghostPlayersList[j]);
         }
       }
@@ -234,10 +234,10 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     if (!this.isGhost && otherPlayer.isGhost) {
       if (otherPlayer.current == CharacterState.deadGhost) {
         //nothing, but need to keep if condition
-      }
-      if (otherPlayer.current == CharacterState.scared ||
+      } else if (otherPlayer.current == CharacterState.scared ||
           otherPlayer.current == CharacterState.scaredIsh) {
         //pacman eats ghost
+        p("pacman eats ghost");
 
         //pacman visuals
         world.play(SfxType.eatGhost);
@@ -245,25 +245,23 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
         playerEatingTimeLatest = world.now;
 
         //ghost impact
-        if (multiGhost) {
+        otherPlayer.current = CharacterState.deadGhost;
+        otherPlayer.ghostDeadTimeLatest = world.now;
+        otherPlayer.ghostDeadPosition = otherPlayer.getUnderlyingBallPosition();
+        if (multipleSpawningGhosts) {
           world.removeGhost(otherPlayer);
         } else {
-          otherPlayer.current = CharacterState.deadGhost;
-          otherPlayer.ghostDeadTimeLatest = world.now;
-          otherPlayer.ghostDeadPosition =
-              otherPlayer.getUnderlyingBallPosition();
-
           //Move ball way offscreen. Stops any physics interactions or collisions
           otherPlayer.setUnderlyingBallPosition(kOffScreenLocation +
               Vector2.random() /
                   100); //will get moved to right position later by other code in sequence checker
-          if (multiplePacmans) {
-            world.addPacman(
-                getUnderlyingBallPosition() + Vector2.random() / 100);
-          }
+        }
+        if (multipleSpawningPacmans) {
+          world.addPacman(getUnderlyingBallPosition() + Vector2.random() / 100);
         }
       } else {
         //ghost kills pacman
+        p("ghost kills pacman");
         if (globalPhysicsLinked) {
           //prevent multiple hits
 
@@ -273,32 +271,35 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
 
           if (world.pacmanPlayersList.length == 1) {
             globalPhysicsLinked = false;
+            Future.delayed(
+                const Duration(milliseconds: kPacmanDeadResetTimeMillis + 100),
+                () {
+              //100 buffer
+              if (!globalPhysicsLinked) {
+                //prevent multiple resets
+
+                world.addScore(); //score counting deaths
+                setUnderlyingBallPosition(kPacmanStartLocation);
+                trimToThreeGhosts();
+                for (var i = 0; i < world.ghostPlayersList.length; i++) {
+                  world.ghostPlayersList[i].setUnderlyingBallPosition(
+                      kGhostStartLocation + Vector2.random() / 100);
+                  world.ghostPlayersList[i].ghostDeadTimeLatest = 0;
+                  world.ghostPlayersList[i].ghostScaredTimeLatest = 0;
+                }
+                current = CharacterState.normal;
+                globalPhysicsLinked = true;
+              }
+            });
           } else {
             //setUnderlyingBallPosition(kPacmanStartLocation);
-            assert(multiplePacmans);
-            world.removePacman(this);
+            assert(multipleSpawningPacmans);
+            Future.delayed(
+                const Duration(milliseconds: kPacmanDeadResetTimeMillis),
+                () {
+              world.removePacman(this);
+            });
           }
-
-          Future.delayed(
-              const Duration(milliseconds: kPacmanDeadResetTimeMillis + 100),
-              () {
-            //100 buffer
-            if (!globalPhysicsLinked) {
-              //prevent multiple resets
-
-              world.addScore(); //score counting deaths
-              setUnderlyingBallPosition(kPacmanStartLocation);
-              trimToThreeGhosts();
-              for (var i = 0; i < world.ghostPlayersList.length; i++) {
-                world.ghostPlayersList[i].setUnderlyingBallPosition(
-                    kGhostStartLocation + Vector2.random() / 100);
-                world.ghostPlayersList[i].ghostDeadTimeLatest = 0;
-                world.ghostPlayersList[i].ghostScaredTimeLatest = 0;
-              }
-              current = CharacterState.normal;
-              globalPhysicsLinked = true;
-            }
-          });
         }
       }
     }
@@ -361,7 +362,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   }
 
   void updateUnderlyingAngle() {
-    if (useForgeRotation) {
+    if (useForgePhysicsBallRotation) {
       try {
         underlyingAngle = underlyingBallReal.angle;
       } catch (e) {
