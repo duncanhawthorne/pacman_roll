@@ -66,7 +66,8 @@ void addMazeWalls(world) {
         Vector2 bottomRight = Vector2(A + D, B + E);
         Vector2 bottomLeft = Vector2(A, B + E);
         Vector2 topLeft = Vector2(A, B);
-        double roundMazeCornersProportion = 0.2;
+        double x = 1 /( sqrt(2) +1);
+        double roundMazeCornersProportion = (1 - x)/2;
         Vector2 vertBit = Vector2(0, roundMazeCornersProportion * scale);
         Vector2 horiBit = Vector2(roundMazeCornersProportion * scale, 0);
 
