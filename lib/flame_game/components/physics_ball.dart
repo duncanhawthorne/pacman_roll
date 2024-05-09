@@ -1,5 +1,4 @@
 import 'package:flame_forge2d/flame_forge2d.dart';
-import 'package:flame/events.dart';
 import 'package:flutter/material.dart';
 import '../constants.dart';
 import 'game_character.dart';
