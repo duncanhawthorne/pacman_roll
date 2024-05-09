@@ -180,8 +180,7 @@ class EndlessWorld extends Forge2DWorld
   }
 
   void addPacman(Vector2 startPosition) {
-    Pacman tmpPlayer =
-        Pacman(startPosition: startPosition);
+    Pacman tmpPlayer = Pacman(startPosition: startPosition);
     add(tmpPlayer);
     pacmanPlayersList.add(tmpPlayer);
   }
@@ -227,9 +226,9 @@ class EndlessWorld extends Forge2DWorld
       }
       Future.delayed(
           const Duration(milliseconds: kPacmanHalfEatingResetTimeMillis * 2),
-              () {
-            world.play(SfxType.endMusic);
-          });
+          () {
+        world.play(SfxType.endMusic);
+      });
     }
   }
 
@@ -297,8 +296,6 @@ class EndlessWorld extends Forge2DWorld
             timeStarted.millisecondsSinceEpoch) /
         1000;
   }
-
-
 
   @override
   void onMount() {

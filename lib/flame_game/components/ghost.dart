@@ -25,38 +25,38 @@ class Ghost extends GameCharacter {
 
   Future<Map<CharacterState, SpriteAnimation>?> getAnimations() async {
     return {
-            CharacterState.normal: SpriteAnimation.spriteList(
-              [
-                await game.loadSprite(ghostNumberForSprite == 0
-                    ? 'dash/ghost1.png'
-                    : ghostNumberForSprite == 1
-                        ? 'dash/ghost2.png'
-                        : ghostNumberForSprite == 2
-                            ? 'dash/ghost3.png'
-                            : [
-                                'dash/ghost1.png',
-                                'dash/ghost2.png',
-                                'dash/ghost3.png'
-                              ][world.random.nextInt(3)])
-              ],
-              stepTime: double.infinity,
-            ),
-            CharacterState.scared: SpriteAnimation.spriteList(
-              [await game.loadSprite('dash/ghostscared1.png')],
-              stepTime: 0.1,
-            ),
-            CharacterState.scaredIsh: SpriteAnimation.spriteList(
-              [
-                await game.loadSprite('dash/ghostscared1.png'),
-                await game.loadSprite('dash/ghostscared2.png')
-              ],
-              stepTime: 0.1,
-            ),
-            CharacterState.deadGhost: SpriteAnimation.spriteList(
-              [await game.loadSprite('dash/eyes.png')],
-              stepTime: double.infinity,
-            ),
-          };
+      CharacterState.normal: SpriteAnimation.spriteList(
+        [
+          await game.loadSprite(ghostNumberForSprite == 0
+              ? 'dash/ghost1.png'
+              : ghostNumberForSprite == 1
+                  ? 'dash/ghost2.png'
+                  : ghostNumberForSprite == 2
+                      ? 'dash/ghost3.png'
+                      : [
+                          'dash/ghost1.png',
+                          'dash/ghost2.png',
+                          'dash/ghost3.png'
+                        ][world.random.nextInt(3)])
+        ],
+        stepTime: double.infinity,
+      ),
+      CharacterState.scared: SpriteAnimation.spriteList(
+        [await game.loadSprite('dash/ghostscared1.png')],
+        stepTime: 0.1,
+      ),
+      CharacterState.scaredIsh: SpriteAnimation.spriteList(
+        [
+          await game.loadSprite('dash/ghostscared1.png'),
+          await game.loadSprite('dash/ghostscared2.png')
+        ],
+        stepTime: 0.1,
+      ),
+      CharacterState.deadGhost: SpriteAnimation.spriteList(
+        [await game.loadSprite('dash/eyes.png')],
+        stepTime: double.infinity,
+      ),
+    };
   }
 
   void ghostDeadScaredScaredIshNormalSequence() {

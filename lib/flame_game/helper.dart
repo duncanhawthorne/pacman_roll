@@ -104,7 +104,6 @@ double convertToSmallestDeltaAngle(double angleDelta) {
   return angleDelta - 2 * pi / 2;
 }
 
-
 // With the `TextPaint` we define what properties the text that we are going
 // to render will have, like font family, size and color in this instance.
 final textRenderer = TextPaint(
@@ -114,7 +113,6 @@ final textRenderer = TextPaint(
     fontFamily: 'Press Start 2P',
   ),
 );
-
 
 final Paint pacmanYellowPaint = Paint()
   ..color = Colors.yellowAccent; //blue; //yellowAccent;
@@ -142,4 +140,3 @@ ui.Image pacmanMouthClosedImage() {
       2 * pi * (1 - mouthWidth), true, pacmanYellowPaint);
   return recorder.endRecording().toImageSync(100, 100);
 }
-

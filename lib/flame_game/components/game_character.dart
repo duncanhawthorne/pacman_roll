@@ -30,8 +30,6 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
       realCharacter: this,
       initialPosition: startingPosition); //to avoid null safety issues
 
-
-
   double underlyingAngle = 0;
   // Used to store the last position of the player, so that we later can
   // determine which direction that the player is moving.
@@ -143,7 +141,6 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     _lastUnderlyingPosition.setFrom(getUnderlyingBallPosition());
     _lastUnderlyingVelocity.setFrom(getUnderlyingBallVelocity());
   }
-
 }
 
 enum CharacterState { normal, scared, scaredIsh, eating, deadGhost, deadPacman }

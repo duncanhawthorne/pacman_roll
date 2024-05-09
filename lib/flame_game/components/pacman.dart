@@ -29,60 +29,58 @@ class Pacman extends GameCharacter {
 
   Future<Map<CharacterState, SpriteAnimation>?> getAnimations() async {
     return {
-            CharacterState.normal: SpriteAnimation.spriteList(
-              [
-                kIsWeb
-                    ? await game.loadSprite('dash/pacmanman.png')
-                    : Sprite(pacmanStandardImage())
-              ],
-              stepTime: double.infinity,
-            ),
-            CharacterState.eating: SpriteAnimation.spriteList(
-              [
-                kIsWeb
-                    ? await game.loadSprite('dash/pacmanman.png')
-                    : Sprite(pacmanStandardImage()),
-                kIsWeb
-                    ? await game.loadSprite('dash/pacmanman_eat.png')
-                    : Sprite(pacmanMouthClosedImage())
-              ],
-              stepTime: kPacmanHalfEatingResetTimeMillis / 1000,
-            )
-          };
+      CharacterState.normal: SpriteAnimation.spriteList(
+        [
+          kIsWeb
+              ? await game.loadSprite('dash/pacmanman.png')
+              : Sprite(pacmanStandardImage())
+        ],
+        stepTime: double.infinity,
+      ),
+      CharacterState.eating: SpriteAnimation.spriteList(
+        [
+          kIsWeb
+              ? await game.loadSprite('dash/pacmanman.png')
+              : Sprite(pacmanStandardImage()),
+          kIsWeb
+              ? await game.loadSprite('dash/pacmanman_eat.png')
+              : Sprite(pacmanMouthClosedImage())
+        ],
+        stepTime: kPacmanHalfEatingResetTimeMillis / 1000,
+      )
+    };
   }
 
   void handleTwoCharactersMeet(PositionComponent other) {
-    if (true) {
-      //only pacman
-      if (other is MiniPellet) {
-        if (pacmanEatingSoundTimeLatest <
-            world.now - kPacmanHalfEatingResetTimeMillis * 2) {
-          pacmanEatingSoundTimeLatest = world.now;
-          world.play(SfxType.waka);
-        }
+    if (other is MiniPellet || other is SuperPellet) {
+      handleEatingPellets(other);
+    } else if (other is Ghost) {
+      //belts and braces. Already handled by physics collisions in Ball //FIXME actually not now
+      handlePacmanMeetsGhost(other);
+    }
+  }
 
-        current = CharacterState.eating;
-        pacmanEatingTimeLatest = world.now;
-
-        other.removeFromParent();
-        world.pelletsRemaining -= 1;
-        world.endOfGameTestAndAct(world);
-      } else if (other is SuperPellet) {
-        world.play(SfxType.ghostsScared);
-        current = CharacterState.eating;
-        pacmanEatingTimeLatest = world.now;
-        for (int i = 0; i < world.ghostPlayersList.length; i++) {
-          world.ghostPlayersList[i].current = CharacterState.scared;
-          world.ghostPlayersList[i].ghostScaredTimeLatest = world.now;
-        }
-        other.removeFromParent();
-        world.pelletsRemaining -= 1;
-        world.endOfGameTestAndAct(world);
-      } else if (other is Ghost) {
-        //belts and braces. Already handled by physics collisions in Ball
-        handlePacmanMeetsGhost(other);
+  void handleEatingPellets(PositionComponent other) {
+    if (other is MiniPellet) {
+      if (pacmanEatingSoundTimeLatest <
+          world.now - kPacmanHalfEatingResetTimeMillis * 2) {
+        pacmanEatingSoundTimeLatest = world.now;
+        world.play(SfxType.waka);
+      }
+    } else {
+      world.play(SfxType.ghostsScared);
+    }
+    current = CharacterState.eating;
+    pacmanEatingTimeLatest = world.now;
+    if (other is SuperPellet) {
+      for (int i = 0; i < world.ghostPlayersList.length; i++) {
+        world.ghostPlayersList[i].current = CharacterState.scared;
+        world.ghostPlayersList[i].ghostScaredTimeLatest = world.now;
       }
     }
+    other.removeFromParent();
+    world.pelletsRemaining -= 1;
+    world.endOfGameTestAndAct(world);
   }
 
   void handlePacmanMeetsGhost(Ghost otherPlayer) {
@@ -194,7 +192,6 @@ class Pacman extends GameCharacter {
   @override
   void update(double dt) {
     pacmanEatingNormalSequence();
-
 
     if (globalPhysicsLinked) {
       oneFrameOfPhysics();
