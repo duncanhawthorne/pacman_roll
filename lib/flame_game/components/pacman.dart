@@ -60,6 +60,17 @@ class Pacman extends GameCharacter {
     }
   }
 
+  void handlePacmanMeetsGhost(Ghost ghost) {
+    if (ghost.current == CharacterState.deadGhost) {
+      //nothing, but need to keep if condition
+    } else if (ghost.current == CharacterState.scared ||
+        ghost.current == CharacterState.scaredIsh) {
+      pacmanEatsGhost(ghost);
+    } else {
+      ghostKillsPacman();
+    }
+  }
+
   void handleEatingPellets(PositionComponent other) {
     if (other is MiniPellet) {
       if (pacmanEatingSoundTimeLatest <
@@ -69,91 +80,80 @@ class Pacman extends GameCharacter {
       }
     } else {
       world.play(SfxType.ghostsScared);
-    }
-    current = CharacterState.eating;
-    pacmanEatingTimeLatest = world.now;
-    if (other is SuperPellet) {
       for (int i = 0; i < world.ghostPlayersList.length; i++) {
         world.ghostPlayersList[i].current = CharacterState.scared;
         world.ghostPlayersList[i].ghostScaredTimeLatest = world.now;
       }
     }
+    current = CharacterState.eating;
+    pacmanEatingTimeLatest = world.now;
     other.removeFromParent();
     world.pelletsRemaining -= 1;
     world.endOfGameTestAndAct(world);
   }
 
-  void handlePacmanMeetsGhost(Ghost otherPlayer) {
-    // ignore: unnecessary_this
-    if (true) {
-      if (otherPlayer.current == CharacterState.deadGhost) {
-        //nothing, but need to keep if condition
-      } else if (otherPlayer.current == CharacterState.scared ||
-          otherPlayer.current == CharacterState.scaredIsh) {
-        //pacman eats ghost
-        p("pacman eats ghost");
+  void pacmanEatsGhost(Ghost ghost) {
+    p("pacman eats ghost");
 
-        //pacman visuals
-        world.play(SfxType.eatGhost);
-        current = CharacterState.eating;
-        pacmanEatingTimeLatest = world.now;
+    //pacman visuals
+    world.play(SfxType.eatGhost);
+    current = CharacterState.eating;
+    pacmanEatingTimeLatest = world.now;
 
-        //ghost impact
-        otherPlayer.current = CharacterState.deadGhost;
-        otherPlayer.ghostDeadTimeLatest = world.now;
-        otherPlayer.ghostDeadPosition = otherPlayer.getUnderlyingBallPosition();
-        if (multipleSpawningGhosts) {
-          world.removeGhost(otherPlayer);
-        } else {
-          //Move ball way offscreen. Stops any physics interactions or collisions
-          otherPlayer.setUnderlyingBallPosition(kOffScreenLocation +
-              Vector2.random() /
-                  100); //will get moved to right position later by other code in sequence checker
-        }
-        if (multipleSpawningPacmans) {
-          world.addPacman(getUnderlyingBallPosition() + Vector2.random() / 100);
-        }
-      } else {
-        //ghost kills pacman
-        p("ghost kills pacman");
-        if (globalPhysicsLinked) {
-          //prevent multiple hits
+    //ghost impact
+    ghost.current = CharacterState.deadGhost;
+    ghost.ghostDeadTimeLatest = world.now;
+    ghost.ghostDeadPosition = ghost.getUnderlyingBallPosition();
+    if (multipleSpawningGhosts) {
+      world.removeGhost(ghost);
+    } else {
+      //Move ball way offscreen. Stops any physics interactions or collisions
+      ghost.setUnderlyingBallPosition(kOffScreenLocation +
+          Vector2.random() /
+              100); //will get moved to right position later by other code in sequence checker
+    }
+    if (multipleSpawningPacmans) {
+      world.addPacman(getUnderlyingBallPosition() + Vector2.random() / 100);
+    }
+  }
 
-          world.play(SfxType.pacmanDeath);
-          pacmanDeadTimeLatest = world.now;
-          current = CharacterState.deadPacman;
+  void ghostKillsPacman() {
+    p("ghost kills pacman");
+    if (globalPhysicsLinked) {
+      //prevent multiple hits
 
-          if (world.pacmanPlayersList.length == 1) {
-            globalPhysicsLinked = false;
-            Future.delayed(
-                const Duration(milliseconds: kPacmanDeadResetTimeMillis + 100),
-                () {
-              //100 buffer
-              if (!globalPhysicsLinked) {
-                //prevent multiple resets
+      world.play(SfxType.pacmanDeath);
+      pacmanDeadTimeLatest = world.now;
+      current = CharacterState.deadPacman;
 
-                world.addScore(); //score counting deaths
-                setUnderlyingBallPosition(kPacmanStartLocation);
-                world.trimToThreeGhosts();
-                for (var i = 0; i < world.ghostPlayersList.length; i++) {
-                  world.ghostPlayersList[i].setUnderlyingBallPosition(
-                      kGhostStartLocation + Vector2.random() / 100);
-                  world.ghostPlayersList[i].ghostDeadTimeLatest = 0;
-                  world.ghostPlayersList[i].ghostScaredTimeLatest = 0;
-                }
-                current = CharacterState.normal;
-                globalPhysicsLinked = true;
-              }
-            });
-          } else {
-            //setUnderlyingBallPosition(kPacmanStartLocation);
-            assert(multipleSpawningPacmans);
-            Future.delayed(
-                const Duration(milliseconds: kPacmanDeadResetTimeMillis), () {
-              world.removePacman(this);
-            });
+      if (world.pacmanPlayersList.length == 1) {
+        globalPhysicsLinked = false;
+        Future.delayed(
+            const Duration(milliseconds: kPacmanDeadResetTimeMillis + 100), () {
+          //100 buffer
+          if (!globalPhysicsLinked) {
+            //prevent multiple resets
+
+            world.addScore(); //score counting deaths
+            setUnderlyingBallPosition(kPacmanStartLocation);
+            world.trimToThreeGhosts();
+            for (var i = 0; i < world.ghostPlayersList.length; i++) {
+              world.ghostPlayersList[i].setUnderlyingBallPosition(
+                  kGhostStartLocation + Vector2.random() / 100);
+              world.ghostPlayersList[i].ghostDeadTimeLatest = 0;
+              world.ghostPlayersList[i].ghostScaredTimeLatest = 0;
+            }
+            current = CharacterState.normal;
+            globalPhysicsLinked = true;
           }
-        }
+        });
+      } else {
+        //setUnderlyingBallPosition(kPacmanStartLocation);
+        assert(multipleSpawningPacmans);
+        Future.delayed(const Duration(milliseconds: kPacmanDeadResetTimeMillis),
+            () {
+          world.removePacman(this);
+        });
       }
     }
   }

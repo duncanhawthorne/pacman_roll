@@ -35,7 +35,6 @@ int getRollSpinDirection(
     Forge2DWorld world, Vector2 vel, Vector2 gravityWeCareAbout) {
   double velx = vel.x;
   double vely = vel.y;
-  //FIXME probably can be dramatically simplified
 
   WallLocation onWall = WallLocation.bottom;
   bool clockwise = true;

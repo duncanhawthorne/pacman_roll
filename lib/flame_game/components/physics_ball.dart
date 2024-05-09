@@ -58,7 +58,7 @@ class PhysicsBall extends BodyComponent with TapCallbacks, ContactCallbacks {
   void beginContact(Object other, Contact contact) {
     super.beginContact(other, contact);
 
-    //FIXME undisable this
+    //FIXME un-disable this
 
     /*
     if (other is PhysicsBall && other.realCharacter != null) {
