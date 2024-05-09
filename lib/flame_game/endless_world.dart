@@ -19,6 +19,8 @@ import 'endless_runner.dart';
 import 'components/game_character.dart';
 import 'components/maze_walls.dart';
 import 'components/maze_image.dart';
+import 'components/pacman.dart';
+import 'components/ghost.dart';
 import 'constants.dart';
 import 'helper.dart';
 import 'package:sensors_plus/sensors_plus.dart';
@@ -83,16 +85,17 @@ class EndlessWorld extends Forge2DWorld
   double worldCos = 1;
   double worldSin = 0;
 
-  List<GameCharacter> ghostPlayersList = [];
-  List<GameCharacter> pacmanPlayersList = [];
+  List<Ghost> ghostPlayersList = [];
+  List<Pacman> pacmanPlayersList = [];
 
   bool isGameLive() {
     return gameRunning && !game.paused && game.isLoaded && game.isMounted;
   }
 
   void play(SfxType type) {
-    game.audioController.playSfx(type);
-    return;
+    if (soundOn) {
+      game.audioController.playSfx(type);
+    }
   }
 
   double getTargetSirenVolume() {
@@ -160,9 +163,8 @@ class EndlessWorld extends Forge2DWorld
   }
 
   void addGhost(int number) {
-    GameCharacter ghost = GameCharacter(
-        isGhost: true,
-        startingPosition: kGhostStartLocation +
+    Ghost ghost = Ghost(
+        startPosition: kGhostStartLocation +
             Vector2(
                 getSingleSquareWidth() * number <= 2 ? (number - 1) : 0, 0));
     ghost.ghostNumberForSprite = number;
@@ -178,22 +180,57 @@ class EndlessWorld extends Forge2DWorld
   }
 
   void addPacman(Vector2 startPosition) {
-    GameCharacter tmpPlayer =
-        GameCharacter(isGhost: false, startingPosition: startPosition);
+    Pacman tmpPlayer =
+        Pacman(startPosition: startPosition);
     add(tmpPlayer);
     pacmanPlayersList.add(tmpPlayer);
   }
 
-  void removePacman(GameCharacter pacman) {
+  void removePacman(Pacman pacman) {
     remove(pacman.underlyingBallReal);
     remove(pacman);
     pacmanPlayersList.remove(pacman);
   }
 
-  void removeGhost(GameCharacter ghost) {
+  void removeGhost(Ghost ghost) {
     remove(ghost.underlyingBallReal);
     remove(ghost);
     ghostPlayersList.remove(ghost);
+  }
+
+  void trimToThreeGhosts() {
+    int origNumGhosts = ghostPlayersList.length;
+    for (int i = 0; i < origNumGhosts; i++) {
+      int j = origNumGhosts - 1 - i;
+      if (j < 3) {
+      } else {
+        assert(multipleSpawningGhosts);
+        removeGhost(ghostPlayersList[j]);
+      }
+    }
+  }
+
+  void endOfGameTestAndAct(world) {
+    if (world.pelletsRemaining == 0) {
+      world.levelCompleteTimeMillis = world.now;
+      int origNumGhosts = world.ghostPlayersList.length;
+      for (int i = 0; i < origNumGhosts; i++) {
+        int j = origNumGhosts - 1 - i;
+        world.ghostPlayersList[j].ghostScaredTimeLatest = 0;
+        if (j < 3) {
+          world.ghostPlayersList[j].setUnderlyingBallPosition(
+              kCageLocation + Vector2.random() / 100);
+        } else {
+          assert(multipleSpawningGhosts);
+          world.removeGhost(world.ghostPlayersList[j]);
+        }
+      }
+      Future.delayed(
+          const Duration(milliseconds: kPacmanHalfEatingResetTimeMillis * 2),
+              () {
+            world.play(SfxType.endMusic);
+          });
+    }
   }
 
   @override
@@ -260,6 +297,8 @@ class EndlessWorld extends Forge2DWorld
             timeStarted.millisecondsSinceEpoch) /
         1000;
   }
+
+
 
   @override
   void onMount() {

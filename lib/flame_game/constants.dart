@@ -47,6 +47,7 @@ bool globalPhysicsLinked = true;
 const bool rotateCamera = true;
 const bool actuallyMoveSpritesToScreenPos = !rotateCamera;
 
+const soundOn = false;
 final bool sirenOn = iOS ? false : true;
 const bool pelletEatSoundOn = true; //iOS ? false : true;
 const multipleSpawningPacmans = false;

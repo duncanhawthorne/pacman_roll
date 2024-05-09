@@ -54,15 +54,22 @@ class PhysicsBall extends BodyComponent with TapCallbacks, ContactCallbacks {
    */
 
   @override
+  // ignore: unnecessary_overrides
   void beginContact(Object other, Contact contact) {
     super.beginContact(other, contact);
 
+    //FIXME undisable this
+
+    /*
     if (other is PhysicsBall && other.realCharacter != null) {
       if (other.realCharacter != null && realCharacter != null) {
-        realCharacter!.handlePacmanMeetsGhost(other.realCharacter!);
+        if (realCharacter is PM) {
+          realCharacter!.handlePacmanMeetsGhost(other.realCharacter!);
+        }
       } else {
         p("shouldn't have got here");
       }
     }
+    */
   }
 }
