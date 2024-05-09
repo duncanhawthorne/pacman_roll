@@ -15,13 +15,13 @@ import 'package:flutter/foundation.dart';
 
 /// The [GameCharacter] is the component that the physical player of the game is
 /// controlling.
-class Pacman extends GameCharacter {
+class Pacman extends GameCharacter with CollisionCallbacks {
   Pacman({
-    required this.startPosition,
-    super.position,
-  }) : super(startingPosition: startPosition);
+    //required this.startPosition,
+    required super.position,
+  }) : super();
 
-  final Vector2 startPosition;
+  //final Vector2 startPosition;
 
   int pacmanDeadTimeLatest = 0; //a long time ago
   int pacmanEatingTimeLatest = 0; //a long time ago
@@ -179,8 +179,7 @@ class Pacman extends GameCharacter {
   @override
   Future<void> onLoad() async {
     animations = await getAnimations();
-    setUnderlyingBallPosition(
-        startingPosition); //FIXME shouldn't be necessary, but avoids one frame starting glitch
+    setUnderlyingBallPosition(position); //FIXME shouldn't be necessary, but avoids one frame starting glitch
     current = CharacterState.normal;
 
     // When adding a CircleHitbox without any arguments it automatically

@@ -70,12 +70,15 @@ void addMazeWalls(world) {
         Vector2 vertBit = Vector2(0, roundMazeCornersProportion * scale);
         Vector2 horiBit = Vector2(roundMazeCornersProportion * scale, 0);
 
+
         if (flatMazeLayout[k] == 1) {
           world.add(Wall(topRight - horiBit, topRight + vertBit));
           world.add(Wall(topLeft + horiBit, topLeft + vertBit));
           world.add(Wall(bottomLeft + horiBit, bottomLeft - vertBit));
           world.add(Wall(bottomRight - horiBit, bottomRight - vertBit));
         }
+
+
 
         if (wallNeededBetween(k, k + 1)) {
           //wall on right

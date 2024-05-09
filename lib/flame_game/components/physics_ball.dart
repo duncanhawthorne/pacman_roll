@@ -5,7 +5,7 @@ import '../constants.dart';
 import 'game_character.dart';
 import '../helper.dart';
 
-class PhysicsBall extends BodyComponent with TapCallbacks, ContactCallbacks {
+class PhysicsBall extends BodyComponent { //with TapCallbacks, ContactCallbacks
   PhysicsBall(
       {Vector2? initialPosition,
       required GameCharacter realCharacter,
@@ -53,6 +53,7 @@ class PhysicsBall extends BodyComponent with TapCallbacks, ContactCallbacks {
 
    */
 
+  /*
   @override
   // ignore: unnecessary_overrides
   void beginContact(Object other, Contact contact) {
@@ -72,4 +73,5 @@ class PhysicsBall extends BodyComponent with TapCallbacks, ContactCallbacks {
     }
     */
   }
+  */
 }

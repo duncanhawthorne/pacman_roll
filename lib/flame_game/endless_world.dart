@@ -164,7 +164,7 @@ class EndlessWorld extends Forge2DWorld
 
   void addGhost(int number) {
     Ghost ghost = Ghost(
-        startPosition: kGhostStartLocation +
+        position: kGhostStartLocation +
             Vector2(
                 getSingleSquareWidth() * number <= 2 ? (number - 1) : 0, 0));
     ghost.ghostNumberForSprite = number;
@@ -180,7 +180,7 @@ class EndlessWorld extends Forge2DWorld
   }
 
   void addPacman(Vector2 startPosition) {
-    Pacman tmpPlayer = Pacman(startPosition: startPosition);
+    Pacman tmpPlayer = Pacman(position: startPosition);
     add(tmpPlayer);
     pacmanPlayersList.add(tmpPlayer);
   }
@@ -212,9 +212,9 @@ class EndlessWorld extends Forge2DWorld
   void endOfGameTestAndAct(world) {
     if (world.pelletsRemaining == 0) {
       world.levelCompleteTimeMillis = world.now;
-      int origNumGhosts = world.ghostPlayersList.length;
-      for (int i = 0; i < origNumGhosts; i++) {
-        int j = origNumGhosts - 1 - i;
+      int tmpOrigNumGhosts = world.ghostPlayersList.length;
+      for (int i = 0; i < tmpOrigNumGhosts; i++) {
+        int j = tmpOrigNumGhosts - 1 - i;
         world.ghostPlayersList[j].ghostScaredTimeLatest = 0;
         if (j < 3) {
           world.ghostPlayersList[j].setUnderlyingBallPosition(

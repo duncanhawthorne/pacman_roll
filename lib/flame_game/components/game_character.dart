@@ -12,11 +12,10 @@ import 'dart:core';
 /// controlling.
 class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     with
-        CollisionCallbacks,
+        //CollisionCallbacks,
         HasWorldReference<EndlessWorld>,
         HasGameReference<EndlessRunner> {
   GameCharacter({
-    required this.startingPosition,
     super.position,
   }) : super(
             size: Vector2.all(getSingleSquareWidth()),
@@ -25,10 +24,10 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
 
   int ghostNumberForSprite = 1;
 
-  final Vector2 startingPosition;
+  //final Vector2 startingPosition;
   late PhysicsBall underlyingBallReal = PhysicsBall(
       realCharacter: this,
-      initialPosition: startingPosition); //to avoid null safety issues
+      initialPosition: position); //to avoid null safety issues
 
   double underlyingAngle = 0;
   // Used to store the last position of the player, so that we later can
@@ -129,8 +128,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
 
   @override
   Future<void> onLoad() async {
-    setUnderlyingBallPosition(
-        startingPosition); //FIXME shouldn't be necessary, but avoids one frame starting glitch
+    setUnderlyingBallPosition(position); //FIXME shouldn't be necessary, but avoids one frame starting glitch
     _lastUnderlyingPosition.setFrom(getUnderlyingBallPosition());
   }
 

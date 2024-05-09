@@ -13,11 +13,8 @@ import 'dart:core';
 /// controlling.
 class Ghost extends GameCharacter {
   Ghost({
-    required this.startPosition,
-    super.position,
-  }) : super(startingPosition: startPosition);
-
-  final Vector2 startPosition;
+    required super.position,
+  }) : super();
 
   int ghostScaredTimeLatest = 0; //a long time ago
   int ghostDeadTimeLatest = 0; //a long time ago
@@ -95,8 +92,7 @@ class Ghost extends GameCharacter {
   @override
   Future<void> onLoad() async {
     animations = await getAnimations();
-    setUnderlyingBallPosition(
-        startingPosition); //FIXME shouldn't be necessary, but avoids one frame starting glitch
+    setUnderlyingBallPosition(position); //FIXME shouldn't be necessary, but avoids one frame starting glitch
     current = CharacterState.deadGhost;
 
     // When adding a CircleHitbox without any arguments it automatically
