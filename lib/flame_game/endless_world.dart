@@ -166,7 +166,10 @@ class EndlessWorld extends Forge2DWorld
     Ghost ghost = Ghost(
         position: kGhostStartLocation +
             Vector2(
-                getSingleSquareWidth() * ghostSpriteChooserNumber <= 2 ? (ghostSpriteChooserNumber - 1) : 0, 0));
+                getSingleSquareWidth() * ghostSpriteChooserNumber <= 2
+                    ? (ghostSpriteChooserNumber - 1)
+                    : 0,
+                0));
     ghost.ghostSpriteChooserNumber = ghostSpriteChooserNumber;
     if (multipleSpawningGhosts && ghostPlayersList.isNotEmpty) {
       //new ghosts are also scared
@@ -204,6 +207,7 @@ class EndlessWorld extends Forge2DWorld
       if (j < 3) {
       } else {
         assert(multipleSpawningGhosts);
+        ghostPlayersList[j].ghostScaredTimeLatest = 0;
         removeGhost(ghostPlayersList[j]);
       }
     }
@@ -212,17 +216,10 @@ class EndlessWorld extends Forge2DWorld
   void endOfGameTestAndAct(world) {
     if (world.pelletsRemaining == 0) {
       world.levelCompleteTimeMillis = world.now;
-      int tmpOrigNumGhosts = world.ghostPlayersList.length;
-      for (int i = 0; i < tmpOrigNumGhosts; i++) {
-        int j = tmpOrigNumGhosts - 1 - i;
-        world.ghostPlayersList[j].ghostScaredTimeLatest = 0;
-        if (j < 3) {
-          world.ghostPlayersList[j].setUnderlyingBallPosition(
-              kCageLocation + Vector2.random() / 100);
-        } else {
-          assert(multipleSpawningGhosts);
-          world.removeGhost(world.ghostPlayersList[j]);
-        }
+      trimToThreeGhosts();
+      for (int i = 0; i < world.ghostPlayersList.length; i++) {
+        world.ghostPlayersList[i]
+            .setUnderlyingBallPosition(kCageLocation + Vector2.random() / 100);
       }
       Future.delayed(
           const Duration(milliseconds: kPacmanHalfEatingResetTimeMillis * 2),
