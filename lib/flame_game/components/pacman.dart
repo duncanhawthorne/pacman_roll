@@ -71,8 +71,8 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     }
   }
 
-  void handleEatingPellets(PositionComponent other) {
-    if (other is MiniPellet) {
+  void handleEatingPellets(PositionComponent pellet) {
+    if (pellet is MiniPellet) {
       if (pacmanEatingSoundTimeLatest <
           world.now - kPacmanHalfEatingResetTimeMillis * 2) {
         pacmanEatingSoundTimeLatest = world.now;
@@ -87,7 +87,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     }
     current = CharacterState.eating;
     pacmanEatingTimeLatest = world.now;
-    other.removeFromParent();
+    pellet.removeFromParent();
     world.pelletsRemaining -= 1;
     world.endOfGameTestAndAct(world);
   }
@@ -103,7 +103,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     //ghost impact
     ghost.current = CharacterState.deadGhost;
     ghost.ghostDeadTimeLatest = world.now;
-    ghost.ghostDeadPosition = ghost.getUnderlyingBallPosition();
+    ghost.ghostDeadPositionLatest = ghost.getUnderlyingBallPosition();
     if (multipleSpawningGhosts) {
       world.removeGhost(ghost);
     } else {
@@ -203,10 +203,10 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   void render(Canvas canvas) {
     super.render(canvas);
     if (current == CharacterState.deadPacman) {
-      double tween = 0;
-      tween = (world.now - pacmanDeadTimeLatest) / kPacmanDeadResetTimeMillis;
+      assert(world.now >= pacmanDeadTimeLatest);
+      double tween = (world.now - pacmanDeadTimeLatest) / kPacmanDeadResetTimeMillis;
       tween = min(1, tween);
-      double mouthWidth = 5 / 32 * (1 - tween) + 1 * tween;
+      double mouthWidth = pacmanMouthWidthDefault * (1 - tween) + 1 * tween;
       canvas.drawArc(rectSingleSquare, 2 * pi * ((mouthWidth / 2) + 0.5),
           2 * pi * (1 - mouthWidth), true, pacmanYellowPaint);
     }

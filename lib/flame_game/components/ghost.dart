@@ -18,17 +18,18 @@ class Ghost extends GameCharacter {
 
   int ghostScaredTimeLatest = 0; //a long time ago
   int ghostDeadTimeLatest = 0; //a long time ago
-  Vector2 ghostDeadPosition = Vector2(0, 0);
+  Vector2 ghostDeadPositionLatest = Vector2(0, 0);
+  int ghostSpriteChooserNumber = 100;
 
   Future<Map<CharacterState, SpriteAnimation>?> getAnimations() async {
     return {
       CharacterState.normal: SpriteAnimation.spriteList(
         [
-          await game.loadSprite(ghostNumberForSprite == 0
+          await game.loadSprite(ghostSpriteChooserNumber == 0
               ? 'dash/ghost1.png'
-              : ghostNumberForSprite == 1
+              : ghostSpriteChooserNumber == 1
                   ? 'dash/ghost2.png'
-                  : ghostNumberForSprite == 2
+                  : ghostSpriteChooserNumber == 2
                       ? 'dash/ghost3.png'
                       : [
                           'dash/ghost1.png',
@@ -40,7 +41,7 @@ class Ghost extends GameCharacter {
       ),
       CharacterState.scared: SpriteAnimation.spriteList(
         [await game.loadSprite('dash/ghostscared1.png')],
-        stepTime: 0.1,
+        stepTime: double.infinity,
       ),
       CharacterState.scaredIsh: SpriteAnimation.spriteList(
         [
@@ -81,12 +82,13 @@ class Ghost extends GameCharacter {
   }
 
   Vector2 getFlyingDeadGhostPosition() {
+    assert(world.now >= ghostDeadTimeLatest);
     double timefrac =
         (world.now - ghostDeadTimeLatest) / (kGhostResetTimeMillis);
     timefrac = min(1, timefrac);
 
     return world.screenPos(
-        ghostDeadPosition * (1 - timefrac) + kGhostStartLocation * (timefrac));
+        ghostDeadPositionLatest * (1 - timefrac) + kGhostStartLocation * (timefrac));
   }
 
   @override

@@ -21,14 +21,14 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
             anchor: Anchor.center,
             priority: 1);
 
-  int ghostNumberForSprite = 1;
+
 
   //final Vector2 startingPosition;
   late PhysicsBall underlyingBallReal = PhysicsBall(
       realCharacter: this,
       initialPosition: position); //to avoid null safety issues
 
-  double underlyingAngle = 0;
+  double _absoluteAngle = 0;
   // Used to store the last position of the player, so that we later can
   // determine which direction that the player is moving.
   // ignore: prefer_final_fields
@@ -85,7 +85,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     }
   }
 
-  void moveUnderlyingBallThroughPipe() {
+  void moveUnderlyingBallThroughPipePortal() {
     if (!debugMode) {
       if (getUnderlyingBallPosition().x > 10 * getSingleSquareWidth()) {
         setUnderlyingBallPosition(kLeftPortalLocation);
@@ -100,27 +100,27 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   void updateUnderlyingAngle() {
     if (useForgePhysicsBallRotation) {
       try {
-        underlyingAngle = underlyingBallReal.angle;
+        _absoluteAngle = underlyingBallReal.angle;
       } catch (e) {
         //FIXME body not initialised. Shouldn't need this, hid error
       }
     } else {
-      underlyingAngle = underlyingAngle +
+      _absoluteAngle = _absoluteAngle +
           (getUnderlyingBallPosition() - _lastUnderlyingPosition).length /
               (size.x / 2) *
               getRollSpinDirection(
-                  world, getUnderlyingBallVelocity(), world.gravity);
+                  getUnderlyingBallVelocity(), world.gravity);
     }
   }
 
   double getUpdatedAngle() {
     updateUnderlyingAngle();
-    return underlyingAngle +
+    return _absoluteAngle +
         (actuallyMoveSpritesToScreenPos ? world.worldAngle : 0);
   }
 
   void oneFrameOfPhysics() {
-    moveUnderlyingBallThroughPipe();
+    moveUnderlyingBallThroughPipePortal();
     position = world.screenPos(getUnderlyingBallPosition());
     angle = getUpdatedAngle();
   }

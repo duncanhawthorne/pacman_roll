@@ -77,9 +77,9 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
     if (dxLast != dx || dyLast != dy) {
       camera.viewport = FixedResolutionViewport(resolution: Vector2(dx, dy));
       camera.viewport.add(scoreComponent);
+      scoreComponent.position = Vector2(dx - 30 - 350, 30);
       dxLast = dx;
       dyLast = dy;
-      scoreComponent.position = Vector2(dx - 30 - 350, 30);
     }
   }
 }

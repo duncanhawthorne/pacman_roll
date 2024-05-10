@@ -1,7 +1,6 @@
 import 'components/maze_walls.dart';
 import 'constants.dart';
 import 'package:flutter/material.dart';
-import 'package:flame_forge2d/flame_forge2d.dart';
 import 'dart:math';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
@@ -31,26 +30,21 @@ int getStartingNumberPelletsAndSuperPellets(List mazeLayout) {
 
 enum WallLocation { bottom, top, left, right }
 
-int getRollSpinDirection(
-    Forge2DWorld world, Vector2 vel, Vector2 gravityWeCareAbout) {
-  double velx = vel.x;
-  double vely = vel.y;
-
+int getRollSpinDirection(Vector2 vel, Vector2 gravity) {
   WallLocation onWall = WallLocation.bottom;
   bool clockwise = true;
-  //Vector2 gravityWeCareAbout = globalGravity; //world.gravity;
   double small = 4;
 
-  if (velx.abs() > small) {
+  if (vel.x.abs() > small) {
     //moving left or right
-    if (gravityWeCareAbout.y > 0) {
+    if (gravity.y > 0) {
       onWall = WallLocation.bottom;
     } else {
       onWall = WallLocation.top;
     }
-  } else if (vely.abs() > small) {
+  } else if (vel.y.abs() > small) {
     //moving up or down
-    if (gravityWeCareAbout.x > 0) {
+    if (gravity.x > 0) {
       onWall = WallLocation.right;
     } else {
       onWall = WallLocation.left;
@@ -58,7 +52,7 @@ int getRollSpinDirection(
   }
 
   if (onWall == WallLocation.bottom) {
-    if ((velx) > 0) {
+    if ((vel.x) > 0) {
       clockwise = true;
     } else {
       clockwise = false;
@@ -66,7 +60,7 @@ int getRollSpinDirection(
   }
 
   if (onWall == WallLocation.top) {
-    if ((velx) > 0) {
+    if ((vel.x) > 0) {
       clockwise = false;
     } else {
       clockwise = true;
@@ -74,7 +68,7 @@ int getRollSpinDirection(
   }
 
   if (onWall == WallLocation.left) {
-    if ((vely) > 0) {
+    if ((vel.y) > 0) {
       clockwise = true;
     } else {
       clockwise = false;
@@ -82,7 +76,7 @@ int getRollSpinDirection(
   }
 
   if (onWall == WallLocation.right) {
-    if ((vely) > 0) {
+    if ((vel.y) > 0) {
       clockwise = false;
     } else {
       clockwise = true;
@@ -125,7 +119,7 @@ final Rect rect100 = Rect.fromCenter(
 ui.Image pacmanStandardImage() {
   final recorder = PictureRecorder();
   final canvas = Canvas(recorder);
-  const mouthWidth = 5 / 32;
+  const mouthWidth = pacmanMouthWidthDefault;
   canvas.drawArc(rect100, 2 * pi * ((mouthWidth / 2) + 0.5),
       2 * pi * (1 - mouthWidth), true, pacmanYellowPaint);
   return recorder.endRecording().toImageSync(100, 100);

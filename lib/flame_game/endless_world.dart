@@ -41,7 +41,7 @@ import 'package:wakelock_plus/wakelock_plus.dart';
 ///  to.
 class EndlessWorld extends Forge2DWorld
     with
-        TapCallbacks,
+        //TapCallbacks,
         HasGameReference<EndlessRunner>,
         DragCallbacks,
         PointerMoveCallbacks {
@@ -162,12 +162,12 @@ class EndlessWorld extends Forge2DWorld
     }
   }
 
-  void addGhost(int number) {
+  void addGhost(int ghostSpriteChooserNumber) {
     Ghost ghost = Ghost(
         position: kGhostStartLocation +
             Vector2(
-                getSingleSquareWidth() * number <= 2 ? (number - 1) : 0, 0));
-    ghost.ghostNumberForSprite = number;
+                getSingleSquareWidth() * ghostSpriteChooserNumber <= 2 ? (ghostSpriteChooserNumber - 1) : 0, 0));
+    ghost.ghostSpriteChooserNumber = ghostSpriteChooserNumber;
     if (multipleSpawningGhosts && ghostPlayersList.isNotEmpty) {
       //new ghosts are also scared
       ghost.ghostScaredTimeLatest = ghostPlayersList[0].ghostScaredTimeLatest;

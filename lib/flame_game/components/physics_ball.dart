@@ -4,7 +4,8 @@ import '../constants.dart';
 import 'game_character.dart';
 import '../helper.dart';
 
-class PhysicsBall extends BodyComponent { //with TapCallbacks, ContactCallbacks
+class PhysicsBall extends BodyComponent {
+  //with TapCallbacks, ContactCallbacks
   PhysicsBall(
       {Vector2? initialPosition,
       required GameCharacter realCharacter,
@@ -34,14 +35,18 @@ class PhysicsBall extends BodyComponent { //with TapCallbacks, ContactCallbacks
               position: initialPosition ?? kPacmanStartLocation,
               type: BodyType.dynamic,
               userData: PhysicsBall,
-            ),
-            paint: Paint()
-              ..color = color ?? Colors.transparent
-              ..style = PaintingStyle.fill);
+            ));
+            //paint: Paint()
+            //  ..color = color ?? Colors.transparent
+            //  ..style = PaintingStyle.fill);
 
   GameCharacter? realCharacter;
 
-  /*
+  @override
+  // ignore: overridden_fields
+  final renderBody = false;
+
+/*
   @override
   Body createBody() {
     if (bodyDef!.userData != null) {

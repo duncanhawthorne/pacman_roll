@@ -1,4 +1,5 @@
 import '../constants.dart';
+import '../maze_layout.dart';
 import '../helper.dart';
 import 'package:flame/components.dart';
 import 'wall.dart';
@@ -56,30 +57,54 @@ void addMazeWalls(world) {
     int mazeWidth = getMazeWidth();
     for (var i = 0; i < mazeWidth; i++) {
       for (var j = 0; j < mazeWidth; j++) {
-        int k = j * mazeWidth + i;
+        int k = i * mazeWidth + j;
         double scale = getSingleSquareWidth();
-        double A = (i * 1.0 - mazeWidth / 2) * scale;
-        double B = (j * 1.0 - mazeWidth / 2) * scale;
+        double A = (j * 1.0 - mazeWidth / 2) * scale;
+        double B = (i * 1.0 - mazeWidth / 2) * scale;
         double D = 1.0 * scale;
         double E = 1.0 * scale;
         Vector2 topRight = Vector2(A + D, B);
         Vector2 bottomRight = Vector2(A + D, B + E);
         Vector2 bottomLeft = Vector2(A, B + E);
         Vector2 topLeft = Vector2(A, B);
-        double x = 1 /( sqrt(2) +1);
-        double roundMazeCornersProportion = (1 - x)/2;
+        double x = 1 / (sqrt(2) + 1);
+        double roundMazeCornersProportion = (1 - x) / 2; //octagonal
         Vector2 vertBit = Vector2(0, roundMazeCornersProportion * scale);
         Vector2 horiBit = Vector2(roundMazeCornersProportion * scale, 0);
 
+        if (wrappedMazeLayout[i][j] == 1) {
+          //square around each point with rounded corners
+          if (i - 1 > 0 &&
+              j + 1 < mazeWidth &&
+              wrappedMazeLayout[i - 1][j] != 1 &&
+              wrappedMazeLayout[i - 1][j + 1] != 1 &&
+              wrappedMazeLayout[i][j + 1] != 1) {
+            world.add(Wall(topRight - horiBit, topRight + vertBit));
+          }
+          if (i - 1 > 0 &&
+              j - 1 > 0 &&
+              wrappedMazeLayout[i - 1][j] != 1 &&
+              wrappedMazeLayout[i - 1][j - 1] != 1 &&
+              wrappedMazeLayout[i][j - 1] != 1) {
+            world.add(Wall(topLeft + horiBit, topLeft + vertBit));
+          }
+          if (i + 1 < mazeWidth &&
+              j - 1 > 0 &&
+              wrappedMazeLayout[i + 1][j] != 1 &&
+              wrappedMazeLayout[i + 1][j - 1] != 1 &&
+              wrappedMazeLayout[i][j - 1] != 1) {
+            world.add(Wall(bottomLeft + horiBit, bottomLeft - vertBit));
+          }
+          if (i + 1 < mazeWidth &&
+              j + 1 < mazeWidth &&
+              wrappedMazeLayout[i + 1][j] != 1 &&
+              wrappedMazeLayout[i + 1][j + 1] != 1 &&
+              wrappedMazeLayout[i][j + 1] != 1) {
+            world.add(Wall(bottomRight - horiBit, bottomRight - vertBit));
+          }
 
-        if (flatMazeLayout[k] == 1) {
-          world.add(Wall(topRight - horiBit, topRight + vertBit));
-          world.add(Wall(topLeft + horiBit, topLeft + vertBit));
-          world.add(Wall(bottomLeft + horiBit, bottomLeft - vertBit));
-          world.add(Wall(bottomRight - horiBit, bottomRight - vertBit));
+          //top right
         }
-
-
 
         if (wallNeededBetween(k, k + 1)) {
           //wall on right
