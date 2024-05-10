@@ -21,6 +21,25 @@ void p(x) {
   debugPrint("///// A " + DateTime.now().toString() + " " + x.toString());
 }
 
+String endText(double value) {
+  double x = percentile(scoreboardItems, value) * 100;
+  String z = x.toStringAsFixed(0);
+  String y =
+      "\nTime: ${value.toStringAsFixed(1)} seconds \n\nRank: ${z}th %ile\n";
+  return y;
+}
+
+double percentile(List<double> list, double value) {
+  //p(["percentile", list.length]);
+  List newList = [];
+  for (int i = 0; i < list.length; i++) {
+    newList.add(list[i]);
+  }
+  newList.add(value);
+  newList.sort();
+  return 1 - newList.indexOf(value) / newList.length;
+}
+
 int getStartingNumberPelletsAndSuperPellets(List mazeLayout) {
   int c = 0;
   c += mazeLayout
@@ -138,7 +157,8 @@ ui.Image pacmanMouthClosedImage() {
   return recorder.endRecording().toImageSync(100, 100);
 }
 
-double getTargetSirenVolume(isgameliveTmp, ghostPlayersList, pacmanPlayersList) {
+double getTargetSirenVolume(
+    isgameliveTmp, ghostPlayersList, pacmanPlayersList) {
   if (!isgameliveTmp) {
     p("siren 0: game not live");
     return 0;
@@ -148,11 +168,11 @@ double getTargetSirenVolume(isgameliveTmp, ghostPlayersList, pacmanPlayersList) 
     for (int i = 0; i < ghostPlayersList.length; i++) {
       tmpSirenVolume += ghostPlayersList[i].current == CharacterState.normal
           ? ghostPlayersList[i].getUnderlyingBallVelocity().length /
-          ghostPlayersList.length
+              ghostPlayersList.length
           : 0;
     }
     if ((pacmanPlayersList.isNotEmpty &&
-        pacmanPlayersList[0].current == CharacterState.deadPacman) ||
+            pacmanPlayersList[0].current == CharacterState.deadPacman) ||
         !globalPhysicsLinked) {
       tmpSirenVolume = 0;
     }

@@ -10,7 +10,8 @@ import 'package:go_router/go_router.dart';
 import 'package:nes_ui/nes_ui.dart';
 import 'package:provider/provider.dart';
 
-import 'game_win_dialog.dart';
+import 'game_lose_dialog.dart';
+import 'game_won_dialog.dart';
 
 /// This widget defines the properties of the game screen.
 ///
@@ -22,7 +23,8 @@ class GameScreen extends StatelessWidget {
 
   final GameLevel level;
 
-  static const String winDialogKey = 'win_dialog';
+  static const String loseDialogKey = 'lose_dialog';
+  static const String wonDialogKey = 'won_dialog';
   static const String backButtonKey = 'back_buttton';
 
   @override
@@ -52,10 +54,16 @@ class GameScreen extends StatelessWidget {
               ),
             );
           },
-          winDialogKey: (BuildContext context, EndlessRunner game) {
-            return GameWinDialog(
+          loseDialogKey: (BuildContext context, EndlessRunner game) {
+            return GameLoseDialog(
               level: level,
               levelCompletedIn: game.world.levelCompletedIn,
+            );
+          },
+          wonDialogKey: (BuildContext context, EndlessRunner game) {
+            return GameWonDialog(
+              level: level,
+              levelCompletedIn: game.world.getLevelTime(),
             );
           },
         },

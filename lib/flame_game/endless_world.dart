@@ -189,6 +189,7 @@ class EndlessWorld extends Forge2DWorld
       if (pelletsRemaining == 0) {
         levelCompleteTimeMillis = now;
         save.firebasePush(getLevelTime());
+        game.overlays.add(GameScreen.wonDialogKey);
         trimToThreeGhosts();
         for (int i = 0; i < ghostPlayersList.length; i++) {
           ghostPlayersList[i]
@@ -206,6 +207,7 @@ class EndlessWorld extends Forge2DWorld
 
   @override
   Future<void> onLoad() async {
+    p("world on load");
     now = DateTime.now().millisecondsSinceEpoch;
     gameRunning = true;
     levelCompleteTimeMillis = 0;
@@ -261,7 +263,7 @@ class EndlessWorld extends Forge2DWorld
 
         playerProgress.setLevelFinished(level.number, levelCompletedIn);
         game.pauseEngine();
-        game.overlays.add(GameScreen.winDialogKey);
+        game.overlays.add(GameScreen.loseDialogKey);
       }
     });
   }
