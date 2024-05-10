@@ -1,5 +1,6 @@
 import 'components/maze_walls.dart';
 import 'constants.dart';
+import 'components/game_character.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
 import 'package:flame/components.dart';
@@ -132,4 +133,34 @@ ui.Image pacmanMouthClosedImage() {
   canvas.drawArc(rect100, 2 * pi * ((mouthWidth / 2) + 0.5),
       2 * pi * (1 - mouthWidth), true, pacmanYellowPaint);
   return recorder.endRecording().toImageSync(100, 100);
+}
+
+double getTargetSirenVolume(isgameliveTmp, ghostPlayersList, pacmanPlayersList) {
+  if (!isgameliveTmp) {
+    p("siren 0: game not live");
+    return 0;
+  }
+  double tmpSirenVolume = 0;
+  try {
+    for (int i = 0; i < ghostPlayersList.length; i++) {
+      tmpSirenVolume += ghostPlayersList[i].current == CharacterState.normal
+          ? ghostPlayersList[i].getUnderlyingBallVelocity().length /
+          ghostPlayersList.length
+          : 0;
+    }
+    if ((pacmanPlayersList.isNotEmpty &&
+        pacmanPlayersList[0].current == CharacterState.deadPacman) ||
+        !globalPhysicsLinked) {
+      tmpSirenVolume = 0;
+    }
+  } catch (e) {
+    tmpSirenVolume = 0;
+    p([e, "tmpSirenVolume error"]);
+  }
+  tmpSirenVolume = tmpSirenVolume / 30;
+  if (tmpSirenVolume < 0.05) {
+    tmpSirenVolume = 0;
+  }
+  tmpSirenVolume = min(0.4, tmpSirenVolume);
+  return tmpSirenVolume;
 }

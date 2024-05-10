@@ -98,41 +98,12 @@ class EndlessWorld extends Forge2DWorld
     }
   }
 
-  double getTargetSirenVolume() {
-    if (!isGameLive()) {
-      p("siren 0: game not live");
-      return 0;
-    }
-    double tmpSirenVolume = 0;
-    try {
-      for (int i = 0; i < ghostPlayersList.length; i++) {
-        tmpSirenVolume += ghostPlayersList[i].current == CharacterState.normal
-            ? ghostPlayersList[i].getUnderlyingBallVelocity().length /
-                ghostPlayersList.length
-            : 0;
-      }
-      if ((pacmanPlayersList.isNotEmpty &&
-              pacmanPlayersList[0].current == CharacterState.deadPacman) ||
-          !globalPhysicsLinked) {
-        tmpSirenVolume = 0;
-      }
-    } catch (e) {
-      tmpSirenVolume = 0;
-      p([e, "tmpSirenVolume error"]);
-    }
-    tmpSirenVolume = tmpSirenVolume / 30;
-    if (tmpSirenVolume < 0.05) {
-      tmpSirenVolume = 0;
-    }
-    tmpSirenVolume = min(0.4, tmpSirenVolume);
-    return tmpSirenVolume;
-  }
-
   void updateSirenVolume() async {
     //NOTE disabled on iOS for bug
     if (sirenOn && now - lastSirenVolumeUpdateTimeMillis > 500) {
       lastSirenVolumeUpdateTimeMillis = now;
-      game.audioController.setSirenVolume(getTargetSirenVolume());
+      game.audioController.setSirenVolume(getTargetSirenVolume(
+          isGameLive(), ghostPlayersList, pacmanPlayersList));
     }
   }
 
@@ -213,18 +184,18 @@ class EndlessWorld extends Forge2DWorld
     }
   }
 
-  void endOfGameTestAndAct(world) {
-    if (world.pelletsRemaining == 0) {
-      world.levelCompleteTimeMillis = world.now;
+  void endOfGameTestAndAct() {
+    if (pelletsRemaining == 0) {
+      levelCompleteTimeMillis = now;
       trimToThreeGhosts();
-      for (int i = 0; i < world.ghostPlayersList.length; i++) {
-        world.ghostPlayersList[i]
+      for (int i = 0; i < ghostPlayersList.length; i++) {
+        ghostPlayersList[i]
             .setUnderlyingBallPosition(kCageLocation + Vector2.random() / 100);
       }
       Future.delayed(
           const Duration(milliseconds: kPacmanHalfEatingResetTimeMillis * 2),
           () {
-        world.play(SfxType.endMusic);
+        play(SfxType.endMusic);
       });
     }
   }

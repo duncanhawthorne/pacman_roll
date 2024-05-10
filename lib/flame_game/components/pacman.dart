@@ -89,7 +89,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     pacmanEatingTimeLatest = world.now;
     pellet.removeFromParent();
     world.pelletsRemaining -= 1;
-    world.endOfGameTestAndAct(world);
+    world.endOfGameTestAndAct();
   }
 
   void pacmanEatsGhost(Ghost ghost) {
