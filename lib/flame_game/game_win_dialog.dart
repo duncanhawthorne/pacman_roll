@@ -39,6 +39,7 @@ class GameWinDialog extends StatelessWidget {
               style: Theme.of(context).textTheme.headlineMedium,
               textAlign: TextAlign.center,
             ),
+            //Text(scoreboardItems.toString()),
             const SizedBox(height: 16),
             //Text(
             //  'You completed level ${level.number} in $levelCompletedIn seconds.',

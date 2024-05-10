@@ -1,5 +1,6 @@
 import 'components/maze_walls.dart';
 import 'constants.dart';
+import 'saves.dart';
 import 'components/game_character.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
@@ -8,6 +9,8 @@ import 'package:flame/game.dart';
 import 'dart:core';
 import 'dart:ui' as ui;
 import 'dart:ui';
+
+Save save = Save();
 
 double getSingleSquareWidth() {
   return inGameVectorPixels / getMazeWidth() * gameScaleFactor;

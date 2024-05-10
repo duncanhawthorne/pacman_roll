@@ -4,6 +4,7 @@ import 'helper.dart';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'dart:core';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 const debugMode = false;
 const bool mazeOn = true;
@@ -53,3 +54,8 @@ final bool sirenOn = iOS ? false : true;
 const bool pelletEatSoundOn = true; //iOS ? false : true;
 const multipleSpawningPacmans = false;
 const multipleSpawningGhosts = false;
+
+bool fbOn = true;
+//String userName = "ABC";
+FirebaseFirestore? db = fbOn ? FirebaseFirestore.instance : null;
+List<double> scoreboardItems = [0.364];

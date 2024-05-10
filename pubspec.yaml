@@ -27,6 +27,8 @@ dependencies:
   sensors_plus: ^5.0.1
   wakelock_plus: ^1.2.4
   flutter_native_splash: ^2.4.0
+  cloud_firestore: ^4.17.3
+  firebase_core: ^2.31.0
 #  just_audio: ^0.9.37
 
 dev_dependencies:

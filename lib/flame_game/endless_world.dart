@@ -185,18 +185,22 @@ class EndlessWorld extends Forge2DWorld
   }
 
   void endOfGameTestAndAct() {
-    if (pelletsRemaining == 0) {
-      levelCompleteTimeMillis = now;
-      trimToThreeGhosts();
-      for (int i = 0; i < ghostPlayersList.length; i++) {
-        ghostPlayersList[i]
-            .setUnderlyingBallPosition(kCageLocation + Vector2.random() / 100);
+    if (isGameLive()) {
+      if (pelletsRemaining == 0) {
+        levelCompleteTimeMillis = now;
+        save.firebasePush(getLevelTime());
+        trimToThreeGhosts();
+        for (int i = 0; i < ghostPlayersList.length; i++) {
+          ghostPlayersList[i]
+              .setUnderlyingBallPosition(
+              kCageLocation + Vector2.random() / 100);
+        }
+        Future.delayed(
+            const Duration(milliseconds: kPacmanHalfEatingResetTimeMillis * 2),
+                () {
+              play(SfxType.endMusic);
+            });
       }
-      Future.delayed(
-          const Duration(milliseconds: kPacmanHalfEatingResetTimeMillis * 2),
-          () {
-        play(SfxType.endMusic);
-      });
     }
   }
 
@@ -205,6 +209,9 @@ class EndlessWorld extends Forge2DWorld
     now = DateTime.now().millisecondsSinceEpoch;
     gameRunning = true;
     levelCompleteTimeMillis = 0;
+    scoreboardItems = (await save.firebasePull()).values.toList();
+    //p(scoreboardItems);
+
     //AudioLogger.logLevel = AudioLogLevel.info;
     if (sirenOn) {
       play(SfxType.ghostsRoamingSiren);
