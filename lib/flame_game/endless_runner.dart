@@ -60,7 +60,20 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
   );
 
 
+  bool isGameLive() {
+    return gameRunning && !paused && isLoaded && isMounted;
+  }
 
+  void deadMansSwitch() async {
+    //Wworks as separate thread to stop all audio when game stops
+    if (isGameLive()) {
+      Future.delayed(const Duration(milliseconds: 500), () {
+        deadMansSwitch();
+      });
+    } else {
+      audioController.stopAllSfx();
+    }
+  }
 
   String getEncodeCurrentGameState() {
     Map<String, dynamic> gameTmp = {};
@@ -82,6 +95,7 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
   /// that only needs to be set once when the level starts up.
   @override
   Future<void> onLoad() async {
+    gameRunning = true;
     userString = getRandomString(world.random, 15);
     downloadScoreboard();
     world.play(SfxType.startMusic);

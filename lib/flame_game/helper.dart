@@ -30,10 +30,7 @@ String endText(double value) {
 }
 
 double percentile(List<double> list, double value) {
-  List newList = [];
-  for (int i = 0; i < list.length; i++) {
-    newList.add(list[i]);
-  }
+  List<double> newList = List<double>.from(list);
   newList.add(value);
   newList.sort();
   return newList.indexOf(value) / newList.length;

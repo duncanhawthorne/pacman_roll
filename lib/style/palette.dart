@@ -16,7 +16,7 @@ import 'package:flame/palette.dart';
 /// we could allow players to customize colors, for example,
 /// or even get the colors from the network.
 class Palette {
-  PaletteEntry get seed => const PaletteEntry(Color(0xFF0050bc));
+  PaletteEntry get seed => const PaletteEntry(Color(0xFF000000)); //0xFF0050bc
   PaletteEntry get text => const PaletteEntry(Color(0xee352b42));
   PaletteEntry get backgroundMain => const PaletteEntry(Color(0xffa2fff3));
   PaletteEntry get backgroundLevelSelection =>

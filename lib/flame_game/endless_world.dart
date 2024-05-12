@@ -88,9 +88,7 @@ class EndlessWorld extends Forge2DWorld
   List<Ghost> ghostPlayersList = [];
   List<Pacman> pacmanPlayersList = [];
 
-  bool isGameLive() {
-    return gameRunning && !game.paused && game.isLoaded && game.isMounted;
-  }
+
 
   void play(SfxType type) {
     if (soundOn) {
@@ -103,20 +101,11 @@ class EndlessWorld extends Forge2DWorld
     if (sirenOn && now - lastSirenVolumeUpdateTimeMillis > 500) {
       lastSirenVolumeUpdateTimeMillis = now;
       game.audioController.setSirenVolume(getTargetSirenVolume(
-          isGameLive(), ghostPlayersList, pacmanPlayersList));
+          game.isGameLive(), ghostPlayersList, pacmanPlayersList));
     }
   }
 
-  void deadMansSwitch() async {
-    //Wworks as separate thread to stop all audio when game stops
-    if (isGameLive()) {
-      Future.delayed(const Duration(milliseconds: 500), () {
-        deadMansSwitch();
-      });
-    } else {
-      game.audioController.stopAllSfx();
-    }
-  }
+
 
   Vector2 screenPos(Vector2 absolutePos) {
     if (!actuallyMoveSpritesToScreenPos) {
@@ -185,7 +174,7 @@ class EndlessWorld extends Forge2DWorld
   }
 
   void endOfGameTestAndAct() {
-    if (isGameLive()) {
+    if (game.isGameLive()) {
       if (pelletsRemaining == 0) {
         levelCompleteTimeMillis = now;
         if (getLevelTimeSeconds() > 10) {
@@ -211,7 +200,6 @@ class EndlessWorld extends Forge2DWorld
   Future<void> onLoad() async {
     p("world on load");
     now = DateTime.now().millisecondsSinceEpoch;
-    gameRunning = true;
     levelCompleteTimeMillis = 0;
 
     //p(scoreboardItems);
@@ -221,7 +209,7 @@ class EndlessWorld extends Forge2DWorld
       play(SfxType.ghostsRoamingSiren);
     }
     pelletsRemaining = getStartingNumberPelletsAndSuperPellets(flatMazeLayout);
-    deadMansSwitch();
+    game.deadMansSwitch();
 
     WakelockPlus.toggle(enable: true);
 
