@@ -53,11 +53,13 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
 
   String userString = "";
 
+  /*
   final scoreComponent = TextComponent(
     text: "Lives: 3",
     position: Vector2(dx - 30 - 300, 30),
     textRenderer: textRenderer,
   );
+   */
 
 
   bool isGameLive() {
@@ -107,13 +109,13 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
     if (!actuallyMoveSpritesToScreenPos) {
       camera.viewfinder.angle = -world.worldAngle;
     }
-    scoreComponent.text =
-        'Lives: ${3 - world.scoreNotifier.value} \n\nTime: ${world.getCurrentOrCompleteLevelTimeSeconds().toStringAsFixed(1)}';
+    //scoreComponent.text =
+    //    'Lives: ${3 - world.scoreNotifier.value} \n\nTime: ${world.getCurrentOrCompleteLevelTimeSeconds().toStringAsFixed(1)}';
 
     if (_dxLast != dx || _dyLast != dy) {
       camera.viewport = FixedResolutionViewport(resolution: Vector2(dx, dy));
-      camera.viewport.add(scoreComponent);
-      scoreComponent.position = Vector2(dx - 30 - 350, 30);
+      //camera.viewport.add(scoreComponent);
+      //scoreComponent.position = Vector2(dx - 30 - 350, 30);
       _dxLast = dx;
       _dyLast = dy;
     }

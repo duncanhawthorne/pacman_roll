@@ -66,7 +66,7 @@ class EndlessWorld extends Forge2DWorld
   DateTime timeStarted = DateTime.now();
   //Vector2 get size => (parent as FlameGame).size;
 
-  int levelCompletedIn = 0;
+  //int levelCompletedIn = 0;
   int pelletsRemaining = 1;
   double _lastDragAngle = 10;
   double _gravityTargetAngle = 2 * pi / 4;
@@ -221,7 +221,7 @@ class EndlessWorld extends Forge2DWorld
 
   @override
   Future<void> onLoad() async {
-    p("world on load");
+    //p("world on load");
     now = DateTime.now().millisecondsSinceEpoch;
     _levelCompleteTimeMillis = 0;
 
@@ -231,8 +231,8 @@ class EndlessWorld extends Forge2DWorld
     if (sirenEnabled) {
       play(SfxType.ghostsRoamingSiren);
     }
-    pelletsRemaining = getStartingNumberPelletsAndSuperPellets(flatMazeLayout);
     game.deadMansSwitch();
+    pelletsRemaining = getStartingNumberPelletsAndSuperPellets(flatMazeLayout);
 
     WakelockPlus.toggle(enable: true);
 
@@ -272,11 +272,7 @@ class EndlessWorld extends Forge2DWorld
     // the player passed the level.
     scoreNotifier.addListener(() {
       if (scoreNotifier.value >= level.winScore) {
-        final levelTime = getCurrentOrCompleteLevelTimeSeconds();
-
-        levelCompletedIn = levelTime.round();
-
-        playerProgress.setLevelFinished(level.number, levelCompletedIn);
+        //playerProgress.setLevelFinished(level.number, getCurrentOrCompleteLevelTimeSeconds().toInt());
         game.pauseEngine();
         game.overlays.add(GameScreen.loseDialogKey);
       }
@@ -298,12 +294,14 @@ class EndlessWorld extends Forge2DWorld
     // overlay so that the player can go back to the previous screen.
     gameRunning = true;
     game.overlays.add(GameScreen.backButtonKey);
+    game.overlays.add(GameScreen.statusOverlay);
   }
 
   @override
   void onRemove() {
     gameRunning = false;
     game.overlays.remove(GameScreen.backButtonKey);
+    game.overlays.remove(GameScreen.statusOverlay);
   }
 
   /// Gives the player points, with a default value +1 points.

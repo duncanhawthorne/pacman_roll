@@ -29,6 +29,8 @@ dependencies:
   flutter_native_splash: ^2.4.0
   cloud_firestore: ^4.17.3
   firebase_core: ^2.31.0
+  elapsed_time_display: ^1.0.0  
+  
 #  just_audio: ^0.9.37
 
 dev_dependencies:
