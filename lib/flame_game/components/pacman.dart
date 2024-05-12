@@ -93,7 +93,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   }
 
   void pacmanEatsGhost(Ghost ghost) {
-    p("pacman eats ghost");
+    //p("pacman eats ghost");
 
     //pacman visuals
     world.play(SfxType.eatGhost);
@@ -118,7 +118,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   }
 
   void ghostKillsPacman() {
-    p("ghost kills pacman");
+    //p("ghost kills pacman");
     if (globalPhysicsLinked) {
       //prevent multiple hits
 

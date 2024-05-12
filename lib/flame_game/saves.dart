@@ -21,7 +21,7 @@ class Save {
   }
 
   Future<List> firebasePull() async {
-    List<Map<String, dynamic>> gameTmpList = [];
+    List<Map<String, dynamic>> allFirebaseEntries = [];
     try {
       if (fbOn) {
         final collectionRef = db!.collection("PMR3");
@@ -30,20 +30,28 @@ class Save {
             .map((doc) => {doc.id: doc.data() as Map<String, dynamic>})
             .toList();
         for (int i = 0; i < allData.length; i++) {
-          var item = allData[i];
-          for (String key in item.keys) {
-            String x = item[key].toString();
-            x = x.substring(7, x.length - 1); //FIXME
-            Map<String, dynamic> gameTmp = {};
-            gameTmp = json.decode(x);
-            gameTmpList.add(gameTmp);
+          try {
+            var item = allData[i];
+            for (String key in item.keys) {
+              //String x = item[key].toString();
+              //x = x.substring(7, x.length - 1);
+              String x = item[key]!["data"].toString();
+              Map<String, dynamic> singleEntry = {};
+              singleEntry = json.decode(x);
+              //p(singleEntry);
+              allFirebaseEntries.add(singleEntry);
+            }
+          }
+          catch(e) {
+            p(e);
           }
         }
-        return gameTmpList;
+        //p(allFirebaseEntries);
+        return allFirebaseEntries;
       }
     } catch (e) {
       p(e);
     }
-    return gameTmpList;
+    return allFirebaseEntries;
   }
 }
