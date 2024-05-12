@@ -22,9 +22,7 @@ import 'components/pacman.dart';
 import 'components/ghost.dart';
 import 'constants.dart';
 import 'helper.dart';
-import 'package:sensors_plus/sensors_plus.dart';
 import 'package:flutter/foundation.dart';
-import 'package:wakelock_plus/wakelock_plus.dart';
 import 'dart:async' as async;
 
 /// The world is where you place all the components that should live inside of
@@ -58,13 +56,13 @@ class EndlessWorld extends Forge2DWorld
   /// progress if a level is finished.
   final PlayerProgress playerProgress;
 
-  /// In the [scoreNotifier] we keep track of what the current score is, and if
+  /// In the [numberOfDeaths] we keep track of what the current score is, and if
   /// other parts of the code is interested in when the score is updated they
   /// can listen to it and act on the updated value.
-  final scoreNotifier = ValueNotifier(0);
+  final numberOfDeaths = ValueNotifier(0);
   final pelletsRemainingNotifier = ValueNotifier(0);
   //late RealCharacter player;
-  DateTime timeStarted = DateTime.now();
+  DateTime datetimeStarted = DateTime.now();
   //Vector2 get size => (parent as FlameGame).size;
 
   //int levelCompletedIn = 0;
@@ -169,7 +167,7 @@ class EndlessWorld extends Forge2DWorld
     ghostPlayersList.remove(ghost);
   }
 
-  void multiGhostTimer() {
+  void multiGhostAdderTimer() {
     if (multipleSpawningGhosts) {
       int counter = 0;
       async.Timer.periodic(const Duration(milliseconds: 5000), (timer) {
@@ -230,58 +228,30 @@ class EndlessWorld extends Forge2DWorld
 
   @override
   Future<void> onLoad() async {
-    //p("world on load");
+    datetimeStarted = DateTime.now();
     now = DateTime.now().millisecondsSinceEpoch;
     _levelCompleteTimeMillis = 0;
-
-    //p(scoreboardItems);
-
-    //AudioLogger.logLevel = AudioLogLevel.info;
-    if (sirenEnabled) {
-      play(SfxType.ghostsRoamingSiren);
-    }
-    game.deadMansSwitch();
-    pelletsRemainingNotifier.value =
-        getStartingNumberPelletsAndSuperPellets(flatMazeLayout);
-
-    WakelockPlus.toggle(enable: true);
-
     // Used to keep track of when the level started, so that we later can
     // calculate how long time it took to finish the level.
-    timeStarted = DateTime.now();
 
-    if (useGyro) {
-      accelerometerEventStream().listen(
-        //start once and then runs
-        (AccelerometerEvent event) {
-          setGravity(Vector2(event.y, event.x - 5) * (android && web ? 5 : 1));
-        },
-        onError: (error) {
-          // Logic to handle error
-          // Needed for Android in case sensor is not available
-        },
-        cancelOnError: true,
-      );
+    play(SfxType.startMusic);
+    if (sirenEnabled) {
+      play(SfxType.ghostsRoamingSiren);
+      sirenVolumeUpdatedTimer();
     }
 
     addPacman(kPacmanStartLocation);
-
     for (int i = 0; i < 3; i++) {
       addGhost(i);
     }
-
+    multiGhostAdderTimer();
     add(MazeImage());
     addMazeWalls(this);
     addAll(createBoundaries(game.camera));
-    addPelletsAndSuperPellets(this);
-    //add(Compass());
+    addPelletsAndSuperPellets(this, pelletsRemainingNotifier);
 
-    // When the player takes a new point we check if the score is enough to
-    // pass the level and if it is we calculate what time the level was passed
-    // in, update the player's progress and open up a dialog that shows that
-    // the player passed the level.
-    scoreNotifier.addListener(() {
-      if (scoreNotifier.value >= level.winScore) {
+    numberOfDeaths.addListener(() {
+      if (numberOfDeaths.value >= level.maxAllowedDeaths) {
         //playerProgress.setLevelFinished(level.number, getCurrentOrCompleteLevelTimeSeconds().toInt());
         game.pauseEngine();
         game.overlays.add(GameScreen.loseDialogKey);
@@ -292,13 +262,13 @@ class EndlessWorld extends Forge2DWorld
         endOfGameTestAndAct();
       }
     });
-    sirenVolumeUpdatedTimer();
-    multiGhostTimer();
+
+    handleAcceleratorEvents(this);
   }
 
   double getCurrentOrCompleteLevelTimeSeconds() {
     return ((_levelCompleteTimeMillis == 0 ? now : _levelCompleteTimeMillis) -
-            timeStarted.millisecondsSinceEpoch) /
+            datetimeStarted.millisecondsSinceEpoch) /
         1000;
   }
 
@@ -319,14 +289,12 @@ class EndlessWorld extends Forge2DWorld
     game.overlays.remove(GameScreen.statusOverlay);
   }
 
-  /// Gives the player points, with a default value +1 points.
-  void addScore({int amount = 1}) {
-    scoreNotifier.value += amount;
+  void addDeath({int amount = 1}) {
+    numberOfDeaths.value += amount;
   }
 
-  /// Sets the player's score to 0 again.
-  void resetScore() {
-    scoreNotifier.value -= 3;
+  void resetDeaths() {
+    numberOfDeaths.value -= 3;
   }
 
   @override

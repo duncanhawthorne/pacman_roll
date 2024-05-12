@@ -10,10 +10,10 @@ import '../player_progress/player_progress.dart';
 import 'endless_world.dart';
 import 'constants.dart';
 import 'helper.dart';
-import '../../audio/sounds.dart';
 import 'dart:core';
 import 'dart:convert';
 import 'dart:async' as async;
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 /// This is the base of the game which is added to the [GameWidget].
 ///
@@ -94,10 +94,11 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
   /// that only needs to be set once when the level starts up.
   @override
   Future<void> onLoad() async {
+    WakelockPlus.toggle(enable: true);
     gameRunning = true;
     userString = getRandomString(world.random, 15);
     downloadScoreboard();
-    world.play(SfxType.startMusic);
+    deadMansSwitch();
     //camera.viewfinder.angle = 0;
   }
 

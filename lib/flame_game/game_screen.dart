@@ -67,16 +67,16 @@ class GameScreen extends StatelessWidget {
                       return Padding(
                         padding: const EdgeInsets.fromLTRB(0, 0, 0, 8.0),
                         child: Text(
-                            "Lives: ${3 - game.world.scoreNotifier.value}",
+                            "Lives: ${3 - game.world.numberOfDeaths.value}",
                             style: const TextStyle(
                                 fontSize: 12, color: Colors.white)),
                       );
                     },
-                    valueListenable: game.world.scoreNotifier,
+                    valueListenable: game.world.numberOfDeaths,
                   ),
                   ElapsedTimeDisplay(
                     startTime: DateTime.fromMillisecondsSinceEpoch(
-                        game.world.timeStarted.millisecondsSinceEpoch),
+                        game.world.datetimeStarted.millisecondsSinceEpoch),
                     interval: const Duration(milliseconds: 100),
                     style: const TextStyle(fontSize: 12, color: Colors.white),
                     formatter: (elapsedTime) {

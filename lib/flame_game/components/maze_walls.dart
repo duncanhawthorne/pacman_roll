@@ -1,3 +1,5 @@
+import 'package:flutter/cupertino.dart';
+
 import '../constants.dart';
 import '../maze_layout.dart';
 import '../helper.dart';
@@ -14,7 +16,8 @@ int getMazeWidth() {
   return sqrt(flatMazeLayout.length).toInt();
 }
 
-void addPelletsAndSuperPellets(Forge2DWorld world) {
+void addPelletsAndSuperPellets(Forge2DWorld world, ValueNotifier pelletsRemainingNotifier) {
+  pelletsRemainingNotifier.value = 0;
   int mazelen = getMazeWidth();
   for (var i = 0; i < mazelen; i++) {
     for (var j = 0; j < mazelen; j++) {
@@ -32,12 +35,14 @@ void addPelletsAndSuperPellets(Forge2DWorld world) {
         pillx.absPosition = location;
         pillx.position = location; //initial set
         world.add(pillx);
+        pelletsRemainingNotifier.value += 1;
       }
       if (flatMazeLayout[k] == 3) {
         var powerpill = SuperPellet();
         powerpill.absPosition = location;
         powerpill.position = location; //initial set
         world.add(powerpill);
+        pelletsRemainingNotifier.value += 1;
       }
     }
   }

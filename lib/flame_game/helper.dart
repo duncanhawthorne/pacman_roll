@@ -1,3 +1,5 @@
+import 'package:pacman_roll/flame_game/endless_world.dart';
+
 import 'components/maze_walls.dart';
 import 'constants.dart';
 import 'saves.dart';
@@ -9,6 +11,7 @@ import 'package:flame/game.dart';
 import 'dart:core';
 import 'dart:ui' as ui;
 import 'dart:ui';
+import 'package:sensors_plus/sensors_plus.dart';
 
 Save save = Save();
 
@@ -186,3 +189,20 @@ double getTargetSirenVolume(
 String getRandomString(random, int length) =>
     String.fromCharCodes(Iterable.generate(
         length, (_) => chars.codeUnitAt(random.nextInt(chars.length))));
+
+
+void handleAcceleratorEvents(EndlessWorld world) {
+  if (useGyro) {
+    accelerometerEventStream().listen(
+      //start once and then runs
+          (AccelerometerEvent event) {
+        world.setGravity(Vector2(event.y, event.x - 5) * (android && web ? 5 : 1));
+      },
+      onError: (error) {
+        // Logic to handle error
+        // Needed for Android in case sensor is not available
+      },
+      cancelOnError: true,
+    );
+  }
+}
