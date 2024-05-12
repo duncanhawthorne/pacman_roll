@@ -7,7 +7,6 @@ import '../level_selection/levels.dart';
 import '../player_progress/player_progress.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
-import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 // ignore: implementation_imports
 import 'package:flame/src/events/messages/pointer_move_event.dart'
@@ -26,6 +25,7 @@ import 'helper.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
+import 'dart:async' as async;
 
 /// The world is where you place all the components that should live inside of
 /// the game, like the player, enemies, obstacles and points for example.
@@ -64,17 +64,16 @@ class EndlessWorld extends Forge2DWorld
   final scoreNotifier = ValueNotifier(0);
   //late RealCharacter player;
   DateTime timeStarted = DateTime.now();
-  Vector2 get size => (parent as FlameGame).size;
+  //Vector2 get size => (parent as FlameGame).size;
 
   int levelCompletedIn = 0;
   int pelletsRemaining = 1;
-  Vector2 lastDragPosition = Vector2(0, 0);
   double _lastDragAngle = 10;
-  double gravityTargetAngle = 2 * pi / 4;
+  double _gravityTargetAngle = 2 * pi / 4;
   int now = DateTime.now().millisecondsSinceEpoch;
-  int levelCompleteTimeMillis = 0;
-  int lastNewGhostTimeMillis = 0;
-  int lastSirenVolumeUpdateTimeMillis = 0;
+  int _levelCompleteTimeMillis = 0;
+  //int _lastNewGhostTimeMillis = 0;
+  //int _lastSirenVolumeUpdateTimeMillis = 0;
 
   /// The random number generator that is used to spawn periodic components.
   final Random random;
@@ -82,13 +81,11 @@ class EndlessWorld extends Forge2DWorld
   /// The gravity is defined in virtual pixels per second squared.
   /// These pixels are in relation to how big the [FixedResolutionViewport] is.
   double worldAngle = 0; //2 * pi / 8;
-  double worldCos = 1;
-  double worldSin = 0;
+  double _worldCos = 1;
+  double _worldSin = 0;
 
   List<Ghost> ghostPlayersList = [];
   List<Pacman> pacmanPlayersList = [];
-
-
 
   void play(SfxType type) {
     if (soundOn) {
@@ -96,16 +93,27 @@ class EndlessWorld extends Forge2DWorld
     }
   }
 
-  void updateSirenVolume() async {
+  void sirenVolumeUpdatedTimer() async {
     //NOTE disabled on iOS for bug
-    if (sirenOn && now - lastSirenVolumeUpdateTimeMillis > 500) {
-      lastSirenVolumeUpdateTimeMillis = now;
+
+    async.Timer.periodic(const Duration(milliseconds: 500), (timer) {
+      if (game.isGameLive()) {
+        game.audioController.setSirenVolume(getTargetSirenVolume(
+            game.isGameLive(), ghostPlayersList, pacmanPlayersList));
+      } else {
+        timer.cancel();
+      }
+    });
+
+    /*
+    if (sirenEnabled && now - _lastSirenVolumeUpdateTimeMillis > 500) {
+      _lastSirenVolumeUpdateTimeMillis = now;
       game.audioController.setSirenVolume(getTargetSirenVolume(
           game.isGameLive(), ghostPlayersList, pacmanPlayersList));
     }
+
+     */
   }
-
-
 
   Vector2 screenPos(Vector2 absolutePos) {
     if (!actuallyMoveSpritesToScreenPos) {
@@ -116,8 +124,8 @@ class EndlessWorld extends Forge2DWorld
       } else {
         //Matrix2 mat = Matrix2(
         //    worldCos, -worldSin, worldSin, worldCos);
-        return Vector2(worldCos * absolutePos[0] + -worldSin * absolutePos[1],
-            worldSin * absolutePos[0] + worldCos * absolutePos[1]);
+        return Vector2(_worldCos * absolutePos[0] + -_worldSin * absolutePos[1],
+            _worldSin * absolutePos[0] + _worldCos * absolutePos[1]);
       }
     }
   }
@@ -139,7 +147,7 @@ class EndlessWorld extends Forge2DWorld
     }
     add(ghost);
     ghostPlayersList.add(ghost);
-    lastNewGhostTimeMillis = now;
+    //_lastNewGhostTimeMillis = now;
   }
 
   void addPacman(Vector2 startPosition) {
@@ -160,6 +168,22 @@ class EndlessWorld extends Forge2DWorld
     ghostPlayersList.remove(ghost);
   }
 
+  void multiGhostTimer() {
+    if (multipleSpawningGhosts) {
+      int counter = 0;
+      async.Timer.periodic(const Duration(milliseconds: 5000), (timer) {
+        if (game.isGameLive()) {
+          if (pelletsRemaining > 0 && counter > 0) {
+            addGhost(100);
+          }
+        } else {
+          timer.cancel();
+        }
+        counter++;
+      });
+    }
+  }
+
   void trimToThreeGhosts() {
     int origNumGhosts = ghostPlayersList.length;
     for (int i = 0; i < origNumGhosts; i++) {
@@ -176,22 +200,21 @@ class EndlessWorld extends Forge2DWorld
   void endOfGameTestAndAct() {
     if (game.isGameLive()) {
       if (pelletsRemaining == 0) {
-        levelCompleteTimeMillis = now;
-        if (getLevelTimeSeconds() > 10) {
+        _levelCompleteTimeMillis = now;
+        if (getCurrentOrCompleteLevelTimeSeconds() > 10) {
           save.firebasePush(game.userString, game.getEncodeCurrentGameState());
         }
         game.overlays.add(GameScreen.wonDialogKey);
         trimToThreeGhosts();
         for (int i = 0; i < ghostPlayersList.length; i++) {
-          ghostPlayersList[i]
-              .setUnderlyingBallPosition(
+          ghostPlayersList[i].setUnderlyingBallPosition(
               kCageLocation + Vector2.random() / 100);
         }
         Future.delayed(
             const Duration(milliseconds: kPacmanHalfEatingResetTimeMillis * 2),
-                () {
-              play(SfxType.endMusic);
-            });
+            () {
+          play(SfxType.endMusic);
+        });
       }
     }
   }
@@ -200,12 +223,12 @@ class EndlessWorld extends Forge2DWorld
   Future<void> onLoad() async {
     p("world on load");
     now = DateTime.now().millisecondsSinceEpoch;
-    levelCompleteTimeMillis = 0;
+    _levelCompleteTimeMillis = 0;
 
     //p(scoreboardItems);
 
     //AudioLogger.logLevel = AudioLogLevel.info;
-    if (sirenOn) {
+    if (sirenEnabled) {
       play(SfxType.ghostsRoamingSiren);
     }
     pelletsRemaining = getStartingNumberPelletsAndSuperPellets(flatMazeLayout);
@@ -239,6 +262,7 @@ class EndlessWorld extends Forge2DWorld
 
     add(MazeImage());
     addMazeWalls(this);
+    addAll(createBoundaries(game.camera));
     addPelletsAndSuperPellets(this);
     //add(Compass());
 
@@ -248,7 +272,7 @@ class EndlessWorld extends Forge2DWorld
     // the player passed the level.
     scoreNotifier.addListener(() {
       if (scoreNotifier.value >= level.winScore) {
-        final levelTime = getLevelTimeSeconds();
+        final levelTime = getCurrentOrCompleteLevelTimeSeconds();
 
         levelCompletedIn = levelTime.round();
 
@@ -257,10 +281,12 @@ class EndlessWorld extends Forge2DWorld
         game.overlays.add(GameScreen.loseDialogKey);
       }
     });
+    sirenVolumeUpdatedTimer();
+    multiGhostTimer();
   }
 
-  double getLevelTimeSeconds() {
-    return ((levelCompleteTimeMillis == 0 ? now : levelCompleteTimeMillis) -
+  double getCurrentOrCompleteLevelTimeSeconds() {
+    return ((_levelCompleteTimeMillis == 0 ? now : _levelCompleteTimeMillis) -
             timeStarted.millisecondsSinceEpoch) /
         1000;
   }
@@ -301,21 +327,10 @@ class EndlessWorld extends Forge2DWorld
     }
   }
 
-  void handleMultiGhost() {
-    if (multipleSpawningGhosts &&
-        pelletsRemaining > 0 &&
-        lastNewGhostTimeMillis != 0 &&
-        now - lastNewGhostTimeMillis > 5000) {
-      addGhost(100);
-    }
-  }
-
   @override
   void update(double dt) {
     super.update(dt);
     now = DateTime.now().millisecondsSinceEpoch;
-    handleMultiGhost();
-    updateSirenVolume();
   }
 
   @override
@@ -326,10 +341,8 @@ class EndlessWorld extends Forge2DWorld
         : event.canvasPosition - game.canvasSize / 2;
     if (clickAndDrag) {
       if (iOS) {
-        lastDragPosition = Vector2(0, 0);
         _lastDragAngle = 10;
       } else {
-        lastDragPosition = Vector2(eventVector.x, eventVector.y);
         _lastDragAngle = atan2(eventVector.x, eventVector.y);
       }
     } else if (followCursor) {
@@ -353,10 +366,9 @@ class EndlessWorld extends Forge2DWorld
         double currentAngleTmp = atan2(eventVector.x, eventVector.y);
         double angleDelta =
             convertToSmallestDeltaAngle(currentAngleTmp - _lastDragAngle);
-        gravityTargetAngle = gravityTargetAngle + angleDelta * spinMultiplier;
-        setGravity(Vector2(cos(gravityTargetAngle), sin(gravityTargetAngle)));
+        _gravityTargetAngle = _gravityTargetAngle + angleDelta * spinMultiplier;
+        setGravity(Vector2(cos(_gravityTargetAngle), sin(_gravityTargetAngle)));
       }
-      lastDragPosition = Vector2(eventVector.x, eventVector.y);
       _lastDragAngle = atan2(eventVector.x, eventVector.y);
     } else if (followCursor) {
       linearCursorMoveToGravity(Vector2(eventVector.x, eventVector.y));
@@ -367,7 +379,6 @@ class EndlessWorld extends Forge2DWorld
   void onDragEnd(DragEndEvent event) {
     super.onDragEnd(event);
     if (clickAndDrag) {
-      lastDragPosition = Vector2(0, 0);
       _lastDragAngle = 10;
     }
   }
@@ -393,8 +404,8 @@ class EndlessWorld extends Forge2DWorld
       if (screenRotates) {
         worldAngle = atan2(gravity.x, gravity.y);
         if (actuallyMoveSpritesToScreenPos) {
-          worldCos = cos(worldAngle);
-          worldSin = sin(worldAngle);
+          _worldCos = cos(worldAngle);
+          _worldSin = sin(worldAngle);
         }
       }
     }

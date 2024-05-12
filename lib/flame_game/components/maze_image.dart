@@ -22,13 +22,14 @@ class MazeImage extends SpriteAnimationComponent
       [await game.loadSprite('dash/Pac-Man.png')],
       stepTime: double.infinity,
     );
+    position = world.screenPos(absPosition);
   }
 
   @override
   void update(double dt) {
     super.update(dt);
-    position = world.screenPos(absPosition);
     if (actuallyMoveSpritesToScreenPos) {
+      position = world.screenPos(absPosition);
       angle = world.worldAngle;
     }
   }

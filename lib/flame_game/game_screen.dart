@@ -63,7 +63,7 @@ class GameScreen extends StatelessWidget {
           wonDialogKey: (BuildContext context, EndlessRunner game) {
             return GameWonDialog(
               level: level,
-              levelCompletedIn: game.world.getLevelTimeSeconds(),
+              levelCompletedIn: game.world.getCurrentOrCompleteLevelTimeSeconds(),
             );
           },
         },

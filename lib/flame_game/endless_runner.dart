@@ -10,10 +10,10 @@ import '../player_progress/player_progress.dart';
 import 'endless_world.dart';
 import 'constants.dart';
 import 'helper.dart';
-import 'components/maze_walls.dart';
 import '../../audio/sounds.dart';
 import 'dart:core';
 import 'dart:convert';
+import 'dart:async' as async;
 
 /// This is the base of the game which is added to the [GameWidget].
 ///
@@ -48,8 +48,8 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
   /// A helper for playing sound effects and background audio.
   final AudioController audioController;
 
-  double dxLast = 0;
-  double dyLast = 0;
+  double _dxLast = 0;
+  double _dyLast = 0;
 
   String userString = "";
 
@@ -65,21 +65,20 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
   }
 
   void deadMansSwitch() async {
-    //Wworks as separate thread to stop all audio when game stops
-    if (isGameLive()) {
-      Future.delayed(const Duration(milliseconds: 500), () {
-        deadMansSwitch();
-      });
-    } else {
-      audioController.stopAllSfx();
-    }
+    //Works as separate thread to stop all audio when game stops
+    async.Timer.periodic(const Duration(seconds: 2), (timer) {
+      if (!isGameLive()) {
+        audioController.stopAllSfx();
+        timer.cancel();
+      }
+    });
   }
 
   String getEncodeCurrentGameState() {
     Map<String, dynamic> gameTmp = {};
     gameTmp = {};
     gameTmp["userString"] = userString;
-    gameTmp["levelCompleteTime"] = world.getLevelTimeSeconds();
+    gameTmp["levelCompleteTime"] = world.getCurrentOrCompleteLevelTimeSeconds();
     return json.encode(gameTmp);
   }
 
@@ -99,7 +98,6 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
     userString = getRandomString(world.random, 15);
     downloadScoreboard();
     world.play(SfxType.startMusic);
-    world.addAll(createBoundaries(camera));
     //camera.viewfinder.angle = 0;
   }
 
@@ -110,14 +108,14 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
       camera.viewfinder.angle = -world.worldAngle;
     }
     scoreComponent.text =
-        'Lives: ${3 - world.scoreNotifier.value} \n\nTime: ${world.getLevelTimeSeconds().toStringAsFixed(1)}';
+        'Lives: ${3 - world.scoreNotifier.value} \n\nTime: ${world.getCurrentOrCompleteLevelTimeSeconds().toStringAsFixed(1)}';
 
-    if (dxLast != dx || dyLast != dy) {
+    if (_dxLast != dx || _dyLast != dy) {
       camera.viewport = FixedResolutionViewport(resolution: Vector2(dx, dy));
       camera.viewport.add(scoreComponent);
       scoreComponent.position = Vector2(dx - 30 - 350, 30);
-      dxLast = dx;
-      dyLast = dy;
+      _dxLast = dx;
+      _dyLast = dy;
     }
   }
 }

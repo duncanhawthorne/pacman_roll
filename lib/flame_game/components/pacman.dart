@@ -23,9 +23,9 @@ class Pacman extends GameCharacter with CollisionCallbacks {
 
   //final Vector2 startPosition;
 
-  int pacmanDeadTimeLatest = 0; //a long time ago
-  int pacmanEatingTimeLatest = 0; //a long time ago
-  int pacmanEatingSoundTimeLatest = 0; //a long time ago
+  int _pacmanDeadTimeLatest = 0; //a long time ago
+  int _pacmanEatingTimeLatest = 0; //a long time ago
+  int _pacmanEatingSoundTimeLatest = 0; //a long time ago
 
   Future<Map<CharacterState, SpriteAnimation>?> getAnimations() async {
     return {
@@ -73,9 +73,9 @@ class Pacman extends GameCharacter with CollisionCallbacks {
 
   void handleEatingPellets(PositionComponent pellet) {
     if (pellet is MiniPellet) {
-      if (pacmanEatingSoundTimeLatest <
+      if (_pacmanEatingSoundTimeLatest <
           world.now - kPacmanHalfEatingResetTimeMillis * 2) {
-        pacmanEatingSoundTimeLatest = world.now;
+        _pacmanEatingSoundTimeLatest = world.now;
         world.play(SfxType.waka);
       }
     } else {
@@ -86,7 +86,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
       }
     }
     current = CharacterState.eating;
-    pacmanEatingTimeLatest = world.now;
+    _pacmanEatingTimeLatest = world.now;
     pellet.removeFromParent();
     world.pelletsRemaining -= 1;
     world.endOfGameTestAndAct();
@@ -98,7 +98,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     //pacman visuals
     world.play(SfxType.eatGhost);
     current = CharacterState.eating;
-    pacmanEatingTimeLatest = world.now;
+    _pacmanEatingTimeLatest = world.now;
 
     //ghost impact
     ghost.current = CharacterState.deadGhost;
@@ -123,7 +123,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
       //prevent multiple hits
 
       world.play(SfxType.pacmanDeath);
-      pacmanDeadTimeLatest = world.now;
+      _pacmanDeadTimeLatest = world.now;
       current = CharacterState.deadPacman;
 
       if (world.pacmanPlayersList.length == 1) {
@@ -160,7 +160,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
 
   void pacmanEatingNormalSequence() {
     if (current == CharacterState.eating) {
-      if (world.now - pacmanEatingTimeLatest >
+      if (world.now - _pacmanEatingTimeLatest >
           2 * kPacmanHalfEatingResetTimeMillis) {
         current = CharacterState.normal;
       }
@@ -203,8 +203,8 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   void render(Canvas canvas) {
     super.render(canvas);
     if (current == CharacterState.deadPacman) {
-      assert(world.now >= pacmanDeadTimeLatest);
-      double tween = (world.now - pacmanDeadTimeLatest) / kPacmanDeadResetTimeMillis;
+      assert(world.now >= _pacmanDeadTimeLatest);
+      double tween = (world.now - _pacmanDeadTimeLatest) / kPacmanDeadResetTimeMillis;
       tween = min(1, tween);
       double mouthWidth = pacmanMouthWidthDefault * (1 - tween) + 1 * tween;
       canvas.drawArc(rectSingleSquare, 2 * pi * ((mouthWidth / 2) + 0.5),
