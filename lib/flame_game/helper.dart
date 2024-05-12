@@ -36,7 +36,6 @@ double percentile(List<double> list, double value) {
 }
 
 int getStartingNumberPelletsAndSuperPellets(List mazeLayout) {
-  return 3;
   int c = 0;
   c += mazeLayout
       .map((element) => element == 0 ? 1 : 0)
