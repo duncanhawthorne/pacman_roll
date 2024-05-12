@@ -61,20 +61,19 @@ class EndlessWorld extends Forge2DWorld
   /// can listen to it and act on the updated value.
   final numberOfDeaths = ValueNotifier(0);
   final pelletsRemainingNotifier = ValueNotifier(0);
-  //late RealCharacter player;
+
   DateTime datetimeStarted = DateTime.now();
+  int now = DateTime.now().millisecondsSinceEpoch;
+  int _levelCompleteTimeMillis = 0;
   //Vector2 get size => (parent as FlameGame).size;
 
   //int levelCompletedIn = 0;
   //int pelletsRemaining = 1;
   double _lastDragAngle = 10;
   double _gravityTargetAngle = 2 * pi / 4;
-  int now = DateTime.now().millisecondsSinceEpoch;
-  int _levelCompleteTimeMillis = 0;
   //int _lastNewGhostTimeMillis = 0;
   //int _lastSirenVolumeUpdateTimeMillis = 0;
 
-  /// The random number generator that is used to spawn periodic components.
   final Random random;
 
   /// The gravity is defined in virtual pixels per second squared.
