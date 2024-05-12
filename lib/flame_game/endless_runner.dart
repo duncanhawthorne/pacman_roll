@@ -13,6 +13,7 @@ import 'helper.dart';
 import 'components/maze_walls.dart';
 import '../../audio/sounds.dart';
 import 'dart:core';
+import 'dart:convert';
 
 /// This is the base of the game which is added to the [GameWidget].
 ///
@@ -50,16 +51,39 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
   double dxLast = 0;
   double dyLast = 0;
 
+  String userString = "";
+
   final scoreComponent = TextComponent(
     text: "Lives: 3",
     position: Vector2(dx - 30 - 300, 30),
     textRenderer: textRenderer,
   );
 
+
+
+
+  String getEncodeCurrentGameState() {
+    Map<String, dynamic> gameTmp = {};
+    gameTmp = {};
+    gameTmp["userString"] = userString;
+    gameTmp["levelCompleteTime"] = world.getLevelTimeSeconds();
+    return json.encode(gameTmp);
+  }
+
+  void downloadScoreboard() async {
+    List firebasePull = await save.firebasePull();
+    for (int i = 0; i< firebasePull.length; i++) {
+      scoreboardItemsDoubles.add(firebasePull[i]["levelCompleteTime"]);
+    }
+  }
+
+
   /// In the [onLoad] method you load different type of assets and set things
   /// that only needs to be set once when the level starts up.
   @override
   Future<void> onLoad() async {
+    userString = getRandomString(world.random, 15);
+    downloadScoreboard();
     world.play(SfxType.startMusic);
     world.addAll(createBoundaries(camera));
     //camera.viewfinder.angle = 0;
@@ -72,7 +96,7 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
       camera.viewfinder.angle = -world.worldAngle;
     }
     scoreComponent.text =
-        'Lives: ${3 - world.scoreNotifier.value} \n\nTime: ${world.getLevelTime().toStringAsFixed(1)}';
+        'Lives: ${3 - world.scoreNotifier.value} \n\nTime: ${world.getLevelTimeSeconds().toStringAsFixed(1)}';
 
     if (dxLast != dx || dyLast != dy) {
       camera.viewport = FixedResolutionViewport(resolution: Vector2(dx, dy));

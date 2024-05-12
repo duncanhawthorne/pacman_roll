@@ -1,61 +1,49 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'helper.dart';
 import 'constants.dart';
-import 'dart:math';
+import 'dart:convert';
 
 class Save {
-  String getRandomString(int length) => String.fromCharCodes(Iterable.generate(
-      length, (_) => _chars.codeUnitAt(_rnd.nextInt(_chars.length))));
-  static const _chars =
-      'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
-  final Random _rnd = Random();
-
-  Future<void> firebasePush(double state) async {
+  Future<void> firebasePush(String recordID, String state) async {
+    p("firebase push");
     try {
-      if (fbOn && state > 10.0) { //dont store short times from debug sessions
+      if (fbOn) {
         final dhState = <String, dynamic>{"data": state};
         db!
-            .collection("PMR")
-            .doc(getRandomString(10))
+            .collection("PMR3")
+            .doc(recordID)
             .set(dhState)
             .onError((e, _) => p("Error writing document: $e"));
       }
-    }
-    catch(e) {
+    } catch (e) {
       p(e);
     }
   }
 
-  Future<Map<String, double>> firebasePull() async {
-    Map<String, double> result = {};
+  Future<List> firebasePull() async {
+    List<Map<String, dynamic>> gameTmpList = [];
     try {
       if (fbOn) {
-        final collectionRef = db!.collection("PMR");
+        final collectionRef = db!.collection("PMR3");
         QuerySnapshot querySnapshot = await collectionRef.get();
-        final allData =
-        querySnapshot.docs.map((doc) => {doc.id: doc.data()}).toList();
-
+        final allData = querySnapshot.docs
+            .map((doc) => {doc.id: doc.data() as Map<String, dynamic>})
+            .toList();
         for (int i = 0; i < allData.length; i++) {
           var item = allData[i];
           for (String key in item.keys) {
-            try {
-              var x = item[key].toString();
-              x = x.substring(7, x.length - 1);
-              double y = double.parse(x);
-              result[key] = y;
-            }
-            catch (e) {
-              p(e);
-            }
+            String x = item[key].toString();
+            x = x.substring(7, x.length - 1); //FIXME
+            Map<String, dynamic> gameTmp = {};
+            gameTmp = json.decode(x);
+            gameTmpList.add(gameTmp);
           }
         }
+        return gameTmpList;
       }
-
-    }
-    catch(e) {
+    } catch (e) {
       p(e);
     }
-    return result;
+    return gameTmpList;
   }
-
 }

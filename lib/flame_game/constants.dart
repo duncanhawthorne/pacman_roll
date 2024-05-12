@@ -58,4 +58,7 @@ const multipleSpawningGhosts = false;
 bool fbOn = true;
 //String userName = "ABC";
 FirebaseFirestore? db = fbOn ? FirebaseFirestore.instance : null;
-List<double> scoreboardItems = [0.364];
+List<double> scoreboardItemsDoubles = [0.364];
+
+const String chars =
+    'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';

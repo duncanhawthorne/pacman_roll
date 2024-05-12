@@ -188,7 +188,9 @@ class EndlessWorld extends Forge2DWorld
     if (isGameLive()) {
       if (pelletsRemaining == 0) {
         levelCompleteTimeMillis = now;
-        save.firebasePush(getLevelTime());
+        if (getLevelTimeSeconds() > 10) {
+          save.firebasePush(game.userString, game.getEncodeCurrentGameState());
+        }
         game.overlays.add(GameScreen.wonDialogKey);
         trimToThreeGhosts();
         for (int i = 0; i < ghostPlayersList.length; i++) {
@@ -211,7 +213,7 @@ class EndlessWorld extends Forge2DWorld
     now = DateTime.now().millisecondsSinceEpoch;
     gameRunning = true;
     levelCompleteTimeMillis = 0;
-    scoreboardItems = (await save.firebasePull()).values.toList();
+
     //p(scoreboardItems);
 
     //AudioLogger.logLevel = AudioLogLevel.info;
@@ -242,6 +244,7 @@ class EndlessWorld extends Forge2DWorld
     }
 
     addPacman(kPacmanStartLocation);
+
     for (int i = 0; i < 3; i++) {
       addGhost(i);
     }
@@ -257,7 +260,7 @@ class EndlessWorld extends Forge2DWorld
     // the player passed the level.
     scoreNotifier.addListener(() {
       if (scoreNotifier.value >= level.winScore) {
-        final levelTime = getLevelTime();
+        final levelTime = getLevelTimeSeconds();
 
         levelCompletedIn = levelTime.round();
 
@@ -268,7 +271,7 @@ class EndlessWorld extends Forge2DWorld
     });
   }
 
-  double getLevelTime() {
+  double getLevelTimeSeconds() {
     return ((levelCompleteTimeMillis == 0 ? now : levelCompleteTimeMillis) -
             timeStarted.millisecondsSinceEpoch) /
         1000;
