@@ -62,12 +62,13 @@ class EndlessWorld extends Forge2DWorld
   /// other parts of the code is interested in when the score is updated they
   /// can listen to it and act on the updated value.
   final scoreNotifier = ValueNotifier(0);
+  final pelletsRemainingNotifier = ValueNotifier(0);
   //late RealCharacter player;
   DateTime timeStarted = DateTime.now();
   //Vector2 get size => (parent as FlameGame).size;
 
   //int levelCompletedIn = 0;
-  int pelletsRemaining = 1;
+  //int pelletsRemaining = 1;
   double _lastDragAngle = 10;
   double _gravityTargetAngle = 2 * pi / 4;
   int now = DateTime.now().millisecondsSinceEpoch;
@@ -173,7 +174,7 @@ class EndlessWorld extends Forge2DWorld
       int counter = 0;
       async.Timer.periodic(const Duration(milliseconds: 5000), (timer) {
         if (game.isGameLive()) {
-          if (pelletsRemaining > 0 && counter > 0) {
+          if (pelletsRemainingNotifier.value > 0 && counter > 0) {
             addGhost(100);
           }
         } else {
@@ -197,9 +198,15 @@ class EndlessWorld extends Forge2DWorld
     }
   }
 
+  void removePellet(PositionComponent pellet) {
+    pellet.removeFromParent();
+    pelletsRemainingNotifier.value -= 1;
+    //world.endOfGameTestAndAct(); //now handled via valuelistener
+  }
+
   void endOfGameTestAndAct() {
     if (game.isGameLive()) {
-      if (pelletsRemaining == 0) {
+      if (pelletsRemainingNotifier.value == 0) {
         _levelCompleteTimeMillis = now;
         if (getCurrentOrCompleteLevelTimeSeconds() > 10) {
           save.firebasePush(game.userString, game.getEncodeCurrentGameState());
@@ -232,7 +239,7 @@ class EndlessWorld extends Forge2DWorld
       play(SfxType.ghostsRoamingSiren);
     }
     game.deadMansSwitch();
-    pelletsRemaining = getStartingNumberPelletsAndSuperPellets(flatMazeLayout);
+    pelletsRemainingNotifier.value = getStartingNumberPelletsAndSuperPellets(flatMazeLayout);
 
     WakelockPlus.toggle(enable: true);
 
@@ -275,6 +282,11 @@ class EndlessWorld extends Forge2DWorld
         //playerProgress.setLevelFinished(level.number, getCurrentOrCompleteLevelTimeSeconds().toInt());
         game.pauseEngine();
         game.overlays.add(GameScreen.loseDialogKey);
+      }
+    });
+    pelletsRemainingNotifier.addListener(() {
+      if (pelletsRemainingNotifier.value == 0) {
+        endOfGameTestAndAct();
       }
     });
     sirenVolumeUpdatedTimer();

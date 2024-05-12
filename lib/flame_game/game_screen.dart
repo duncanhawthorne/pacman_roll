@@ -64,10 +64,13 @@ class GameScreen extends StatelessWidget {
                 children: [
                   ValueListenableBuilder<int>(
                     builder: (BuildContext context, int value, Widget? child) {
-                      return Text(
-                          "Lives: ${3 - game.world.scoreNotifier.value}\n",
-                          style: const TextStyle(
-                              fontSize: 12, color: Colors.white));
+                      return Padding(
+                        padding: const EdgeInsets.fromLTRB(0,0,0,8.0),
+                        child: Text(
+                            "Lives: ${3 - game.world.scoreNotifier.value}",
+                            style: const TextStyle(
+                                fontSize: 12, color: Colors.white)),
+                      );
                     },
                     valueListenable: game.world.scoreNotifier,
                   ),

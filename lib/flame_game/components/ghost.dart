@@ -60,7 +60,7 @@ class Ghost extends GameCharacter {
   void ghostDeadScaredScaredIshNormalSequence() {
     if (current == CharacterState.deadGhost) {
       if (world.now - ghostDeadTimeLatest > kGhostResetTimeMillis) {
-        if (world.pelletsRemaining > 0) {
+        if (world.pelletsRemainingNotifier.value > 0) {
           setUnderlyingBallPosition(
               kGhostStartLocation + Vector2.random() / 100);
         }
