@@ -67,20 +67,14 @@ class EndlessWorld extends Forge2DWorld
   int _levelCompleteTimeMillis = 0;
   //Vector2 get size => (parent as FlameGame).size;
 
-  //int levelCompletedIn = 0;
-  //int pelletsRemaining = 1;
   double _lastDragAngle = 10;
   double _gravityTargetAngle = 2 * pi / 4;
-  //int _lastNewGhostTimeMillis = 0;
-  //int _lastSirenVolumeUpdateTimeMillis = 0;
 
   final Random random;
 
   /// The gravity is defined in virtual pixels per second squared.
   /// These pixels are in relation to how big the [FixedResolutionViewport] is.
   double worldAngle = 0; //2 * pi / 8;
-  double _worldCos = 1;
-  double _worldSin = 0;
 
   List<Ghost> ghostPlayersList = [];
   List<Pacman> pacmanPlayersList = [];
@@ -92,8 +86,7 @@ class EndlessWorld extends Forge2DWorld
   }
 
   void sirenVolumeUpdatedTimer() async {
-    //NOTE disabled on iOS for bug
-
+    //NOTE disabled on iOS due to bug
     async.Timer.periodic(const Duration(milliseconds: 500), (timer) {
       if (game.isGameLive()) {
         game.audioController.setSirenVolume(getTargetSirenVolume(
@@ -102,30 +95,6 @@ class EndlessWorld extends Forge2DWorld
         timer.cancel();
       }
     });
-
-    /*
-    if (sirenEnabled && now - _lastSirenVolumeUpdateTimeMillis > 500) {
-      _lastSirenVolumeUpdateTimeMillis = now;
-      game.audioController.setSirenVolume(getTargetSirenVolume(
-          game.isGameLive(), ghostPlayersList, pacmanPlayersList));
-    }
-
-     */
-  }
-
-  Vector2 screenPos(Vector2 absolutePos) {
-    if (!actuallyMoveSpritesToScreenPos) {
-      return absolutePos;
-    } else {
-      if (!screenRotates) {
-        return absolutePos;
-      } else {
-        //Matrix2 mat = Matrix2(
-        //    worldCos, -worldSin, worldSin, worldCos);
-        return Vector2(_worldCos * absolutePos[0] + -_worldSin * absolutePos[1],
-            _worldSin * absolutePos[0] + _worldCos * absolutePos[1]);
-      }
-    }
   }
 
   void addGhost(int ghostSpriteChooserNumber) {
@@ -168,16 +137,14 @@ class EndlessWorld extends Forge2DWorld
 
   void multiGhostAdderTimer() {
     if (multipleSpawningGhosts) {
-      int counter = 0;
       async.Timer.periodic(const Duration(milliseconds: 5000), (timer) {
         if (game.isGameLive()) {
-          if (pelletsRemainingNotifier.value > 0 && counter > 0) {
+          if (pelletsRemainingNotifier.value > 0) {
             addGhost(100);
           }
         } else {
           timer.cancel();
         }
-        counter++;
       });
     }
   }
@@ -299,9 +266,7 @@ class EndlessWorld extends Forge2DWorld
   @override
   void onPointerMove(flame_pointer_move_event.PointerMoveEvent event) {
     //TODO try to capture mouse on windows
-    Vector2 eventVector = actuallyMoveSpritesToScreenPos
-        ? event.localPosition
-        : event.canvasPosition - game.canvasSize / 2;
+    Vector2 eventVector = event.canvasPosition - game.canvasSize / 2;
     if (followCursor) {
       linearCursorMoveToGravity(Vector2(eventVector.x, eventVector.y));
     }
@@ -316,9 +281,7 @@ class EndlessWorld extends Forge2DWorld
   @override
   void onDragStart(DragStartEvent event) {
     super.onDragStart(event);
-    Vector2 eventVector = actuallyMoveSpritesToScreenPos
-        ? event.localPosition
-        : event.canvasPosition - game.canvasSize / 2;
+    Vector2 eventVector = event.canvasPosition - game.canvasSize / 2;
     if (clickAndDrag) {
       if (iOS) {
         _lastDragAngle = 10;
@@ -333,12 +296,8 @@ class EndlessWorld extends Forge2DWorld
   @override
   void onDragUpdate(DragUpdateEvent event) {
     super.onDragUpdate(event);
-    Vector2 eventVector = actuallyMoveSpritesToScreenPos
-        ? event.localStartPosition
-        : event.canvasStartPosition - game.canvasSize / 2;
-    double eventVectorLengthProportion = actuallyMoveSpritesToScreenPos
-        ? event.localStartPosition.length / (inGameVectorPixels / 2)
-        : (event.canvasStartPosition - game.canvasSize / 2).length /
+    Vector2 eventVector = event.canvasStartPosition - game.canvasSize / 2;
+    double eventVectorLengthProportion = (event.canvasStartPosition - game.canvasSize / 2).length /
             (min(game.canvasSize.x, game.canvasSize.y) / 2);
     if (clickAndDrag) {
       if (_lastDragAngle != 10) {
@@ -367,9 +326,7 @@ class EndlessWorld extends Forge2DWorld
     assert(screenRotates);
     if (globalPhysicsLinked) {
       double impliedAngle = -eventVector.x /
-          (actuallyMoveSpritesToScreenPos
-              ? inGameVectorPixels
-              : min(game.canvasSize.x, game.canvasSize.y)) *
+          min(game.canvasSize.x, game.canvasSize.y) *
           pointerRotationSpeed;
       setGravity(Vector2(cos(impliedAngle), sin(impliedAngle)));
     }
@@ -383,10 +340,6 @@ class EndlessWorld extends Forge2DWorld
       }
       if (screenRotates) {
         worldAngle = atan2(gravity.x, gravity.y);
-        if (actuallyMoveSpritesToScreenPos) {
-          _worldCos = cos(worldAngle);
-          _worldSin = sin(worldAngle);
-        }
       }
     }
   }

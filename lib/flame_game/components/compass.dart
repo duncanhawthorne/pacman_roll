@@ -29,8 +29,7 @@ class Compass extends SpriteAnimationComponent
   @override
   void update(double dt) {
     super.update(dt);
-    absPosition = kCompassLocation +
+    position = kCompassLocation +
         capVector(world.gravity / 25) * getSingleSquareWidth();
-    position = world.screenPos(absPosition);
   }
 }

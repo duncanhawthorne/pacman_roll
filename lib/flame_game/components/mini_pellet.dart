@@ -27,12 +27,4 @@ class MiniPellet extends SpriteAnimationComponent
     // it.
     add(CircleHitbox());
   }
-
-  @override
-  void update(double dt) {
-    super.update(dt);
-    if (actuallyMoveSpritesToScreenPos) {
-      position = world.screenPos(absPosition);
-    }
-  }
 }

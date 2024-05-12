@@ -2,7 +2,6 @@ import 'maze_walls.dart';
 import '../helper.dart';
 
 import '../endless_world.dart';
-import '../constants.dart';
 import 'package:flame/components.dart';
 
 /// The [MiniPellet] components are the components that the [Player] should collect
@@ -14,7 +13,6 @@ class MazeImage extends SpriteAnimationComponent
   static final Vector2 spriteSize =
       Vector2.all(getSingleSquareWidth() * getMazeWidth());
   //final speed = 0;
-  Vector2 absPosition = Vector2(0, 0);
 
   @override
   Future<void> onLoad() async {
@@ -22,15 +20,6 @@ class MazeImage extends SpriteAnimationComponent
       [await game.loadSprite('dash/Pac-Man.png')],
       stepTime: double.infinity,
     );
-    position = world.screenPos(absPosition);
-  }
-
-  @override
-  void update(double dt) {
-    super.update(dt);
-    if (actuallyMoveSpritesToScreenPos) {
-      position = world.screenPos(absPosition);
-      angle = world.worldAngle;
-    }
+    position = Vector2(0, 0);
   }
 }

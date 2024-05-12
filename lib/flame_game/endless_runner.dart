@@ -105,9 +105,7 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
   @override
   void update(double dt) {
     super.update(dt);
-    if (!actuallyMoveSpritesToScreenPos) {
-      camera.viewfinder.angle = -world.worldAngle;
-    }
+    camera.viewfinder.angle = -world.worldAngle;
     //scoreComponent.text =
     //    'Lives: ${3 - world.scoreNotifier.value} \n\nTime: ${world.getCurrentOrCompleteLevelTimeSeconds().toStringAsFixed(1)}';
 

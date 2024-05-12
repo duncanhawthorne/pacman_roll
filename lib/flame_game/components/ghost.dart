@@ -87,8 +87,8 @@ class Ghost extends GameCharacter {
         (world.now - ghostDeadTimeLatest) / (kGhostResetTimeMillis);
     timefrac = min(1, timefrac);
 
-    return world.screenPos(ghostDeadPositionLatest * (1 - timefrac) +
-        kGhostStartLocation * (timefrac));
+    return ghostDeadPositionLatest * (1 - timefrac) +
+        kGhostStartLocation * (timefrac);
   }
 
   @override

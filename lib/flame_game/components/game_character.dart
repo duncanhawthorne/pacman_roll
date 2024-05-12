@@ -26,7 +26,6 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
       realCharacter: this,
       initialPosition: position); //to avoid null safety issues
 
-  double _absoluteAngle = 0;
   // Used to store the last position of the player, so that we later can
   // determine which direction that the player is moving.
   // ignore: prefer_final_fields
@@ -95,30 +94,27 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     }
   }
 
-  void updateUnderlyingAngle() {
+  double getUpdatedAngle() {
+    double tmpAngle = 0;
     if (useForgePhysicsBallRotation) {
       try {
-        _absoluteAngle = underlyingBallReal.angle;
+        tmpAngle = underlyingBallReal.angle;
       } catch (e) {
         //FIXME body not initialised. Shouldn't need this, hid error
+        tmpAngle = angle;
       }
     } else {
-      _absoluteAngle = _absoluteAngle +
+      tmpAngle = angle +
           (getUnderlyingBallPosition() - _lastUnderlyingPosition).length /
               (size.x / 2) *
               getRollSpinDirection(getUnderlyingBallVelocity(), world.gravity);
     }
-  }
-
-  double getUpdatedAngle() {
-    updateUnderlyingAngle();
-    return _absoluteAngle +
-        (actuallyMoveSpritesToScreenPos ? world.worldAngle : 0);
+    return tmpAngle;
   }
 
   void oneFrameOfPhysics() {
     moveUnderlyingBallThroughPipePortal();
-    position = world.screenPos(getUnderlyingBallPosition());
+    position = getUnderlyingBallPosition();
     angle = getUpdatedAngle();
   }
 

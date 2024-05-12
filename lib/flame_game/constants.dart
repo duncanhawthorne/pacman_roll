@@ -45,15 +45,15 @@ const int kPacmanDeadResetTimeMillis = 1700;
 const int kPacmanHalfEatingResetTimeMillis = 180;
 
 bool globalPhysicsLinked = true;
-const bool rotateCamera = true;
-const bool actuallyMoveSpritesToScreenPos = !rotateCamera;
+//const bool rotateCamera = true;
+//const bool actuallyMoveSpritesToScreenPos = !rotateCamera;
 const double pacmanMouthWidthDefault = 5 / 32;
 
 const soundOn = true;
 final bool sirenEnabled = iOS ? false : true;
 const bool pelletEatSoundOn = true; //iOS ? false : true;
 const multipleSpawningPacmans = false;
-const multipleSpawningGhosts = false;
+const multipleSpawningGhosts = true;
 
 bool fbOn = true;
 //String userName = "ABC";
