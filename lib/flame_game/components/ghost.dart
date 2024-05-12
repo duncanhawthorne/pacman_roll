@@ -87,14 +87,15 @@ class Ghost extends GameCharacter {
         (world.now - ghostDeadTimeLatest) / (kGhostResetTimeMillis);
     timefrac = min(1, timefrac);
 
-    return world.screenPos(
-        ghostDeadPositionLatest * (1 - timefrac) + kGhostStartLocation * (timefrac));
+    return world.screenPos(ghostDeadPositionLatest * (1 - timefrac) +
+        kGhostStartLocation * (timefrac));
   }
 
   @override
   Future<void> onLoad() async {
     animations = await getAnimations();
-    setUnderlyingBallPosition(position); //FIXME shouldn't be necessary, but avoids one frame starting glitch
+    setUnderlyingBallPosition(
+        position); //FIXME shouldn't be necessary, but avoids one frame starting glitch
     current = CharacterState.deadGhost;
 
     // When adding a CircleHitbox without any arguments it automatically

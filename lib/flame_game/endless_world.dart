@@ -211,6 +211,8 @@ class EndlessWorld extends Forge2DWorld
         if (getCurrentOrCompleteLevelTimeSeconds() > 10) {
           save.firebasePush(game.userString, game.getEncodeCurrentGameState());
         }
+        game.overlays.remove(GameScreen.statusOverlay);
+        game.overlays.remove(GameScreen.backButtonKey);
         game.overlays.add(GameScreen.wonDialogKey);
         trimToThreeGhosts();
         for (int i = 0; i < ghostPlayersList.length; i++) {
@@ -239,7 +241,8 @@ class EndlessWorld extends Forge2DWorld
       play(SfxType.ghostsRoamingSiren);
     }
     game.deadMansSwitch();
-    pelletsRemainingNotifier.value = getStartingNumberPelletsAndSuperPellets(flatMazeLayout);
+    pelletsRemainingNotifier.value =
+        getStartingNumberPelletsAndSuperPellets(flatMazeLayout);
 
     WakelockPlus.toggle(enable: true);
 

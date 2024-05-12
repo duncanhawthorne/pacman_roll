@@ -21,8 +21,6 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
             anchor: Anchor.center,
             priority: 1);
 
-
-
   //final Vector2 startingPosition;
   late PhysicsBall underlyingBallReal = PhysicsBall(
       realCharacter: this,
@@ -108,8 +106,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
       _absoluteAngle = _absoluteAngle +
           (getUnderlyingBallPosition() - _lastUnderlyingPosition).length /
               (size.x / 2) *
-              getRollSpinDirection(
-                  getUnderlyingBallVelocity(), world.gravity);
+              getRollSpinDirection(getUnderlyingBallVelocity(), world.gravity);
     }
   }
 
@@ -127,7 +124,8 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
 
   @override
   Future<void> onLoad() async {
-    setUnderlyingBallPosition(position); //FIXME shouldn't be necessary, but avoids one frame starting glitch
+    setUnderlyingBallPosition(
+        position); //FIXME shouldn't be necessary, but avoids one frame starting glitch
     _lastUnderlyingPosition.setFrom(getUnderlyingBallPosition());
   }
 

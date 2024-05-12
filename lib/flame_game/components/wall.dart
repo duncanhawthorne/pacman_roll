@@ -1,6 +1,7 @@
 import 'package:flame_forge2d/flame_forge2d.dart';
 
-class Wall extends BodyComponent { //with CollisionCallbacks
+class Wall extends BodyComponent {
+  //with CollisionCallbacks
   final Vector2 _start;
   final Vector2 _end;
 

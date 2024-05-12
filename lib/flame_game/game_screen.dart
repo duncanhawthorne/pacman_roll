@@ -65,7 +65,7 @@ class GameScreen extends StatelessWidget {
                   ValueListenableBuilder<int>(
                     builder: (BuildContext context, int value, Widget? child) {
                       return Padding(
-                        padding: const EdgeInsets.fromLTRB(0,0,0,8.0),
+                        padding: const EdgeInsets.fromLTRB(0, 0, 0, 8.0),
                         child: Text(
                             "Lives: ${3 - game.world.scoreNotifier.value}",
                             style: const TextStyle(
@@ -98,7 +98,8 @@ class GameScreen extends StatelessWidget {
           loseDialogKey: (BuildContext context, EndlessRunner game) {
             return GameLoseDialog(
               level: level,
-              levelCompletedIn: (game.world.getCurrentOrCompleteLevelTimeSeconds()).toInt(),
+              levelCompletedIn:
+                  (game.world.getCurrentOrCompleteLevelTimeSeconds()).toInt(),
             );
           },
           wonDialogKey: (BuildContext context, EndlessRunner game) {

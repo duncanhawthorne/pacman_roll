@@ -24,8 +24,7 @@ void p(x) {
 String endText(double value) {
   double x = percentile(scoreboardItemsDoubles, value) * 100;
   String z = x.toStringAsFixed(0);
-  String y =
-      "\nTime: ${value.toStringAsFixed(1)} seconds \n\nRank: Top $z%\n";
+  String y = "\nTime: ${value.toStringAsFixed(1)} seconds \n\nRank: Top $z%\n";
   return y;
 }
 
@@ -37,6 +36,7 @@ double percentile(List<double> list, double value) {
 }
 
 int getStartingNumberPelletsAndSuperPellets(List mazeLayout) {
+  return 3;
   int c = 0;
   c += mazeLayout
       .map((element) => element == 0 ? 1 : 0)
@@ -184,5 +184,6 @@ double getTargetSirenVolume(
   return tmpSirenVolume;
 }
 
-String getRandomString(random, int length) => String.fromCharCodes(Iterable.generate(
-    length, (_) => chars.codeUnitAt(random.nextInt(chars.length))));
+String getRandomString(random, int length) =>
+    String.fromCharCodes(Iterable.generate(
+        length, (_) => chars.codeUnitAt(random.nextInt(chars.length))));

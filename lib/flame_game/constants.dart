@@ -47,7 +47,7 @@ const int kPacmanHalfEatingResetTimeMillis = 180;
 bool globalPhysicsLinked = true;
 const bool rotateCamera = true;
 const bool actuallyMoveSpritesToScreenPos = !rotateCamera;
-const double pacmanMouthWidthDefault = 5/32;
+const double pacmanMouthWidthDefault = 5 / 32;
 
 const soundOn = true;
 final bool sirenEnabled = iOS ? false : true;

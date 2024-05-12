@@ -41,8 +41,7 @@ class Save {
               //p(singleEntry);
               allFirebaseEntries.add(singleEntry);
             }
-          }
-          catch(e) {
+          } catch (e) {
             p(e);
           }
         }

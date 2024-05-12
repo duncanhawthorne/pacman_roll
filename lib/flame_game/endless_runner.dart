@@ -61,7 +61,6 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
   );
    */
 
-
   bool isGameLive() {
     return gameRunning && !paused && isLoaded && isMounted;
   }
@@ -86,11 +85,10 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
 
   void downloadScoreboard() async {
     List firebasePull = await save.firebasePull();
-    for (int i = 0; i< firebasePull.length; i++) {
+    for (int i = 0; i < firebasePull.length; i++) {
       scoreboardItemsDoubles.add(firebasePull[i]["levelCompleteTime"]);
     }
   }
-
 
   /// In the [onLoad] method you load different type of assets and set things
   /// that only needs to be set once when the level starts up.

@@ -36,9 +36,9 @@ class PhysicsBall extends BodyComponent {
               type: BodyType.dynamic,
               userData: PhysicsBall,
             ));
-            //paint: Paint()
-            //  ..color = color ?? Colors.transparent
-            //  ..style = PaintingStyle.fill);
+  //paint: Paint()
+  //  ..color = color ?? Colors.transparent
+  //  ..style = PaintingStyle.fill);
 
   GameCharacter? realCharacter;
 
