@@ -13,6 +13,7 @@ import 'package:provider/provider.dart';
 import 'game_lose_dialog.dart';
 import 'game_won_dialog.dart';
 import 'package:elapsed_time_display/elapsed_time_display.dart';
+import 'package:flutter/services.dart';
 
 /// This widget defines the properties of the game screen.
 ///
@@ -31,6 +32,9 @@ class GameScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Colors.black, // Status bar color
+    ));
     final audioController = context.read<AudioController>();
     return Scaffold(
       body: GameWidget<EndlessRunner>(
@@ -65,7 +69,7 @@ class GameScreen extends StatelessWidget {
                   ValueListenableBuilder<int>(
                     builder: (BuildContext context, int value, Widget? child) {
                       return Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 0, 0, 8.0),
+                        padding: const EdgeInsets.fromLTRB(0, 2, 0, 8),
                         child: Text(
                             "Lives: ${3 - game.world.numberOfDeaths.value}",
                             style: const TextStyle(
@@ -76,7 +80,7 @@ class GameScreen extends StatelessWidget {
                   ),
                   ElapsedTimeDisplay(
                     startTime: DateTime.fromMillisecondsSinceEpoch(
-                        game.world.datetimeStarted.millisecondsSinceEpoch),
+                        game.world.datetimeStartedMillis),
                     interval: const Duration(milliseconds: 100),
                     style: const TextStyle(fontSize: 12, color: Colors.white),
                     formatter: (elapsedTime) {
@@ -99,14 +103,14 @@ class GameScreen extends StatelessWidget {
             return GameLoseDialog(
               level: level,
               levelCompletedIn:
-                  (game.world.getCurrentOrCompleteLevelTimeSeconds()).toInt(),
+                  (game.world.getLevelCompleteTimeSeconds()).toInt(),
             );
           },
           wonDialogKey: (BuildContext context, EndlessRunner game) {
             return GameWonDialog(
               level: level,
               levelCompletedIn:
-                  game.world.getCurrentOrCompleteLevelTimeSeconds(),
+                  game.world.getLevelCompleteTimeSeconds(),
             );
           },
         },

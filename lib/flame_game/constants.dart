@@ -52,8 +52,8 @@ const double pacmanMouthWidthDefault = 5 / 32;
 const soundOn = true;
 final bool sirenEnabled = iOS ? false : true;
 const bool pelletEatSoundOn = true; //iOS ? false : true;
-const multipleSpawningPacmans = true;
-const multipleSpawningGhosts = true;
+const multipleSpawningPacmans = false;
+const multipleSpawningGhosts = false;
 
 bool fbOn = true;
 //String userName = "ABC";

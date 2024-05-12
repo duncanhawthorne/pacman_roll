@@ -59,9 +59,9 @@ class EndlessWorld extends Forge2DWorld
   final numberOfDeaths = ValueNotifier(0);
   final pelletsRemainingNotifier = ValueNotifier(0);
 
-  DateTime datetimeStarted = DateTime.now();
-  int now = DateTime.now().millisecondsSinceEpoch;
-  int _levelCompleteTimeMillis = 0;
+  int datetimeStartedMillis = -1;
+  int now = -1;
+  int _levelCompleteTimeMillis = -1;
   //Vector2 get size => (parent as FlameGame).size;
 
   double _lastDragAngle = 10;
@@ -165,11 +165,11 @@ class EndlessWorld extends Forge2DWorld
     //world.endOfGameTestAndAct(); //now handled via valuelistener
   }
 
-  void endOfGameTestAndAct() {
+  void handleWinGame() {
     if (game.isGameLive()) {
       if (pelletsRemainingNotifier.value == 0) {
         _levelCompleteTimeMillis = now;
-        if (getCurrentOrCompleteLevelTimeSeconds() > 10) {
+        if (getLevelCompleteTimeSeconds() > 10) {
           save.firebasePush(game.userString, game.getEncodeCurrentGameState());
         }
         game.overlays.remove(GameScreen.statusOverlay);
@@ -189,13 +189,41 @@ class EndlessWorld extends Forge2DWorld
     }
   }
 
+  void winOrLoseGameListener() {
+    numberOfDeaths.addListener(() {
+      if (numberOfDeaths.value >= level.maxAllowedDeaths) {
+        handleLoseGame();
+      }
+    });
+    pelletsRemainingNotifier.addListener(() {
+      if (pelletsRemainingNotifier.value == 0) {
+        handleWinGame();
+      }
+    });
+  }
+
+  void handleLoseGame() {
+    //playerProgress.setLevelFinished(level.number, getCurrentOrCompleteLevelTimeSeconds().toInt());
+    game.pauseEngine();
+    game.overlays.add(GameScreen.loseDialogKey);
+    game.overlays.remove(GameScreen.statusOverlay);
+    game.overlays.remove(GameScreen.backButtonKey);
+  }
+
+  double getLevelCompleteTimeSeconds() {
+    assert(_levelCompleteTimeMillis != -1);
+    return (_levelCompleteTimeMillis -
+        datetimeStartedMillis) /
+        1000;
+  }
+
   @override
   Future<void> onLoad() async {
-    datetimeStarted = DateTime.now();
     now = DateTime.now().millisecondsSinceEpoch;
-    _levelCompleteTimeMillis = 0;
+    datetimeStartedMillis = now;
     // Used to keep track of when the level started, so that we later can
     // calculate how long time it took to finish the level.
+    _levelCompleteTimeMillis = -1;
 
     play(SfxType.startMusic);
     if (sirenEnabled) {
@@ -213,26 +241,8 @@ class EndlessWorld extends Forge2DWorld
     addAll(createBoundaries(game.camera));
     addPelletsAndSuperPellets(this, pelletsRemainingNotifier);
 
-    numberOfDeaths.addListener(() {
-      if (numberOfDeaths.value >= level.maxAllowedDeaths) {
-        //playerProgress.setLevelFinished(level.number, getCurrentOrCompleteLevelTimeSeconds().toInt());
-        game.pauseEngine();
-        game.overlays.add(GameScreen.loseDialogKey);
-      }
-    });
-    pelletsRemainingNotifier.addListener(() {
-      if (pelletsRemainingNotifier.value == 0) {
-        endOfGameTestAndAct();
-      }
-    });
-
+    winOrLoseGameListener();
     handleAcceleratorEvents(this);
-  }
-
-  double getCurrentOrCompleteLevelTimeSeconds() {
-    return ((_levelCompleteTimeMillis == 0 ? now : _levelCompleteTimeMillis) -
-            datetimeStarted.millisecondsSinceEpoch) /
-        1000;
   }
 
   @override

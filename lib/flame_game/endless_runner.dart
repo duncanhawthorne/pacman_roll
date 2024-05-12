@@ -79,7 +79,7 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
     Map<String, dynamic> gameTmp = {};
     gameTmp = {};
     gameTmp["userString"] = userString;
-    gameTmp["levelCompleteTime"] = world.getCurrentOrCompleteLevelTimeSeconds();
+    gameTmp["levelCompleteTime"] = world.getLevelCompleteTimeSeconds();
     return json.encode(gameTmp);
   }
 
@@ -105,14 +105,8 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
   @override
   void update(double dt) {
     super.update(dt);
-    //camera.viewfinder.angle = -world.worldAngle;
-    //scoreComponent.text =
-    //    'Lives: ${3 - world.scoreNotifier.value} \n\nTime: ${world.getCurrentOrCompleteLevelTimeSeconds().toStringAsFixed(1)}';
-
     if (_dxLast != dx || _dyLast != dy) {
       camera.viewport = FixedResolutionViewport(resolution: Vector2(dx, dy));
-      //camera.viewport.add(scoreComponent);
-      //scoreComponent.position = Vector2(dx - 30 - 350, 30);
       _dxLast = dx;
       _dyLast = dy;
     }
