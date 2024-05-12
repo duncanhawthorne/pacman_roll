@@ -56,9 +56,6 @@ class EndlessWorld extends Forge2DWorld
   /// progress if a level is finished.
   final PlayerProgress playerProgress;
 
-  /// In the [numberOfDeaths] we keep track of what the current score is, and if
-  /// other parts of the code is interested in when the score is updated they
-  /// can listen to it and act on the updated value.
   final numberOfDeaths = ValueNotifier(0);
   final pelletsRemainingNotifier = ValueNotifier(0);
 
@@ -74,7 +71,7 @@ class EndlessWorld extends Forge2DWorld
 
   /// The gravity is defined in virtual pixels per second squared.
   /// These pixels are in relation to how big the [FixedResolutionViewport] is.
-  double worldAngle = 0; //2 * pi / 8;
+  //double worldAngle = 0; //2 * pi / 8;
 
   List<Ghost> ghostPlayersList = [];
   List<Pacman> pacmanPlayersList = [];
@@ -339,7 +336,7 @@ class EndlessWorld extends Forge2DWorld
         gravity = gravity.normalized() * 50;
       }
       if (screenRotates) {
-        worldAngle = atan2(gravity.x, gravity.y);
+        game.camera.viewfinder.angle = -atan2(gravity.x, gravity.y);
       }
     }
   }
