@@ -47,6 +47,7 @@ class PhysicsBall extends BodyComponent {
   // ignore: overridden_fields
   final renderBody = false;
 
+
 /*
   @override
   Body createBody() {

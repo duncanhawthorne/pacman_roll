@@ -32,9 +32,9 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   // Used to store the last position of the player, so that we later can
   // determine which direction that the player is moving.
   // ignore: prefer_final_fields
-  Vector2 _lastUnderlyingBallPosition = Vector2.zero();
+  Vector2 _lastPosition = Vector2.zero();
   // ignore: prefer_final_fields
-  Vector2 _lastUnderlyingBallVelocity = Vector2.zero();
+  Vector2 _lastVelocity = Vector2.zero();
 
   PhysicsBall createUnderlyingBall(Vector2 targetPosition) {
     PhysicsBall underlyingBallRealTmp =
@@ -46,8 +46,12 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     return underlyingBallRealTmp;
   }
 
-  void removeUnderlyingBall() {
+  void removeUnderlyingBallFromWorld() {
     world.remove(_underlyingBall);
+  }
+
+  void addUnderlyingBallToWorld() {
+    world.add(_underlyingBall);
   }
 
   Vector2 getUnderlyingBallPosition() {
@@ -55,14 +59,16 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
       return _underlyingBall.position;
     } catch (e) {
       //FIXME body not initialised. Shouldn't need this, hid error
-      //p(["getUnderlyingBallPosition", e, _lastUnderlyingBallPosition]);
-      return _lastUnderlyingBallPosition; //Vector2(10, 0);
+      //p(["getUnderlyingBallPosition", e, _lastPosition]);
+      return _lastPosition; //Vector2(10, 0);
     }
   }
 
   void setUnderlyingBallPosition(Vector2 targetLoc) {
+
     _underlyingBall
         .removeFromParent(); //note possible risk that may try to remove a ball that isn't in the world
+    //removeUnderlyingBallFromWorld();
     _underlyingBall = createUnderlyingBall(targetLoc);
     world.add(_underlyingBall);
   }
@@ -73,32 +79,38 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
           _underlyingBall.body.linearVelocity.y);
     } catch (e) {
       //FIXME body not initialised. Shouldn't need this, hid error
-      //p(["getUnderlyingBallVelocity", e]);
-      return _lastUnderlyingBallVelocity;
+      //p(["getUnderlyingBallVelocity", e, _lastVelocity]);
+      return _lastVelocity;
     }
   }
 
   void setUnderlyingVelocity(Vector2 vel) {
+    Future.delayed(const Duration(seconds: 0), () {
+      _underlyingBall.body.linearVelocity = vel;
+    });
+    /*
     try {
       _underlyingBall.body.linearVelocity = vel;
     } catch (e) {
+      //FIXME body not initialised. Shouldn't need this, hid error
+      p(["setUnderlyingVelocity", e, vel]);
       Future.delayed(const Duration(seconds: 0), () {
-        //FIXME body not initialised. Shouldn't need this, hid error
         _underlyingBall.body.linearVelocity = vel;
       });
     }
+     */
   }
 
   void moveUnderlyingBallThroughPipePortal() {
-    if (!debugMode) {
-      if (getUnderlyingBallPosition().x > 10 * getSingleSquareWidth()) {
+      if (position.x > 10 * getSingleSquareWidth()) {
+        Vector2 startVel = getUnderlyingBallVelocity(); //before destroy ball
         setUnderlyingBallPosition(kLeftPortalLocation);
-        setUnderlyingVelocity(getUnderlyingBallVelocity());
-      } else if (getUnderlyingBallPosition().x < -10 * getSingleSquareWidth()) {
-        setUnderlyingBallPosition(kRightPortalLocation);
-        setUnderlyingVelocity(getUnderlyingBallVelocity());
+        setUnderlyingVelocity(startVel);
+      } else if (position.x < -10 * getSingleSquareWidth()) {
+        Vector2 startVel = getUnderlyingBallVelocity();
+        setUnderlyingBallPosition(kRightPortalLocation); //before destroy ball
+        setUnderlyingVelocity(startVel);
       }
-    }
   }
 
   double getUpdatedAngle() {
@@ -113,7 +125,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     } else {
       //p([(getUnderlyingBallPosition() - _lastUnderlyingBallPosition).length]);
       tmpAngle = angle +
-          (getUnderlyingBallPosition() - _lastUnderlyingBallPosition).length /
+          (position - _lastPosition).length /
               (size.x / 2) *
               getRollSpinDirection(getUnderlyingBallVelocity(), world.gravity);
     }
@@ -121,27 +133,23 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   }
 
   void oneFrameOfPhysics() {
-    moveUnderlyingBallThroughPipePortal();
     position = getUnderlyingBallPosition();
     angle = getUpdatedAngle();
+    moveUnderlyingBallThroughPipePortal();
   }
 
   @override
   Future<void> onLoad() async {
-    setUnderlyingBallPosition(
-        position); //FIXME shouldn't be necessary, but avoids one frame starting glitch
-    _lastUnderlyingBallPosition.setFrom(position);
-    // When adding a CircleHitbox without any arguments it automatically
-    // fills up the size of the component as much as it can without overflowing
-    // it.
-    add(CircleHitbox());
+    addUnderlyingBallToWorld();
+    _lastPosition.setFrom(position);
+    add(CircleHitbox()); //hitbox as large as possble
   }
 
   @override
   void update(double dt) {
     super.update(dt);
-    _lastUnderlyingBallPosition.setFrom(getUnderlyingBallPosition());
-    _lastUnderlyingBallVelocity.setFrom(getUnderlyingBallVelocity());
+    _lastVelocity.setFrom((position - _lastPosition)/dt); //FIXME except ball through portal
+    _lastPosition.setFrom(position);
   }
 }
 

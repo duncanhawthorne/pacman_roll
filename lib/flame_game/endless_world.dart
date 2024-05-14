@@ -122,13 +122,13 @@ class EndlessWorld extends Forge2DWorld
   }
 
   void removePacman(Pacman pacman) {
-    pacman.removeUnderlyingBall();
+    pacman.removeUnderlyingBallFromWorld();
     remove(pacman);
     pacmanPlayersList.remove(pacman);
   }
 
   void removeGhost(Ghost ghost) {
-    ghost.removeUnderlyingBall();
+    ghost.removeUnderlyingBallFromWorld();
     remove(ghost);
     ghostPlayersList.remove(ghost);
   }
