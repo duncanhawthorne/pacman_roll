@@ -12,6 +12,10 @@ import 'dart:core';
 import 'dart:ui' as ui;
 import 'dart:ui';
 import 'package:sensors_plus/sensors_plus.dart';
+import '../style/palette.dart';
+
+
+final palette = Palette();
 
 Save save = Save();
 
@@ -26,8 +30,7 @@ void p(x) {
 
 String endText(double value) {
   double x = percentile(scoreboardItemsDoubles, value) * 100;
-  String z = x.toStringAsFixed(0);
-  String y = "\nTime: ${value.toStringAsFixed(1)} seconds \n\nRank: Top $z%\n";
+  String y = "\nTime: ${value.toStringAsFixed(1)} seconds \n\nRank: Top ${x.toStringAsFixed(0)}%\n";
   return y;
 }
 
@@ -38,6 +41,7 @@ double percentile(List<double> list, double value) {
   return newList.indexOf(value) / newList.length;
 }
 
+/*
 int getStartingNumberPelletsAndSuperPellets(List mazeLayout) {
   int c = 0;
   c += mazeLayout
@@ -48,6 +52,7 @@ int getStartingNumberPelletsAndSuperPellets(List mazeLayout) {
       .reduce((value, element) => value + element);
   return c;
 }
+ */
 
 enum WallLocation { bottom, top, left, right }
 

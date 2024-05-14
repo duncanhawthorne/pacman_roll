@@ -37,12 +37,12 @@ void saveViewPortSize(BuildContext context) {
   double x = MediaQuery.of(context).size.width;
   double y = MediaQuery.of(context).size.height;
   if (x > y) {
-    dx = (kSquareNotionalSize * x / y);
-    dy = kSquareNotionalSize;
+    screenSizeX.value = (kSquareNotionalSize * x / y);
+    screenSizeY.value = kSquareNotionalSize;
   }
   else {
-    dx = kSquareNotionalSize;
-    dy = (kSquareNotionalSize * y / x);
+    screenSizeX.value = kSquareNotionalSize;
+    screenSizeY.value = (kSquareNotionalSize * y / x);
   }
 }
 

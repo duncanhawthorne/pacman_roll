@@ -14,6 +14,7 @@ import 'dart:core';
 import 'dart:convert';
 import 'dart:async' as async;
 import 'package:wakelock_plus/wakelock_plus.dart';
+import 'package:flame/palette.dart';
 
 /// This is the base of the game which is added to the [GameWidget].
 ///
@@ -38,7 +39,7 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
   }) : super(
           world: EndlessWorld(level: level, playerProgress: playerProgress),
           camera: CameraComponent.withFixedResolution(
-              width: dx, height: dy), //2800, 1700 //CameraComponent(),//
+              width: screenSizeX.value, height: screenSizeY.value), //2800, 1700 //CameraComponent(),//
           zoom: flameGameZoom,
         );
 
@@ -48,18 +49,10 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
   /// A helper for playing sound effects and background audio.
   final AudioController audioController;
 
-  double _dxLast = 0;
-  double _dyLast = 0;
-
   String userString = "";
 
-  /*
-  final scoreComponent = TextComponent(
-    text: "Lives: 3",
-    position: Vector2(dx - 30 - 300, 30),
-    textRenderer: textRenderer,
-  );
-   */
+  @override
+  Color backgroundColor() => palette.flameGameBackground.color;
 
   bool isGameLive() {
     return gameRunning && !paused && isLoaded && isMounted;
@@ -90,6 +83,15 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
     }
   }
 
+  void screenSizeChangeListener() {
+    screenSizeX.addListener(() {
+      camera.viewport = FixedResolutionViewport(resolution: Vector2(screenSizeX.value, screenSizeY.value));
+    });
+    screenSizeY.addListener(() {
+      camera.viewport = FixedResolutionViewport(resolution: Vector2(screenSizeX.value, screenSizeY.value));
+    });
+  }
+
   /// In the [onLoad] method you load different type of assets and set things
   /// that only needs to be set once when the level starts up.
   @override
@@ -99,16 +101,6 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
     userString = getRandomString(world.random, 15);
     downloadScoreboard();
     deadMansSwitch();
-    //camera.viewfinder.angle = 0;
-  }
-
-  @override
-  void update(double dt) {
-    super.update(dt);
-    if (_dxLast != dx || _dyLast != dy) {
-      camera.viewport = FixedResolutionViewport(resolution: Vector2(dx, dy));
-      _dxLast = dx;
-      _dyLast = dy;
-    }
+    screenSizeChangeListener();
   }
 }

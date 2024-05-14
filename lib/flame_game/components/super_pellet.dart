@@ -25,6 +25,6 @@ class SuperPellet extends SpriteAnimationComponent
     // When adding a CircleHitbox without any arguments it automatically
     // fills up the size of the component as much as it can without overflowing
     // it.
-    add(CircleHitbox());
+    add(CircleHitbox(collisionType: CollisionType.passive));
   }
 }

@@ -1,4 +1,3 @@
-import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 
 import '../../audio/sounds.dart';
@@ -93,15 +92,9 @@ class Ghost extends GameCharacter {
 
   @override
   Future<void> onLoad() async {
+    super.onLoad();
     animations = await getAnimations();
-    setUnderlyingBallPosition(
-        position); //FIXME shouldn't be necessary, but avoids one frame starting glitch
     current = CharacterState.deadGhost;
-
-    // When adding a CircleHitbox without any arguments it automatically
-    // fills up the size of the component as much as it can without overflowing
-    // it.
-    add(CircleHitbox());
   }
 
   @override

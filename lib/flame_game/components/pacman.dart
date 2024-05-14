@@ -6,6 +6,8 @@ import '../constants.dart';
 import '../helper.dart';
 import 'mini_pellet.dart';
 import 'super_pellet.dart';
+import 'mini_pellet_circle.dart';
+import 'super_pellet_circle.dart';
 import 'ghost.dart';
 import 'game_character.dart';
 import 'dart:math';
@@ -52,7 +54,10 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   }
 
   void handleTwoCharactersMeet(PositionComponent other) {
-    if (other is MiniPellet || other is SuperPellet) {
+    if (other is MiniPellet ||
+        other is SuperPellet ||
+        other is MiniPelletCircle ||
+        other is SuperPelletCircle) {
       handleEatingPellets(other);
     } else if (other is Ghost) {
       //belts and braces. Already handled by physics collisions in Ball //FIXME actually not now
@@ -72,7 +77,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   }
 
   void handleEatingPellets(PositionComponent pellet) {
-    if (pellet is MiniPellet) {
+    if (pellet is MiniPellet || pellet is MiniPelletCircle) {
       if (_pacmanEatingSoundTimeLatest <
           world.now - kPacmanHalfEatingResetTimeMillis * 2) {
         _pacmanEatingSoundTimeLatest = world.now;
@@ -176,15 +181,9 @@ class Pacman extends GameCharacter with CollisionCallbacks {
 
   @override
   Future<void> onLoad() async {
+    super.onLoad();
     animations = await getAnimations();
-    setUnderlyingBallPosition(
-        position); //FIXME shouldn't be necessary, but avoids one frame starting glitch
     current = CharacterState.normal;
-
-    // When adding a CircleHitbox without any arguments it automatically
-    // fills up the size of the component as much as it can without overflowing
-    // it.
-    add(CircleHitbox());
   }
 
   @override

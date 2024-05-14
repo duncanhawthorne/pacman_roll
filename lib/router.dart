@@ -3,10 +3,10 @@ import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-import 'level_selection/level_selection_screen.dart';
+//import 'level_selection/level_selection_screen.dart';
 import 'level_selection/levels.dart';
 import 'main_menu/main_menu_screen.dart';
-import 'settings/settings_screen.dart';
+//import 'settings/settings_screen.dart';
 import 'style/page_transition.dart';
 import 'style/palette.dart';
 
@@ -17,16 +17,16 @@ final router = GoRouter(
     GoRoute(
       path: '/',
       builder: (context, state) => const MainMenuScreen(key: Key('main menu')),
-      routes: [
-        GoRoute(
-          path: 'play',
-          pageBuilder: (context, state) => buildPageTransition<void>(
-            key: const ValueKey('play'),
-            color: context.watch<Palette>().backgroundLevelSelection.color,
-            child: const LevelSelectionScreen(
-              key: Key('level selection'),
-            ),
-          ),
+      //routes: [
+      //  GoRoute(
+      //    path: 'play',
+      //    pageBuilder: (context, state) => buildPageTransition<void>(
+      //      key: const ValueKey('play'),
+      //      color: context.watch<Palette>().backgroundLevelSelection.color,
+      //      child: const LevelSelectionScreen(
+      //        key: Key('level selection'),
+      //      ),
+      //    ),
           routes: [
             GoRoute(
               path: 'session/:level',
@@ -41,14 +41,14 @@ final router = GoRouter(
               },
             ),
           ],
-        ),
-        GoRoute(
-          path: 'settings',
-          builder: (context, state) => const SettingsScreen(
-            key: Key('settings'),
-          ),
-        ),
-      ],
+        //),
+      //  GoRoute(
+      //    path: 'settings',
+      //    builder: (context, state) => const SettingsScreen(
+      //      key: Key('settings'),
+      //    ),
+      //  ),
+      //],
     ),
   ],
 );

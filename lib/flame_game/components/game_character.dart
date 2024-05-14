@@ -7,6 +7,8 @@ import '../helper.dart';
 import 'physics_ball.dart';
 import 'dart:core';
 
+import 'package:flame/collisions.dart';
+
 /// The [GameCharacter] is the component that the physical player of the game is
 /// controlling.
 class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
@@ -123,12 +125,15 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     setUnderlyingBallPosition(
         position); //FIXME shouldn't be necessary, but avoids one frame starting glitch
     _lastUnderlyingPosition.setFrom(getUnderlyingBallPosition());
+    // When adding a CircleHitbox without any arguments it automatically
+    // fills up the size of the component as much as it can without overflowing
+    // it.
+    add(CircleHitbox());
   }
 
   @override
   void update(double dt) {
     super.update(dt);
-
     _lastUnderlyingPosition.setFrom(getUnderlyingBallPosition());
     _lastUnderlyingVelocity.setFrom(getUnderlyingBallVelocity());
   }

@@ -14,6 +14,7 @@ import 'game_lose_dialog.dart';
 import 'game_won_dialog.dart';
 import 'package:elapsed_time_display/elapsed_time_display.dart';
 import 'package:flutter/services.dart';
+import '../style/palette.dart';
 
 /// This widget defines the properties of the game screen.
 ///
@@ -32,8 +33,9 @@ class GameScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      statusBarColor: Colors.black, // Status bar color
+    final palette = context.watch<Palette>();
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarColor: palette.flameGameBackground.color, // Status bar color
     ));
     final audioController = context.read<AudioController>();
     return Scaffold(
@@ -102,15 +104,13 @@ class GameScreen extends StatelessWidget {
           loseDialogKey: (BuildContext context, EndlessRunner game) {
             return GameLoseDialog(
               level: level,
-              levelCompletedIn:
-                  (game.world.getLevelCompleteTimeSeconds()).toInt(),
+              levelCompletedIn: -1, //disabled
             );
           },
           wonDialogKey: (BuildContext context, EndlessRunner game) {
             return GameWonDialog(
               level: level,
-              levelCompletedIn:
-                  game.world.getLevelCompleteTimeSeconds(),
+              levelCompletedIn: game.world.getLevelCompleteTimeSeconds(),
             );
           },
         },

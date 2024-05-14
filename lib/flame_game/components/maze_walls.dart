@@ -9,6 +9,8 @@ import 'package:flame_forge2d/flame_forge2d.dart';
 import 'dart:math';
 import 'super_pellet.dart';
 import 'mini_pellet.dart';
+import 'mini_pellet_circle.dart';
+import 'super_pellet_circle.dart';
 
 import 'package:flame/extensions.dart';
 
@@ -31,17 +33,21 @@ void addPelletsAndSuperPellets(Forge2DWorld world, ValueNotifier pelletsRemainin
       Vector2 location = Vector2(A + D / 2, B + E / 2);
 
       if (flatMazeLayout[k] == 0) {
-        var pillx = MiniPellet();
-        pillx.absPosition = location;
-        pillx.position = location; //initial set
-        world.add(pillx);
+        //var pillx = MiniPellet();
+        //pillx.absPosition = location;
+        //pillx.position = location; //initial set
+        //world.add(pillx);
+        world.add(MiniPelletCircle(position: location));
         pelletsRemainingNotifier.value += 1;
       }
       if (flatMazeLayout[k] == 3) {
-        var powerpill = SuperPellet();
-        powerpill.absPosition = location;
-        powerpill.position = location; //initial set
-        world.add(powerpill);
+        //var powerpill = SuperPellet();
+        //powerpill.absPosition = location;
+        //powerpill.position = location; //initial set
+        //world.add(powerpill);
+
+
+        world.add(SuperPelletCircle(position: location));
         pelletsRemainingNotifier.value += 1;
       }
     }
@@ -76,6 +82,15 @@ void addMazeWalls(world) {
         double roundMazeCornersProportion = (1 - x) / 2; //octagonal
         Vector2 vertBit = Vector2(0, roundMazeCornersProportion * scale);
         Vector2 horiBit = Vector2(roundMazeCornersProportion * scale, 0);
+
+
+        if (i == 10 && j == 0) {
+          assert(wrappedMazeLayout[i][j] == 1);
+          world.add(Wall(topRight, bottomRight));
+          world.add(Wall(bottomLeft, bottomRight));
+          world.add(Wall(bottomLeft, topLeft));
+          world.add(Wall(topRight + horiBit, topLeft));
+        }
 
         if (wrappedMazeLayout[i][j] == 1) {
           //square around each point with rounded corners
