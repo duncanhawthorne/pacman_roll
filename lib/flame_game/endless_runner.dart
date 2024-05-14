@@ -11,6 +11,7 @@ import 'endless_world.dart';
 import 'constants.dart';
 import 'helper.dart';
 import 'dart:core';
+import 'dart:async' as async;
 import 'dart:convert';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:flame/palette.dart';
@@ -58,8 +59,6 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
   }
 
   void deadMansSwitch() async {
-    return;
-    /*
     //Works as separate thread to stop all audio when game stops
     async.Timer.periodic(const Duration(seconds: 2), (timer) {
       if (!isGameLive()) {
@@ -67,7 +66,6 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
         timer.cancel();
       }
     });
-     */
   }
 
   String getEncodeCurrentGameState() {
@@ -100,6 +98,6 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
     gameRunning = true;
     userString = getRandomString(world.random, 15);
     downloadScoreboard();
-    //deadMansSwitch();
+    deadMansSwitch();
   }
 }
