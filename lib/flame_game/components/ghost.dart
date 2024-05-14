@@ -8,8 +8,16 @@ import 'game_character.dart';
 import 'dart:math';
 import 'dart:core';
 
-/// The [GameCharacter] is the component that the physical player of the game is
-/// controlling.
+import 'package:flame/effects.dart';
+import 'package:flutter/animation.dart';
+
+/// The [JumpEffect] is simply a [MoveByEffect] which has the properties of the
+/// effect pre-defined.
+class ReturnHomeEffect extends MoveToEffect {
+  ReturnHomeEffect(Vector2 destination)
+      : super(destination, EffectController(duration: kGhostResetTimeMillis / 1000, curve: Curves.linear));
+}
+
 class Ghost extends GameCharacter {
   Ghost({
     required super.position,
@@ -17,7 +25,6 @@ class Ghost extends GameCharacter {
 
   int ghostScaredTimeLatest = 0; //a long time ago
   int ghostDeadTimeLatest = 0; //a long time ago
-  Vector2 ghostDeadPositionLatest = Vector2(0, 0);
   int ghostSpriteChooserNumber = 100;
 
   Future<Map<CharacterState, SpriteAnimation>?> getAnimations() async {
@@ -80,16 +87,6 @@ class Ghost extends GameCharacter {
     }
   }
 
-  Vector2 getFlyingDeadGhostPosition() {
-    assert(world.now >= ghostDeadTimeLatest);
-    double timefrac =
-        (world.now - ghostDeadTimeLatest) / (kGhostResetTimeMillis);
-    timefrac = min(1, timefrac);
-
-    return ghostDeadPositionLatest * (1 - timefrac) +
-        kGhostStartLocation * (timefrac);
-  }
-
   @override
   Future<void> onLoad() async {
     super.onLoad();
@@ -103,7 +100,7 @@ class Ghost extends GameCharacter {
 
     if (globalPhysicsLinked) {
       if (current == CharacterState.deadGhost) {
-        position = getFlyingDeadGhostPosition();
+        /// handled by [ReturnHomeEffect]
       } else {
         oneFrameOfPhysics();
       }

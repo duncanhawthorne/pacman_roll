@@ -103,8 +103,8 @@ class Pacman extends GameCharacter with CollisionCallbacks {
 
     //ghost impact
     ghost.current = CharacterState.deadGhost;
+    ghost.add(ReturnHomeEffect(kGhostStartLocation));
     ghost.ghostDeadTimeLatest = world.now;
-    ghost.ghostDeadPositionLatest = ghost.getUnderlyingBallPosition();
     if (multipleSpawningGhosts) {
       world.removeGhost(ghost);
     } else {
