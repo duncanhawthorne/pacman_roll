@@ -133,6 +133,9 @@ final textRenderer = TextPaint(
   ),
 );
 
+
+final Paint blueMazePaint = Paint()
+  ..color = const Color(0xFF3B32D4); //blue; //yellowAccent;
 final Paint pacmanYellowPaint = Paint()
   ..color = Colors.yellowAccent; //blue; //yellowAccent;
 final Rect rectSingleSquare = Rect.fromCenter(

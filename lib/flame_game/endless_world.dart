@@ -236,7 +236,7 @@ class EndlessWorld extends Forge2DWorld
       addGhost(i);
     }
     multiGhostAdderTimer();
-    add(MazeImage());
+    //add(MazeImage());
     addMazeWalls(this);
     addAll(createBoundaries(game.camera));
     addPelletsAndSuperPellets(this, pelletsRemainingNotifier);

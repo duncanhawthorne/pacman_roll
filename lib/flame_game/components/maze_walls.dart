@@ -9,8 +9,6 @@ import 'package:flame_forge2d/flame_forge2d.dart';
 import 'dart:math';
 import 'super_pellet.dart';
 import 'mini_pellet.dart';
-import 'mini_pellet_circle.dart';
-import 'super_pellet_circle.dart';
 
 import 'package:flame/extensions.dart';
 
@@ -18,7 +16,8 @@ int getMazeWidth() {
   return sqrt(flatMazeLayout.length).toInt();
 }
 
-void addPelletsAndSuperPellets(Forge2DWorld world, ValueNotifier pelletsRemainingNotifier) {
+void addPelletsAndSuperPellets(
+    Forge2DWorld world, ValueNotifier pelletsRemainingNotifier) {
   pelletsRemainingNotifier.value = 0;
   int mazelen = getMazeWidth();
   for (var i = 0; i < mazelen; i++) {
@@ -46,7 +45,6 @@ void addPelletsAndSuperPellets(Forge2DWorld world, ValueNotifier pelletsRemainin
         //powerpill.position = location; //initial set
         //world.add(powerpill);
 
-
         world.add(SuperPelletCircle(position: location));
         pelletsRemainingNotifier.value += 1;
       }
@@ -56,11 +54,23 @@ void addPelletsAndSuperPellets(Forge2DWorld world, ValueNotifier pelletsRemainin
 
 bool wallNeededBetween(int k, int l) {
   int mazeWidth = getMazeWidth();
-  return (l < flatMazeLayout.length &&
+  return (k > 0 &&
+      l > 0 &&
+      l < flatMazeLayout.length &&
+      k < flatMazeLayout.length &&
       (flatMazeLayout[k] == 1 && flatMazeLayout[l] != 1 ||
           flatMazeLayout[k] != 1 &&
               flatMazeLayout[l] == 1 &&
               (l) % mazeWidth != 0));
+}
+
+class MazeWallSquare extends RectangleComponent {
+  MazeWallSquare({required super.position})
+      : super(
+            size: Vector2(getSingleSquareWidth().ceil().toDouble(),
+                getSingleSquareWidth().ceil().toDouble()),
+            anchor: Anchor.center,
+            paint: blueMazePaint);
 }
 
 void addMazeWalls(world) {
@@ -78,10 +88,15 @@ void addMazeWalls(world) {
         Vector2 bottomRight = Vector2(A + D, B + E);
         Vector2 bottomLeft = Vector2(A, B + E);
         Vector2 topLeft = Vector2(A, B);
+        Vector2 center = (topRight + bottomLeft) / 2;
         double x = 1 / (sqrt(2) + 1);
         double roundMazeCornersProportion = (1 - x) / 2; //octagonal
         Vector2 vertBit = Vector2(0, roundMazeCornersProportion * scale);
         Vector2 horiBit = Vector2(roundMazeCornersProportion * scale, 0);
+
+        if (wrappedMazeLayout[i][j] == 1) {
+          world.add(MazeWallSquare(position: center));
+        }
 
 
         if (i == 10 && j == 0) {
@@ -93,6 +108,7 @@ void addMazeWalls(world) {
         }
 
         if (wrappedMazeLayout[i][j] == 1) {
+
           //square around each point with rounded corners
           if (i - 1 > 0 &&
               j + 1 < mazeWidth &&

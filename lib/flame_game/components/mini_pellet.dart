@@ -5,6 +5,21 @@ import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import '../constants.dart';
 
+class MiniPelletCircle extends CircleComponent {
+  MiniPelletCircle({required super.position})
+      : super(
+      radius:
+      getSingleSquareWidth() * miniPelletAndSuperPelletScaleFactor / 2 * 1/ 3,
+      anchor: Anchor.center);
+
+  @override
+  Future<void> onLoad() async {
+    super.onLoad();
+    add(CircleHitbox(collisionType: CollisionType.passive));
+  }
+}
+
+
 /// The [MiniPellet] components are the components that the [Player] should collect
 /// to finish a level. The points are represented by Flame's mascot; Ember.
 class MiniPellet extends SpriteAnimationComponent

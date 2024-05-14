@@ -6,8 +6,6 @@ import '../constants.dart';
 import '../helper.dart';
 import 'mini_pellet.dart';
 import 'super_pellet.dart';
-import 'mini_pellet_circle.dart';
-import 'super_pellet_circle.dart';
 import 'ghost.dart';
 import 'game_character.dart';
 import 'dart:math';
