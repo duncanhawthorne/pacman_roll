@@ -8,14 +8,21 @@ import '../constants.dart';
 class MiniPelletCircle extends CircleComponent {
   MiniPelletCircle({required super.position})
       : super(
-      radius:
-      getSingleSquareWidth() * miniPelletAndSuperPelletScaleFactor / 2 * 1/ 3,
-      anchor: Anchor.center);
+            radius: getSingleSquareWidth() *
+                miniPelletAndSuperPelletScaleFactor /
+                2 *
+                1 /
+                3,
+            anchor: Anchor.center);
 
   @override
   Future<void> onLoad() async {
     super.onLoad();
-    add(CircleHitbox(isSolid: true, radius: getSingleSquareWidth() * miniPelletAndSuperPelletScaleFactor / 2, collisionType: CollisionType.passive));
+    add(CircleHitbox(
+        isSolid: true,
+        radius:
+            getSingleSquareWidth() * miniPelletAndSuperPelletScaleFactor / 2,
+        collisionType: CollisionType.passive));
   }
 }
 

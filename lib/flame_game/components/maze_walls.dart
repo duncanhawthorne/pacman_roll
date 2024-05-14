@@ -98,7 +98,6 @@ void addMazeWalls(world) {
           world.add(MazeWallSquare(position: center));
         }
 
-
         if (i == 10 && j == 0) {
           assert(wrappedMazeLayout[i][j] == 1);
           world.add(Wall(topRight, bottomRight));
@@ -108,7 +107,6 @@ void addMazeWalls(world) {
         }
 
         if (wrappedMazeLayout[i][j] == 1) {
-
           //square around each point with rounded corners
           if (i - 1 > 0 &&
               j + 1 < mazeWidth &&

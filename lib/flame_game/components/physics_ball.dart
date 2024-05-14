@@ -8,7 +8,7 @@ class PhysicsBall extends BodyComponent {
   //with TapCallbacks, ContactCallbacks
   PhysicsBall(
       {Vector2? initialPosition,
-        position,
+      position,
       required GameCharacter realCharacter,
       double? size,
       Color? color})

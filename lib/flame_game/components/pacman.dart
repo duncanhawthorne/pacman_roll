@@ -187,9 +187,6 @@ class Pacman extends GameCharacter with CollisionCallbacks {
 
   @override
   void update(double dt) {
-
-
-
     pacmanEatingNormalSequence();
 
     if (globalPhysicsLinked) {
@@ -205,7 +202,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     if (current == CharacterState.deadPacman) {
       assert(world.now >= _pacmanDeadTimeLatest);
       double tween =
-          (world.now - _pacmanDeadTimeLatest) / kPacmanDeadResetTimeMillis;
+          (world.now - _pacmanDeadTimeLatest) / kPacmanDeadResetTimeAnimationMillis;
       tween = min(1, tween);
       double mouthWidth = pacmanMouthWidthDefault * (1 - tween) + 1 * tween;
       canvas.drawArc(rectSingleSquare, 2 * pi * ((mouthWidth / 2) + 0.5),

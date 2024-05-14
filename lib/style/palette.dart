@@ -1,7 +1,6 @@
 import 'package:flame/palette.dart';
 import 'package:flutter/material.dart';
 
-
 /// A palette of colors to be used in the game.
 ///
 /// The reason we're not going with something like Material Design's
@@ -18,9 +17,11 @@ import 'package:flutter/material.dart';
 /// we could allow players to customize colors, for example,
 /// or even get the colors from the network.
 class Palette {
-  PaletteEntry get seed => const PaletteEntry(Colors.yellowAccent); //Color(0xFF000000) //0xFF0050bc
+  PaletteEntry get seed =>
+      const PaletteEntry(Colors.yellowAccent); //Color(0xFF000000) //0xFF0050bc
   PaletteEntry get text => const PaletteEntry(Color(0xee352b42));
-  PaletteEntry get backgroundMain => const PaletteEntry(Color(0xffa2fff3)); //0xffa2fff3
+  PaletteEntry get backgroundMain =>
+      const PaletteEntry(Color(0xffa2fff3)); //0xffa2fff3
   PaletteEntry get backgroundLevelSelection =>
       const PaletteEntry(Color(0xffffcd75));
   PaletteEntry get backgroundPlaySession =>

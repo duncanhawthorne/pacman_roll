@@ -39,7 +39,8 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
   }) : super(
           world: EndlessWorld(level: level, playerProgress: playerProgress),
           camera: CameraComponent.withFixedResolution(
-              width: kSquareNotionalSize, height: kSquareNotionalSize), //2800, 1700 //CameraComponent(),//
+              width: kSquareNotionalSize,
+              height: kSquareNotionalSize), //2800, 1700 //CameraComponent(),//
           zoom: flameGameZoom,
         );
 
@@ -63,6 +64,7 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
     async.Timer.periodic(const Duration(seconds: 2), (timer) {
       if (!isGameLive()) {
         audioController.stopAllSfx();
+        setStatusBarColor(palette.backgroundMain.color);
         timer.cancel();
       }
     });
@@ -86,7 +88,8 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
   @override
   Future<void> onGameResize(size) async {
     Vector2 targetViewPortSize = sanitizeScreenSize(size);
-    camera.viewport = FixedResolutionViewport(resolution: Vector2(targetViewPortSize.x, targetViewPortSize.y));
+    camera.viewport = FixedResolutionViewport(
+        resolution: Vector2(targetViewPortSize.x, targetViewPortSize.y));
     super.onGameResize(size);
   }
 

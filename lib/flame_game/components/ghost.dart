@@ -14,7 +14,10 @@ import 'package:flutter/animation.dart';
 /// effect pre-defined.
 class ReturnHomeEffect extends MoveToEffect {
   ReturnHomeEffect(Vector2 destination)
-      : super(destination, EffectController(duration: kGhostResetTimeMillis / 1000, curve: Curves.linear));
+      : super(
+            destination,
+            EffectController(
+                duration: kGhostResetTimeMillis / 1000, curve: Curves.linear));
 }
 
 class Ghost extends GameCharacter {
@@ -65,7 +68,8 @@ class Ghost extends GameCharacter {
   void ghostDeadScaredScaredIshNormalSequence() {
     if (current == CharacterState.deadGhost) {
       if (world.now - ghostDeadTimeLatest > kGhostResetTimeMillis) {
-        if (world.pelletsRemainingNotifier.value > 0 && ghostDeadTimeLatest != 0) {
+        if (world.pelletsRemainingNotifier.value > 0 &&
+            ghostDeadTimeLatest != 0) {
           setUnderlyingBallPosition(
               kGhostStartLocation + Vector2.random() / 100);
         }

@@ -40,6 +40,7 @@ bool gameRunning = false;
 const int kGhostResetTimeMillis = 1000;
 const int kGhostChaseTimeMillis = 6000;
 const int kPacmanDeadResetTimeMillis = 1700;
+const int kPacmanDeadResetTimeAnimationMillis = 1250;
 const int kPacmanHalfEatingResetTimeMillis = 180;
 
 bool globalPhysicsLinked = true;

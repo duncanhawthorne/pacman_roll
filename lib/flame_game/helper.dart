@@ -7,14 +7,12 @@ import 'components/game_character.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
 import 'package:flame/components.dart';
-import 'package:flame/game.dart';
 import 'dart:core';
 import 'dart:ui' as ui;
 import 'dart:ui';
 import 'package:sensors_plus/sensors_plus.dart';
 import '../style/palette.dart';
 import 'package:flutter/services.dart';
-
 
 final palette = Palette();
 
@@ -31,7 +29,8 @@ void p(x) {
 
 String endText(double value) {
   double x = percentile(scoreboardItemsDoubles, value) * 100;
-  String y = "\nTime: ${value.toStringAsFixed(1)} seconds \n\nRank: Top ${x.toStringAsFixed(0)}%\n";
+  String y =
+      "\nTime: ${value.toStringAsFixed(1)} seconds \n\nRank: Top ${x.toStringAsFixed(0)}%\n";
   return y;
 }
 
@@ -134,7 +133,6 @@ final textRenderer = TextPaint(
   ),
 );
 
-
 final Paint blueMazePaint = Paint()
   ..color = const Color(0xFF3B32D4); //blue; //yellowAccent;
 final Paint pacmanYellowPaint = Paint()
@@ -162,6 +160,31 @@ ui.Image pacmanMouthClosedImage() {
   canvas.drawArc(rect100, 2 * pi * ((mouthWidth / 2) + 0.5),
       2 * pi * (1 - mouthWidth), true, pacmanYellowPaint);
   return recorder.endRecording().toImageSync(100, 100);
+}
+
+pureVectorPacman() {
+  double pfrac = 5 / 32;
+  double pangle = pfrac * 2 * pi / 2;
+  return ClipComponent.polygon(
+    points: [
+      Vector2(1, 0),
+      Vector2(0, 0),
+      Vector2(0, 1),
+      Vector2(1, 1),
+      pfrac > 0.5 ? Vector2(0, 1) : Vector2(1, 1),
+      Vector2(0.5 + cos(pangle) / 2, 0.5 + sin(pangle) / 2),
+      Vector2(0.5, 0.5),
+      Vector2(0.5 + cos(pangle) / 2, 0.5 - sin(pangle) / 2),
+      pfrac > 0.5 ? Vector2(0, 0) : Vector2(1, 0),
+      Vector2(1, 0),
+    ],
+    position: Vector2(0, 0),
+    size: Vector2.all(getSingleSquareWidth()),
+    children: [
+      CircleComponent(
+          radius: getSingleSquareWidth() / 2, paint: pacmanYellowPaint),
+    ],
+  );
 }
 
 double getTargetSirenVolume(
@@ -199,13 +222,13 @@ String getRandomString(random, int length) =>
     String.fromCharCodes(Iterable.generate(
         length, (_) => chars.codeUnitAt(random.nextInt(chars.length))));
 
-
 void handleAcceleratorEvents(EndlessWorld world) {
   if (useGyro) {
     accelerometerEventStream().listen(
       //start once and then runs
-          (AccelerometerEvent event) {
-        world.setGravity(Vector2(event.y, event.x - 5) * (android && web ? 5 : 1));
+      (AccelerometerEvent event) {
+        world.setGravity(
+            Vector2(event.y, event.x - 5) * (android && web ? 5 : 1));
       },
       onError: (error) {
         // Logic to handle error
@@ -219,8 +242,7 @@ void handleAcceleratorEvents(EndlessWorld world) {
 Vector2 sanitizeScreenSize(Vector2 size) {
   if (size.x > size.y) {
     return Vector2(kSquareNotionalSize * size.x / size.y, kSquareNotionalSize);
-  }
-  else {
+  } else {
     return Vector2(kSquareNotionalSize, kSquareNotionalSize * size.y / size.x);
   }
 }

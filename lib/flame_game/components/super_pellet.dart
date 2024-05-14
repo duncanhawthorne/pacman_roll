@@ -5,13 +5,13 @@ import '../constants.dart';
 import '../helper.dart';
 import 'dart:math';
 
-
 class SuperPelletCircle extends CircleComponent {
   SuperPelletCircle({required super.position})
       : super(
-      radius:
-      getSingleSquareWidth() * miniPelletAndSuperPelletScaleFactor / 2,
-      anchor: Anchor.center);
+            radius: getSingleSquareWidth() *
+                miniPelletAndSuperPelletScaleFactor /
+                2,
+            anchor: Anchor.center);
 
   @override
   Future<void> onLoad() async {

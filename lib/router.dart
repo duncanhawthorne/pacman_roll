@@ -27,21 +27,21 @@ final router = GoRouter(
       //        key: Key('level selection'),
       //      ),
       //    ),
-          routes: [
-            GoRoute(
-              path: 'session/:level',
-              pageBuilder: (context, state) {
-                final levelNumber = int.parse(state.pathParameters['level']!);
-                final level = gameLevels[levelNumber - 1];
-                return buildPageTransition<void>(
-                  key: const ValueKey('level'),
-                  color: context.watch<Palette>().backgroundPlaySession.color,
-                  child: GameScreen(level: level),
-                );
-              },
-            ),
-          ],
-        //),
+      routes: [
+        GoRoute(
+          path: 'session/:level',
+          pageBuilder: (context, state) {
+            final levelNumber = int.parse(state.pathParameters['level']!);
+            final level = gameLevels[levelNumber - 1];
+            return buildPageTransition<void>(
+              key: const ValueKey('level'),
+              color: context.watch<Palette>().backgroundPlaySession.color,
+              child: GameScreen(level: level),
+            );
+          },
+        ),
+      ],
+      //),
       //  GoRoute(
       //    path: 'settings',
       //    builder: (context, state) => const SettingsScreen(

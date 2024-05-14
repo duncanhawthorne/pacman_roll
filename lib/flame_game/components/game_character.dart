@@ -27,7 +27,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   late PhysicsBall _underlyingBall = PhysicsBall(
       realCharacter: this,
       initialPosition: position,
-  position: position); //to avoid null safety issues
+      position: position); //to avoid null safety issues
 
   // Used to store the last position of the player, so that we later can
   // determine which direction that the player is moving.

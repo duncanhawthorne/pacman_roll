@@ -6,7 +6,7 @@ const gameLevels = <GameLevel>[
   ),
   (
     number: 2,
-  maxAllowedDeaths: 3,
+    maxAllowedDeaths: 3,
     canSpawnTall: true,
   ),
 ];
