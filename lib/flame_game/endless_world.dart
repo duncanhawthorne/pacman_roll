@@ -70,7 +70,6 @@ class EndlessWorld extends Forge2DWorld
 
   /// The gravity is defined in virtual pixels per second squared.
   /// These pixels are in relation to how big the [FixedResolutionViewport] is.
-  //double worldAngle = 0; //2 * pi / 8;
 
   List<Ghost> ghostPlayersList = [];
   List<Pacman> pacmanPlayersList = [];
@@ -85,8 +84,7 @@ class EndlessWorld extends Forge2DWorld
     //NOTE disabled on iOS due to bug
     async.Timer.periodic(const Duration(milliseconds: 500), (timer) {
       if (game.isGameLive()) {
-        game.audioController.setSirenVolume(getTargetSirenVolume(
-            game.isGameLive(), ghostPlayersList, pacmanPlayersList));
+        game.audioController.setSirenVolume(getTargetSirenVolume(this));
       } else {
         timer.cancel();
       }
@@ -107,30 +105,9 @@ class EndlessWorld extends Forge2DWorld
       //new ghosts are also scared
       ghost.ghostScaredTimeLatest = ghostPlayersList[0].ghostScaredTimeLatest;
       ghost.current = CharacterState
-          .deadGhost; //and then will get sequenced to correct state
+          .scared; //and then will get sequenced to correct state
     }
     add(ghost);
-    ghostPlayersList.add(ghost);
-    //_lastNewGhostTimeMillis = now;
-  }
-
-  void addPacman(Vector2 startPosition) {
-    Vector2 target = Vector2(startPosition.x, startPosition.y);
-    Pacman tmpPlayer = Pacman(position: target);
-    add(tmpPlayer);
-    pacmanPlayersList.add(tmpPlayer);
-  }
-
-  void removePacman(Pacman pacman) {
-    pacman.removeUnderlyingBallFromWorld();
-    remove(pacman);
-    pacmanPlayersList.remove(pacman);
-  }
-
-  void removeGhost(Ghost ghost) {
-    ghost.removeUnderlyingBallFromWorld();
-    remove(ghost);
-    ghostPlayersList.remove(ghost);
   }
 
   void multiGhostAdderTimer() {
@@ -155,15 +132,9 @@ class EndlessWorld extends Forge2DWorld
       } else {
         assert(multipleSpawningGhosts);
         ghostPlayersList[j].ghostScaredTimeLatest = 0;
-        removeGhost(ghostPlayersList[j]);
+        remove(ghostPlayersList[j]);
       }
     }
-  }
-
-  void removePellet(PositionComponent pellet) {
-    pellet.removeFromParent();
-    pelletsRemainingNotifier.value -= 1;
-    //world.endOfGameTestAndAct(); //now handled via valuelistener
   }
 
   void handleWinGame() {
@@ -231,7 +202,7 @@ class EndlessWorld extends Forge2DWorld
       sirenVolumeUpdatedTimer();
     }
 
-    addPacman(kPacmanStartLocation);
+    add(Pacman(position: kPacmanStartLocation));
     for (int i = 0; i < 3; i++) {
       addGhost(i);
     }

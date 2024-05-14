@@ -93,8 +93,15 @@ class Ghost extends GameCharacter {
   @override
   Future<void> onLoad() async {
     super.onLoad();
+    world.ghostPlayersList.add(this);
     animations = await getAnimations();
     current = CharacterState.scared;
+  }
+
+  @override
+  Future<void> onRemove() async {
+    world.ghostPlayersList.remove(this);
+    super.onRemove();
   }
 
   @override

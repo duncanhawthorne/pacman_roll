@@ -5,7 +5,7 @@ import '../constants.dart';
 import '../helper.dart';
 import 'dart:math';
 
-class SuperPelletCircle extends CircleComponent {
+class SuperPelletCircle extends CircleComponent with HasWorldReference<EndlessWorld> {
   SuperPelletCircle({required super.position})
       : super(
             radius: getSingleSquareWidth() *
@@ -17,6 +17,13 @@ class SuperPelletCircle extends CircleComponent {
   Future<void> onLoad() async {
     super.onLoad();
     add(CircleHitbox(isSolid: true, collisionType: CollisionType.passive));
+    world.pelletsRemainingNotifier.value += 1;
+  }
+
+  @override
+  Future<void> onRemove() async {
+    world.pelletsRemainingNotifier.value -= 1;
+    super.onRemove();
   }
 }
 
@@ -41,5 +48,12 @@ class SuperPellet extends SpriteAnimationComponent
     // fills up the size of the component as much as it can without overflowing
     // it.
     add(CircleHitbox(collisionType: CollisionType.passive));
+    world.pelletsRemainingNotifier.value += 1;
+  }
+
+  @override
+  Future<void> onRemove() async {
+    world.pelletsRemainingNotifier.value -= 1;
+    super.onRemove();
   }
 }

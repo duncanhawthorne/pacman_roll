@@ -17,11 +17,8 @@ import 'package:flutter/foundation.dart';
 /// controlling.
 class Pacman extends GameCharacter with CollisionCallbacks {
   Pacman({
-    //required this.startPosition,
     required super.position,
   }) : super();
-
-  //final Vector2 startPosition;
 
   int _pacmanDeadTimeLatest = 0; //a long time ago
   int _pacmanEatingTimeLatest = 0; //a long time ago
@@ -90,7 +87,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     }
     current = CharacterState.eating;
     _pacmanEatingTimeLatest = world.now;
-    world.removePellet(pellet);
+    world.remove(pellet);
   }
 
   void pacmanEatsGhost(Ghost ghost) {
@@ -106,7 +103,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     ghost.add(ReturnHomeEffect(kGhostStartLocation));
     ghost.ghostDeadTimeLatest = world.now;
     if (multipleSpawningGhosts) {
-      world.removeGhost(ghost);
+      world.remove(ghost);
     } else {
       //Move ball way offscreen. Stops any physics interactions or collisions
       ghost.setUnderlyingBallPosition(kOffScreenLocation +
@@ -114,8 +111,9 @@ class Pacman extends GameCharacter with CollisionCallbacks {
               100); //will get moved to right position later by other code in sequence checker
     }
     if (multipleSpawningPacmans) {
-      world.addPacman(getUnderlyingBallPosition() + Vector2.random() / 100);
-    }
+      //world.addPacman(getUnderlyingBallPosition() + Vector2.random() / 100);
+      world.add(Pacman(position: position + Vector2.random() / 100));
+      }
   }
 
   void ghostKillsPacman() {
@@ -153,7 +151,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
         assert(multipleSpawningPacmans);
         Future.delayed(const Duration(milliseconds: kPacmanDeadResetTimeMillis),
             () {
-          world.removePacman(this);
+          world.remove(this);
         });
       }
     }
@@ -180,9 +178,16 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   @override
   Future<void> onLoad() async {
     super.onLoad();
+    world.pacmanPlayersList.add(this);
     animations = await getAnimations();
     current = CharacterState.normal;
     angle = 2 * pi / 2;
+  }
+
+  @override
+  Future<void> onRemove() async {
+    world.pacmanPlayersList.remove(this);
+    super.onRemove();
   }
 
   @override

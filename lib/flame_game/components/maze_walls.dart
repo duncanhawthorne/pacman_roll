@@ -37,7 +37,7 @@ void addPelletsAndSuperPellets(
         //pillx.position = location; //initial set
         //world.add(pillx);
         world.add(MiniPelletCircle(position: location));
-        pelletsRemainingNotifier.value += 1;
+        //pelletsRemainingNotifier.value += 1;
       }
       if (flatMazeLayout[k] == 3) {
         //var powerpill = SuperPellet();
@@ -46,7 +46,7 @@ void addPelletsAndSuperPellets(
         //world.add(powerpill);
 
         world.add(SuperPelletCircle(position: location));
-        pelletsRemainingNotifier.value += 1;
+        //pelletsRemainingNotifier.value += 1;
       }
     }
   }

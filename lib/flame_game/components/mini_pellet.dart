@@ -5,7 +5,7 @@ import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import '../constants.dart';
 
-class MiniPelletCircle extends CircleComponent {
+class MiniPelletCircle extends CircleComponent with HasWorldReference<EndlessWorld> {
   MiniPelletCircle({required super.position})
       : super(
             radius: getSingleSquareWidth() *
@@ -23,7 +23,15 @@ class MiniPelletCircle extends CircleComponent {
         radius:
             getSingleSquareWidth() * miniPelletAndSuperPelletScaleFactor / 2,
         collisionType: CollisionType.passive));
+    world.pelletsRemainingNotifier.value += 1;
   }
+
+  @override
+  Future<void> onRemove() async {
+    world.pelletsRemainingNotifier.value -= 1;
+    super.onRemove();
+  }
+
 }
 
 /// The [MiniPellet] components are the components that the [Player] should collect
@@ -47,5 +55,13 @@ class MiniPellet extends SpriteAnimationComponent
     // fills up the size of the component as much as it can without overflowing
     // it.
     add(CircleHitbox(collisionType: CollisionType.passive));
+    world.pelletsRemainingNotifier.value += 1;
   }
+
+  @override
+  Future<void> onRemove() async {
+    world.pelletsRemainingNotifier.value -= 1;
+    super.onRemove();
+  }
+
 }

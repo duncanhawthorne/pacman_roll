@@ -186,22 +186,21 @@ pureVectorPacman() {
   );
 }
 
-double getTargetSirenVolume(
-    isgameliveTmp, ghostPlayersList, pacmanPlayersList) {
-  if (!isgameliveTmp) {
+double getTargetSirenVolume(EndlessWorld world) {
+  if (!world.game.isGameLive()) {
     p("siren 0: game not live");
     return 0;
   }
   double tmpSirenVolume = 0;
   try {
-    for (int i = 0; i < ghostPlayersList.length; i++) {
-      tmpSirenVolume += ghostPlayersList[i].current == CharacterState.normal
-          ? ghostPlayersList[i].getUnderlyingBallVelocity().length /
-              ghostPlayersList.length
+    for (int i = 0; i < world.ghostPlayersList.length; i++) {
+      tmpSirenVolume += world.ghostPlayersList[i].current == CharacterState.normal
+          ? world.ghostPlayersList[i].getVelocity().length /
+          world.ghostPlayersList.length
           : 0;
     }
-    if ((pacmanPlayersList.isNotEmpty &&
-            pacmanPlayersList[0].current == CharacterState.deadPacman) ||
+    if ((world.pacmanPlayersList.isNotEmpty &&
+        world.pacmanPlayersList[0].current == CharacterState.deadPacman) ||
         !globalPhysicsLinked) {
       tmpSirenVolume = 0;
     }
