@@ -32,8 +32,8 @@ class PhysicsBall extends BodyComponent {
               ),
             ],
             bodyDef: BodyDef(
-              angularDamping: 0.1,
-              position: initialPosition ?? kPacmanStartLocation,
+              angularDamping: useForgePhysicsBallRotation ? 0.1 : 0.1,
+              position: initialPosition ?? kCageLocation,
               type: BodyType.dynamic,
               userData: PhysicsBall,
             ));
