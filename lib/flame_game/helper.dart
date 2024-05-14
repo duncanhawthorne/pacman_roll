@@ -13,6 +13,7 @@ import 'dart:ui' as ui;
 import 'dart:ui';
 import 'package:sensors_plus/sensors_plus.dart';
 import '../style/palette.dart';
+import 'package:flutter/services.dart';
 
 
 final palette = Palette();
@@ -213,4 +214,19 @@ void handleAcceleratorEvents(EndlessWorld world) {
       cancelOnError: true,
     );
   }
+}
+
+Vector2 sanitizeScreenSize(Vector2 size) {
+  if (size.x > size.y) {
+    return Vector2(kSquareNotionalSize * size.x / size.y, kSquareNotionalSize);
+  }
+  else {
+    return Vector2(kSquareNotionalSize, kSquareNotionalSize * size.y / size.x);
+  }
+}
+
+void setStatusBarColor(color) {
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    statusBarColor: color, // Status bar color
+  ));
 }

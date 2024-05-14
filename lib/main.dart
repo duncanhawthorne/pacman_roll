@@ -32,26 +32,11 @@ void main() async {
   runApp(const MyGame());
 }
 
-void saveViewPortSize(BuildContext context) {
-  //FIXME total hack. Purpose is to set max viewport but still have fixed size underneath at ksizex and ksizey
-  double x = MediaQuery.of(context).size.width;
-  double y = MediaQuery.of(context).size.height;
-  if (x > y) {
-    screenSizeX.value = (kSquareNotionalSize * x / y);
-    screenSizeY.value = kSquareNotionalSize;
-  }
-  else {
-    screenSizeX.value = kSquareNotionalSize;
-    screenSizeY.value = (kSquareNotionalSize * y / x);
-  }
-}
-
 class MyGame extends StatelessWidget {
   const MyGame({super.key});
 
   @override
   Widget build(BuildContext context) {
-    saveViewPortSize(context);
     return AppLifecycleObserver(
       child: MultiProvider(
         providers: [

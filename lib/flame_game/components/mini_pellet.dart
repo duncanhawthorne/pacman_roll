@@ -15,10 +15,9 @@ class MiniPelletCircle extends CircleComponent {
   @override
   Future<void> onLoad() async {
     super.onLoad();
-    add(CircleHitbox(collisionType: CollisionType.passive));
+    add(CircleHitbox(isSolid: true, radius: getSingleSquareWidth() * miniPelletAndSuperPelletScaleFactor / 2, collisionType: CollisionType.passive));
   }
 }
-
 
 /// The [MiniPellet] components are the components that the [Player] should collect
 /// to finish a level. The points are represented by Flame's mascot; Ember.

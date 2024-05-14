@@ -17,7 +17,6 @@ import 'game_screen.dart';
 import 'endless_runner.dart';
 import 'components/game_character.dart';
 import 'components/maze_walls.dart';
-import 'components/maze_image.dart';
 import 'components/pacman.dart';
 import 'components/ghost.dart';
 import 'constants.dart';
@@ -260,6 +259,8 @@ class EndlessWorld extends Forge2DWorld
     gameRunning = false;
     game.overlays.remove(GameScreen.backButtonKey);
     game.overlays.remove(GameScreen.statusOverlay);
+    setStatusBarColor(palette.backgroundMain.color);
+    game.audioController.stopAllSfx();
   }
 
   void addDeath({int amount = 1}) {

@@ -13,8 +13,8 @@ import 'package:provider/provider.dart';
 import 'game_lose_dialog.dart';
 import 'game_won_dialog.dart';
 import 'package:elapsed_time_display/elapsed_time_display.dart';
-import 'package:flutter/services.dart';
 import '../style/palette.dart';
+import '../flame_game/helper.dart';
 
 /// This widget defines the properties of the game screen.
 ///
@@ -34,9 +34,7 @@ class GameScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = context.watch<Palette>();
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarColor: palette.flameGameBackground.color, // Status bar color
-    ));
+    setStatusBarColor(palette.flameGameBackground.color);
     final audioController = context.read<AudioController>();
     return Scaffold(
       body: GameWidget<EndlessRunner>(

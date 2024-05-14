@@ -186,6 +186,9 @@ class Pacman extends GameCharacter with CollisionCallbacks {
 
   @override
   void update(double dt) {
+
+
+
     pacmanEatingNormalSequence();
 
     if (globalPhysicsLinked) {

@@ -12,7 +12,6 @@ import 'constants.dart';
 import 'helper.dart';
 import 'dart:core';
 import 'dart:convert';
-import 'dart:async' as async;
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:flame/palette.dart';
 
@@ -39,7 +38,7 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
   }) : super(
           world: EndlessWorld(level: level, playerProgress: playerProgress),
           camera: CameraComponent.withFixedResolution(
-              width: screenSizeX.value, height: screenSizeY.value), //2800, 1700 //CameraComponent(),//
+              width: kSquareNotionalSize, height: kSquareNotionalSize), //2800, 1700 //CameraComponent(),//
           zoom: flameGameZoom,
         );
 
@@ -59,6 +58,8 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
   }
 
   void deadMansSwitch() async {
+    return;
+    /*
     //Works as separate thread to stop all audio when game stops
     async.Timer.periodic(const Duration(seconds: 2), (timer) {
       if (!isGameLive()) {
@@ -66,6 +67,7 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
         timer.cancel();
       }
     });
+     */
   }
 
   String getEncodeCurrentGameState() {
@@ -83,13 +85,11 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
     }
   }
 
-  void screenSizeChangeListener() {
-    screenSizeX.addListener(() {
-      camera.viewport = FixedResolutionViewport(resolution: Vector2(screenSizeX.value, screenSizeY.value));
-    });
-    screenSizeY.addListener(() {
-      camera.viewport = FixedResolutionViewport(resolution: Vector2(screenSizeX.value, screenSizeY.value));
-    });
+  @override
+  Future<void> onGameResize(size) async {
+    Vector2 targetViewPortSize = sanitizeScreenSize(size);
+    camera.viewport = FixedResolutionViewport(resolution: Vector2(targetViewPortSize.x, targetViewPortSize.y));
+    super.onGameResize(size);
   }
 
   /// In the [onLoad] method you load different type of assets and set things
@@ -100,7 +100,6 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
     gameRunning = true;
     userString = getRandomString(world.random, 15);
     downloadScoreboard();
-    deadMansSwitch();
-    screenSizeChangeListener();
+    //deadMansSwitch();
   }
 }

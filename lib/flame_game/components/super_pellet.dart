@@ -16,7 +16,7 @@ class SuperPelletCircle extends CircleComponent {
   @override
   Future<void> onLoad() async {
     super.onLoad();
-    add(CircleHitbox(collisionType: CollisionType.passive));
+    add(CircleHitbox(isSolid: true, collisionType: CollisionType.passive));
   }
 }
 

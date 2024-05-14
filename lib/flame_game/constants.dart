@@ -24,8 +24,6 @@ const clickAndDrag = true; //!windows && !useGyro;
 const gameScaleFactor = screenRotates ? 0.9 : 1.0;
 const flameGameZoom = 20.0;
 const double kSquareNotionalSize = 1700;
-ValueNotifier screenSizeX = ValueNotifier(0);
-ValueNotifier screenSizeY = ValueNotifier(0);
 const inGameVectorPixels = kSquareNotionalSize / flameGameZoom;
 
 final Vector2 kGhostStartLocation = Vector2(0, -3) * getSingleSquareWidth();

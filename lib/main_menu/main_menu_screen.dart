@@ -10,7 +10,7 @@ import '../style/wobbly_button.dart';
 import '../style/palette.dart';
 import '../style/responsive_screen.dart';
 import '../flame_game/constants.dart';
-import 'package:flutter/services.dart';
+import '../flame_game/helper.dart';
 
 class MainMenuScreen extends StatelessWidget {
   const MainMenuScreen({super.key});
@@ -18,9 +18,7 @@ class MainMenuScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = context.watch<Palette>();
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarColor: palette.backgroundMain.color, // Status bar color
-    ));
+    setStatusBarColor(palette.backgroundMain.color);
     // ignore: unused_local_variable
     final settingsController = context.watch<SettingsController>();
     // ignore: unused_local_variable
