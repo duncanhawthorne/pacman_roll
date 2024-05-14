@@ -24,16 +24,17 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
             priority: 1);
 
   //final Vector2 startingPosition;
-  late PhysicsBall underlyingBallReal = PhysicsBall(
+  late PhysicsBall _underlyingBall = PhysicsBall(
       realCharacter: this,
-      initialPosition: position); //to avoid null safety issues
+      initialPosition: position,
+  position: position); //to avoid null safety issues
 
   // Used to store the last position of the player, so that we later can
   // determine which direction that the player is moving.
   // ignore: prefer_final_fields
-  Vector2 _lastUnderlyingPosition = Vector2.zero();
+  Vector2 _lastUnderlyingBallPosition = Vector2.zero();
   // ignore: prefer_final_fields
-  Vector2 _lastUnderlyingVelocity = Vector2.zero();
+  Vector2 _lastUnderlyingBallVelocity = Vector2.zero();
 
   PhysicsBall createUnderlyingBall(Vector2 targetPosition) {
     PhysicsBall underlyingBallRealTmp =
@@ -45,41 +46,45 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     return underlyingBallRealTmp;
   }
 
+  void removeUnderlyingBall() {
+    world.remove(_underlyingBall);
+  }
+
   Vector2 getUnderlyingBallPosition() {
     try {
-      return underlyingBallReal.position;
+      return _underlyingBall.position;
     } catch (e) {
       //FIXME body not initialised. Shouldn't need this, hid error
-      //p(["getUnderlyingBallPosition", e]);
-      return _lastUnderlyingPosition; //Vector2(10, 0);
+      p(["getUnderlyingBallPosition", e, _lastUnderlyingBallPosition]);
+      return _lastUnderlyingBallPosition; //Vector2(10, 0);
     }
   }
 
   void setUnderlyingBallPosition(Vector2 targetLoc) {
-    underlyingBallReal
+    _underlyingBall
         .removeFromParent(); //note possible risk that may try to remove a ball that isn't in the world
-    underlyingBallReal = createUnderlyingBall(targetLoc);
-    world.add(underlyingBallReal);
+    _underlyingBall = createUnderlyingBall(targetLoc);
+    world.add(_underlyingBall);
   }
 
   Vector2 getUnderlyingBallVelocity() {
     try {
-      return Vector2(underlyingBallReal.body.linearVelocity.x,
-          underlyingBallReal.body.linearVelocity.y);
+      return Vector2(_underlyingBall.body.linearVelocity.x,
+          _underlyingBall.body.linearVelocity.y);
     } catch (e) {
       //FIXME body not initialised. Shouldn't need this, hid error
       //p(["getUnderlyingBallVelocity", e]);
-      return _lastUnderlyingVelocity;
+      return _lastUnderlyingBallVelocity;
     }
   }
 
   void setUnderlyingVelocity(Vector2 vel) {
     try {
-      underlyingBallReal.body.linearVelocity = vel;
+      _underlyingBall.body.linearVelocity = vel;
     } catch (e) {
       Future.delayed(const Duration(seconds: 0), () {
         //FIXME body not initialised. Shouldn't need this, hid error
-        underlyingBallReal.body.linearVelocity = vel;
+        _underlyingBall.body.linearVelocity = vel;
       });
     }
   }
@@ -100,14 +105,15 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     double tmpAngle = 0;
     if (useForgePhysicsBallRotation) {
       try {
-        tmpAngle = underlyingBallReal.angle;
+        tmpAngle = _underlyingBall.angle;
       } catch (e) {
         //FIXME body not initialised. Shouldn't need this, hid error
         tmpAngle = angle;
       }
     } else {
+      //p([(getUnderlyingBallPosition() - _lastUnderlyingBallPosition).length]);
       tmpAngle = angle +
-          (getUnderlyingBallPosition() - _lastUnderlyingPosition).length /
+          (getUnderlyingBallPosition() - _lastUnderlyingBallPosition).length /
               (size.x / 2) *
               getRollSpinDirection(getUnderlyingBallVelocity(), world.gravity);
     }
@@ -124,7 +130,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   Future<void> onLoad() async {
     setUnderlyingBallPosition(
         position); //FIXME shouldn't be necessary, but avoids one frame starting glitch
-    _lastUnderlyingPosition.setFrom(getUnderlyingBallPosition());
+    _lastUnderlyingBallPosition.setFrom(position);
     // When adding a CircleHitbox without any arguments it automatically
     // fills up the size of the component as much as it can without overflowing
     // it.
@@ -134,8 +140,8 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   @override
   void update(double dt) {
     super.update(dt);
-    _lastUnderlyingPosition.setFrom(getUnderlyingBallPosition());
-    _lastUnderlyingVelocity.setFrom(getUnderlyingBallVelocity());
+    _lastUnderlyingBallPosition.setFrom(getUnderlyingBallPosition());
+    _lastUnderlyingBallVelocity.setFrom(getUnderlyingBallVelocity());
   }
 }
 

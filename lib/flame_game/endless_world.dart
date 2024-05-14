@@ -94,13 +94,14 @@ class EndlessWorld extends Forge2DWorld
   }
 
   void addGhost(int ghostSpriteChooserNumber) {
-    Ghost ghost = Ghost(
-        position: kGhostStartLocation +
-            Vector2(
-                getSingleSquareWidth() * ghostSpriteChooserNumber <= 2
+    Vector2 target = kGhostStartLocation +
+        Vector2(
+            getSingleSquareWidth() *
+                (ghostSpriteChooserNumber <= 2
                     ? (ghostSpriteChooserNumber - 1)
-                    : 0,
-                0));
+                    : 0),
+            0);
+    Ghost ghost = Ghost(position: target);
     ghost.ghostSpriteChooserNumber = ghostSpriteChooserNumber;
     if (multipleSpawningGhosts && ghostPlayersList.isNotEmpty) {
       //new ghosts are also scared
@@ -114,19 +115,20 @@ class EndlessWorld extends Forge2DWorld
   }
 
   void addPacman(Vector2 startPosition) {
-    Pacman tmpPlayer = Pacman(position: startPosition);
+    Vector2 target = Vector2(startPosition.x, startPosition.y);
+    Pacman tmpPlayer = Pacman(position: target);
     add(tmpPlayer);
     pacmanPlayersList.add(tmpPlayer);
   }
 
   void removePacman(Pacman pacman) {
-    remove(pacman.underlyingBallReal);
+    pacman.removeUnderlyingBall();
     remove(pacman);
     pacmanPlayersList.remove(pacman);
   }
 
   void removeGhost(Ghost ghost) {
-    remove(ghost.underlyingBallReal);
+    ghost.removeUnderlyingBall();
     remove(ghost);
     ghostPlayersList.remove(ghost);
   }
@@ -211,9 +213,7 @@ class EndlessWorld extends Forge2DWorld
 
   double getLevelCompleteTimeSeconds() {
     assert(_levelCompleteTimeMillis != -1);
-    return (_levelCompleteTimeMillis -
-        datetimeStartedMillis) /
-        1000;
+    return (_levelCompleteTimeMillis - datetimeStartedMillis) / 1000;
   }
 
   @override
@@ -305,7 +305,8 @@ class EndlessWorld extends Forge2DWorld
   void onDragUpdate(DragUpdateEvent event) {
     super.onDragUpdate(event);
     Vector2 eventVector = event.canvasStartPosition - game.canvasSize / 2;
-    double eventVectorLengthProportion = (event.canvasStartPosition - game.canvasSize / 2).length /
+    double eventVectorLengthProportion =
+        (event.canvasStartPosition - game.canvasSize / 2).length /
             (min(game.canvasSize.x, game.canvasSize.y) / 2);
     if (clickAndDrag) {
       if (_lastDragAngle != 10) {

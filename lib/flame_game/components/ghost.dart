@@ -5,7 +5,6 @@ import '../constants.dart';
 // ignore: unused_import
 import '../helper.dart';
 import 'game_character.dart';
-import 'dart:math';
 import 'dart:core';
 
 import 'package:flame/effects.dart';
@@ -91,7 +90,7 @@ class Ghost extends GameCharacter {
   Future<void> onLoad() async {
     super.onLoad();
     animations = await getAnimations();
-    current = CharacterState.deadGhost;
+    current = CharacterState.scared;
   }
 
   @override

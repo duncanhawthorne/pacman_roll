@@ -182,6 +182,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     super.onLoad();
     animations = await getAnimations();
     current = CharacterState.normal;
+    angle = 2 * pi / 2;
   }
 
   @override
