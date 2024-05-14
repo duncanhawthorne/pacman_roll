@@ -61,7 +61,7 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
 
   void deadMansSwitch() async {
     //Works as separate thread to stop all audio when game stops
-    async.Timer.periodic(const Duration(seconds: 2), (timer) {
+    async.Timer.periodic(const Duration(seconds: 1), (timer) {
       if (!isGameLive()) {
         audioController.stopAllSfx();
         setStatusBarColor(palette.backgroundMain.color);

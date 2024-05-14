@@ -22,7 +22,7 @@ const followCursor = false; //windows;
 const clickAndDrag = true; //!windows && !useGyro;
 
 const gameScaleFactor = screenRotates ? 0.9 : 1.0;
-const flameGameZoom = 20.0;
+const flameGameZoom = 40.0;
 const double kSquareNotionalSize = 1700;
 const inGameVectorPixels = kSquareNotionalSize / flameGameZoom;
 
