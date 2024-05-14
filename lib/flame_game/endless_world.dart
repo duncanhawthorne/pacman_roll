@@ -149,7 +149,7 @@ class EndlessWorld extends Forge2DWorld
         game.overlays.add(GameScreen.wonDialogKey);
         trimToThreeGhosts();
         for (int i = 0; i < ghostPlayersList.length; i++) {
-          ghostPlayersList[i].setUnderlyingBallPosition(
+          ghostPlayersList[i].setPosition(
               kCageLocation + Vector2.random() / 100);
         }
         Future.delayed(

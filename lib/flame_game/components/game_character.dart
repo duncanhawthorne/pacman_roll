@@ -32,7 +32,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   // Used to store the last position of the player, so that we later can
   // determine which direction that the player is moving.
   final Vector2 _lastPosition = Vector2.zero();
-  final Vector2 lastVelocity = Vector2.zero();
+  final Vector2 _lastVelocity = Vector2.zero();
 
   /*
   PhysicsBall createUnderlyingBall(Vector2 targetPosition) {
@@ -75,6 +75,11 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     return _getUnderlyingBallVelocity();
   }
 
+  void setPosition(Vector2 targetLoc) {
+    setUnderlyingBallPosition(targetLoc);
+    position.setFrom(targetLoc);
+  }
+
   Vector2 _getUnderlyingBallPosition() {
     try {
       return _underlyingBall.position;
@@ -105,8 +110,8 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
           _underlyingBall.body.linearVelocity.y);
     } catch (e) {
       //FIXME body not initialised. Shouldn't need this, hid error
-      p(["getUnderlyingBallVelocity", e, lastVelocity]);
-      return lastVelocity;
+      p(["getUnderlyingBallVelocity", e, _lastVelocity]);
+      return _lastVelocity;
     }
   }
 
@@ -180,7 +185,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   @override
   void update(double dt) {
     super.update(dt);
-    lastVelocity.setFrom((position - _lastPosition)/dt); //FIXME except ball through portal
+    _lastVelocity.setFrom((position - _lastPosition)/dt); //FIXME except ball through portal
     _lastPosition.setFrom(position);
   }
 }
