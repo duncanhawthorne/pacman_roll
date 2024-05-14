@@ -79,9 +79,9 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
   }
 
   void downloadScoreboard() async {
-    List firebasePull = await save.firebasePull();
-    for (int i = 0; i < firebasePull.length; i++) {
-      scoreboardItemsDoubles.add(firebasePull[i]["levelCompleteTime"]);
+    List firebasePullDownload = await save.firebasePull();
+    for (int i = 0; i < firebasePullDownload.length; i++) {
+      scoreboardItemsDoubles.add(firebasePullDownload[i]["levelCompleteTime"]);
     }
   }
 

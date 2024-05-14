@@ -110,8 +110,8 @@ class AudioController {
         volume: soundTypeToVolume(type));
   }
 
-  void pauseSfx(SfxType type) {
-    _sfxPlayersNew[type]!.pause();
+  void stopSfx(SfxType type) {
+    _sfxPlayersNew[type]!.stop();
   }
 
   void setSirenVolume(double volume) {

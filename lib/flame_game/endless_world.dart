@@ -227,6 +227,7 @@ class EndlessWorld extends Forge2DWorld
     play(SfxType.startMusic);
     if (sirenEnabled) {
       play(SfxType.ghostsRoamingSiren);
+      game.audioController.setSirenVolume(0);
       sirenVolumeUpdatedTimer();
     }
 

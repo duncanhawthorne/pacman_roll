@@ -28,9 +28,8 @@ void p(x) {
 }
 
 String endText(double value) {
-  double x = percentile(scoreboardItemsDoubles, value) * 100;
-  String y =
-      "\nTime: ${value.toStringAsFixed(1)} seconds \n\nRank: Top ${x.toStringAsFixed(0)}%\n";
+  double x = fbOn ? percentile(scoreboardItemsDoubles, value) * 100 : 0.0;
+  String y = "\nTime: ${value.toStringAsFixed(1)} seconds\n${!fbOn ? "" : "\nRank: Top ${x.toStringAsFixed(0)}%\n"}";
   return y;
 }
 
@@ -59,7 +58,7 @@ enum WallLocation { bottom, top, left, right }
 int getRollSpinDirection(Vector2 vel, Vector2 gravity) {
   WallLocation onWall = WallLocation.bottom;
   bool clockwise = true;
-  double smallThresholdVelocity = 4;
+  double smallThresholdVelocity = 80 / flameGameZoom;
 
   if (vel.x.abs() > smallThresholdVelocity) {
     //moving left or right

@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 
 import 'router.dart';
 import 'flame_game/constants.dart';
+import 'flame_game/helper.dart';
 import 'app_lifecycle/app_lifecycle.dart';
 import 'audio/audio_controller.dart';
 import 'player_progress/player_progress.dart';
@@ -26,6 +27,9 @@ void main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
     db = FirebaseFirestore.instance;
+  }
+  else {
+    p("fb off");
   }
 
   await Flame.device.fullScreen();

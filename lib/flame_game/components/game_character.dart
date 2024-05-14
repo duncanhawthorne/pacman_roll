@@ -55,7 +55,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
       return _underlyingBall.position;
     } catch (e) {
       //FIXME body not initialised. Shouldn't need this, hid error
-      p(["getUnderlyingBallPosition", e, _lastUnderlyingBallPosition]);
+      //p(["getUnderlyingBallPosition", e, _lastUnderlyingBallPosition]);
       return _lastUnderlyingBallPosition; //Vector2(10, 0);
     }
   }

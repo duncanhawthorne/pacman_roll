@@ -67,8 +67,8 @@ bool wallNeededBetween(int k, int l) {
 class MazeWallSquare extends RectangleComponent {
   MazeWallSquare({required super.position})
       : super(
-            size: Vector2(getSingleSquareWidth().ceil().toDouble(),
-                getSingleSquareWidth().ceil().toDouble()),
+            size: Vector2(getSingleSquareWidth() * 1.03, //.ceil().toDouble()
+                getSingleSquareWidth() * 1.03), //.ceil().toDouble()
             anchor: Anchor.center,
             paint: blueMazePaint);
 }

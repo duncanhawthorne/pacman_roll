@@ -22,7 +22,7 @@ const followCursor = false; //windows;
 const clickAndDrag = true; //!windows && !useGyro;
 
 const gameScaleFactor = screenRotates ? 0.9 : 1.0;
-const flameGameZoom = 40.0;
+const flameGameZoom = 30.0;
 const double kSquareNotionalSize = 1700;
 const inGameVectorPixels = kSquareNotionalSize / flameGameZoom;
 
@@ -54,10 +54,10 @@ const bool pelletEatSoundOn = true; //iOS ? false : true;
 const multipleSpawningPacmans = false;
 const multipleSpawningGhosts = false;
 
-bool fbOn = true;
+bool fbOn = !(windows && !kIsWeb);
 //String userName = "ABC";
 FirebaseFirestore? db = fbOn ? FirebaseFirestore.instance : null;
-List<double> scoreboardItemsDoubles = [0.364];
+List<double> scoreboardItemsDoubles = [];
 
 const String chars =
     'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';

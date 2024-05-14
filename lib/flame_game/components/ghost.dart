@@ -85,7 +85,7 @@ class Ghost extends GameCharacter {
     if (current == CharacterState.scaredIsh) {
       if (world.now - ghostScaredTimeLatest > kGhostChaseTimeMillis) {
         current = CharacterState.normal;
-        game.audioController.pauseSfx(SfxType.ghostsScared);
+        game.audioController.stopSfx(SfxType.ghostsScared);
       }
     }
   }
