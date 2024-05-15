@@ -1,3 +1,4 @@
+import 'package:flame/effects.dart';
 import 'package:pacman_roll/flame_game/endless_world.dart';
 
 import 'components/maze_layout.dart';
@@ -187,6 +188,42 @@ pureVectorPacman() {
           radius: getSingleSquareWidth() / 2, paint: pacmanYellowPaint),
     ],
   );
+}
+
+pureVectorPacmanTwo() {
+  CircleComponent d = CircleComponent(
+      radius: getSingleSquareWidth() / 2,
+      paint: pacmanYellowPaint,
+      anchor: Anchor.topLeft,
+      position: Vector2(0, 0));
+  PolygonComponent b = PolygonComponent([
+    Vector2(1 * getSingleSquareWidth(),
+        -1 * getSingleSquareWidth() * tan(1 / 2 * 5 / 32 * 2 * pi)),
+    Vector2(0, 0),
+    Vector2(1 * getSingleSquareWidth(),
+        1 * getSingleSquareWidth() * tan(1 / 2 * 5 / 32 * 2 * pi))
+  ],
+      anchor: Anchor.centerLeft,
+      position: Vector2.all(getSingleSquareWidth() / 2),
+      paint: blackBackgroundPaint);
+  ClipComponent c = ClipComponent.circle(
+      anchor: Anchor.center,
+      size: Vector2.all(getSingleSquareWidth()),
+      children: [d, b]);
+
+  final effectClose = ScaleEffect.to(
+    Vector2(1, 0.0),
+    EffectController(duration: kPacmanHalfEatingResetTimeMillis / 1000),
+  );
+  final effectOpen = ScaleEffect.to(
+    Vector2(1, 1),
+    EffectController(duration: kPacmanHalfEatingResetTimeMillis / 1000),
+  );
+  final effect = SequenceEffect([effectClose, effectOpen]);
+
+  c.children.last.add(effect);
+
+  return c;
 }
 
 double getTargetSirenVolume(EndlessWorld world) {

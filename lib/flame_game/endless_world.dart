@@ -208,12 +208,11 @@ class EndlessWorld extends Forge2DWorld
     for (int i = 0; i < 3; i++) {
       addGhost(i);
     }
-    multiGhostAdderTimer();
-    //add(MazeImage());
-    addMazeWalls(this);
-    addAll(createBoundaries(game.camera));
-    addPelletsAndSuperPellets(this, pelletsRemainingNotifier);
+    addAll(mazeWalls());
+    addAll(screenEdgeBoundaries(game.camera));
+    addAll(pelletsAndSuperPellets(pelletsRemainingNotifier));
 
+    multiGhostAdderTimer();
     winOrLoseGameListener();
     handleAcceleratorEvents(this);
   }

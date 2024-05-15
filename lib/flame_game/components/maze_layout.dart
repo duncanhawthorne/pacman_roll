@@ -4,7 +4,6 @@ import '../constants.dart';
 import '../helper.dart';
 import 'package:flame/components.dart';
 import 'wall.dart';
-import 'package:flame_forge2d/flame_forge2d.dart';
 import 'super_pellet.dart';
 import 'mini_pellet.dart';
 
@@ -16,8 +15,8 @@ int getMazeIntWidth() {
   return wrappedMazeLayout.isEmpty ? 0 : wrappedMazeLayout[0].length;
 }
 
-void addPelletsAndSuperPellets(
-    Forge2DWorld world, ValueNotifier pelletsRemainingNotifier) {
+List<Component> pelletsAndSuperPellets(ValueNotifier pelletsRemainingNotifier) {
+  List<Component> result = [];
   pelletsRemainingNotifier.value = 0;
   double scale = getSingleSquareWidth();
   for (var i = 0; i < wrappedMazeLayout.length; i++) {
@@ -26,13 +25,14 @@ void addPelletsAndSuperPellets(
               i + 1 / 2 - wrappedMazeLayout.length / 2) *
           scale;
       if (wrappedMazeLayout[i][j] == 0) {
-        world.add(MiniPelletCircle(position: center));
+        result.add(MiniPelletCircle(position: center));
       }
       if (wrappedMazeLayout[i][j] == 3) {
-        world.add(SuperPelletCircle(position: center));
+        result.add(SuperPelletCircle(position: center));
       }
     }
   }
+  return result;
 }
 
 class MazeWallSquareVisual extends RectangleComponent {
@@ -51,7 +51,8 @@ class MazeWallCircleVisual extends CircleComponent {
       : super(anchor: Anchor.center, paint: blackBackgroundPaint); //NOTE BLACK
 }
 
-void addMazeWalls(world) {
+List<Component> mazeWalls() {
+  List<Component> result = [];
   double scale = getSingleSquareWidth();
   if (mazeOn) {
     for (var i = 0; i < wrappedMazeLayout.length; i++) {
@@ -60,15 +61,15 @@ void addMazeWalls(world) {
                 i + 1 / 2 - wrappedMazeLayout.length / 2) *
             scale;
         if (wrappedMazeLayout[i][j] == 1) {
-          world.add(MazeWallCircleGround(center, scale / 2));
+          result.add(MazeWallCircleGround(center, scale / 2));
           if (j + 1 < wrappedMazeLayout[0].length &&
               wrappedMazeLayout[i][j + 1] == 1) {
-            world.add(MazeWallRectangleGround(
+            result.add(MazeWallRectangleGround(
                 center + Vector2(scale / 2, 0), scale, scale));
           }
           if (i + 1 < wrappedMazeLayout.length &&
               wrappedMazeLayout[i + 1][j] == 1) {
-            world.add(MazeWallRectangleGround(
+            result.add(MazeWallRectangleGround(
                 center + Vector2(0, scale / 2), scale, scale));
           }
         }
@@ -81,20 +82,20 @@ void addMazeWalls(world) {
                 i + 1 / 2 - wrappedMazeLayout.length / 2) *
             scale;
         if (wrappedMazeLayout[i][j] == 1) {
-          world.add(MazeWallCircleVisual(
+          result.add(MazeWallCircleVisual(
               position: center,
               radius: getSingleSquareWidth() / 2 * mazeWallWidthFactor));
 
           if (j + 1 < wrappedMazeLayout[i].length &&
               wrappedMazeLayout[i][j + 1] == 1) {
-            world.add(MazeWallSquareVisual(
+            result.add(MazeWallSquareVisual(
                 position: center + Vector2(scale / 2, 0),
                 widthx: scale,
                 heightx: scale * mazeWallWidthFactor));
           }
           if (i + 1 < wrappedMazeLayout.length &&
               wrappedMazeLayout[i + 1][j] == 1) {
-            world.add(MazeWallSquareVisual(
+            result.add(MazeWallSquareVisual(
                 position: center + Vector2(0, scale / 2),
                 widthx: scale * mazeWallWidthFactor,
                 heightx: scale));
@@ -103,9 +104,10 @@ void addMazeWalls(world) {
       }
     }
   }
+  return result;
 }
 
-List<Component> createBoundaries(CameraComponent camera) {
+List<Component> screenEdgeBoundaries(CameraComponent camera) {
   final Rect visibleRect = camera.visibleWorldRect;
   final Vector2 topLeft = visibleRect.topLeft.toVector2();
   final Vector2 topRight = visibleRect.topRight.toVector2();

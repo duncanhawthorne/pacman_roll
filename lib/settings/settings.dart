@@ -72,10 +72,10 @@ class SettingsController {
         if (kIsWeb) {
           // On the web, sound can only start after user interaction, so
           // we start muted there on every game start.
-          return audioOn.value = true; //false;
+          return audioOn.value = value; //false;
         }
         // On other platforms, we can use the persisted value.
-        return audioOn.value = true; //value;
+        return audioOn.value = value; //true; //value;
       }),
       _store
           .getSoundsOn(defaultValue: true)
