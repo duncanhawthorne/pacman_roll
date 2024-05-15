@@ -19,7 +19,6 @@ class MainMenuScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final palette = context.watch<Palette>();
     setStatusBarColor(palette.backgroundMain.color);
-    // ignore: unused_local_variable
     final settingsController = context.watch<SettingsController>();
     // ignore: unused_local_variable
     final audioController = context.watch<AudioController>();
@@ -68,19 +67,6 @@ class MainMenuScreen extends StatelessWidget {
               child: const Text('Play'),
             ),
             _gap,
-            _gap,
-            _gap,
-            _gap,
-            _gap,
-            _gap,
-            /*
-            WobblyButton(
-              onPressed: () => GoRouter.of(context).push('/settings'),
-              child: const Text('Settings'),
-            ),
-            _gap,
-             */
-            /*
             Padding(
               padding: const EdgeInsets.only(top: 32),
               child: ValueListenableBuilder<bool>(
@@ -94,8 +80,22 @@ class MainMenuScreen extends StatelessWidget {
               ),
             ),
             _gap,
-
+            _gap,
+            _gap,
+            _gap,
+            _gap,
+            /*
+            WobblyButton(
+              onPressed: () => GoRouter.of(context).push('/settings'),
+              child: const Text('Settings'),
+            ),
+            _gap,
              */
+
+
+            _gap,
+
+
             //const Text('Built with Flame'),
           ],
         ),

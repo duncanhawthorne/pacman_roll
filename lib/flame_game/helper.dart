@@ -1,6 +1,6 @@
 import 'package:pacman_roll/flame_game/endless_world.dart';
 
-import 'components/maze_walls.dart';
+import 'components/maze_layout.dart';
 import 'constants.dart';
 import 'saves.dart';
 import 'components/game_character.dart';

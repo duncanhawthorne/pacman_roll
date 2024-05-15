@@ -1,4 +1,4 @@
-import 'maze_walls.dart';
+import 'maze_layout.dart';
 import '../helper.dart';
 
 import '../endless_world.dart';

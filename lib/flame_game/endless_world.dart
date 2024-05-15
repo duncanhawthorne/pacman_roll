@@ -16,7 +16,7 @@ import '../../audio/sounds.dart';
 import 'game_screen.dart';
 import 'endless_runner.dart';
 import 'components/game_character.dart';
-import 'components/maze_walls.dart';
+import 'components/maze_layout.dart';
 import 'components/pacman.dart';
 import 'components/ghost.dart';
 import 'constants.dart';
