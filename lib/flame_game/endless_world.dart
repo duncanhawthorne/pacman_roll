@@ -104,8 +104,8 @@ class EndlessWorld extends Forge2DWorld
     if (multipleSpawningGhosts && ghostPlayersList.isNotEmpty) {
       //new ghosts are also scared
       ghost.ghostScaredTimeLatest = ghostPlayersList[0].ghostScaredTimeLatest;
-      ghost.current = CharacterState
-          .scared; //and then will get sequenced to correct state
+      ghost.current =
+          CharacterState.scared; //and then will get sequenced to correct state
     }
     add(ghost);
   }
@@ -149,8 +149,10 @@ class EndlessWorld extends Forge2DWorld
         game.overlays.add(GameScreen.wonDialogKey);
         trimToThreeGhosts();
         for (int i = 0; i < ghostPlayersList.length; i++) {
-          ghostPlayersList[i].setPosition(
-              kCageLocation + Vector2.random() / 100);
+          ghostPlayersList[i]
+              .setPosition(kCageLocation + Vector2.random() / 100);
+          ghostPlayersList[i].ghostDeadTimeLatest = 0;
+          ghostPlayersList[i].ghostScaredTimeLatest = 0;
         }
         Future.delayed(
             const Duration(milliseconds: kPacmanHalfEatingResetTimeMillis * 2),

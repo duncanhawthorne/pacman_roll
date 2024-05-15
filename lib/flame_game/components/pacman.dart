@@ -113,7 +113,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     if (multipleSpawningPacmans) {
       //world.addPacman(getUnderlyingBallPosition() + Vector2.random() / 100);
       world.add(Pacman(position: position + Vector2.random() / 100));
-      }
+    }
   }
 
   void ghostKillsPacman() {
@@ -137,8 +137,8 @@ class Pacman extends GameCharacter with CollisionCallbacks {
             setPosition(kPacmanStartLocation);
             world.trimToThreeGhosts();
             for (var i = 0; i < world.ghostPlayersList.length; i++) {
-              world.ghostPlayersList[i].setPosition(
-                  kGhostStartLocation + Vector2.random() / 100);
+              world.ghostPlayersList[i]
+                  .setPosition(kGhostStartLocation + Vector2.random() / 100);
               world.ghostPlayersList[i].ghostDeadTimeLatest = 0;
               world.ghostPlayersList[i].ghostScaredTimeLatest = 0;
             }
@@ -206,8 +206,8 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     super.render(canvas);
     if (current == CharacterState.deadPacman) {
       assert(world.now >= _pacmanDeadTimeLatest);
-      double tween =
-          (world.now - _pacmanDeadTimeLatest) / kPacmanDeadResetTimeAnimationMillis;
+      double tween = (world.now - _pacmanDeadTimeLatest) /
+          kPacmanDeadResetTimeAnimationMillis;
       tween = min(1, tween);
       double mouthWidth = pacmanMouthWidthDefault * (1 - tween) + 1 * tween;
       canvas.drawArc(rectSingleSquare, 2 * pi * ((mouthWidth / 2) + 0.5),

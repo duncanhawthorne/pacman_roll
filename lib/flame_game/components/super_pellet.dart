@@ -5,7 +5,8 @@ import '../constants.dart';
 import '../helper.dart';
 import 'dart:math';
 
-class SuperPelletCircle extends CircleComponent with HasWorldReference<EndlessWorld> {
+class SuperPelletCircle extends CircleComponent
+    with HasWorldReference<EndlessWorld> {
   SuperPelletCircle({required super.position})
       : super(
             radius: getSingleSquareWidth() *

@@ -5,7 +5,8 @@ import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import '../constants.dart';
 
-class MiniPelletCircle extends CircleComponent with HasWorldReference<EndlessWorld> {
+class MiniPelletCircle extends CircleComponent
+    with HasWorldReference<EndlessWorld> {
   MiniPelletCircle({required super.position})
       : super(
             radius: getSingleSquareWidth() *
@@ -31,7 +32,6 @@ class MiniPelletCircle extends CircleComponent with HasWorldReference<EndlessWor
     world.pelletsRemainingNotifier.value -= 1;
     super.onRemove();
   }
-
 }
 
 /// The [MiniPellet] components are the components that the [Player] should collect
@@ -63,5 +63,4 @@ class MiniPellet extends SpriteAnimationComponent
     world.pelletsRemainingNotifier.value -= 1;
     super.onRemove();
   }
-
 }

@@ -19,7 +19,7 @@ final palette = Palette();
 Save save = Save();
 
 double getSingleSquareWidth() {
-  return inGameVectorPixels / getMazeWidth() * gameScaleFactor;
+  return inGameVectorPixels / getMazeIntWidth() * gameScaleFactor;
 }
 
 void p(x) {
@@ -29,7 +29,8 @@ void p(x) {
 
 String endText(double value) {
   double x = fbOn ? percentile(scoreboardItemsDoubles, value) * 100 : 0.0;
-  String y = "\nTime: ${value.toStringAsFixed(1)} seconds\n${!fbOn ? "" : "\nRank: Top ${x.toStringAsFixed(0)}%\n"}";
+  String y =
+      "\nTime: ${value.toStringAsFixed(1)} seconds\n${!fbOn ? "" : "\nRank: Top ${x.toStringAsFixed(0)}%\n"}";
   return y;
 }
 
@@ -136,6 +137,8 @@ final Paint blueMazePaint = Paint()
   ..color = const Color(0xFF3B32D4); //blue; //yellowAccent;
 final Paint pacmanYellowPaint = Paint()
   ..color = Colors.yellowAccent; //blue; //yellowAccent;
+final Paint blackBackgroundPaint = Paint()
+  ..color = palette.flameGameBackground.color;
 final Rect rectSingleSquare = Rect.fromCenter(
     center: Offset(getSingleSquareWidth() / 2, getSingleSquareWidth() / 2),
     width: getSingleSquareWidth(),
@@ -194,13 +197,14 @@ double getTargetSirenVolume(EndlessWorld world) {
   double tmpSirenVolume = 0;
   try {
     for (int i = 0; i < world.ghostPlayersList.length; i++) {
-      tmpSirenVolume += world.ghostPlayersList[i].current == CharacterState.normal
-          ? world.ghostPlayersList[i].getVelocity().length /
-          world.ghostPlayersList.length
-          : 0;
+      tmpSirenVolume +=
+          world.ghostPlayersList[i].current == CharacterState.normal
+              ? world.ghostPlayersList[i].getVelocity().length /
+                  world.ghostPlayersList.length
+              : 0;
     }
     if ((world.pacmanPlayersList.isNotEmpty &&
-        world.pacmanPlayersList[0].current == CharacterState.deadPacman) ||
+            world.pacmanPlayersList[0].current == CharacterState.deadPacman) ||
         !globalPhysicsLinked) {
       tmpSirenVolume = 0;
     }

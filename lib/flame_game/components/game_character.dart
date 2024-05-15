@@ -63,7 +63,6 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
 
    */
 
-
 /*
   void addUnderlyingBallToWorld() {
     world.add(_underlyingBall);
@@ -92,7 +91,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
 
   void setUnderlyingBallPosition(Vector2 targetLoc) {
     _underlyingBall.body.setTransform(targetLoc, angle);
-    _underlyingBall.body.linearVelocity = Vector2(0,0);
+    _underlyingBall.body.linearVelocity = Vector2(0, 0);
     //_underlyingBall.body.setAwake(true);
     /*
     _underlyingBall
@@ -133,15 +132,15 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   }
 
   void _moveUnderlyingBallThroughPipePortal() {
-      if (position.x > 10 * getSingleSquareWidth()) {
-        Vector2 startVel = _getUnderlyingBallVelocity(); //before destroy ball
-        setUnderlyingBallPosition(kLeftPortalLocation);
-        _setUnderlyingVelocity(startVel);
-      } else if (position.x < -10 * getSingleSquareWidth()) {
-        Vector2 startVel = _getUnderlyingBallVelocity();
-        setUnderlyingBallPosition(kRightPortalLocation); //before destroy ball
-        _setUnderlyingVelocity(startVel);
-      }
+    if (position.x > 10 * getSingleSquareWidth()) {
+      Vector2 startVel = _getUnderlyingBallVelocity(); //before destroy ball
+      setUnderlyingBallPosition(kLeftPortalLocation);
+      _setUnderlyingVelocity(startVel);
+    } else if (position.x < -10 * getSingleSquareWidth()) {
+      Vector2 startVel = _getUnderlyingBallVelocity();
+      setUnderlyingBallPosition(kRightPortalLocation); //before destroy ball
+      _setUnderlyingVelocity(startVel);
+    }
   }
 
   double _getUpdatedAngle() {
@@ -173,7 +172,9 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     world.add(_underlyingBall);
     //addUnderlyingBallToWorld();
     _lastPosition.setFrom(position);
-    add(CircleHitbox()); //hitbox as large as possble
+    add(CircleHitbox(
+      isSolid: true,
+    )); //hitbox as large as possble
   }
 
   @override
@@ -185,7 +186,8 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   @override
   void update(double dt) {
     super.update(dt);
-    _lastVelocity.setFrom((position - _lastPosition)/dt); //FIXME except ball through portal
+    _lastVelocity.setFrom(
+        (position - _lastPosition) / dt); //FIXME except ball through portal
     _lastPosition.setFrom(position);
   }
 }

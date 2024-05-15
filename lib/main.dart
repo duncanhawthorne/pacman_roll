@@ -27,8 +27,7 @@ void main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
     db = FirebaseFirestore.instance;
-  }
-  else {
+  } else {
     p("fb off");
   }
 
