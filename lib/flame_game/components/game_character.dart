@@ -34,42 +34,6 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   final Vector2 _lastPosition = Vector2.zero();
   final Vector2 _lastVelocity = Vector2.zero();
 
-  /*
-  PhysicsBall createUnderlyingBall(Vector2 targetPosition) {
-    return PhysicsBall(realCharacter: this, initialPosition: targetPosition);
-    //underlyingBallRealTmp.realCharacter =
-    //    this;
-    //underlyingBallRealTmp.createBody();
-    //underlyingBallRealTmp.bodyDef!.position = startPosition;
-    //return underlyingBallRealTmp;
-  }
-
-
-   */
-
-  /*
-  void removeUnderlyingBallFromWorld() {
-    world.remove(_underlyingBall);
-  }
-
-   */
-
-  /*
-  void removeSelfFromWorld() {
-    //removeUnderlyingBallFromWorld();
-    world.remove(_underlyingBall);
-    world.remove(this);
-  }
-
-   */
-
-/*
-  void addUnderlyingBallToWorld() {
-    world.add(_underlyingBall);
-  }
-
- */
-
   Vector2 getVelocity() {
     return _getUnderlyingBallVelocity();
   }
@@ -92,15 +56,6 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   void setUnderlyingBallPosition(Vector2 targetLoc) {
     _underlyingBall.body.setTransform(targetLoc, angle);
     _underlyingBall.body.linearVelocity = Vector2(0, 0);
-    //_underlyingBall.body.setAwake(true);
-    /*
-    _underlyingBall
-        .removeFromParent(); //note possible risk that may try to remove a ball that isn't in the world
-    //removeUnderlyingBallFromWorld();
-    _underlyingBall = createUnderlyingBall(targetLoc);
-    //world.add(_underlyingBall);
-    addUnderlyingBallToWorld()
-     */
   }
 
   Vector2 _getUnderlyingBallVelocity() {
@@ -118,17 +73,6 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     Future.delayed(const Duration(seconds: 0), () {
       _underlyingBall.body.linearVelocity = vel;
     });
-    /*
-    try {
-      _underlyingBall.body.linearVelocity = vel;
-    } catch (e) {
-      //FIXME body not initialised. Shouldn't need this, hid error
-      p(["setUnderlyingVelocity", e, vel]);
-      Future.delayed(const Duration(seconds: 0), () {
-        _underlyingBall.body.linearVelocity = vel;
-      });
-    }
-     */
   }
 
   void _moveUnderlyingBallThroughPipePortal() {
@@ -170,7 +114,6 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   @override
   Future<void> onLoad() async {
     world.add(_underlyingBall);
-    //addUnderlyingBallToWorld();
     _lastPosition.setFrom(position);
     add(CircleHitbox(
       isSolid: true,
