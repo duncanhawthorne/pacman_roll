@@ -37,7 +37,7 @@ class MainMenuScreen extends StatelessWidget {
                   filterQuality: FilterQuality.none,
                 ),
               ),
-              _gap,
+              //_gap,
               Transform.rotate(
                 angle: -0.1,
                 child: ConstrainedBox(
@@ -59,10 +59,12 @@ class MainMenuScreen extends StatelessWidget {
         rectangularMenuArea: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            _gap,
             WobblyButton(
               onPressed: () {
                 //audioController.playSfx(SfxType.buttonTap);
                 GoRouter.of(context).go('/session/1');
+                setStatusBarColor(palette.flameGameBackground.color);
               },
               child: const Text('Play'),
             ),
@@ -79,7 +81,7 @@ class MainMenuScreen extends StatelessWidget {
                 },
               ),
             ),
-            _gap,
+
             _gap,
             _gap,
             _gap,

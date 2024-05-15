@@ -109,6 +109,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
       ghost.setUnderlyingBallPosition(kOffScreenLocation +
           Vector2.random() /
               100); //will get moved to right position later by other code in sequence checker
+      //ghost.setUnderlyingBallStatic();
     }
     if (multipleSpawningPacmans) {
       //world.addPacman(getUnderlyingBallPosition() + Vector2.random() / 100);

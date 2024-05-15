@@ -43,6 +43,16 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     position.setFrom(targetLoc);
   }
 
+  /*
+  void setUnderlyingBallDynamic() {
+    _underlyingBall.body.setType(BodyType.dynamic);
+  }
+
+  void setUnderlyingBallStatic() {
+    _underlyingBall.body.setType(BodyType.static);
+  }
+   */
+
   Vector2 _getUnderlyingBallPosition() {
     try {
       return _underlyingBall.position;

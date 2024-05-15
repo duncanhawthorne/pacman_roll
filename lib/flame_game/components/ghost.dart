@@ -71,6 +71,7 @@ class Ghost extends GameCharacter {
         if (world.pelletsRemainingNotifier.value > 0 &&
             ghostDeadTimeLatest != 0) {
           setPosition(kGhostStartLocation + Vector2.random() / 100);
+          //setUnderlyingBallDynamic();
         }
         current = CharacterState.scared;
       }

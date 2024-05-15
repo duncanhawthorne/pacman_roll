@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import 'package:nes_ui/nes_ui.dart';
 import 'package:provider/provider.dart';
 
+import 'helper.dart';
+
 /// This dialog is shown when a level is completed.
 ///
 /// It shows what time the level was completed in and if there are more levels
@@ -50,6 +52,7 @@ class GameLoseDialog extends StatelessWidget {
               NesButton(
                 onPressed: () {
                   context.go('/');
+                  setStatusBarColor(palette.backgroundMain.color);
                 },
                 type: NesButtonType.primary,
                 child: const Text('Retry'),

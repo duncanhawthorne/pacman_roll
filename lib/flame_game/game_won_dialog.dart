@@ -52,6 +52,7 @@ class GameWonDialog extends StatelessWidget {
               NesButton(
                 onPressed: () {
                   context.go('/');
+                  setStatusBarColor(palette.backgroundMain.color);
                 },
                 type: NesButtonType.primary,
                 child: const Text('Retry'),
