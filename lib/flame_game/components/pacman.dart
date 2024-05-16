@@ -11,7 +11,6 @@ import 'game_character.dart';
 import 'dart:math';
 import 'dart:ui';
 import 'dart:core';
-import 'package:flutter/foundation.dart';
 
 /// The [GameCharacter] is the component that the physical player of the game is
 /// controlling.
@@ -28,7 +27,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     return {
       CharacterState.normal: SpriteAnimation.spriteList(
         [
-          kIsWeb
+          usePacmanImageFromDisk
               ? await game.loadSprite('dash/pacmanman.png')
               : Sprite(pacmanStandardImage())
         ],
@@ -36,10 +35,10 @@ class Pacman extends GameCharacter with CollisionCallbacks {
       ),
       CharacterState.eating: SpriteAnimation.spriteList(
         [
-          kIsWeb
+          usePacmanImageFromDisk
               ? await game.loadSprite('dash/pacmanman.png')
               : Sprite(pacmanStandardImage()),
-          kIsWeb
+          usePacmanImageFromDisk
               ? await game.loadSprite('dash/pacmanman_eat.png')
               : Sprite(pacmanMouthClosedImage())
         ],

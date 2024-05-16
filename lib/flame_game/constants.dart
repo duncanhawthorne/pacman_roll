@@ -14,6 +14,7 @@ final bool iOS = defaultTargetPlatform == TargetPlatform.iOS;
 final bool windows = defaultTargetPlatform == TargetPlatform.windows;
 const bool web = kIsWeb;
 final isiOSMobile = kIsWeb && defaultTargetPlatform == TargetPlatform.iOS;
+const bool usePacmanImageFromDisk = kIsWeb;
 
 const useForgePhysicsBallRotation = false;
 const bool normaliseGravity = true; //android ? false : true;
