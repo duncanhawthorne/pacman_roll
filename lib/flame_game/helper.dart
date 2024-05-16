@@ -15,6 +15,8 @@ import 'package:sensors_plus/sensors_plus.dart';
 import '../style/palette.dart';
 import 'package:flutter/services.dart';
 
+import 'title_fix_stub.dart' if (dart.library.js_interop) 'title_fix_web.dart';
+
 final palette = Palette();
 
 Save save = Save();
@@ -290,4 +292,8 @@ void setStatusBarColor(color) {
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
     statusBarColor: color, // Status bar color
   ));
+}
+
+void fixTitle() {
+  fixTitleReal(); //either from web or stub
 }

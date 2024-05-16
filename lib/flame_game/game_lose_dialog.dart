@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:nes_ui/nes_ui.dart';
 import 'package:provider/provider.dart';
 
+import 'constants.dart';
 import 'helper.dart';
 
 /// This dialog is shown when a level is completed.
@@ -52,6 +53,7 @@ class GameLoseDialog extends StatelessWidget {
               NesButton(
                 onPressed: () {
                   context.go('/');
+                  gameRunning = false;
                   setStatusBarColor(palette.backgroundMain.color);
                 },
                 type: NesButtonType.primary,

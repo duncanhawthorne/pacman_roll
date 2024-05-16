@@ -31,6 +31,12 @@ void main() async {
     p("fb off");
   }
 
+  for (int i = 0; i < 10; i++) {
+    Future.delayed(Duration(seconds: i), () {
+      fixTitle();
+    });
+  }
+
   await Flame.device.fullScreen();
   runApp(const MyGame());
 }
@@ -63,7 +69,7 @@ class MyGame extends StatelessWidget {
           final palette = context.watch<Palette>();
 
           return MaterialApp.router(
-            title: 'Pacman ROLL',
+            title: appTitle,
             theme: flutterNesTheme().copyWith(
               colorScheme: ColorScheme.fromSeed(
                 seedColor: palette.seed.color,

@@ -1,4 +1,5 @@
 import '../level_selection/levels.dart';
+import 'constants.dart';
 import 'helper.dart';
 import '../style/palette.dart';
 import 'package:flutter/material.dart';
@@ -52,6 +53,7 @@ class GameWonDialog extends StatelessWidget {
               NesButton(
                 onPressed: () {
                   context.go('/');
+                  gameRunning = false;
                   setStatusBarColor(palette.backgroundMain.color);
                 },
                 type: NesButtonType.primary,

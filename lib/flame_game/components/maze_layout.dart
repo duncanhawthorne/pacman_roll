@@ -51,24 +51,39 @@ class MazeWallCircleVisual extends CircleComponent {
       : super(anchor: Anchor.center, paint: blackBackgroundPaint); //NOTE BLACK
 }
 
+bool mazeWallAt(int i, int j) {
+  if (i >= wrappedMazeLayout.length || i < 0 || j >= wrappedMazeLayout[i].length || j < 0) {
+    return false;
+  }
+  else {
+    return wrappedMazeLayout[i][j] == 1;
+  }
+}
+
+bool circleAt(int i, int j) {
+  assert(mazeWallAt(i, j));
+  return !(mazeWallAt(i - 1, j) && mazeWallAt(i + 1, j) ||
+      mazeWallAt(i, j - 1) && mazeWallAt(i, j + 1));
+}
+
 List<Component> mazeWalls() {
   List<Component> result = [];
   double scale = getSingleSquareWidth();
   if (mazeOn) {
     for (var i = 0; i < wrappedMazeLayout.length; i++) {
-      for (var j = 0; j < wrappedMazeLayout[0].length; j++) {
+      for (var j = 0; j < wrappedMazeLayout[i].length; j++) {
         Vector2 center = Vector2(j + 1 / 2 - wrappedMazeLayout[0].length / 2,
                 i + 1 / 2 - wrappedMazeLayout.length / 2) *
             scale;
-        if (wrappedMazeLayout[i][j] == 1) {
-          result.add(MazeWallCircleGround(center, scale / 2));
-          if (j + 1 < wrappedMazeLayout[0].length &&
-              wrappedMazeLayout[i][j + 1] == 1) {
+        if (mazeWallAt(i, j)) {
+          if (circleAt(i, j)) {
+            result.add(MazeWallCircleGround(center, scale / 2));
+          }
+          if (mazeWallAt(i, j + 1)) {
             result.add(MazeWallRectangleGround(
                 center + Vector2(scale / 2, 0), scale, scale));
           }
-          if (i + 1 < wrappedMazeLayout.length &&
-              wrappedMazeLayout[i + 1][j] == 1) {
+          if (mazeWallAt(i + 1, j)) {
             result.add(MazeWallRectangleGround(
                 center + Vector2(0, scale / 2), scale, scale));
           }
@@ -77,24 +92,23 @@ List<Component> mazeWalls() {
     }
 
     for (var i = 0; i < wrappedMazeLayout.length; i++) {
-      for (var j = 0; j < wrappedMazeLayout[0].length; j++) {
+      for (var j = 0; j < wrappedMazeLayout[i].length; j++) {
         Vector2 center = Vector2(j + 1 / 2 - wrappedMazeLayout[0].length / 2,
                 i + 1 / 2 - wrappedMazeLayout.length / 2) *
             scale;
-        if (wrappedMazeLayout[i][j] == 1) {
-          result.add(MazeWallCircleVisual(
-              position: center,
-              radius: getSingleSquareWidth() / 2 * mazeWallWidthFactor));
-
-          if (j + 1 < wrappedMazeLayout[i].length &&
-              wrappedMazeLayout[i][j + 1] == 1) {
+        if (mazeWallAt(i, j)) {
+          if (circleAt(i, j)) {
+            result.add(MazeWallCircleVisual(
+                position: center,
+                radius: getSingleSquareWidth() / 2 * mazeWallWidthFactor));
+          }
+          if (mazeWallAt(i, j + 1)) {
             result.add(MazeWallSquareVisual(
                 position: center + Vector2(scale / 2, 0),
                 widthx: scale,
                 heightx: scale * mazeWallWidthFactor));
           }
-          if (i + 1 < wrappedMazeLayout.length &&
-              wrappedMazeLayout[i + 1][j] == 1) {
+          if (mazeWallAt(i + 1, j)) {
             result.add(MazeWallSquareVisual(
                 position: center + Vector2(0, scale / 2),
                 widthx: scale * mazeWallWidthFactor,

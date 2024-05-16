@@ -5,6 +5,7 @@ import 'package:flame/game.dart';
 import 'dart:core';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+const String appTitle = "Pacman ROLL";
 const debugMode = false;
 const bool mazeOn = true;
 
@@ -12,6 +13,7 @@ final bool android = defaultTargetPlatform == TargetPlatform.android;
 final bool iOS = defaultTargetPlatform == TargetPlatform.iOS;
 final bool windows = defaultTargetPlatform == TargetPlatform.windows;
 const bool web = kIsWeb;
+final isiOSMobile = kIsWeb && defaultTargetPlatform == TargetPlatform.iOS;
 
 const useForgePhysicsBallRotation = false;
 const bool normaliseGravity = true; //android ? false : true;
