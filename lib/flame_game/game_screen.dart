@@ -87,6 +87,7 @@ class GameScreen extends StatelessWidget {
                     interval: const Duration(milliseconds: 100),
                     style: const TextStyle(fontSize: 12, color: Colors.white),
                     formatter: (elapsedTime) {
+                      /*
                       String secondsStr =
                           (elapsedTime.minutes * 60 + elapsedTime.seconds)
                               .toString();
@@ -94,8 +95,12 @@ class GameScreen extends StatelessWidget {
                           (elapsedTime.milliseconds / 100)
                               .truncate()
                               .toString();
-
-                      return 'Time: $secondsStr.$hundredthSecondsStr';
+                       */
+                      String timeText =
+                      !game.world.timerSet ? "0.0" : ((game.world.now - game.world.datetimeStartedMillis) /
+                                  1000)
+                              .toStringAsFixed(1);
+                      return 'Time: $timeText';
                     },
                   ),
                 ],

@@ -86,6 +86,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   }
 
   void _moveUnderlyingBallThroughPipePortal() {
+    assert(current != CharacterState.deadGhost); //as physics doesn't apply
     if (position.x > kRightPortalLocation.x) {
       Vector2 startVel = _getUnderlyingBallVelocity(); //before destroy ball
       setUnderlyingBallPosition(kLeftPortalLocation);
@@ -116,9 +117,10 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   }
 
   void oneFrameOfPhysics() {
+    assert(current != CharacterState.deadGhost);
     position = _getUnderlyingBallPosition();
     angle = _getUpdatedAngle();
-    _moveUnderlyingBallThroughPipePortal();
+    _moveUnderlyingBallThroughPipePortal(); //note never called for deadGhost
   }
 
   @override

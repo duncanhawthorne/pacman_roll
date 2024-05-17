@@ -65,6 +65,7 @@ class EndlessWorld extends Forge2DWorld
 
   double _lastDragAngle = 10;
   double _gravityTargetAngle = 2 * pi / 4;
+  bool timerSet = false;
 
   final Random random;
 
@@ -189,10 +190,18 @@ class EndlessWorld extends Forge2DWorld
     return (_levelCompleteTimeMillis - datetimeStartedMillis) / 1000;
   }
 
+  void startTimer() {
+    if (!timerSet) {
+      timerSet = true;
+      datetimeStartedMillis = now;
+    }
+  }
+
   @override
   Future<void> onLoad() async {
+    timerSet = false;
     now = DateTime.now().millisecondsSinceEpoch;
-    datetimeStartedMillis = now;
+    //datetimeStartedMillis = now;
     // Used to keep track of when the level started, so that we later can
     // calculate how long time it took to finish the level.
     _levelCompleteTimeMillis = -1;
@@ -263,6 +272,7 @@ class EndlessWorld extends Forge2DWorld
   @override
   void onDragStart(DragStartEvent event) {
     super.onDragStart(event);
+    startTimer(); //starts off timer first time drag
     Vector2 eventVector = event.canvasPosition - game.canvasSize / 2;
     if (clickAndDrag) {
       if (iOS) {

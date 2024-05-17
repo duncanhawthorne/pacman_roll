@@ -64,6 +64,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     int unroundedMouthOpenTime =
         2 * kPacmanHalfEatingResetTimeMillis + _pacmanEatingTimeLatest;
 
+    //ensure animation end synced up with turned off eating state, so move forward time by a few milliseconds
     _targetRoundedMouthOpenTime = roundUpToMult(
             unroundedMouthOpenTime - _pacmanSpecialStartEatingTimeLatest,
             2 * kPacmanHalfEatingResetTimeMillis) +
@@ -201,9 +202,6 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     animations = await getAnimations();
     current = CharacterState.normal;
     angle = 2 * pi / 2;
-
-    current = CharacterState.eating;
-    _pacmanEatingTimeLatest = world.now + 10000000;
   }
 
   @override
