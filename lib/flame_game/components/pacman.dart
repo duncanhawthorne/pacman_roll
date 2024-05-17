@@ -9,7 +9,6 @@ import 'super_pellet.dart';
 import 'ghost.dart';
 import 'game_character.dart';
 import 'dart:math';
-import 'dart:ui';
 import 'dart:core';
 
 /// The [GameCharacter] is the component that the physical player of the game is
@@ -19,32 +18,56 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     required super.position,
   }) : super();
 
-  int _pacmanDeadTimeLatest = 0; //a long time ago
+  int _pacmanSpecialStartEatingTimeLatest = 0; //a long time ago
+  int _targetRoundedMouthOpenTime = 0; //a long time ago
   int _pacmanEatingTimeLatest = 0; //a long time ago
   int _pacmanEatingSoundTimeLatest = 0; //a long time ago
 
   Future<Map<CharacterState, SpriteAnimation>?> getAnimations() async {
     return {
       CharacterState.normal: SpriteAnimation.spriteList(
-        [
-          usePacmanImageFromDisk
-              ? await game.loadSprite('dash/pacmanman.png')
-              : Sprite(pacmanStandardImage())
-        ],
+        [Sprite(pacmanImage(pacmanMouthWidthDefault))],
         stepTime: double.infinity,
       ),
       CharacterState.eating: SpriteAnimation.spriteList(
-        [
-          usePacmanImageFromDisk
-              ? await game.loadSprite('dash/pacmanman.png')
-              : Sprite(pacmanStandardImage()),
-          usePacmanImageFromDisk
-              ? await game.loadSprite('dash/pacmanman_eat.png')
-              : Sprite(pacmanMouthClosedImage())
-        ],
-        stepTime: kPacmanHalfEatingResetTimeMillis / 1000,
+        List<Sprite>.generate(
+            pacmanEatingHalfFrames * 2, //open and close
+            (int index) => Sprite(pacmanImage(pacmanMouthWidthDefault -
+                pacmanMouthWidthDefault *
+                    ((index < pacmanEatingHalfFrames
+                            ? index
+                            : pacmanEatingHalfFrames -
+                                (index - pacmanEatingHalfFrames)) /
+                        pacmanEatingHalfFrames))),
+            growable: true),
+        stepTime: kPacmanHalfEatingResetTimeMillis / 1000 / pacmanEatingHalfFrames,
+      ),
+      CharacterState.deadPacman: SpriteAnimation.spriteList(
+        List<Sprite>.generate(
+            pacmanDeadFrames * 2, //buffer for sound effect time difference
+            (int index) => Sprite(pacmanImage(pacmanMouthWidthDefault +
+                (1 - pacmanMouthWidthDefault) * (index / pacmanDeadFrames))),
+            growable: true),
+        stepTime: kPacmanDeadResetTimeAnimationMillis / 1000 / pacmanDeadFrames,
       )
     };
+  }
+
+  void eat() {
+    if (current != CharacterState.eating) {
+      //first time
+      _pacmanSpecialStartEatingTimeLatest = world.now;
+    }
+    current = CharacterState.eating;
+    _pacmanEatingTimeLatest = world.now;
+
+    int unroundedMouthOpenTime =
+        2 * kPacmanHalfEatingResetTimeMillis + _pacmanEatingTimeLatest;
+
+    _targetRoundedMouthOpenTime = roundUpToMult(
+            unroundedMouthOpenTime - _pacmanSpecialStartEatingTimeLatest,
+            2 * kPacmanHalfEatingResetTimeMillis) +
+        _pacmanSpecialStartEatingTimeLatest;
   }
 
   void handleTwoCharactersMeet(PositionComponent other) {
@@ -84,8 +107,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
         world.ghostPlayersList[i].ghostScaredTimeLatest = world.now;
       }
     }
-    current = CharacterState.eating;
-    _pacmanEatingTimeLatest = world.now;
+    eat();
     world.remove(pellet);
   }
 
@@ -94,8 +116,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
 
     //pacman visuals
     world.play(SfxType.eatGhost);
-    current = CharacterState.eating;
-    _pacmanEatingTimeLatest = world.now;
+    eat();
 
     //ghost impact
     ghost.current = CharacterState.deadGhost;
@@ -122,7 +143,6 @@ class Pacman extends GameCharacter with CollisionCallbacks {
       //prevent multiple hits
 
       world.play(SfxType.pacmanDeath);
-      _pacmanDeadTimeLatest = world.now;
       current = CharacterState.deadPacman;
 
       if (world.pacmanPlayersList.length == 1) {
@@ -159,8 +179,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
 
   void pacmanEatingNormalSequence() {
     if (current == CharacterState.eating) {
-      if (world.now - _pacmanEatingTimeLatest >
-          2 * kPacmanHalfEatingResetTimeMillis) {
+      if (world.now > _targetRoundedMouthOpenTime) {
         current = CharacterState.normal;
       }
     }
@@ -182,6 +201,9 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     animations = await getAnimations();
     current = CharacterState.normal;
     angle = 2 * pi / 2;
+
+    current = CharacterState.eating;
+    _pacmanEatingTimeLatest = world.now + 10000000;
   }
 
   @override
@@ -199,19 +221,5 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     }
 
     super.update(dt);
-  }
-
-  @override
-  void render(Canvas canvas) {
-    super.render(canvas);
-    if (current == CharacterState.deadPacman) {
-      assert(world.now >= _pacmanDeadTimeLatest);
-      double tween = (world.now - _pacmanDeadTimeLatest) /
-          kPacmanDeadResetTimeAnimationMillis;
-      tween = min(1, tween);
-      double mouthWidth = pacmanMouthWidthDefault * (1 - tween) + 1 * tween;
-      canvas.drawArc(rectSingleSquare, 2 * pi * ((mouthWidth / 2) + 0.5),
-          2 * pi * (1 - mouthWidth), true, pacmanYellowPaint);
-    }
   }
 }

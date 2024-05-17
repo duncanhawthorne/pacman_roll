@@ -25,7 +25,7 @@ class PhysicsBall extends BodyComponent {
 
                  */
                 CircleShape()
-                  ..radius = size ?? getSingleSquareWidth() / 2 * 0.99, //0.95
+                  ..radius = size ?? spriteWidth() / 2 * 0.99, //0.95
                 restitution: 0.0,
                 friction: useForgePhysicsBallRotation ? 1 : 0,
                 userData: PhysicsBall,

@@ -1,7 +1,4 @@
-import 'package:flame/effects.dart';
-import 'package:pacman_roll/flame_game/endless_world.dart';
-
-import 'components/maze_layout.dart';
+import 'endless_world.dart';
 import 'constants.dart';
 import 'saves.dart';
 import 'components/game_character.dart';
@@ -25,6 +22,14 @@ double getSingleSquareWidth() {
   return inGameVectorPixels / getMazeIntWidth() * gameScaleFactor;
 }
 
+double spriteWidth() {
+  return getSingleSquareWidth() * (expandedMaze ? 2 : 1);
+}
+
+int getMazeIntWidth() {
+  return wrappedMazeLayout.isEmpty ? 0 : wrappedMazeLayout[0].length;
+}
+
 void p(x) {
   // ignore: prefer_interpolation_to_compose_strings
   debugPrint("///// A " + DateTime.now().toString() + " " + x.toString());
@@ -43,19 +48,6 @@ double percentile(List<double> list, double value) {
   newList.sort();
   return newList.indexOf(value) / newList.length;
 }
-
-/*
-int getStartingNumberPelletsAndSuperPellets(List mazeLayout) {
-  int c = 0;
-  c += mazeLayout
-      .map((element) => element == 0 ? 1 : 0)
-      .reduce((value, element) => value + element);
-  c += mazeLayout
-      .map((element) => element == 3 ? 1 : 0)
-      .reduce((value, element) => value + element);
-  return c;
-}
- */
 
 enum WallLocation { bottom, top, left, right }
 
@@ -149,83 +141,13 @@ final Rect rectSingleSquare = Rect.fromCenter(
 final Rect rect100 = Rect.fromCenter(
     center: const Offset(100 / 2, 100 / 2), width: 100, height: 100);
 
-ui.Image pacmanStandardImage() {
+ui.Image pacmanImage(double mouthWidth) {
+  mouthWidth = max(0,min(1,mouthWidth));
   final recorder = PictureRecorder();
   final canvas = Canvas(recorder);
-  const mouthWidth = pacmanMouthWidthDefault;
   canvas.drawArc(rect100, 2 * pi * ((mouthWidth / 2) + 0.5),
       2 * pi * (1 - mouthWidth), true, pacmanYellowPaint);
   return recorder.endRecording().toImageSync(100, 100);
-}
-
-ui.Image pacmanMouthClosedImage() {
-  final recorder = PictureRecorder();
-  final canvas = Canvas(recorder);
-  const mouthWidth = 0;
-  canvas.drawArc(rect100, 2 * pi * ((mouthWidth / 2) + 0.5),
-      2 * pi * (1 - mouthWidth), true, pacmanYellowPaint);
-  return recorder.endRecording().toImageSync(100, 100);
-}
-
-pureVectorPacman() {
-  double pfrac = 5 / 32;
-  double pangle = pfrac * 2 * pi / 2;
-  return ClipComponent.polygon(
-    points: [
-      Vector2(1, 0),
-      Vector2(0, 0),
-      Vector2(0, 1),
-      Vector2(1, 1),
-      pfrac > 0.5 ? Vector2(0, 1) : Vector2(1, 1),
-      Vector2(0.5 + cos(pangle) / 2, 0.5 + sin(pangle) / 2),
-      Vector2(0.5, 0.5),
-      Vector2(0.5 + cos(pangle) / 2, 0.5 - sin(pangle) / 2),
-      pfrac > 0.5 ? Vector2(0, 0) : Vector2(1, 0),
-      Vector2(1, 0),
-    ],
-    position: Vector2(0, 0),
-    size: Vector2.all(getSingleSquareWidth()),
-    children: [
-      CircleComponent(
-          radius: getSingleSquareWidth() / 2, paint: pacmanYellowPaint),
-    ],
-  );
-}
-
-pureVectorPacmanTwo() {
-  CircleComponent d = CircleComponent(
-      radius: getSingleSquareWidth() / 2,
-      paint: pacmanYellowPaint,
-      anchor: Anchor.topLeft,
-      position: Vector2(0, 0));
-  PolygonComponent b = PolygonComponent([
-    Vector2(1 * getSingleSquareWidth(),
-        -1 * getSingleSquareWidth() * tan(1 / 2 * 5 / 32 * 2 * pi)),
-    Vector2(0, 0),
-    Vector2(1 * getSingleSquareWidth(),
-        1 * getSingleSquareWidth() * tan(1 / 2 * 5 / 32 * 2 * pi))
-  ],
-      anchor: Anchor.centerLeft,
-      position: Vector2.all(getSingleSquareWidth() / 2),
-      paint: blackBackgroundPaint);
-  ClipComponent c = ClipComponent.circle(
-      anchor: Anchor.center,
-      size: Vector2.all(getSingleSquareWidth()),
-      children: [d, b]);
-
-  final effectClose = ScaleEffect.to(
-    Vector2(1, 0.0),
-    EffectController(duration: kPacmanHalfEatingResetTimeMillis / 1000),
-  );
-  final effectOpen = ScaleEffect.to(
-    Vector2(1, 1),
-    EffectController(duration: kPacmanHalfEatingResetTimeMillis / 1000),
-  );
-  final effect = SequenceEffect([effectClose, effectOpen]);
-
-  c.children.last.add(effect);
-
-  return c;
 }
 
 double getTargetSirenVolume(EndlessWorld world) {
@@ -296,4 +218,8 @@ void setStatusBarColor(color) {
 
 void fixTitle() {
   fixTitleReal(); //either from web or stub
+}
+
+int roundUpToMult(int x, int roundUpMult) {
+  return (x / roundUpMult).ceil() * roundUpMult;
 }

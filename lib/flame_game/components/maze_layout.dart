@@ -11,9 +11,7 @@ import 'package:flame/extensions.dart';
 
 const mazeWallWidthFactor = 0.7;
 
-int getMazeIntWidth() {
-  return wrappedMazeLayout.isEmpty ? 0 : wrappedMazeLayout[0].length;
-}
+
 
 List<Component> pelletsAndSuperPellets(ValueNotifier pelletsRemainingNotifier) {
   List<Component> result = [];
@@ -100,7 +98,7 @@ List<Component> mazeWalls() {
           if (circleAt(i, j)) {
             result.add(MazeWallCircleVisual(
                 position: center,
-                radius: getSingleSquareWidth() / 2 * mazeWallWidthFactor));
+                radius: scale / 2 * mazeWallWidthFactor));
           }
           if (mazeWallAt(i, j + 1)) {
             result.add(MazeWallSquareVisual(
@@ -135,3 +133,17 @@ List<Component> screenEdgeBoundaries(CameraComponent camera) {
     Wall(topLeft, bottomLeft),
   ];
 }
+
+
+/*
+int getStartingNumberPelletsAndSuperPellets(List mazeLayout) {
+  int c = 0;
+  c += mazeLayout
+      .map((element) => element == 0 ? 1 : 0)
+      .reduce((value, element) => value + element);
+  c += mazeLayout
+      .map((element) => element == 3 ? 1 : 0)
+      .reduce((value, element) => value + element);
+  return c;
+}
+ */

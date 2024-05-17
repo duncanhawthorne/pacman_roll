@@ -64,7 +64,6 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
     async.Timer.periodic(const Duration(seconds: 1), (timer) {
       if (!isGameLive()) {
         audioController.stopAllSfx();
-        //setStatusBarColor(palette.backgroundMain.color);
         timer.cancel();
       }
     });

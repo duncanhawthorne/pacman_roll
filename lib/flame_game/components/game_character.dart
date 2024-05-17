@@ -19,7 +19,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   GameCharacter({
     super.position,
   }) : super(
-            size: Vector2.all(getSingleSquareWidth()),
+            size: Vector2.all(spriteWidth()),
             anchor: Anchor.center,
             priority: 1);
 
@@ -86,11 +86,11 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   }
 
   void _moveUnderlyingBallThroughPipePortal() {
-    if (position.x > 10 * getSingleSquareWidth()) {
+    if (position.x > kRightPortalLocation.x) {
       Vector2 startVel = _getUnderlyingBallVelocity(); //before destroy ball
       setUnderlyingBallPosition(kLeftPortalLocation);
       _setUnderlyingVelocity(startVel);
-    } else if (position.x < -10 * getSingleSquareWidth()) {
+    } else if (position.x < kLeftPortalLocation.x) {
       Vector2 startVel = _getUnderlyingBallVelocity();
       setUnderlyingBallPosition(kRightPortalLocation); //before destroy ball
       _setUnderlyingVelocity(startVel);
