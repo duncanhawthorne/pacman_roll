@@ -8,11 +8,13 @@ import 'dart:ui' as ui;
 import 'dart:ui';
 
 
+
+
 ui.Image pacmanStandardImage() {
   final recorder = PictureRecorder();
   final canvas = Canvas(recorder);
   const mouthWidth = pacmanMouthWidthDefault;
-  canvas.drawArc(rect100, 2 * pi * ((mouthWidth / 2) + 0.5),
+  canvas.drawArc(pacmanRect, 2 * pi * ((mouthWidth / 2) + 0.5),
       2 * pi * (1 - mouthWidth), true, pacmanYellowPaint);
   return recorder.endRecording().toImageSync(100, 100);
 }
@@ -21,7 +23,7 @@ ui.Image pacmanMouthClosedImage() {
   final recorder = PictureRecorder();
   final canvas = Canvas(recorder);
   const mouthWidth = 0;
-  canvas.drawArc(rect100, 2 * pi * ((mouthWidth / 2) + 0.5),
+  canvas.drawArc(pacmanRect, 2 * pi * ((mouthWidth / 2) + 0.5),
       2 * pi * (1 - mouthWidth), true, pacmanYellowPaint);
   return recorder.endRecording().toImageSync(100, 100);
 }

@@ -40,11 +40,16 @@ class Pacman extends GameCharacter with CollisionCallbacks {
                                 (index - pacmanEatingHalfFrames)) /
                         pacmanEatingHalfFrames))),
             growable: true),
-        stepTime: kPacmanHalfEatingResetTimeMillis / 1000 / pacmanEatingHalfFrames,
+        stepTime:
+            kPacmanHalfEatingResetTimeMillis / 1000 / pacmanEatingHalfFrames,
       ),
       CharacterState.deadPacman: SpriteAnimation.spriteList(
         List<Sprite>.generate(
-            pacmanDeadFrames * 2, //buffer for sound effect time difference
+            (pacmanDeadFrames *
+                    kPacmanDeadResetTimeMillis /
+                    kPacmanDeadResetTimeAnimationMillis *
+                    1.2)
+                .toInt(), //buffer for sound effect time difference
             (int index) => Sprite(pacmanImage(pacmanMouthWidthDefault +
                 (1 - pacmanMouthWidthDefault) * (index / pacmanDeadFrames))),
             growable: true),

@@ -134,20 +134,26 @@ final Paint pacmanYellowPaint = Paint()
   ..color = Colors.yellowAccent; //blue; //yellowAccent;
 final Paint blackBackgroundPaint = Paint()
   ..color = palette.flameGameBackground.color;
+/*
 final Rect rectSingleSquare = Rect.fromCenter(
     center: Offset(getSingleSquareWidth() / 2, getSingleSquareWidth() / 2),
     width: getSingleSquareWidth(),
     height: getSingleSquareWidth());
-final Rect rect100 = Rect.fromCenter(
-    center: const Offset(100 / 2, 100 / 2), width: 100, height: 100);
+ */
+
+const pacmanRectSize = 50;
+final Rect pacmanRect = Rect.fromCenter(
+    center: const Offset(pacmanRectSize / 2, pacmanRectSize / 2),
+    width: pacmanRectSize.toDouble(),
+    height: pacmanRectSize.toDouble());
 
 ui.Image pacmanImage(double mouthWidth) {
-  mouthWidth = max(0,min(1,mouthWidth));
+  mouthWidth = max(0, min(1, mouthWidth));
   final recorder = PictureRecorder();
   final canvas = Canvas(recorder);
-  canvas.drawArc(rect100, 2 * pi * ((mouthWidth / 2) + 0.5),
+  canvas.drawArc(pacmanRect, 2 * pi * ((mouthWidth / 2) + 0.5),
       2 * pi * (1 - mouthWidth), true, pacmanYellowPaint);
-  return recorder.endRecording().toImageSync(100, 100);
+  return recorder.endRecording().toImageSync(pacmanRectSize, pacmanRectSize);
 }
 
 double getTargetSirenVolume(EndlessWorld world) {

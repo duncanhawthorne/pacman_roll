@@ -64,6 +64,8 @@ bool circleAt(int i, int j) {
       mazeWallAt(i, j - 1) && mazeWallAt(i, j + 1));
 }
 
+const double pixelationBuffer = 1.03;
+
 List<Component> mazeWalls() {
   List<Component> result = [];
   double scale = getSingleSquareWidth();
@@ -79,11 +81,11 @@ List<Component> mazeWalls() {
           }
           if (mazeWallAt(i, j + 1)) {
             result.add(MazeWallRectangleGround(
-                center + Vector2(scale / 2, 0), scale, scale));
+                center + Vector2(scale / 2, 0), scale * pixelationBuffer, scale));
           }
           if (mazeWallAt(i + 1, j)) {
             result.add(MazeWallRectangleGround(
-                center + Vector2(0, scale / 2), scale, scale));
+                center + Vector2(0, scale / 2), scale, scale * pixelationBuffer));
           }
         }
       }
@@ -103,14 +105,14 @@ List<Component> mazeWalls() {
           if (mazeWallAt(i, j + 1)) {
             result.add(MazeWallSquareVisual(
                 position: center + Vector2(scale / 2, 0),
-                widthx: scale,
+                widthx: scale * pixelationBuffer,
                 heightx: scale * mazeWallWidthFactor));
           }
           if (mazeWallAt(i + 1, j)) {
             result.add(MazeWallSquareVisual(
                 position: center + Vector2(0, scale / 2),
                 widthx: scale * mazeWallWidthFactor,
-                heightx: scale));
+                heightx: scale * pixelationBuffer));
           }
         }
       }
