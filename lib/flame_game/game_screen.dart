@@ -117,6 +117,7 @@ class GameScreen extends StatelessWidget {
             return GameWonDialog(
               level: level,
               levelCompletedIn: game.world.getLevelCompleteTimeSeconds(),
+              game: game
             );
           },
         },

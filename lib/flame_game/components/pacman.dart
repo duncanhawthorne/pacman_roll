@@ -145,18 +145,18 @@ class Pacman extends GameCharacter with CollisionCallbacks {
 
   void ghostKillsPacman() {
     //p("ghost kills pacman");
-    if (globalPhysicsLinked) {
+    if (world.globalPhysicsLinked) {
       //prevent multiple hits
 
       world.play(SfxType.pacmanDeath);
       current = CharacterState.deadPacman;
 
       if (world.pacmanPlayersList.length == 1) {
-        globalPhysicsLinked = false;
+        world.globalPhysicsLinked = false;
         Future.delayed(
             const Duration(milliseconds: kPacmanDeadResetTimeMillis + 100), () {
           //100 buffer
-          if (!globalPhysicsLinked) {
+          if (!world.globalPhysicsLinked) {
             //prevent multiple resets
 
             world.addDeath(); //score counting deaths
@@ -169,7 +169,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
               world.ghostPlayersList[i].ghostScaredTimeLatest = 0;
             }
             current = CharacterState.normal;
-            globalPhysicsLinked = true;
+            world.globalPhysicsLinked = true;
           }
         });
       } else {
@@ -219,7 +219,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   void update(double dt) {
     pacmanEatingNormalSequence();
 
-    if (globalPhysicsLinked) {
+    if (world.globalPhysicsLinked) {
       oneFrameOfPhysics();
     }
 

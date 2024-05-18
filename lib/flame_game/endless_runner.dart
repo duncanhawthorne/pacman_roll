@@ -52,6 +52,8 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
 
   String userString = "";
 
+  final List<double> leaderboardWinTimes = [];
+
   @override
   Color backgroundColor() => palette.flameGameBackground.color;
 
@@ -77,10 +79,10 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
     return json.encode(gameTmp);
   }
 
-  void downloadScoreboard() async {
+  void downloadLeaderboard() async {
     List firebasePullDownload = await save.firebasePull();
     for (int i = 0; i < firebasePullDownload.length; i++) {
-      scoreboardItemsDoubles.add(firebasePullDownload[i]["levelCompleteTime"]);
+      leaderboardWinTimes.add(firebasePullDownload[i]["levelCompleteTime"]);
     }
   }
 
@@ -99,7 +101,7 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
     WakelockPlus.toggle(enable: true);
     gameRunning = true;
     userString = getRandomString(world.random, 15);
-    downloadScoreboard();
+    downloadLeaderboard();
     deadMansSwitch();
   }
 }

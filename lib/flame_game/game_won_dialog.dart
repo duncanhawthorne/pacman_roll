@@ -1,3 +1,5 @@
+import 'package:pacman_roll/flame_game/endless_runner.dart';
+
 import '../level_selection/levels.dart';
 import 'constants.dart';
 import 'helper.dart';
@@ -12,15 +14,21 @@ import 'package:provider/provider.dart';
 /// It shows what time the level was completed in and if there are more levels
 /// it lets the user go to the next level, or otherwise back to the level
 /// selection screen.
+///
+///
+
 class GameWonDialog extends StatelessWidget {
   const GameWonDialog({
     super.key,
     required this.level,
     required this.levelCompletedIn,
+    required this.game,
   });
 
   /// The properties of the level that was just finished.
   final GameLevel level;
+
+  final EndlessRunner game;
 
   /// How many seconds that the level was completed in.
   final double levelCompletedIn;
@@ -47,7 +55,7 @@ class GameWonDialog extends StatelessWidget {
             //  'You completed level ${level.number} in $levelCompletedIn seconds.',
             //  textAlign: TextAlign.center,
             //),
-            Text(endText(levelCompletedIn)),
+            Text(endText(game, levelCompletedIn)),
             const SizedBox(height: 16),
             if (true) ...[
               NesButton(
@@ -73,4 +81,18 @@ class GameWonDialog extends StatelessWidget {
       ),
     );
   }
+}
+
+String endText(EndlessRunner game, double value) {
+  double x = fbOn ? percentile(game.leaderboardWinTimes, value) * 100 : 0.0;
+  String y =
+      "\nTime: ${value.toStringAsFixed(1)} seconds\n${!fbOn ? "" : "\nRank: Top ${x.toStringAsFixed(0)}%\n"}";
+  return y;
+}
+
+double percentile(List<double> list, double value) {
+  List<double> newList = List<double>.from(list);
+  newList.add(value);
+  newList.sort();
+  return newList.indexOf(value) / newList.length;
 }

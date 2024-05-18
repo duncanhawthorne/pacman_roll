@@ -69,6 +69,8 @@ class EndlessWorld extends Forge2DWorld
 
   final Random random;
 
+  bool globalPhysicsLinked = true;
+
   /// The gravity is defined in virtual pixels per second squared.
   /// These pixels are in relation to how big the [FixedResolutionViewport] is.
 

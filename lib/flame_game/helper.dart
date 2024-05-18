@@ -35,20 +35,6 @@ void p(x) {
   debugPrint("///// A " + DateTime.now().toString() + " " + x.toString());
 }
 
-String endText(double value) {
-  double x = fbOn ? percentile(scoreboardItemsDoubles, value) * 100 : 0.0;
-  String y =
-      "\nTime: ${value.toStringAsFixed(1)} seconds\n${!fbOn ? "" : "\nRank: Top ${x.toStringAsFixed(0)}%\n"}";
-  return y;
-}
-
-double percentile(List<double> list, double value) {
-  List<double> newList = List<double>.from(list);
-  newList.add(value);
-  newList.sort();
-  return newList.indexOf(value) / newList.length;
-}
-
 enum WallLocation { bottom, top, left, right }
 
 int getRollSpinDirection(Vector2 vel, Vector2 gravity) {
@@ -112,37 +98,6 @@ double convertToSmallestDeltaAngle(double angleDelta) {
   return angleDelta - 2 * pi / 2;
 }
 
-// With the `TextPaint` we define what properties the text that we are going
-// to render will have, like font family, size and color in this instance.
-final textRenderer = TextPaint(
-  style: const TextStyle(
-    fontSize: 30,
-    color: Colors.white,
-    fontFamily: 'Press Start 2P',
-  ),
-);
-
-final Paint blueMazePaint = Paint()
-  ..color = const Color(0xFF3B32D4); //blue; //yellowAccent;
-final Paint yellowPacmanPaint = Paint()
-  ..color = Colors.yellowAccent; //blue; //yellowAccent;
-final Paint blackBackgroundPaint = Paint()
-  ..color = palette.flameGameBackground.color;
-final Paint transparentPaint = Paint()
-  ..color = const Color(0x00000000);
-/*
-final Rect rectSingleSquare = Rect.fromCenter(
-    center: Offset(getSingleSquareWidth() / 2, getSingleSquareWidth() / 2),
-    width: getSingleSquareWidth(),
-    height: getSingleSquareWidth());
- */
-
-const pacmanRectSize = 50;
-final Rect pacmanRect = Rect.fromCenter(
-    center: const Offset(pacmanRectSize / 2, pacmanRectSize / 2),
-    width: pacmanRectSize.toDouble(),
-    height: pacmanRectSize.toDouble());
-
 ui.Image pacmanImageAtFrac(double mouthWidth) {
   mouthWidth = max(0, min(1, mouthWidth));
   final recorder = PictureRecorder();
@@ -152,15 +107,15 @@ ui.Image pacmanImageAtFrac(double mouthWidth) {
   return recorder.endRecording().toImageSync(pacmanRectSize, pacmanRectSize);
 }
 
-
 final List<Sprite> pacmanSpritesAtFrac = List<Sprite>.generate(
     pacmanRenderFracIncrementsNumber + 1, //open and close
-    (int index) => Sprite(pacmanImageAtFrac(index / pacmanRenderFracIncrementsNumber)),
+    (int index) =>
+        Sprite(pacmanImageAtFrac(index / pacmanRenderFracIncrementsNumber)),
     growable: true);
 
 Sprite pacmanSpriteAtFrac(double frac) {
-  int fracInt =
-      max(0, min(pacmanRenderFracIncrementsNumber, (frac * pacmanRenderFracIncrementsNumber).ceil()));
+  frac = max(0, min(1, frac));
+  int fracInt = (frac * pacmanRenderFracIncrementsNumber).ceil();
   return pacmanSpritesAtFrac[fracInt];
 }
 
@@ -180,7 +135,7 @@ double getTargetSirenVolume(EndlessWorld world) {
     }
     if ((world.pacmanPlayersList.isNotEmpty &&
             world.pacmanPlayersList[0].current == CharacterState.deadPacman) ||
-        !globalPhysicsLinked) {
+        !world.globalPhysicsLinked) {
       tmpSirenVolume = 0;
     }
   } catch (e) {

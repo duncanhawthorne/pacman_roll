@@ -1,5 +1,5 @@
 import 'package:flame_forge2d/flame_forge2d.dart';
-import '../helper.dart';
+import '../constants.dart';
 
 class MazeWallRectangleGround extends BodyComponent {
   final Vector2 _position;

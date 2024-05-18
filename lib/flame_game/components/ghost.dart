@@ -108,7 +108,7 @@ class Ghost extends GameCharacter {
   void update(double dt) {
     ghostDeadScaredScaredIshNormalSequence();
 
-    if (globalPhysicsLinked) {
+    if (world.globalPhysicsLinked) {
       if (current == CharacterState.deadGhost) {
         /// handled by [ReturnHomeEffect]
       } else {

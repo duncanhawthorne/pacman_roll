@@ -1,12 +1,19 @@
+
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'helper.dart';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'dart:core';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+//global variables
+bool gameRunning = false;
+FirebaseFirestore? db = fbOn ? FirebaseFirestore.instance : null;
+
+//constants
 const String appTitle = "Pacman ROLL";
-const debugMode = false;
+//const debugMode = false;
 const bool mazeOn = true;
 
 final bool android = defaultTargetPlatform == TargetPlatform.android;
@@ -38,7 +45,6 @@ final Vector2 kCompassLocation = Vector2(0, 0) * spriteWidth();
 final Vector2 kOffScreenLocation = Vector2(0, 1000) * spriteWidth();
 const double miniPelletAndSuperPelletScaleFactor = 0.46;
 const pointerRotationSpeed = 10;
-bool gameRunning = false;
 
 const int kGhostResetTimeMillis = 1000;
 const int kGhostChaseTimeMillis = 6000;
@@ -49,21 +55,43 @@ const int pacmanRenderFracIncrementsNumber = 32;
 const int pacmanDeadFrames = (pacmanRenderFracIncrementsNumber * 3) ~/ 4; //(kPacmanDeadResetTimeAnimationMillis / 33).ceil();
 const int pacmanEatingHalfFrames = (pacmanRenderFracIncrementsNumber * 1) ~/ 4; //(kPacmanHalfEatingResetTimeMillis / 67).ceil();
 
-bool globalPhysicsLinked = true;
 //const bool rotateCamera = true;
 //const bool actuallyMoveSpritesToScreenPos = !rotateCamera;
 const double pacmanMouthWidthDefault = 8 / 32; //5/32
 
 final soundOn = !(windows && !kIsWeb);
 final bool sirenEnabled = iOS ? false : true;
-const bool pelletEatSoundOn = true; //iOS ? false : true;
+//const bool pelletEatSoundOn = true; //iOS ? false : true;
 const multipleSpawningPacmans = false;
 const multipleSpawningGhosts = false;
 
-bool fbOn = !(windows && !kIsWeb);
+final bool fbOn = !(windows && !kIsWeb);
 //String userName = "ABC";
-FirebaseFirestore? db = fbOn ? FirebaseFirestore.instance : null;
-List<double> scoreboardItemsDoubles = [];
+
+// With the `TextPaint` we define what properties the text that we are going
+// to render will have, like font family, size and color in this instance.
+final textRenderer = TextPaint(
+  style: const TextStyle(
+    fontSize: 30,
+    color: Colors.white,
+    fontFamily: 'Press Start 2P',
+  ),
+);
+
+final Paint blueMazePaint = Paint()
+  ..color = const Color(0xFF3B32D4); //blue; //yellowAccent;
+final Paint yellowPacmanPaint = Paint()
+  ..color = Colors.yellowAccent; //blue; //yellowAccent;
+final Paint blackBackgroundPaint = Paint()
+  ..color = palette.flameGameBackground.color;
+final Paint transparentPaint = Paint()
+  ..color = const Color(0x00000000);
+
+const pacmanRectSize = 50;
+final Rect pacmanRect = Rect.fromCenter(
+    center: const Offset(pacmanRectSize / 2, pacmanRectSize / 2),
+    width: pacmanRectSize.toDouble(),
+    height: pacmanRectSize.toDouble());
 
 const String chars =
     'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
