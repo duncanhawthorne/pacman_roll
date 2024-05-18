@@ -26,19 +26,19 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   Future<Map<CharacterState, SpriteAnimation>?> getAnimations() async {
     return {
       CharacterState.normal: SpriteAnimation.spriteList(
-        [Sprite(pacmanImage(pacmanMouthWidthDefault))],
+        [pacmanSpriteAtFrac(pacmanMouthWidthDefault)],
         stepTime: double.infinity,
       ),
       CharacterState.eating: SpriteAnimation.spriteList(
         List<Sprite>.generate(
             pacmanEatingHalfFrames * 2, //open and close
-            (int index) => Sprite(pacmanImage(pacmanMouthWidthDefault -
+            (int index) => pacmanSpriteAtFrac(pacmanMouthWidthDefault -
                 pacmanMouthWidthDefault *
                     ((index < pacmanEatingHalfFrames
                             ? index
                             : pacmanEatingHalfFrames -
                                 (index - pacmanEatingHalfFrames)) /
-                        pacmanEatingHalfFrames))),
+                        pacmanEatingHalfFrames)),
             growable: true),
         stepTime:
             kPacmanHalfEatingResetTimeMillis / 1000 / pacmanEatingHalfFrames,
@@ -50,8 +50,8 @@ class Pacman extends GameCharacter with CollisionCallbacks {
                     kPacmanDeadResetTimeAnimationMillis *
                     1.2)
                 .toInt(), //buffer for sound effect time difference
-            (int index) => Sprite(pacmanImage(pacmanMouthWidthDefault +
-                (1 - pacmanMouthWidthDefault) * (index / pacmanDeadFrames))),
+            (int index) => pacmanSpriteAtFrac(pacmanMouthWidthDefault +
+                (1 - pacmanMouthWidthDefault) * (index / pacmanDeadFrames)),
             growable: true),
         stepTime: kPacmanDeadResetTimeAnimationMillis / 1000 / pacmanDeadFrames,
       )

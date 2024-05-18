@@ -11,19 +11,26 @@ class MiniPelletCircle extends CircleComponent
       : super(
             radius: getSingleSquareWidth() *
                 miniPelletAndSuperPelletScaleFactor /
-                2 *
-                1 /
+                2 /
                 3,
             anchor: Anchor.center);
 
   @override
   Future<void> onLoad() async {
     super.onLoad();
-    add(CircleHitbox(
+    CircleHitbox x = CircleHitbox(
         isSolid: true,
-        radius:
-            getSingleSquareWidth() * miniPelletAndSuperPelletScaleFactor / 2,
-        collisionType: CollisionType.passive));
+        position: Vector2.all(getSingleSquareWidth() *
+            miniPelletAndSuperPelletScaleFactor /
+            2 /
+            3),
+        anchor: Anchor.center,
+        radius: getSingleSquareWidth() *
+            miniPelletAndSuperPelletScaleFactor /
+            2 /
+            3,
+        collisionType: CollisionType.passive);
+    add(x);
     world.pelletsRemainingNotifier.value += 1;
   }
 

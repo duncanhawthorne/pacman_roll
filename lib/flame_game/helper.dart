@@ -78,25 +78,19 @@ int getRollSpinDirection(Vector2 vel, Vector2 gravity) {
     } else {
       clockwise = false;
     }
-  }
-
-  if (onWall == WallLocation.top) {
+  } else if (onWall == WallLocation.top) {
     if ((vel.x) > 0) {
       clockwise = false;
     } else {
       clockwise = true;
     }
-  }
-
-  if (onWall == WallLocation.left) {
+  } else if (onWall == WallLocation.left) {
     if ((vel.y) > 0) {
       clockwise = true;
     } else {
       clockwise = false;
     }
-  }
-
-  if (onWall == WallLocation.right) {
+  } else if (onWall == WallLocation.right) {
     if ((vel.y) > 0) {
       clockwise = false;
     } else {
@@ -130,10 +124,12 @@ final textRenderer = TextPaint(
 
 final Paint blueMazePaint = Paint()
   ..color = const Color(0xFF3B32D4); //blue; //yellowAccent;
-final Paint pacmanYellowPaint = Paint()
+final Paint yellowPacmanPaint = Paint()
   ..color = Colors.yellowAccent; //blue; //yellowAccent;
 final Paint blackBackgroundPaint = Paint()
   ..color = palette.flameGameBackground.color;
+final Paint transparentPaint = Paint()
+  ..color = const Color(0x00000000);
 /*
 final Rect rectSingleSquare = Rect.fromCenter(
     center: Offset(getSingleSquareWidth() / 2, getSingleSquareWidth() / 2),
@@ -147,13 +143,25 @@ final Rect pacmanRect = Rect.fromCenter(
     width: pacmanRectSize.toDouble(),
     height: pacmanRectSize.toDouble());
 
-ui.Image pacmanImage(double mouthWidth) {
+ui.Image pacmanImageAtFrac(double mouthWidth) {
   mouthWidth = max(0, min(1, mouthWidth));
   final recorder = PictureRecorder();
   final canvas = Canvas(recorder);
   canvas.drawArc(pacmanRect, 2 * pi * ((mouthWidth / 2) + 0.5),
-      2 * pi * (1 - mouthWidth), true, pacmanYellowPaint);
+      2 * pi * (1 - mouthWidth), true, yellowPacmanPaint);
   return recorder.endRecording().toImageSync(pacmanRectSize, pacmanRectSize);
+}
+
+
+final List<Sprite> pacmanSpritesAtFrac = List<Sprite>.generate(
+    pacmanRenderFracIncrementsNumber + 1, //open and close
+    (int index) => Sprite(pacmanImageAtFrac(index / pacmanRenderFracIncrementsNumber)),
+    growable: true);
+
+Sprite pacmanSpriteAtFrac(double frac) {
+  int fracInt =
+      max(0, min(pacmanRenderFracIncrementsNumber, (frac * pacmanRenderFracIncrementsNumber).ceil()));
+  return pacmanSpritesAtFrac[fracInt];
 }
 
 double getTargetSirenVolume(EndlessWorld world) {

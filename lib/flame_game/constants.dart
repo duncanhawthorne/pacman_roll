@@ -45,8 +45,9 @@ const int kGhostChaseTimeMillis = 6000;
 const int kPacmanDeadResetTimeMillis = 1700;
 const int kPacmanDeadResetTimeAnimationMillis = 1250;
 const int kPacmanHalfEatingResetTimeMillis = 180;
-final int pacmanDeadFrames = (kPacmanDeadResetTimeAnimationMillis / 33).ceil();
-final int pacmanEatingHalfFrames = (kPacmanHalfEatingResetTimeMillis / 67).ceil();
+const int pacmanRenderFracIncrementsNumber = 32;
+const int pacmanDeadFrames = (pacmanRenderFracIncrementsNumber * 3) ~/ 4; //(kPacmanDeadResetTimeAnimationMillis / 33).ceil();
+const int pacmanEatingHalfFrames = (pacmanRenderFracIncrementsNumber * 1) ~/ 4; //(kPacmanHalfEatingResetTimeMillis / 67).ceil();
 
 bool globalPhysicsLinked = true;
 //const bool rotateCamera = true;

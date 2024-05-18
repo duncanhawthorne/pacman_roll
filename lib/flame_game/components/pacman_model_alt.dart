@@ -15,7 +15,7 @@ ui.Image pacmanStandardImage() {
   final canvas = Canvas(recorder);
   const mouthWidth = pacmanMouthWidthDefault;
   canvas.drawArc(pacmanRect, 2 * pi * ((mouthWidth / 2) + 0.5),
-      2 * pi * (1 - mouthWidth), true, pacmanYellowPaint);
+      2 * pi * (1 - mouthWidth), true, yellowPacmanPaint);
   return recorder.endRecording().toImageSync(100, 100);
 }
 
@@ -24,7 +24,7 @@ ui.Image pacmanMouthClosedImage() {
   final canvas = Canvas(recorder);
   const mouthWidth = 0;
   canvas.drawArc(pacmanRect, 2 * pi * ((mouthWidth / 2) + 0.5),
-      2 * pi * (1 - mouthWidth), true, pacmanYellowPaint);
+      2 * pi * (1 - mouthWidth), true, yellowPacmanPaint);
   return recorder.endRecording().toImageSync(100, 100);
 }
 
@@ -49,7 +49,7 @@ pureVectorPacman() {
     size: Vector2.all(getSingleSquareWidth()),
     children: [
       CircleComponent(
-          radius: getSingleSquareWidth() / 2, paint: pacmanYellowPaint),
+          radius: getSingleSquareWidth() / 2, paint: yellowPacmanPaint),
     ],
   );
 }
@@ -57,7 +57,7 @@ pureVectorPacman() {
 pureVectorPacmanTwo() {
   CircleComponent d = CircleComponent(
       radius: getSingleSquareWidth() / 2,
-      paint: pacmanYellowPaint,
+      paint: yellowPacmanPaint,
       anchor: Anchor.topLeft,
       position: Vector2(0, 0));
   PolygonComponent b = PolygonComponent([

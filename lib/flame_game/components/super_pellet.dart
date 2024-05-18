@@ -1,3 +1,4 @@
+
 import '../endless_world.dart';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
@@ -17,7 +18,18 @@ class SuperPelletCircle extends CircleComponent
   @override
   Future<void> onLoad() async {
     super.onLoad();
-    add(CircleHitbox(isSolid: true, collisionType: CollisionType.passive));
+    CircleHitbox x = CircleHitbox(
+      isSolid: true,
+      collisionType: CollisionType.passive,
+      position: Vector2.all(getSingleSquareWidth() *
+          miniPelletAndSuperPelletScaleFactor /
+          2),
+      radius: getSingleSquareWidth() *
+          miniPelletAndSuperPelletScaleFactor /
+          2,
+      anchor: Anchor.center,
+    );
+    add(x);
     world.pelletsRemainingNotifier.value += 1;
   }
 
