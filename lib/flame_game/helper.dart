@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'dart:math';
 import 'package:flame/components.dart';
 import 'dart:core';
-import 'dart:ui' as ui;
 import 'dart:ui';
 import 'package:sensors_plus/sensors_plus.dart';
 import '../style/palette.dart';
@@ -98,26 +97,49 @@ double convertToSmallestDeltaAngle(double angleDelta) {
   return angleDelta - 2 * pi / 2;
 }
 
-ui.Image pacmanImageAtFrac(double mouthWidth) {
+Sprite pacmanImageAtFracNonAsync(int mouthWidthAsInt) {
+  double mouthWidth = mouthWidthAsInt / pacmanRenderFracIncrementsNumber;
   mouthWidth = max(0, min(1, mouthWidth));
   final recorder = PictureRecorder();
   final canvas = Canvas(recorder);
   canvas.drawArc(pacmanRect, 2 * pi * ((mouthWidth / 2) + 0.5),
       2 * pi * (1 - mouthWidth), true, yellowPacmanPaint);
-  return recorder.endRecording().toImageSync(pacmanRectSize, pacmanRectSize);
+  return Sprite(
+      recorder.endRecording().toImageSync(pacmanRectSize, pacmanRectSize));
 }
 
+/*
+Future<Sprite> pacmanImageAtFrac(double mouthWidth) async {
+   return pacmanImageAtFracNonAsync(mouthWidth);
+}
+
+Map<int, Sprite> pacmanSpritesAtFrac = {};
+
+Future<void> fillOutPacmanSpritesAtFrac() async {
+  for (int index = 0; index < pacmanRenderFracIncrementsNumber + 1; index++) {
+    pacmanSpritesAtFrac[index] = await pacmanImageAtFrac(index / pacmanRenderFracIncrementsNumber);
+  }
+}
+
+/*
 final List<Sprite> pacmanSpritesAtFrac = List<Sprite>.generate(
     pacmanRenderFracIncrementsNumber + 1, //open and close
     (int index) =>
         Sprite(pacmanImageAtFrac(index / pacmanRenderFracIncrementsNumber)),
     growable: true);
+ */
 
 Sprite pacmanSpriteAtFrac(double frac) {
   frac = max(0, min(1, frac));
   int fracInt = (frac * pacmanRenderFracIncrementsNumber).ceil();
-  return pacmanSpritesAtFrac[fracInt];
+  if (!pacmanSpritesAtFrac.keys.contains(fracInt)) {
+    p("manual load");
+    pacmanSpritesAtFrac[fracInt] = pacmanImageAtFracNonAsync(fracInt / pacmanRenderFracIncrementsNumber);
+  }
+  return pacmanSpritesAtFrac[fracInt]!;
 }
+
+ */
 
 double getTargetSirenVolume(EndlessWorld world) {
   if (!world.game.isGameLive()) {

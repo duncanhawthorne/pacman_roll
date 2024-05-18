@@ -30,7 +30,7 @@ ui.Image pacmanMouthClosedImage() {
 
 
 pureVectorPacman() {
-  double pfrac = pacmanMouthWidthDefault;
+  double pfrac = pacmanMouthWidthDefault.toDouble();
   double pangle = pfrac * 2 * pi / 2;
   return ClipComponent.polygon(
     points: [

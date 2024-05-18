@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flame/flame.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -30,6 +32,8 @@ void main() async {
   } else {
     p("fb off");
   }
+
+  //unawaited(fillOutPacmanSpritesAtFrac()); //start pre-load now and store
 
   for (int i = 0; i < 10; i++) {
     Future.delayed(Duration(seconds: i), () {

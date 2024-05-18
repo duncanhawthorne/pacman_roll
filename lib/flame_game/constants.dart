@@ -52,12 +52,14 @@ const int kPacmanDeadResetTimeMillis = 1700;
 const int kPacmanDeadResetTimeAnimationMillis = 1250;
 const int kPacmanHalfEatingResetTimeMillis = 180;
 const int pacmanRenderFracIncrementsNumber = 32;
+const int pacmanMouthWidthDefault = pacmanRenderFracIncrementsNumber ~/ 4; //8 / 32; //5/32
 const int pacmanDeadFrames = (pacmanRenderFracIncrementsNumber * 3) ~/ 4; //(kPacmanDeadResetTimeAnimationMillis / 33).ceil();
 const int pacmanEatingHalfFrames = (pacmanRenderFracIncrementsNumber * 1) ~/ 4; //(kPacmanHalfEatingResetTimeMillis / 67).ceil();
 
+
 //const bool rotateCamera = true;
 //const bool actuallyMoveSpritesToScreenPos = !rotateCamera;
-const double pacmanMouthWidthDefault = 8 / 32; //5/32
+
 
 final soundOn = !(windows && !kIsWeb);
 final bool sirenEnabled = iOS ? false : true;
