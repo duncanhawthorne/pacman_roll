@@ -9,8 +9,8 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flutter/material.dart';
 // ignore: implementation_imports
-import 'package:flame/src/events/messages/pointer_move_event.dart'
-    as flame_pointer_move_event;
+//import 'package:flame/src/events/messages/pointer_move_event.dart'
+//    as flame_pointer_move_event;
 
 import '../../audio/sounds.dart';
 import 'game_screen.dart';
@@ -40,8 +40,8 @@ class EndlessWorld extends Forge2DWorld
     with
         //TapCallbacks,
         HasGameReference<EndlessRunner>,
-        DragCallbacks,
-        PointerMoveCallbacks {
+        //PointerMoveCallbacks,
+        DragCallbacks {
   EndlessWorld({
     required this.level,
     required this.playerProgress,
@@ -263,6 +263,7 @@ class EndlessWorld extends Forge2DWorld
     numberOfDeaths.value -= 3;
   }
 
+  /*
   @override
   void onPointerMove(flame_pointer_move_event.PointerMoveEvent event) {
     //TODO try to capture mouse on windows
@@ -271,6 +272,7 @@ class EndlessWorld extends Forge2DWorld
       linearCursorMoveToGravity(Vector2(eventVector.x, eventVector.y));
     }
   }
+   */
 
   @override
   void update(double dt) {
