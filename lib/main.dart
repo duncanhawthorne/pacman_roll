@@ -33,7 +33,7 @@ void main() async {
     p("fb off");
   }
 
-  //unawaited(fillOutPacmanSpritesAtFrac()); //start pre-load now and store
+  precachePacmanAtFrac(); //start pre-load now and store
 
   for (int i = 0; i < 10; i++) {
     Future.delayed(Duration(seconds: i), () {

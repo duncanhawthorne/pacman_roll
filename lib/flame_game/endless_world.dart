@@ -57,19 +57,20 @@ class EndlessWorld extends Forge2DWorld
 
   final numberOfDeaths = ValueNotifier(0);
   final pelletsRemainingNotifier = ValueNotifier(0);
+  int allGhostScaredTimeLatest = 0;
 
-  int datetimeStartedMillis = -1;
+  int _datetimeStartedMillis = -1;
   int now = -1;
   int _levelCompleteTimeMillis = -1;
   //Vector2 get size => (parent as FlameGame).size;
 
   double _lastDragAngle = 10;
   double _gravityTargetAngle = 2 * pi / 4;
-  bool timerSet = false;
+  bool _timerSet = false;
 
   final Random random;
 
-  bool globalPhysicsLinked = true;
+  bool physicsOn = true;
 
   /// The gravity is defined in virtual pixels per second squared.
   /// These pixels are in relation to how big the [FixedResolutionViewport] is.
@@ -81,6 +82,16 @@ class EndlessWorld extends Forge2DWorld
     if (soundOn) {
       game.audioController.playSfx(type);
     }
+  }
+
+  bool gameWonOrLost() {
+    return pelletsRemainingNotifier.value <= 0 || numberOfDeaths.value >= level.maxAllowedDeaths;
+  }
+
+  String secondsElapsedText() {
+    return !_timerSet ? "0.0" : ((now - _datetimeStartedMillis) /
+        1000)
+        .toStringAsFixed(1);
   }
 
   void sirenVolumeUpdatedTimer() async {
@@ -117,7 +128,7 @@ class EndlessWorld extends Forge2DWorld
     if (multipleSpawningGhosts) {
       async.Timer.periodic(const Duration(milliseconds: 5000), (timer) {
         if (game.isGameLive()) {
-          if (pelletsRemainingNotifier.value > 0) {
+          if (!gameWonOrLost()) {
             addGhost(100);
           }
         } else {
@@ -134,7 +145,6 @@ class EndlessWorld extends Forge2DWorld
       if (j < 3) {
       } else {
         assert(multipleSpawningGhosts);
-        ghostPlayersList[j].ghostScaredTimeLatest = 0;
         remove(ghostPlayersList[j]);
       }
     }
@@ -152,10 +162,7 @@ class EndlessWorld extends Forge2DWorld
         game.overlays.add(GameScreen.wonDialogKey);
         trimToThreeGhosts();
         for (int i = 0; i < ghostPlayersList.length; i++) {
-          ghostPlayersList[i]
-              .setPosition(kCageLocation + Vector2.random() / 100);
-          ghostPlayersList[i].ghostDeadTimeLatest = 0;
-          ghostPlayersList[i].ghostScaredTimeLatest = 0;
+          ghostPlayersList[i].setPositionForGameEnd();
         }
         Future.delayed(
             const Duration(milliseconds: kPacmanHalfEatingResetTimeMillis * 2),
@@ -189,19 +196,19 @@ class EndlessWorld extends Forge2DWorld
 
   double getLevelCompleteTimeSeconds() {
     assert(_levelCompleteTimeMillis != -1);
-    return (_levelCompleteTimeMillis - datetimeStartedMillis) / 1000;
+    return (_levelCompleteTimeMillis - _datetimeStartedMillis) / 1000;
   }
 
   void startTimer() {
-    if (!timerSet) {
-      timerSet = true;
-      datetimeStartedMillis = now;
+    if (!_timerSet) {
+      _timerSet = true;
+      _datetimeStartedMillis = now;
     }
   }
 
   @override
   Future<void> onLoad() async {
-    timerSet = false;
+    _timerSet = false;
     now = DateTime.now().millisecondsSinceEpoch;
     //datetimeStartedMillis = now;
     // Used to keep track of when the level started, so that we later can
@@ -319,7 +326,7 @@ class EndlessWorld extends Forge2DWorld
 
   void linearCursorMoveToGravity(Vector2 eventVector) {
     assert(screenRotates);
-    if (globalPhysicsLinked) {
+    if (physicsOn) {
       double impliedAngle = -eventVector.x /
           min(game.canvasSize.x, game.canvasSize.y) *
           pointerRotationSpeed;
@@ -328,7 +335,7 @@ class EndlessWorld extends Forge2DWorld
   }
 
   void setGravity(Vector2 targetGravity) {
-    if (globalPhysicsLinked) {
+    if (physicsOn) {
       gravity = targetGravity;
       if (normaliseGravity) {
         gravity = gravity.normalized() * 50;

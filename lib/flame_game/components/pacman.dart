@@ -26,30 +26,25 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   Future<Map<CharacterState, SpriteAnimation>?> getAnimations() async {
     return {
       CharacterState.normal: SpriteAnimation.spriteList(
-        [pacmanImageAtFracNonAsync(pacmanMouthWidthDefault)],
+        [pacmanAtFrac(pacmanMouthWidthDefault)],
         stepTime: double.infinity,
       ),
       CharacterState.eating: SpriteAnimation.spriteList(
         List<Sprite>.generate(
             pacmanEatingHalfFrames * 2, //open and close
-            (int index) => pacmanImageAtFracNonAsync(
-                (pacmanMouthWidthDefault - index).abs()),
-            growable: true),
+            (int index) =>
+                pacmanAtFrac((pacmanMouthWidthDefault - (index + 1)).abs()),
+            growable: false),
         stepTime:
             kPacmanHalfEatingResetTimeMillis / 1000 / pacmanEatingHalfFrames,
       ),
       CharacterState.deadPacman: SpriteAnimation.spriteList(
-        List<Sprite>.generate(
-            (pacmanDeadFrames *
-                    kPacmanDeadResetTimeMillis /
-                    kPacmanDeadResetTimeAnimationMillis *
-                    1.2)
-                .toInt(), //buffer for sound effect time difference
-            (int index) =>
-                pacmanImageAtFracNonAsync(pacmanMouthWidthDefault + index),
-            growable: true),
-        stepTime: kPacmanDeadResetTimeAnimationMillis / 1000 / pacmanDeadFrames,
-      )
+          List<Sprite>.generate(pacmanDeadFrames + 1,
+              (int index) => pacmanAtFrac(pacmanMouthWidthDefault + index),
+              growable: false),
+          stepTime:
+              kPacmanDeadResetTimeAnimationMillis / 1000 / pacmanDeadFrames,
+          loop: false)
     };
   }
 
@@ -103,9 +98,9 @@ class Pacman extends GameCharacter with CollisionCallbacks {
       }
     } else {
       world.play(SfxType.ghostsScared);
+      world.allGhostScaredTimeLatest = world.now;
       for (int i = 0; i < world.ghostPlayersList.length; i++) {
-        world.ghostPlayersList[i].current = CharacterState.scared;
-        world.ghostPlayersList[i].ghostScaredTimeLatest = world.now;
+        world.ghostPlayersList[i].setScared();
       }
     }
     eat();
@@ -120,18 +115,9 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     eat();
 
     //ghost impact
-    ghost.current = CharacterState.deadGhost;
-    ghost.add(ReturnHomeEffect(kGhostStartLocation));
-    ghost.ghostDeadTimeLatest = world.now;
-    if (multipleSpawningGhosts) {
-      world.remove(ghost);
-    } else {
-      //Move ball way offscreen. Stops any physics interactions or collisions
-      ghost.setUnderlyingBallPosition(kOffScreenLocation +
-          Vector2.random() /
-              100); //will get moved to right position later by other code in sequence checker
-      //ghost.setUnderlyingBallStatic();
-    }
+    ghost.setDead();
+
+    //other impact
     if (multipleSpawningPacmans) {
       //world.addPacman(getUnderlyingBallPosition() + Vector2.random() / 100);
       world.add(Pacman(position: position + Vector2.random() / 100));
@@ -140,31 +126,28 @@ class Pacman extends GameCharacter with CollisionCallbacks {
 
   void ghostKillsPacman() {
     //p("ghost kills pacman");
-    if (world.globalPhysicsLinked) {
+    if (world.physicsOn) {
       //prevent multiple hits
 
       world.play(SfxType.pacmanDeath);
       current = CharacterState.deadPacman;
 
       if (world.pacmanPlayersList.length == 1) {
-        world.globalPhysicsLinked = false;
+        world.physicsOn = false;
         Future.delayed(
             const Duration(milliseconds: kPacmanDeadResetTimeMillis + 100), () {
           //100 buffer
-          if (!world.globalPhysicsLinked) {
+          if (!world.physicsOn) {
             //prevent multiple resets
 
             world.addDeath(); //score counting deaths
             setPosition(kPacmanStartLocation);
             world.trimToThreeGhosts();
             for (var i = 0; i < world.ghostPlayersList.length; i++) {
-              world.ghostPlayersList[i]
-                  .setPosition(kGhostStartLocation + Vector2.random() / 100);
-              world.ghostPlayersList[i].ghostDeadTimeLatest = 0;
-              world.ghostPlayersList[i].ghostScaredTimeLatest = 0;
+              world.ghostPlayersList[i].setStartPositionAfterPacmanDeath();
             }
             current = CharacterState.normal;
-            world.globalPhysicsLinked = true;
+            world.physicsOn = true;
           }
         });
       } else {
@@ -214,7 +197,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   void update(double dt) {
     pacmanEatingNormalSequence();
 
-    if (world.globalPhysicsLinked) {
+    if (world.physicsOn) {
       oneFrameOfPhysics();
     }
 

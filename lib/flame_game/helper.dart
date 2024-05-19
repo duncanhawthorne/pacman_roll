@@ -97,49 +97,46 @@ double convertToSmallestDeltaAngle(double angleDelta) {
   return angleDelta - 2 * pi / 2;
 }
 
-Sprite pacmanImageAtFracNonAsync(int mouthWidthAsInt) {
+Picture _pacmanRecorderAtFrac(int mouthWidthAsInt) {
   double mouthWidth = mouthWidthAsInt / pacmanRenderFracIncrementsNumber;
   mouthWidth = max(0, min(1, mouthWidth));
   final recorder = PictureRecorder();
   final canvas = Canvas(recorder);
   canvas.drawArc(pacmanRect, 2 * pi * ((mouthWidth / 2) + 0.5),
       2 * pi * (1 - mouthWidth), true, yellowPacmanPaint);
+  Picture picture = recorder.endRecording();
+  return picture;
+}
+
+Sprite _pacmanAtFracNonAsync(int mouthWidthAsInt) {
   return Sprite(
-      recorder.endRecording().toImageSync(pacmanRectSize, pacmanRectSize));
+      _pacmanRecorderAtFrac(mouthWidthAsInt).toImageSync(pacmanRectSize, pacmanRectSize));
 }
 
-/*
-Future<Sprite> pacmanImageAtFrac(double mouthWidth) async {
-   return pacmanImageAtFracNonAsync(mouthWidth);
+Future<Sprite> _pacmanAtFracAsync(int mouthWidthAsInt) async {
+  return Sprite(
+      await _pacmanRecorderAtFrac(mouthWidthAsInt).toImage(pacmanRectSize, pacmanRectSize));
 }
 
-Map<int, Sprite> pacmanSpritesAtFrac = {};
+Map<int, Sprite> pacmanAtFracCache = {};
 
-Future<void> fillOutPacmanSpritesAtFrac() async {
+Future<void> precachePacmanAtFrac() async {
   for (int index = 0; index < pacmanRenderFracIncrementsNumber + 1; index++) {
-    pacmanSpritesAtFrac[index] = await pacmanImageAtFrac(index / pacmanRenderFracIncrementsNumber);
+    if (!pacmanAtFracCache.keys.contains(index)) { //avoid redoing if done manually
+      pacmanAtFracCache[index] =
+      await _pacmanAtFracAsync(index);
+    }
   }
 }
 
-/*
-final List<Sprite> pacmanSpritesAtFrac = List<Sprite>.generate(
-    pacmanRenderFracIncrementsNumber + 1, //open and close
-    (int index) =>
-        Sprite(pacmanImageAtFrac(index / pacmanRenderFracIncrementsNumber)),
-    growable: true);
- */
-
-Sprite pacmanSpriteAtFrac(double frac) {
-  frac = max(0, min(1, frac));
-  int fracInt = (frac * pacmanRenderFracIncrementsNumber).ceil();
-  if (!pacmanSpritesAtFrac.keys.contains(fracInt)) {
-    p("manual load");
-    pacmanSpritesAtFrac[fracInt] = pacmanImageAtFracNonAsync(fracInt / pacmanRenderFracIncrementsNumber);
+Sprite pacmanAtFrac(int fracInt) {
+  fracInt = max(0,min(pacmanRenderFracIncrementsNumber, fracInt));
+  if (!pacmanAtFracCache.keys.contains(fracInt)) {
+    p(["manual load", fracInt]);
+    pacmanAtFracCache[fracInt] = _pacmanAtFracNonAsync(fracInt);
   }
-  return pacmanSpritesAtFrac[fracInt]!;
+  return pacmanAtFracCache[fracInt]!;
 }
-
- */
 
 double getTargetSirenVolume(EndlessWorld world) {
   if (!world.game.isGameLive()) {
@@ -157,7 +154,7 @@ double getTargetSirenVolume(EndlessWorld world) {
     }
     if ((world.pacmanPlayersList.isNotEmpty &&
             world.pacmanPlayersList[0].current == CharacterState.deadPacman) ||
-        !world.globalPhysicsLinked) {
+        !world.physicsOn) {
       tmpSirenVolume = 0;
     }
   } catch (e) {

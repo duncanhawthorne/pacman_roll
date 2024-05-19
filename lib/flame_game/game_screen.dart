@@ -82,8 +82,7 @@ class GameScreen extends StatelessWidget {
                     valueListenable: game.world.numberOfDeaths,
                   ),
                   ElapsedTimeDisplay(
-                    startTime: DateTime.fromMillisecondsSinceEpoch(
-                        game.world.datetimeStartedMillis),
+                    startTime: DateTime.now(), //actually ignored
                     interval: const Duration(milliseconds: 100),
                     style: const TextStyle(fontSize: 12, color: Colors.white),
                     formatter: (elapsedTime) {
@@ -96,10 +95,7 @@ class GameScreen extends StatelessWidget {
                               .truncate()
                               .toString();
                        */
-                      String timeText =
-                      !game.world.timerSet ? "0.0" : ((game.world.now - game.world.datetimeStartedMillis) /
-                                  1000)
-                              .toStringAsFixed(1);
+                      String timeText = game.world.secondsElapsedText();
                       return 'Time: $timeText';
                     },
                   ),

@@ -36,19 +36,15 @@ class Save {
             try {
               var item = allData[i];
               for (String key in item.keys) {
-                //String x = item[key].toString();
-                //x = x.substring(7, x.length - 1);
                 String x = item[key]!["data"].toString();
                 Map<String, dynamic> singleEntry = {};
                 singleEntry = json.decode(x);
-                //p(singleEntry);
                 allFirebaseEntries.add(singleEntry);
               }
             } catch (e) {
               p(e);
             }
           }
-          //p(allFirebaseEntries);
           return allFirebaseEntries;
         }
       } catch (e) {
