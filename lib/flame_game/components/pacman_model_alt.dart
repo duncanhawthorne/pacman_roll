@@ -7,9 +7,6 @@ import 'dart:core';
 import 'dart:ui' as ui;
 import 'dart:ui';
 
-
-
-
 ui.Image pacmanStandardImage() {
   final recorder = PictureRecorder();
   final canvas = Canvas(recorder);
@@ -27,7 +24,6 @@ ui.Image pacmanMouthClosedImage() {
       2 * pi * (1 - mouthWidth), true, yellowPacmanPaint);
   return recorder.endRecording().toImageSync(100, 100);
 }
-
 
 pureVectorPacman() {
   double pfrac = pacmanMouthWidthDefault.toDouble();
@@ -61,11 +57,17 @@ pureVectorPacmanTwo() {
       anchor: Anchor.topLeft,
       position: Vector2(0, 0));
   PolygonComponent b = PolygonComponent([
-    Vector2(1 * getSingleSquareWidth(),
-        -1 * getSingleSquareWidth() * tan(1 / 2 * pacmanMouthWidthDefault * 2 * pi)),
+    Vector2(
+        1 * getSingleSquareWidth(),
+        -1 *
+            getSingleSquareWidth() *
+            tan(1 / 2 * pacmanMouthWidthDefault * 2 * pi)),
     Vector2(0, 0),
-    Vector2(1 * getSingleSquareWidth(),
-        1 * getSingleSquareWidth() * tan(1 / 2 * pacmanMouthWidthDefault * 2 * pi))
+    Vector2(
+        1 * getSingleSquareWidth(),
+        1 *
+            getSingleSquareWidth() *
+            tan(1 / 2 * pacmanMouthWidthDefault * 2 * pi))
   ],
       anchor: Anchor.centerLeft,
       position: Vector2.all(getSingleSquareWidth() / 2),

@@ -11,8 +11,6 @@ import 'package:flame/extensions.dart';
 
 const mazeWallWidthFactor = 0.7;
 
-
-
 List<Component> pelletsAndSuperPellets(ValueNotifier pelletsRemainingNotifier) {
   List<Component> result = [];
   pelletsRemainingNotifier.value = 0;
@@ -50,10 +48,12 @@ class MazeWallCircleVisual extends CircleComponent {
 }
 
 bool mazeWallAt(int i, int j) {
-  if (i >= wrappedMazeLayout.length || i < 0 || j >= wrappedMazeLayout[i].length || j < 0) {
+  if (i >= wrappedMazeLayout.length ||
+      i < 0 ||
+      j >= wrappedMazeLayout[i].length ||
+      j < 0) {
     return false;
-  }
-  else {
+  } else {
     return wrappedMazeLayout[i][j] == 1;
   }
 }
@@ -80,12 +80,12 @@ List<Component> mazeWalls() {
             result.add(MazeWallCircleGround(center, scale / 2));
           }
           if (mazeWallAt(i, j + 1)) {
-            result.add(MazeWallRectangleGround(
-                center + Vector2(scale / 2, 0), scale * pixelationBuffer, scale));
+            result.add(MazeWallRectangleGround(center + Vector2(scale / 2, 0),
+                scale * pixelationBuffer, scale));
           }
           if (mazeWallAt(i + 1, j)) {
-            result.add(MazeWallRectangleGround(
-                center + Vector2(0, scale / 2), scale, scale * pixelationBuffer));
+            result.add(MazeWallRectangleGround(center + Vector2(0, scale / 2),
+                scale, scale * pixelationBuffer));
           }
         }
       }
@@ -99,8 +99,7 @@ List<Component> mazeWalls() {
         if (mazeWallAt(i, j)) {
           if (circleAt(i, j)) {
             result.add(MazeWallCircleVisual(
-                position: center,
-                radius: scale / 2 * mazeWallWidthFactor));
+                position: center, radius: scale / 2 * mazeWallWidthFactor));
           }
           if (mazeWallAt(i, j + 1)) {
             result.add(MazeWallSquareVisual(
@@ -135,7 +134,6 @@ List<Component> screenEdgeBoundaries(CameraComponent camera) {
     Wall(topLeft, bottomLeft),
   ];
 }
-
 
 /*
 int getStartingNumberPelletsAndSuperPellets(List mazeLayout) {

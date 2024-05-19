@@ -1,4 +1,3 @@
-
 import '../endless_world.dart';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
@@ -21,12 +20,9 @@ class SuperPelletCircle extends CircleComponent
     CircleHitbox x = CircleHitbox(
       isSolid: true,
       collisionType: CollisionType.passive,
-      position: Vector2.all(getSingleSquareWidth() *
-          miniPelletAndSuperPelletScaleFactor /
-          2),
-      radius: getSingleSquareWidth() *
-          miniPelletAndSuperPelletScaleFactor /
-          2,
+      position: Vector2.all(
+          getSingleSquareWidth() * miniPelletAndSuperPelletScaleFactor / 2),
+      radius: getSingleSquareWidth() * miniPelletAndSuperPelletScaleFactor / 2,
       anchor: Anchor.center,
     );
     add(x);

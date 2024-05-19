@@ -85,13 +85,14 @@ class EndlessWorld extends Forge2DWorld
   }
 
   bool gameWonOrLost() {
-    return pelletsRemainingNotifier.value <= 0 || numberOfDeaths.value >= level.maxAllowedDeaths;
+    return pelletsRemainingNotifier.value <= 0 ||
+        numberOfDeaths.value >= level.maxAllowedDeaths;
   }
 
   String secondsElapsedText() {
-    return !_timerSet ? "0.0" : ((now - _datetimeStartedMillis) /
-        1000)
-        .toStringAsFixed(1);
+    return !_timerSet
+        ? "0.0"
+        : ((now - _datetimeStartedMillis) / 1000).toStringAsFixed(1);
   }
 
   void sirenVolumeUpdatedTimer() async {
@@ -117,7 +118,6 @@ class EndlessWorld extends Forge2DWorld
     ghost.ghostSpriteChooserNumber = ghostSpriteChooserNumber;
     if (multipleSpawningGhosts && ghostPlayersList.isNotEmpty) {
       //new ghosts are also scared
-      ghost.ghostScaredTimeLatest = ghostPlayersList[0].ghostScaredTimeLatest;
       ghost.current =
           CharacterState.scared; //and then will get sequenced to correct state
     }

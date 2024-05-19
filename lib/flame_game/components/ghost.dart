@@ -25,7 +25,7 @@ class Ghost extends GameCharacter {
     required super.position,
   }) : super();
 
-  int ghostScaredTimeLatest = 0; //a long time ago
+  //int ghostScaredTimeLatest = 0; //a long time ago
   int _ghostDeadTimeLatest = 0; //a long time ago
   int ghostSpriteChooserNumber = 100;
 
@@ -67,7 +67,7 @@ class Ghost extends GameCharacter {
 
   void setScared() {
     current = CharacterState.scared;
-    ghostScaredTimeLatest = world.now;
+    world.allGhostScaredTimeLatest = world.now;
   }
 
   void setDead() {
@@ -78,30 +78,31 @@ class Ghost extends GameCharacter {
       world.remove(this);
     } else {
       //Move ball way offscreen. Stops any physics interactions or collisions
+      //Further physics doesn't apply in deadGhost state
       setUnderlyingBallPosition(kOffScreenLocation +
           Vector2.random() /
               100); //will get moved to right position later by other code in sequence checker
-      //ghost.setUnderlyingBallStatic();
+      //setUnderlyingBallStatic();
     }
   }
 
   void setStartPositionAfterPacmanDeath() {
     setPosition(kGhostStartLocation + Vector2.random() / 100);
     _ghostDeadTimeLatest = 0;
-    ghostScaredTimeLatest = 0;
+    world.allGhostScaredTimeLatest = 0;
   }
 
   void setPositionForGameEnd() {
     setPosition(kCageLocation + Vector2.random() / 100);
     _ghostDeadTimeLatest = 0;
-    ghostScaredTimeLatest = 0;
+    world.allGhostScaredTimeLatest = 0;
   }
 
   void ghostDeadScaredScaredIshNormalSequence() {
     if (current == CharacterState.deadGhost) {
       if (world.now - _ghostDeadTimeLatest > kGhostResetTimeMillis) {
-        if (!world.gameWonOrLost() &&
-            _ghostDeadTimeLatest != 0) { //dont set on game over or after pacman death
+        if (!world.gameWonOrLost() && _ghostDeadTimeLatest != 0) {
+          //dont set on game over or after pacman death
           setPosition(kGhostStartLocation + Vector2.random() / 100);
           //setUnderlyingBallDynamic();
         }
@@ -109,13 +110,14 @@ class Ghost extends GameCharacter {
       }
     }
     if (current == CharacterState.scared) {
-      if (world.now - ghostScaredTimeLatest > kGhostChaseTimeMillis * 2 / 3) {
+      if (world.now - world.allGhostScaredTimeLatest >
+          kGhostChaseTimeMillis * 2 / 3) {
         current = CharacterState.scaredIsh;
       }
     }
 
     if (current == CharacterState.scaredIsh) {
-      if (world.now - ghostScaredTimeLatest > kGhostChaseTimeMillis) {
+      if (world.now - world.allGhostScaredTimeLatest > kGhostChaseTimeMillis) {
         current = CharacterState.normal;
         game.audioController.stopSfx(SfxType.ghostsScared);
       }
@@ -132,7 +134,7 @@ class Ghost extends GameCharacter {
 
   @override
   Future<void> onRemove() async {
-    ghostScaredTimeLatest = 0;
+    //XghostScaredTimeLatest = 0;
     world.ghostPlayersList.remove(this);
     super.onRemove();
   }

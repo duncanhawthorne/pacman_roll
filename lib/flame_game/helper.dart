@@ -109,28 +109,28 @@ Picture _pacmanRecorderAtFrac(int mouthWidthAsInt) {
 }
 
 Sprite _pacmanAtFracNonAsync(int mouthWidthAsInt) {
-  return Sprite(
-      _pacmanRecorderAtFrac(mouthWidthAsInt).toImageSync(pacmanRectSize, pacmanRectSize));
+  return Sprite(_pacmanRecorderAtFrac(mouthWidthAsInt)
+      .toImageSync(pacmanRectSize, pacmanRectSize));
 }
 
 Future<Sprite> _pacmanAtFracAsync(int mouthWidthAsInt) async {
-  return Sprite(
-      await _pacmanRecorderAtFrac(mouthWidthAsInt).toImage(pacmanRectSize, pacmanRectSize));
+  return Sprite(await _pacmanRecorderAtFrac(mouthWidthAsInt)
+      .toImage(pacmanRectSize, pacmanRectSize));
 }
 
 Map<int, Sprite> pacmanAtFracCache = {};
 
 Future<void> precachePacmanAtFrac() async {
   for (int index = 0; index < pacmanRenderFracIncrementsNumber + 1; index++) {
-    if (!pacmanAtFracCache.keys.contains(index)) { //avoid redoing if done manually
-      pacmanAtFracCache[index] =
-      await _pacmanAtFracAsync(index);
+    if (!pacmanAtFracCache.keys.contains(index)) {
+      //avoid redoing if done manually
+      pacmanAtFracCache[index] = await _pacmanAtFracAsync(index);
     }
   }
 }
 
 Sprite pacmanAtFrac(int fracInt) {
-  fracInt = max(0,min(pacmanRenderFracIncrementsNumber, fracInt));
+  fracInt = max(0, min(pacmanRenderFracIncrementsNumber, fracInt));
   if (!pacmanAtFracCache.keys.contains(fracInt)) {
     p(["manual load", fracInt]);
     pacmanAtFracCache[fracInt] = _pacmanAtFracNonAsync(fracInt);

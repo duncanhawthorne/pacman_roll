@@ -98,7 +98,6 @@ class Pacman extends GameCharacter with CollisionCallbacks {
       }
     } else {
       world.play(SfxType.ghostsScared);
-      world.allGhostScaredTimeLatest = world.now;
       for (int i = 0; i < world.ghostPlayersList.length; i++) {
         world.ghostPlayersList[i].setScared();
       }
@@ -108,8 +107,6 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   }
 
   void pacmanEatsGhost(Ghost ghost) {
-    //p("pacman eats ghost");
-
     //pacman visuals
     world.play(SfxType.eatGhost);
     eat();
@@ -125,7 +122,6 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   }
 
   void ghostKillsPacman() {
-    //p("ghost kills pacman");
     if (world.physicsOn) {
       //prevent multiple hits
 
@@ -151,7 +147,6 @@ class Pacman extends GameCharacter with CollisionCallbacks {
           }
         });
       } else {
-        //setUnderlyingBallPosition(kPacmanStartLocation);
         assert(multipleSpawningPacmans);
         Future.delayed(const Duration(milliseconds: kPacmanDeadResetTimeMillis),
             () {
