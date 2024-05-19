@@ -1,28 +1,83 @@
 {
   "hosting": {
-    "public": "build/web",
+
+    "public": "build/web",  
+
     "ignore": [
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
     ],
-    "frameworksBackend": {
-      "region": "europe-west1"
-    }
-  },
-    "headers": [
-  {
-    "regex": "/.*",
-    "headers": [
-      {
+
+    "redirects": [ {
+      "source": "/foo",
+      "destination": "/bar",
+      "type": 301
+    }, {
+      "source": "/firebase/**",
+      "destination": "https://www.firebase.com",
+      "type": 302
+    } ],
+
+    "rewrites": [ {
+      "source": "/app/**",
+      "destination": "/app/index.html"
+    }, {
+      "source": "/promos/**",
+      "dynamicLinks": true
+    } ],
+
+    "headers": [ {
+      "source": "**/*.@(eot|otf|ttf|ttc|woff|font.css)",
+      "headers": [ {
+        "key": "Access-Control-Allow-Origin",
+        "value": "*"
+      } ]
+    }, {
+      "source": "**/*.@(jpg|jpeg|gif|png|html)",
+      "headers": [ {
+        "key": "Cache-Control",
+        "value": "max-age=7200"
+      },
+	        {
         "key": "Cross-Origin-Embedder-Policy",
-        "value": "require-corp"
+        "value": "credentialless"
       },
       {
         "key": "Cross-Origin-Opener-Policy",
         "value": "same-origin"
       }
-    ]
+	  ]
+    }, 
+	{
+      "source": "**",
+      "headers": [ {
+        "key": "Cache-Control",
+        "value": "max-age=7200"
+      },
+	        {
+        "key": "Cross-Origin-Embedder-Policy",
+        "value": "credentialless"
+      },
+      {
+        "key": "Cross-Origin-Opener-Policy",
+        "value": "same-origin"
+      }
+	  ]
+    }, 
+	{
+      "source": "404.html",
+      "headers": [ {
+        "key": "Cache-Control",
+        "value": "max-age=300"
+      } ]
+    } ],
+
+    "cleanUrls": false,
+
+    "trailingSlash": false,
+
+    "appAssociation": "AUTO"
+
   }
-  ]
 }
