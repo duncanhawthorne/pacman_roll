@@ -32,7 +32,9 @@ final router = GoRouter(
           path: 'session/:level',
           pageBuilder: (context, state) {
             final levelNumber = int.parse(state.pathParameters['level']!);
-            final level = gameLevels[levelNumber - 1];
+            final level = levelNumber - 1 < gameLevels.length
+                ? gameLevels[levelNumber - 1]
+                : gameLevels[0]; //avoid crash if type in high level
             return buildPageTransition<void>(
               key: const ValueKey('level'),
               color: context.watch<Palette>().backgroundPlaySession.color,

@@ -39,16 +39,16 @@ enum WallLocation { bottom, top, left, right }
 int getRollSpinDirection(Vector2 vel, Vector2 gravity) {
   WallLocation onWall = WallLocation.bottom;
   bool clockwise = true;
-  double smallThresholdVelocity = 80 / flameGameZoom;
+  //double smallThresholdVelocity = 80 / flameGameZoom;
 
-  if (vel.x.abs() > smallThresholdVelocity) {
+  if (vel.x.abs() > vel.y.abs()) {
     //moving left or right
     if (gravity.y > 0) {
       onWall = WallLocation.bottom;
     } else {
       onWall = WallLocation.top;
     }
-  } else if (vel.y.abs() > smallThresholdVelocity) {
+  } else {
     //moving up or down
     if (gravity.x > 0) {
       onWall = WallLocation.right;

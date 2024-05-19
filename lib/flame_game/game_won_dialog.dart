@@ -86,7 +86,7 @@ class GameWonDialog extends StatelessWidget {
 String endText(EndlessRunner game, double value) {
   double x = fbOn ? percentile(game.leaderboardWinTimes, value) * 100 : 0.0;
   String y =
-      "\nTime: ${value.toStringAsFixed(1)} seconds\n${!fbOn ? "" : "\nRank: Top ${x.toStringAsFixed(0)}%\n"}";
+      "\nTime: ${value.toStringAsFixed(1)} seconds\n${!fbOn || game.leaderboardWinTimes.isEmpty ? "" : "\nRank: ${x == 0 ? "World Record" : "Top ${x.toStringAsFixed(0)}%"}\n"}";
   return y;
 }
 

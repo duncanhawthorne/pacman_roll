@@ -183,6 +183,9 @@ class EndlessWorld extends Forge2DWorld
       if (pelletsRemainingNotifier.value == 0) {
         handleWinGame();
       }
+      if (pelletsRemainingNotifier.value == 5) {
+        game.downloadLeaderboard(); //close to the end but not at the end
+      }
     });
   }
 

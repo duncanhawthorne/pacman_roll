@@ -80,9 +80,11 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
   }
 
   void downloadLeaderboard() async {
-    List firebasePullDownload = await save.firebasePull();
-    for (int i = 0; i < firebasePullDownload.length; i++) {
-      leaderboardWinTimes.add(firebasePullDownload[i]["levelCompleteTime"]);
+    if (leaderboardWinTimes.isEmpty) { //so don't re-download
+      List firebaseDownloadCache = await save.firebasePull();
+      for (int i = 0; i < firebaseDownloadCache.length; i++) {
+        leaderboardWinTimes.add(firebaseDownloadCache[i]["levelCompleteTime"]);
+      }
     }
   }
 
@@ -101,7 +103,7 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
     WakelockPlus.toggle(enable: true);
     gameRunning = true;
     userString = getRandomString(world.random, 15);
-    downloadLeaderboard();
+    //downloadLeaderboard();
     deadMansSwitch();
   }
 }
