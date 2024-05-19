@@ -76,7 +76,9 @@ class GameScreen extends StatelessWidget {
                         child: Text(
                             "Lives: ${3 - game.world.numberOfDeaths.value}",
                             style: const TextStyle(
-                                fontSize: 12, color: Colors.white)),
+                                fontSize: 12,
+                                color: Colors.white,
+                                fontFamily: 'Press Start 2P')),
                       );
                     },
                     valueListenable: game.world.numberOfDeaths,
@@ -84,7 +86,10 @@ class GameScreen extends StatelessWidget {
                   ElapsedTimeDisplay(
                     startTime: DateTime.now(), //actually ignored
                     interval: const Duration(milliseconds: 100),
-                    style: const TextStyle(fontSize: 12, color: Colors.white),
+                    style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.white,
+                        fontFamily: 'Press Start 2P'),
                     formatter: (elapsedTime) {
                       /*
                       String secondsStr =

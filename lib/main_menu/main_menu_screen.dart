@@ -66,7 +66,8 @@ class MainMenuScreen extends StatelessWidget {
                 GoRouter.of(context).go('/session/1');
                 setStatusBarColor(palette.flameGameBackground.color);
               },
-              child: const Text('Play'),
+              child: const Text('Play',
+                  style: TextStyle(fontFamily: 'Press Start 2P')),
             ),
             _gap,
             Padding(

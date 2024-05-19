@@ -44,18 +44,17 @@ class GameWonDialog extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              'You won',
-              style: Theme.of(context).textTheme.headlineMedium,
-              textAlign: TextAlign.center,
-            ),
+            Text('You won',
+                style: Theme.of(context).textTheme.headlineMedium,
+                textAlign: TextAlign.center),
             //Text(scoreboardItems.toString()),
             const SizedBox(height: 16),
             //Text(
             //  'You completed level ${level.number} in $levelCompletedIn seconds.',
             //  textAlign: TextAlign.center,
             //),
-            Text(endText(game, levelCompletedIn)),
+            Text(endText(game, levelCompletedIn),
+                style: const TextStyle(fontFamily: 'Press Start 2P')),
             const SizedBox(height: 16),
             if (true) ...[
               NesButton(
@@ -65,7 +64,8 @@ class GameWonDialog extends StatelessWidget {
                   setStatusBarColor(palette.backgroundMain.color);
                 },
                 type: NesButtonType.primary,
-                child: const Text('Retry'),
+                child: const Text('Retry',
+                    style: TextStyle(fontFamily: 'Press Start 2P')),
               ),
               const SizedBox(height: 16),
             ],

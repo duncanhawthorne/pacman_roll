@@ -57,7 +57,8 @@ class GameLoseDialog extends StatelessWidget {
                   setStatusBarColor(palette.backgroundMain.color);
                 },
                 type: NesButtonType.primary,
-                child: const Text('Retry'),
+                child: const Text('Retry',
+                    style: TextStyle(fontFamily: 'Press Start 2P')),
               ),
               const SizedBox(height: 16),
             ],
