@@ -26,22 +26,16 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   Future<Map<CharacterState, SpriteAnimation>?> getAnimations() async {
     return {
       CharacterState.normal: SpriteAnimation.spriteList(
-        [pacmanAtFrac(pacmanMouthWidthDefault)],
+        [await pacmanAtFrac(pacmanMouthWidthDefault)],
         stepTime: double.infinity,
       ),
       CharacterState.eating: SpriteAnimation.spriteList(
-        List<Sprite>.generate(
-            pacmanEatingHalfFrames * 2, //open and close
-            (int index) =>
-                pacmanAtFrac((pacmanMouthWidthDefault - (index + 1)).abs()),
-            growable: false),
+        await pacmanEatingSprites(),
         stepTime:
             kPacmanHalfEatingResetTimeMillis / 1000 / pacmanEatingHalfFrames,
       ),
       CharacterState.deadPacman: SpriteAnimation.spriteList(
-          List<Sprite>.generate(pacmanDeadFrames + 1,
-              (int index) => pacmanAtFrac(pacmanMouthWidthDefault + index),
-              growable: false),
+          await pacmanDyingSprites(),
           stepTime:
               kPacmanDeadResetTimeAnimationMillis / 1000 / pacmanDeadFrames,
           loop: false)

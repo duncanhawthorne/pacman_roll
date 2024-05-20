@@ -118,24 +118,63 @@ Future<Sprite> _pacmanAtFracAsync(int mouthWidthAsInt) async {
       .toImage(pacmanRectSize, pacmanRectSize));
 }
 
-Map<int, Sprite> pacmanAtFracCache = {};
+Map<int, Future<Sprite>> pacmanAtFracCache = {};
+
+
+Future<List<Sprite>> pacmanEatingSprites() async {
+
+  //rolls from list of futures to future of a list
+
+  List<Sprite> finalItems = [];
+  // Get the item keys from the network
+  List itemsKeysList =  List<int>.generate(pacmanEatingHalfFrames * 2, (i) => i);
+
+  // Future.wait will wait until I get an actual list back!
+  await Future.wait(itemsKeysList.map((item) async {
+    Sprite finalItem = await pacmanAtFrac((- (item + 1) + pacmanMouthWidthDefault).abs());
+    finalItems.add(finalItem);
+  }).toList());
+
+  return finalItems;
+}
+
+Future<List<Sprite>> pacmanDyingSprites() async {
+
+  //rolls from list of futures to future of a list
+
+  List<Sprite> finalItems = [];
+  // Get the item keys from the network
+  List itemsKeysList =  List<int>.generate(pacmanDeadFrames + 1, (i) => i);
+
+  // Future.wait will wait until I get an actual list back!
+  await Future.wait(itemsKeysList.map((item) async {
+    Sprite finalItem = await pacmanAtFrac(item + pacmanMouthWidthDefault);
+    finalItems.add(finalItem);
+  }).toList());
+
+  return finalItems;
+}
+
 
 Future<void> precachePacmanAtFrac() async {
   for (int index = 0; index < pacmanRenderFracIncrementsNumber + 1; index++) {
     if (!pacmanAtFracCache.keys.contains(index)) {
       //avoid redoing if done manually
-      pacmanAtFracCache[index] = await _pacmanAtFracAsync(index);
+      pacmanAtFracCache[index] = _pacmanAtFracAsync(index);
     }
   }
 }
 
-Sprite pacmanAtFrac(int fracInt) {
+Future<Sprite> pacmanAtFrac(int fracInt) async {
   fracInt = max(0, min(pacmanRenderFracIncrementsNumber, fracInt));
+  /*
   if (!pacmanAtFracCache.keys.contains(fracInt)) {
     p(["manual load", fracInt]);
     pacmanAtFracCache[fracInt] = _pacmanAtFracNonAsync(fracInt);
   }
-  return pacmanAtFracCache[fracInt]!;
+
+   */
+  return await pacmanAtFracCache[fracInt]!;
 }
 
 double getTargetSirenVolume(EndlessWorld world) {
