@@ -52,7 +52,7 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
 
   String userString = "";
 
-  final List<double> leaderboardWinTimes = [];
+  Future<List<double>>? leaderboardWinTimes;
 
   @override
   Color backgroundColor() => palette.flameGameBackground.color;
@@ -79,6 +79,7 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
     return json.encode(gameTmp);
   }
 
+  /*
   List<double> leaderboardPercentiles() {
     List<double> percentilesList = [];
 
@@ -90,6 +91,7 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
     }
     return percentilesList;
   }
+   */
 
   List<double> summariseLeaderboard(List<double> startList) {
     List<double> percentilesList = [];
@@ -138,6 +140,15 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
   }
 
   Future<Map<String, dynamic>> downLeaderboardSummary() async {
+
+    /*
+    //debug forced delay
+    await Future.delayed(
+      const Duration(seconds: 5),
+          () => 'X',
+    );
+     */
+
     String firebaseDownloadCacheEncoded =
         await save.firebasePullSummaryLeaderboard();
     Map<String, dynamic> gameTmp = {};
@@ -145,10 +156,11 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
     return gameTmp;
   }
 
-  void cacheLeaderboard() async {
+  Future<List<double>> cacheLeaderboard() async {
     Map<String, dynamic> leaderboardSummary = {};
+    List<double> leaderboardWinTimes = [];
 
-    if (leaderboardWinTimes.isEmpty) {
+    if (true) {
       //so don't re-download
       try {
         leaderboardSummary = await downLeaderboardSummary();
@@ -172,12 +184,14 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
         p("refreshed summary download");
       }
 
-      leaderboardWinTimes.clear();
+
+      //leaderboardWinTimes.clear();
       for (int i = 0; i < leaderboardSummary["percentilesList"].length; i++) {
         leaderboardWinTimes.add(leaderboardSummary["percentilesList"][i]);
       }
       p("summary saved");
     }
+    return leaderboardWinTimes;
   }
 
   @override

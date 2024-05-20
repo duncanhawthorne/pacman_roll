@@ -53,8 +53,17 @@ class GameWonDialog extends StatelessWidget {
             //  'You completed level ${level.number} in $levelCompletedIn seconds.',
             //  textAlign: TextAlign.center,
             //),
-            Text(endText(game, levelCompletedIn),
-                style: const TextStyle(fontFamily: 'Press Start 2P')),
+            FutureBuilder(
+                future: endText(game, levelCompletedIn),
+                initialData: timeText(game, levelCompletedIn),
+                builder: (BuildContext context, AsyncSnapshot<String> text) {
+                  return Text(
+                    text.data!,
+                    style: const TextStyle(fontFamily: 'Press Start 2P'),
+                  );
+                }),
+            //Text(endText(game, levelCompletedIn),
+            //    style: const TextStyle(fontFamily: 'Press Start 2P')),
             const SizedBox(height: 16),
             if (true) ...[
               NesButton(
@@ -83,12 +92,20 @@ class GameWonDialog extends StatelessWidget {
   }
 }
 
-String endText(EndlessRunner game, double value) {
-  double x = fbOn ? percentile(game.leaderboardWinTimes, value) * 100 : 0.0;
+Future<String> endText(EndlessRunner game, double value) async {
+
+  double x = fbOn ? percentile(await game.leaderboardWinTimes!, value) * 100 : 0.0;
   String y =
-      "\nTime: ${value.toStringAsFixed(1)} seconds\n${!fbOn || game.leaderboardWinTimes.isEmpty ? "" : "\nRank: ${x == 0 ? "World Record" : "Top ${x.toStringAsFixed(0)}%"}\n"}";
+      "\nTime: ${value.toStringAsFixed(1)} seconds\n${!fbOn || (await game.leaderboardWinTimes)!.isEmpty ? "" : "\nRank: ${x == 0 ? "World Record" : "Top ${x.toStringAsFixed(0)}%"}\n"}";
   return y;
 }
+
+String timeText(EndlessRunner game, double value) {
+  String y =
+      "\nTime: ${value.toStringAsFixed(1)} seconds\n${!fbOn ? "" : "\nRank: Loading...\n"}";
+  return y;
+}
+
 
 double percentile(List<double> list, double value) {
   List<double> newList = List<double>.from(list);
