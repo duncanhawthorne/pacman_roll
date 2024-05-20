@@ -108,10 +108,12 @@ Picture _pacmanRecorderAtFrac(int mouthWidthAsInt) {
   return picture;
 }
 
+/*
 Sprite _pacmanAtFracNonAsync(int mouthWidthAsInt) {
   return Sprite(_pacmanRecorderAtFrac(mouthWidthAsInt)
       .toImageSync(pacmanRectSize, pacmanRectSize));
 }
+ */
 
 Future<Sprite> _pacmanAtFracAsync(int mouthWidthAsInt) async {
   return Sprite(await _pacmanRecorderAtFrac(mouthWidthAsInt)

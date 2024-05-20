@@ -79,12 +79,92 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
     return json.encode(gameTmp);
   }
 
-  void downloadLeaderboard() async {
-    if (leaderboardWinTimes.isEmpty) { //so don't re-download
-      List firebaseDownloadCache = await save.firebasePull();
+  List<double> leaderboardPercentiles() {
+    List<double> percentilesList = [];
+
+    List<double> newList = List<double>.from(leaderboardWinTimes);
+    newList.sort();
+
+    for (int i = 0; i < 101; i++) {
+      percentilesList.add(newList[(i / 100 * (newList.length - 1)).floor()]);
+    }
+    return percentilesList;
+  }
+
+  List<double> summariseLeaderboard(List<double> startList) {
+    List<double> percentilesList = [];
+
+    List<double> newList = List<double>.from(startList);
+    newList.sort();
+
+    for (int i = 0; i < 101; i++) {
+      percentilesList.add(newList[(i / 100 * (newList.length - 1)).floor()]);
+    }
+    return percentilesList;
+  }
+
+  String encodeSummarisedLeaderboard(percentilesList) {
+    Map<String, dynamic> gameTmp = {};
+    gameTmp = {};
+    gameTmp["effectiveDate"] = DateTime.now().millisecondsSinceEpoch;
+    gameTmp["percentilesList"] = percentilesList;
+    String result = json.encode(gameTmp);
+    //p(["encoded percentiles", result]);
+    return result;
+  }
+
+  /*
+  Future<void> downloadLeaderboardFull() async {
+    if (leaderboardWinTimes.isEmpty) {
+      //so don't re-download
+      List firebaseDownloadCache = await save.firebasePullFull();
       for (int i = 0; i < firebaseDownloadCache.length; i++) {
         leaderboardWinTimes.add(firebaseDownloadCache[i]["levelCompleteTime"]);
       }
+    }
+  }
+   */
+
+  Future<List<double>> downloadLeaderboardFull() async {
+    List<double> tmpList = [];
+    List firebaseDownloadCache = await save.firebasePullFullLeaderboard();
+    for (int i = 0; i < firebaseDownloadCache.length; i++) {
+      tmpList.add(firebaseDownloadCache[i]["levelCompleteTime"]);
+    }
+    return tmpList;
+  }
+
+  Future<Map<String, dynamic>> downLeaderboardSummary() async {
+    String firebaseDownloadCacheEncoded = await save.firebasePullSummaryLeaderboard();
+    Map<String, dynamic> gameTmp = {};
+    gameTmp = json.decode(firebaseDownloadCacheEncoded);
+    return gameTmp;
+  }
+
+  void cacheLeaderboard() async {
+    Map<String, dynamic> leaderboardSummary = {};
+
+    if (leaderboardWinTimes.isEmpty) {
+      //so don't re-download
+      leaderboardSummary = await downLeaderboardSummary();
+
+      if (leaderboardSummary["effectiveDate"] <
+          DateTime.now().millisecondsSinceEpoch -
+              1000 * 60 * 60 -
+              1000 * 60 * 10 * world.random.nextDouble()) { //random 10 minutes to avoid multiple hits at the same time
+        p("full refresh required");
+        await save.firebasePushSummaryLeaderboard(encodeSummarisedLeaderboard(
+            summariseLeaderboard(await downloadLeaderboardFull())));
+        p("pushed new summary");
+        leaderboardSummary = await downLeaderboardSummary();
+        p("refreshed summary download");
+      }
+
+      leaderboardWinTimes.clear();
+      for (int i = 0; i < leaderboardSummary["percentilesList"].length; i++) {
+        leaderboardWinTimes.add(leaderboardSummary["percentilesList"][i]);
+      }
+      p("summary saved");
     }
   }
 
@@ -103,7 +183,6 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
     WakelockPlus.toggle(enable: true);
     gameRunning = true;
     userString = getRandomString(world.random, 15);
-    //downloadLeaderboard();
     deadMansSwitch();
   }
 }
