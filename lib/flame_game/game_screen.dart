@@ -53,7 +53,7 @@ class GameScreen extends StatelessWidget {
                 type: NesButtonType.normal,
                 onPressed: () {
                   GoRouter.of(context).go("/");
-                  gameRunning = false;
+                  gameRunningFailsafeIndicator = false;
                   setStatusBarColor(palette.backgroundMain.color);
                 },
                 child: NesIcon(

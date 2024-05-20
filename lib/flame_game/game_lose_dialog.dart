@@ -53,7 +53,7 @@ class GameLoseDialog extends StatelessWidget {
               NesButton(
                 onPressed: () {
                   context.go('/');
-                  gameRunning = false;
+                  gameRunningFailsafeIndicator = false;
                   setStatusBarColor(palette.backgroundMain.color);
                 },
                 type: NesButtonType.primary,

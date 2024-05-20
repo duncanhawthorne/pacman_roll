@@ -22,7 +22,7 @@ class MainMenuScreen extends StatelessWidget {
     final settingsController = context.watch<SettingsController>();
     // ignore: unused_local_variable
     final audioController = context.watch<AudioController>();
-    gameRunning = false;
+    gameRunningFailsafeIndicator = false;
     return Scaffold(
       backgroundColor: palette.backgroundMain.color,
       body: ResponsiveScreen(

@@ -6,6 +6,9 @@ import 'constants.dart';
 import 'dart:convert';
 
 class Save {
+
+  FirebaseFirestore? db = fbOn ? FirebaseFirestore.instance : null;
+
   Future<void> firebasePushSingleScore(String recordID, String state) async {
     if (fbOn) {
       p("firebase push");
@@ -13,7 +16,7 @@ class Save {
         if (fbOn) {
           final dhState = <String, dynamic>{"data": state};
           db!
-              .collection("PMR3")
+              .collection(mainDB)
               .doc(recordID)
               .set(dhState)
               .onError((e, _) => p("Error writing document: $e"));
@@ -31,7 +34,7 @@ class Save {
         if (fbOn) {
           final dhState = <String, dynamic>{"data": state};
           db!
-              .collection("PMRpercent")
+              .collection(summaryDB)
               .doc("percentiles")
               .set(dhState)
               .onError((e, _) => p("Error writing document: $e"));
@@ -45,14 +48,19 @@ class Save {
   Future<String> firebasePullSummaryLeaderboard() async {
     String gameEncoded = "";
     if (fbOn) {
-      final docRef = db!.collection("PMRpercent").doc("percentiles");
-      await docRef.get().then(
-            (DocumentSnapshot doc) {
-          final gameEncodedTmp = doc.data() as Map<String, dynamic>;
-          gameEncoded = gameEncodedTmp["data"];
-        },
-        onError: (e) => p("Error getting document: $e"),
-      );
+      try {
+        final docRef = db!.collection(summaryDB).doc("percentiles");
+        await docRef.get().then(
+              (DocumentSnapshot doc) {
+            final gameEncodedTmp = doc.data() as Map<String, dynamic>;
+            gameEncoded = gameEncodedTmp["data"];
+          },
+          onError: (e) => p("Error getting document: $e"),
+        );
+      }
+      catch(e) {
+        p(["no matching fb entries",e]);
+      }
     }
     return gameEncoded;
   }
@@ -62,7 +70,7 @@ class Save {
     if (fbOn) {
       try {
         if (fbOn) {
-          final collectionRef = db!.collection("PMR3");
+          final collectionRef = db!.collection(mainDB);
           QuerySnapshot querySnapshot = await collectionRef.get();
           final allData = querySnapshot.docs
               .map((doc) => {doc.id: doc.data() as Map<String, dynamic>})
@@ -77,13 +85,13 @@ class Save {
                 allFirebaseEntries.add(singleEntry);
               }
             } catch (e) {
-              p(e);
+              p(["ill formed firebase entry",e]);
             }
           }
           return allFirebaseEntries;
         }
       } catch (e) {
-        p(e);
+        p(["full firebase entries error",e]);
       }
     }
     return allFirebaseEntries;
@@ -123,11 +131,13 @@ class Save {
     return tmpList;
   }
 
-  Future<Map<String, dynamic>> downLeaderboardSummary() async {
+  Future<Map<String, dynamic>> downloadLeaderboardSummary() async {
     String firebaseDownloadCacheEncoded =
     await save.firebasePullSummaryLeaderboard();
     Map<String, dynamic> gameTmp = {};
-    gameTmp = json.decode(firebaseDownloadCacheEncoded);
+    if (firebaseDownloadCacheEncoded != "") {
+      gameTmp = json.decode(firebaseDownloadCacheEncoded) ?? {};
+    }
     return gameTmp;
   }
 
@@ -138,10 +148,10 @@ class Save {
     if (true) {
       //so don't re-download
       try {
-        leaderboardSummary = await downLeaderboardSummary();
+        leaderboardSummary = await downloadLeaderboardSummary();
       } catch (e) {
         //likely firebase database blank, i.e. first run
-        p(e);
+        p(["ill-formed leaderboard",e]);
       }
 
       if (leaderboardSummary.isEmpty ||
@@ -155,14 +165,14 @@ class Save {
         await save.firebasePushSummaryLeaderboard(encodeSummarisedLeaderboard(
             summariseLeaderboard(await downloadLeaderboardFull())));
         p("pushed new summary");
-        leaderboardSummary = await downLeaderboardSummary();
+        leaderboardSummary = await downloadLeaderboardSummary();
         p("refreshed summary download");
       }
 
       for (int i = 0; i < leaderboardSummary["percentilesList"].length; i++) {
         leaderboardWinTimesTmp.add(leaderboardSummary["percentilesList"][i]);
       }
-      p("summary saved");
+      p("summary saved locally");
     }
     return leaderboardWinTimesTmp;
   }

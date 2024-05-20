@@ -58,7 +58,7 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
   Color backgroundColor() => palette.flameGameBackground.color;
 
   bool isGameLive() {
-    return gameRunning && !paused && isLoaded && isMounted;
+    return gameRunningFailsafeIndicator && !paused && isLoaded && isMounted;
   }
 
   void deadMansSwitch() async {
@@ -92,7 +92,7 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
   @override
   Future<void> onLoad() async {
     WakelockPlus.toggle(enable: true);
-    gameRunning = true;
+    gameRunningFailsafeIndicator = true;
     userString = getRandomString(world.random, 15);
     deadMansSwitch();
   }

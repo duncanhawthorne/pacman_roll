@@ -29,7 +29,7 @@ void main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-    db = FirebaseFirestore.instance;
+    save.db = FirebaseFirestore.instance;
   } else {
     p("fb off");
   }

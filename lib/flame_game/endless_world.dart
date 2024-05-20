@@ -244,7 +244,7 @@ class EndlessWorld extends Forge2DWorld
     super.onMount();
     // When the world is mounted in the game we add a back button widget as an
     // overlay so that the player can go back to the previous screen.
-    gameRunning = true;
+    gameRunningFailsafeIndicator = true;
     setStatusBarColor(palette.flameGameBackground.color);
     game.overlays.add(GameScreen.backButtonKey);
     game.overlays.add(GameScreen.statusOverlay);
@@ -252,7 +252,7 @@ class EndlessWorld extends Forge2DWorld
 
   @override
   void onRemove() {
-    gameRunning = false;
+    gameRunningFailsafeIndicator = false;
     game.overlays.remove(GameScreen.backButtonKey);
     game.overlays.remove(GameScreen.statusOverlay);
     setStatusBarColor(palette.backgroundMain.color);

@@ -4,11 +4,9 @@ import 'helper.dart';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'dart:core';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 //global variables
-bool gameRunning = false;
-FirebaseFirestore? db = fbOn ? FirebaseFirestore.instance : null;
+bool gameRunningFailsafeIndicator = false;
 
 //constants
 const String appTitle = "Pacman ROLL";
@@ -70,6 +68,8 @@ const multipleSpawningPacmans = false;
 const multipleSpawningGhosts = false;
 
 final bool fbOn = !(windows && !kIsWeb);
+const String mainDB = "PMR3";
+const String summaryDB = "PMRpercent";
 //String userName = "ABC";
 
 // With the `TextPaint` we define what properties the text that we are going
