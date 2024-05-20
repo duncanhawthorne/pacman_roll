@@ -95,10 +95,13 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
     List<double> percentilesList = [];
 
     List<double> newList = List<double>.from(startList);
-    newList.sort();
 
-    for (int i = 0; i < 101; i++) {
-      percentilesList.add(newList[(i / 100 * (newList.length - 1)).floor()]);
+    if (newList.isNotEmpty) {
+      newList.sort();
+
+      for (int i = 0; i < 101; i++) {
+        percentilesList.add(newList[(i / 100 * (newList.length - 1)).floor()]);
+      }
     }
     return percentilesList;
   }
@@ -135,7 +138,8 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
   }
 
   Future<Map<String, dynamic>> downLeaderboardSummary() async {
-    String firebaseDownloadCacheEncoded = await save.firebasePullSummaryLeaderboard();
+    String firebaseDownloadCacheEncoded =
+        await save.firebasePullSummaryLeaderboard();
     Map<String, dynamic> gameTmp = {};
     gameTmp = json.decode(firebaseDownloadCacheEncoded);
     return gameTmp;
@@ -146,12 +150,20 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
 
     if (leaderboardWinTimes.isEmpty) {
       //so don't re-download
-      leaderboardSummary = await downLeaderboardSummary();
+      try {
+        leaderboardSummary = await downLeaderboardSummary();
+      } catch (e) {
+        //likely firebase database blank, i.e. first run
+        p(e);
+      }
 
-      if (leaderboardSummary["effectiveDate"] <
-          DateTime.now().millisecondsSinceEpoch -
-              1000 * 60 * 60 -
-              1000 * 60 * 10 * world.random.nextDouble()) { //random 10 minutes to avoid multiple hits at the same time
+      if (leaderboardSummary.isEmpty ||
+          leaderboardSummary["percentilesList"].isEmpty ||
+          leaderboardSummary["effectiveDate"] <
+              DateTime.now().millisecondsSinceEpoch -
+                  1000 * 60 * 60 -
+                  1000 * 60 * 10 * world.random.nextDouble()) {
+        //random 10 minutes to avoid multiple hits at the same time
         p("full refresh required");
         await save.firebasePushSummaryLeaderboard(encodeSummarisedLeaderboard(
             summariseLeaderboard(await downloadLeaderboardFull())));
