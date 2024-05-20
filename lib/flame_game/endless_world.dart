@@ -155,7 +155,8 @@ class EndlessWorld extends Forge2DWorld
       if (pelletsRemainingNotifier.value == 0) {
         _levelCompleteTimeMillis = now;
         if (getLevelCompleteTimeSeconds() > 10) {
-          save.firebasePushSingleScore(game.userString, game.getEncodeCurrentGameState());
+          save.firebasePushSingleScore(
+              game.userString, game.getEncodeCurrentGameState());
         }
         game.overlays.remove(GameScreen.statusOverlay);
         game.overlays.remove(GameScreen.backButtonKey);
@@ -184,7 +185,8 @@ class EndlessWorld extends Forge2DWorld
         handleWinGame();
       }
       if (pelletsRemainingNotifier.value == 5) {
-        game.leaderboardWinTimes = game.cacheLeaderboard(); //close to the end but not at the end
+        game.leaderboardWinTimesCache = save
+            .getCacheLeaderboard(random); //close to the end but not at the end
       }
     });
   }

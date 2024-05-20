@@ -94,9 +94,9 @@ class GameWonDialog extends StatelessWidget {
 
 Future<String> endText(EndlessRunner game, double value) async {
 
-  double x = fbOn ? percentile(await game.leaderboardWinTimes!, value) * 100 : 0.0;
+  double x = fbOn ? percentile(await game.leaderboardWinTimesCache!, value) * 100 : 0.0;
   String y =
-      "\nTime: ${value.toStringAsFixed(1)} seconds\n${!fbOn || (await game.leaderboardWinTimes)!.isEmpty ? "" : "\nRank: ${x == 0 ? "World Record" : "Top ${x.toStringAsFixed(0)}%"}\n"}";
+      "\nTime: ${value.toStringAsFixed(1)} seconds\n${!fbOn || (await game.leaderboardWinTimesCache)!.isEmpty ? "" : "\nRank: ${x == 0 ? "World Record" : "Top ${x.toStringAsFixed(0)}%"}\n"}";
   return y;
 }
 

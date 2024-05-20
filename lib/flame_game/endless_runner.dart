@@ -52,7 +52,7 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
 
   String userString = "";
 
-  Future<List<double>>? leaderboardWinTimes;
+  Future<List<double>>? leaderboardWinTimesCache;
 
   @override
   Color backgroundColor() => palette.flameGameBackground.color;
@@ -77,84 +77,6 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
     gameTmp["userString"] = userString;
     gameTmp["levelCompleteTime"] = world.getLevelCompleteTimeSeconds();
     return json.encode(gameTmp);
-  }
-
-  List<double> summariseLeaderboard(List<double> startList) {
-    List<double> percentilesList = [];
-
-    List<double> newList = List<double>.from(startList);
-
-    if (newList.isNotEmpty) {
-      newList.sort();
-
-      for (int i = 0; i < 101; i++) {
-        percentilesList.add(newList[(i / 100 * (newList.length - 1)).floor()]);
-      }
-    }
-    return percentilesList;
-  }
-
-  String encodeSummarisedLeaderboard(percentilesList) {
-    Map<String, dynamic> gameTmp = {};
-    gameTmp = {};
-    gameTmp["effectiveDate"] = DateTime.now().millisecondsSinceEpoch;
-    gameTmp["percentilesList"] = percentilesList;
-    String result = json.encode(gameTmp);
-    //p(["encoded percentiles", result]);
-    return result;
-  }
-
-  Future<List<double>> downloadLeaderboardFull() async {
-    List<double> tmpList = [];
-    List firebaseDownloadCache = await save.firebasePullFullLeaderboard();
-    for (int i = 0; i < firebaseDownloadCache.length; i++) {
-      tmpList.add(firebaseDownloadCache[i]["levelCompleteTime"]);
-    }
-    return tmpList;
-  }
-
-  Future<Map<String, dynamic>> downLeaderboardSummary() async {
-    String firebaseDownloadCacheEncoded =
-        await save.firebasePullSummaryLeaderboard();
-    Map<String, dynamic> gameTmp = {};
-    gameTmp = json.decode(firebaseDownloadCacheEncoded);
-    return gameTmp;
-  }
-
-  Future<List<double>> cacheLeaderboard() async {
-    Map<String, dynamic> leaderboardSummary = {};
-    List<double> leaderboardWinTimesTmp = [];
-
-    if (true) {
-      //so don't re-download
-      try {
-        leaderboardSummary = await downLeaderboardSummary();
-      } catch (e) {
-        //likely firebase database blank, i.e. first run
-        p(e);
-      }
-
-      if (leaderboardSummary.isEmpty ||
-          leaderboardSummary["percentilesList"].isEmpty ||
-          leaderboardSummary["effectiveDate"] <
-              DateTime.now().millisecondsSinceEpoch -
-                  1000 * 60 * 60 -
-                  1000 * 60 * 10 * world.random.nextDouble()) {
-        //random 10 minutes to avoid multiple hits at the same time
-        p("full refresh required");
-        await save.firebasePushSummaryLeaderboard(encodeSummarisedLeaderboard(
-            summariseLeaderboard(await downloadLeaderboardFull())));
-        p("pushed new summary");
-        leaderboardSummary = await downLeaderboardSummary();
-        p("refreshed summary download");
-      }
-
-      for (int i = 0; i < leaderboardSummary["percentilesList"].length; i++) {
-        leaderboardWinTimesTmp.add(leaderboardSummary["percentilesList"][i]);
-      }
-      p("summary saved");
-    }
-    return leaderboardWinTimesTmp;
   }
 
   @override
