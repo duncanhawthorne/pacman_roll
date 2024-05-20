@@ -79,20 +79,6 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
     return json.encode(gameTmp);
   }
 
-  /*
-  List<double> leaderboardPercentiles() {
-    List<double> percentilesList = [];
-
-    List<double> newList = List<double>.from(leaderboardWinTimes);
-    newList.sort();
-
-    for (int i = 0; i < 101; i++) {
-      percentilesList.add(newList[(i / 100 * (newList.length - 1)).floor()]);
-    }
-    return percentilesList;
-  }
-   */
-
   List<double> summariseLeaderboard(List<double> startList) {
     List<double> percentilesList = [];
 
@@ -118,18 +104,6 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
     return result;
   }
 
-  /*
-  Future<void> downloadLeaderboardFull() async {
-    if (leaderboardWinTimes.isEmpty) {
-      //so don't re-download
-      List firebaseDownloadCache = await save.firebasePullFull();
-      for (int i = 0; i < firebaseDownloadCache.length; i++) {
-        leaderboardWinTimes.add(firebaseDownloadCache[i]["levelCompleteTime"]);
-      }
-    }
-  }
-   */
-
   Future<List<double>> downloadLeaderboardFull() async {
     List<double> tmpList = [];
     List firebaseDownloadCache = await save.firebasePullFullLeaderboard();
@@ -140,15 +114,6 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
   }
 
   Future<Map<String, dynamic>> downLeaderboardSummary() async {
-
-    /*
-    //debug forced delay
-    await Future.delayed(
-      const Duration(seconds: 5),
-          () => 'X',
-    );
-     */
-
     String firebaseDownloadCacheEncoded =
         await save.firebasePullSummaryLeaderboard();
     Map<String, dynamic> gameTmp = {};
@@ -158,7 +123,7 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
 
   Future<List<double>> cacheLeaderboard() async {
     Map<String, dynamic> leaderboardSummary = {};
-    List<double> leaderboardWinTimes = [];
+    List<double> leaderboardWinTimesTmp = [];
 
     if (true) {
       //so don't re-download
@@ -184,19 +149,17 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
         p("refreshed summary download");
       }
 
-
-      //leaderboardWinTimes.clear();
       for (int i = 0; i < leaderboardSummary["percentilesList"].length; i++) {
-        leaderboardWinTimes.add(leaderboardSummary["percentilesList"][i]);
+        leaderboardWinTimesTmp.add(leaderboardSummary["percentilesList"][i]);
       }
       p("summary saved");
     }
-    return leaderboardWinTimes;
+    return leaderboardWinTimesTmp;
   }
 
   @override
   Future<void> onGameResize(size) async {
-    Vector2 targetViewPortSize = sanitizeScreenSize(size);
+    Vector2 targetViewPortSize = getSanitizedScreenSize(size);
     camera.viewport = FixedResolutionViewport(
         resolution: Vector2(targetViewPortSize.x, targetViewPortSize.y));
     super.onGameResize(size);

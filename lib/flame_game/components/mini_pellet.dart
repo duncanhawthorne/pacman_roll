@@ -9,7 +9,7 @@ class MiniPelletCircle extends CircleComponent
     with HasWorldReference<EndlessWorld> {
   MiniPelletCircle({required super.position})
       : super(
-            radius: getSingleSquareWidth() *
+            radius: singleSquareWidth() *
                 miniPelletAndSuperPelletScaleFactor /
                 2 /
                 3,
@@ -20,12 +20,12 @@ class MiniPelletCircle extends CircleComponent
     super.onLoad();
     CircleHitbox x = CircleHitbox(
         isSolid: true,
-        position: Vector2.all(getSingleSquareWidth() *
+        position: Vector2.all(singleSquareWidth() *
             miniPelletAndSuperPelletScaleFactor /
             2 /
             3),
         anchor: Anchor.center,
-        radius: getSingleSquareWidth() *
+        radius: singleSquareWidth() *
             miniPelletAndSuperPelletScaleFactor /
             2 /
             3,
@@ -48,7 +48,7 @@ class MiniPellet extends SpriteAnimationComponent
   MiniPellet() : super(size: spriteSize, anchor: Anchor.center);
 
   static final Vector2 spriteSize =
-      Vector2.all(getSingleSquareWidth() * miniPelletAndSuperPelletScaleFactor);
+      Vector2.all(singleSquareWidth() * miniPelletAndSuperPelletScaleFactor);
   final speed = 0;
   Vector2 absPosition = Vector2(0, 0);
 

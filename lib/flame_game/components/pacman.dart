@@ -6,6 +6,7 @@ import '../constants.dart';
 import '../helper.dart';
 import 'mini_pellet.dart';
 import 'super_pellet.dart';
+import 'pacman_sprites.dart';
 import 'ghost.dart';
 import 'game_character.dart';
 import 'dart:math';
@@ -84,20 +85,23 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   }
 
   void handleEatingPellets(PositionComponent pellet) {
-    if (pellet is MiniPellet || pellet is MiniPelletCircle) {
-      if (_pacmanEatingSoundTimeLatest <
-          world.now - kPacmanHalfEatingResetTimeMillis * 2) {
-        _pacmanEatingSoundTimeLatest = world.now;
-        world.play(SfxType.waka);
+    if (current != CharacterState.deadPacman) {
+      // can simultaneously eat pellet and die to ghost so don't want to do this if just died
+      if (pellet is MiniPellet || pellet is MiniPelletCircle) {
+        if (_pacmanEatingSoundTimeLatest <
+            world.now - kPacmanHalfEatingResetTimeMillis * 2) {
+          _pacmanEatingSoundTimeLatest = world.now;
+          world.play(SfxType.waka);
+        }
+      } else {
+        world.play(SfxType.ghostsScared);
+        for (int i = 0; i < world.ghostPlayersList.length; i++) {
+          world.ghostPlayersList[i].setScared();
+        }
       }
-    } else {
-      world.play(SfxType.ghostsScared);
-      for (int i = 0; i < world.ghostPlayersList.length; i++) {
-        world.ghostPlayersList[i].setScared();
-      }
+      eat();
+      world.remove(pellet);
     }
-    eat();
-    world.remove(pellet);
   }
 
   void pacmanEatsGhost(Ghost ghost) {

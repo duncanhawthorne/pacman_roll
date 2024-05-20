@@ -74,14 +74,14 @@ class GameScreen extends StatelessWidget {
                       return Padding(
                         padding: const EdgeInsets.fromLTRB(0, 2, 0, 8),
                         child: Text(
-                            "Lives: ${3 - game.world.numberOfDeaths.value}",
+                            "Lives: ${3 - game.world.numberOfDeathsNotifier.value}",
                             style: const TextStyle(
                                 fontSize: 12,
                                 color: Colors.white,
                                 fontFamily: 'Press Start 2P')),
                       );
                     },
-                    valueListenable: game.world.numberOfDeaths,
+                    valueListenable: game.world.numberOfDeathsNotifier,
                   ),
                   ElapsedTimeDisplay(
                     startTime: DateTime.now(), //actually ignored

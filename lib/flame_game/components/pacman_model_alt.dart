@@ -7,7 +7,7 @@ import 'dart:core';
 import 'dart:ui' as ui;
 import 'dart:ui';
 
-ui.Image pacmanStandardImage() {
+ui.Image pacmanStandardImageAlt() {
   final recorder = PictureRecorder();
   final canvas = Canvas(recorder);
   const mouthWidth = pacmanMouthWidthDefault;
@@ -16,7 +16,7 @@ ui.Image pacmanStandardImage() {
   return recorder.endRecording().toImageSync(100, 100);
 }
 
-ui.Image pacmanMouthClosedImage() {
+ui.Image pacmanMouthClosedImageAlt() {
   final recorder = PictureRecorder();
   final canvas = Canvas(recorder);
   const mouthWidth = 0;
@@ -25,7 +25,7 @@ ui.Image pacmanMouthClosedImage() {
   return recorder.endRecording().toImageSync(100, 100);
 }
 
-pureVectorPacman() {
+pureVectorPacmanAlt() {
   double pfrac = pacmanMouthWidthDefault.toDouble();
   double pangle = pfrac * 2 * pi / 2;
   return ClipComponent.polygon(
@@ -42,39 +42,39 @@ pureVectorPacman() {
       Vector2(1, 0),
     ],
     position: Vector2(0, 0),
-    size: Vector2.all(getSingleSquareWidth()),
+    size: Vector2.all(singleSquareWidth()),
     children: [
       CircleComponent(
-          radius: getSingleSquareWidth() / 2, paint: yellowPacmanPaint),
+          radius: singleSquareWidth() / 2, paint: yellowPacmanPaint),
     ],
   );
 }
 
-pureVectorPacmanTwo() {
+pureVectorPacmanTwoAlt() {
   CircleComponent d = CircleComponent(
-      radius: getSingleSquareWidth() / 2,
+      radius: singleSquareWidth() / 2,
       paint: yellowPacmanPaint,
       anchor: Anchor.topLeft,
       position: Vector2(0, 0));
   PolygonComponent b = PolygonComponent([
     Vector2(
-        1 * getSingleSquareWidth(),
+        1 * singleSquareWidth(),
         -1 *
-            getSingleSquareWidth() *
+            singleSquareWidth() *
             tan(1 / 2 * pacmanMouthWidthDefault * 2 * pi)),
     Vector2(0, 0),
     Vector2(
-        1 * getSingleSquareWidth(),
+        1 * singleSquareWidth(),
         1 *
-            getSingleSquareWidth() *
+            singleSquareWidth() *
             tan(1 / 2 * pacmanMouthWidthDefault * 2 * pi))
   ],
       anchor: Anchor.centerLeft,
-      position: Vector2.all(getSingleSquareWidth() / 2),
+      position: Vector2.all(singleSquareWidth() / 2),
       paint: blackBackgroundPaint);
   ClipComponent c = ClipComponent.circle(
       anchor: Anchor.center,
-      size: Vector2.all(getSingleSquareWidth()),
+      size: Vector2.all(singleSquareWidth()),
       children: [d, b]);
 
   final effectClose = ScaleEffect.to(

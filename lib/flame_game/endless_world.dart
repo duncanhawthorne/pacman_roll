@@ -55,7 +55,7 @@ class EndlessWorld extends Forge2DWorld
   /// progress if a level is finished.
   final PlayerProgress playerProgress;
 
-  final numberOfDeaths = ValueNotifier(0);
+  final numberOfDeathsNotifier = ValueNotifier(0);
   final pelletsRemainingNotifier = ValueNotifier(0);
   int allGhostScaredTimeLatest = 0;
 
@@ -86,7 +86,7 @@ class EndlessWorld extends Forge2DWorld
 
   bool gameWonOrLost() {
     return pelletsRemainingNotifier.value <= 0 ||
-        numberOfDeaths.value >= level.maxAllowedDeaths;
+        numberOfDeathsNotifier.value >= level.maxAllowedDeaths;
   }
 
   String secondsElapsedText() {
@@ -109,7 +109,7 @@ class EndlessWorld extends Forge2DWorld
   void addGhost(int ghostSpriteChooserNumber) {
     Vector2 target = kGhostStartLocation +
         Vector2(
-            getSingleSquareWidth() *
+            singleSquareWidth() *
                 (ghostSpriteChooserNumber <= 2
                     ? (ghostSpriteChooserNumber - 1)
                     : 0),
@@ -174,8 +174,8 @@ class EndlessWorld extends Forge2DWorld
   }
 
   void winOrLoseGameListener() {
-    numberOfDeaths.addListener(() {
-      if (numberOfDeaths.value >= level.maxAllowedDeaths) {
+    numberOfDeathsNotifier.addListener(() {
+      if (numberOfDeathsNotifier.value >= level.maxAllowedDeaths) {
         handleLoseGame();
       }
     });
@@ -235,7 +235,6 @@ class EndlessWorld extends Forge2DWorld
 
     multiGhostAdderTimer();
     winOrLoseGameListener();
-    handleAcceleratorEvents(this);
   }
 
   @override
@@ -259,11 +258,11 @@ class EndlessWorld extends Forge2DWorld
   }
 
   void addDeath({int amount = 1}) {
-    numberOfDeaths.value += amount;
+    numberOfDeathsNotifier.value += amount;
   }
 
   void resetDeaths() {
-    numberOfDeaths.value -= 3;
+    numberOfDeathsNotifier.value -= 3;
   }
 
   /*

@@ -10,7 +10,7 @@ class MazeImage extends SpriteAnimationComponent
   MazeImage() : super(size: spriteSize, anchor: Anchor.center);
 
   static final Vector2 spriteSize =
-      Vector2.all(getSingleSquareWidth() * getMazeIntWidth());
+      Vector2.all(singleSquareWidth() * getMazeIntWidth());
   //final speed = 0;
 
   @override

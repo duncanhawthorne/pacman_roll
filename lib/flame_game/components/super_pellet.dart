@@ -9,7 +9,7 @@ class SuperPelletCircle extends CircleComponent
     with HasWorldReference<EndlessWorld> {
   SuperPelletCircle({required super.position})
       : super(
-            radius: getSingleSquareWidth() *
+            radius: singleSquareWidth() *
                 miniPelletAndSuperPelletScaleFactor /
                 2,
             anchor: Anchor.center);
@@ -21,8 +21,8 @@ class SuperPelletCircle extends CircleComponent
       isSolid: true,
       collisionType: CollisionType.passive,
       position: Vector2.all(
-          getSingleSquareWidth() * miniPelletAndSuperPelletScaleFactor / 2),
-      radius: getSingleSquareWidth() * miniPelletAndSuperPelletScaleFactor / 2,
+          singleSquareWidth() * miniPelletAndSuperPelletScaleFactor / 2),
+      radius: singleSquareWidth() * miniPelletAndSuperPelletScaleFactor / 2,
       anchor: Anchor.center,
     );
     add(x);
@@ -43,7 +43,7 @@ class SuperPellet extends SpriteAnimationComponent
   SuperPellet() : super(size: spriteSize, anchor: Anchor.center);
 
   static final Vector2 spriteSize =
-      Vector2.all(getSingleSquareWidth() * miniPelletAndSuperPelletScaleFactor);
+      Vector2.all(singleSquareWidth() * miniPelletAndSuperPelletScaleFactor);
   final speed = 0;
   Vector2 absPosition = Vector2(0, 0);
 

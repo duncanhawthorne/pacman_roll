@@ -11,7 +11,7 @@ class Compass extends SpriteAnimationComponent
   Compass() : super(size: spriteSize, anchor: Anchor.center);
 
   static final Vector2 spriteSize = Vector2.all(
-      getSingleSquareWidth() * miniPelletAndSuperPelletScaleFactor / 2);
+      singleSquareWidth() * miniPelletAndSuperPelletScaleFactor / 2);
   Vector2 absPosition = kCompassLocation;
 
   @override
@@ -30,6 +30,6 @@ class Compass extends SpriteAnimationComponent
   void update(double dt) {
     super.update(dt);
     position = kCompassLocation +
-        capVector(world.gravity / 25) * getSingleSquareWidth();
+        capVector(world.gravity / 25) * singleSquareWidth();
   }
 }

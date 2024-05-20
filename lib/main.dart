@@ -14,6 +14,7 @@ import 'audio/audio_controller.dart';
 import 'player_progress/player_progress.dart';
 import 'settings/settings.dart';
 import 'style/palette.dart';
+import 'flame_game/components/pacman_sprites.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';

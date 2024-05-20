@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'dart:math';
 import 'package:flame/components.dart';
 import 'dart:core';
-import 'dart:ui';
 import 'package:sensors_plus/sensors_plus.dart';
 import '../style/palette.dart';
 import 'package:flutter/services.dart';
@@ -17,12 +16,12 @@ final palette = Palette();
 
 Save save = Save();
 
-double getSingleSquareWidth() {
+double singleSquareWidth() {
   return inGameVectorPixels / getMazeIntWidth() * gameScaleFactor;
 }
 
 double spriteWidth() {
-  return getSingleSquareWidth() * (expandedMaze ? 2 : 1);
+  return singleSquareWidth() * (expandedMaze ? 2 : 1);
 }
 
 int getMazeIntWidth() {
@@ -34,59 +33,49 @@ void p(x) {
   debugPrint("///// A " + DateTime.now().toString() + " " + x.toString());
 }
 
-enum WallLocation { bottom, top, left, right }
-
 int getRollSpinDirection(Vector2 vel, Vector2 gravity) {
-  WallLocation onWall = WallLocation.bottom;
-  bool clockwise = true;
-  //double smallThresholdVelocity = 80 / flameGameZoom;
-
   if (vel.x.abs() > vel.y.abs()) {
     //moving left or right
     if (gravity.y > 0) {
-      onWall = WallLocation.bottom;
+      //onWall = WallLocation.bottom;
+      if ((vel.x) > 0) {
+        //clockwise = true;
+        return 1;
+      } else {
+        //clockwise = false;
+        return -1;
+      }
     } else {
-      onWall = WallLocation.top;
+      //onWall = WallLocation.top;
+      if ((vel.x) > 0) {
+        //clockwise = false;
+        return -1;
+      } else {
+        //clockwise = true;
+        return 1;
+      }
     }
   } else {
     //moving up or down
     if (gravity.x > 0) {
-      onWall = WallLocation.right;
+      //onWall = WallLocation.right;
+      if ((vel.y) > 0) {
+        //clockwise = false;
+        return -1;
+      } else {
+        //clockwise = true;
+        return 1;
+      }
     } else {
-      onWall = WallLocation.left;
+      //onWall = WallLocation.left;
+      if ((vel.y) > 0) {
+        //clockwise = true;
+        return 1;
+      } else {
+        //clockwise = false;
+        return -1;
+      }
     }
-  }
-
-  if (onWall == WallLocation.bottom) {
-    if ((vel.x) > 0) {
-      clockwise = true;
-    } else {
-      clockwise = false;
-    }
-  } else if (onWall == WallLocation.top) {
-    if ((vel.x) > 0) {
-      clockwise = false;
-    } else {
-      clockwise = true;
-    }
-  } else if (onWall == WallLocation.left) {
-    if ((vel.y) > 0) {
-      clockwise = true;
-    } else {
-      clockwise = false;
-    }
-  } else if (onWall == WallLocation.right) {
-    if ((vel.y) > 0) {
-      clockwise = false;
-    } else {
-      clockwise = true;
-    }
-  }
-
-  if (clockwise) {
-    return 1;
-  } else {
-    return -1;
   }
 }
 
@@ -95,88 +84,6 @@ double convertToSmallestDeltaAngle(double angleDelta) {
   angleDelta = angleDelta + 2 * pi / 2;
   angleDelta = angleDelta % (2 * pi);
   return angleDelta - 2 * pi / 2;
-}
-
-Picture _pacmanRecorderAtFrac(int mouthWidthAsInt) {
-  double mouthWidth = mouthWidthAsInt / pacmanRenderFracIncrementsNumber;
-  mouthWidth = max(0, min(1, mouthWidth));
-  final recorder = PictureRecorder();
-  final canvas = Canvas(recorder);
-  canvas.drawArc(pacmanRect, 2 * pi * ((mouthWidth / 2) + 0.5),
-      2 * pi * (1 - mouthWidth), true, yellowPacmanPaint);
-  Picture picture = recorder.endRecording();
-  return picture;
-}
-
-/*
-Sprite _pacmanAtFracNonAsync(int mouthWidthAsInt) {
-  return Sprite(_pacmanRecorderAtFrac(mouthWidthAsInt)
-      .toImageSync(pacmanRectSize, pacmanRectSize));
-}
- */
-
-Future<Sprite> _pacmanAtFracAsync(int mouthWidthAsInt) async {
-  return Sprite(await _pacmanRecorderAtFrac(mouthWidthAsInt)
-      .toImage(pacmanRectSize, pacmanRectSize));
-}
-
-Map<int, Future<Sprite>> pacmanAtFracCache = {};
-
-
-Future<List<Sprite>> pacmanEatingSprites() async {
-
-  //rolls from list of futures to future of a list
-
-  List<Sprite> finalItems = [];
-  // Get the item keys from the network
-  List itemsKeysList =  List<int>.generate(pacmanEatingHalfFrames * 2, (i) => i);
-
-  // Future.wait will wait until I get an actual list back!
-  await Future.wait(itemsKeysList.map((item) async {
-    Sprite finalItem = await pacmanAtFrac((- (item + 1) + pacmanMouthWidthDefault).abs());
-    finalItems.add(finalItem);
-  }).toList());
-
-  return finalItems;
-}
-
-Future<List<Sprite>> pacmanDyingSprites() async {
-
-  //rolls from list of futures to future of a list
-
-  List<Sprite> finalItems = [];
-  // Get the item keys from the network
-  List itemsKeysList =  List<int>.generate(pacmanDeadFrames + 1, (i) => i);
-
-  // Future.wait will wait until I get an actual list back!
-  await Future.wait(itemsKeysList.map((item) async {
-    Sprite finalItem = await pacmanAtFrac(item + pacmanMouthWidthDefault);
-    finalItems.add(finalItem);
-  }).toList());
-
-  return finalItems;
-}
-
-
-Future<void> precachePacmanAtFrac() async {
-  for (int index = 0; index < pacmanRenderFracIncrementsNumber + 1; index++) {
-    if (!pacmanAtFracCache.keys.contains(index)) {
-      //avoid redoing if done manually
-      pacmanAtFracCache[index] = _pacmanAtFracAsync(index);
-    }
-  }
-}
-
-Future<Sprite> pacmanAtFrac(int fracInt) async {
-  fracInt = max(0, min(pacmanRenderFracIncrementsNumber, fracInt));
-  /*
-  if (!pacmanAtFracCache.keys.contains(fracInt)) {
-    p(["manual load", fracInt]);
-    pacmanAtFracCache[fracInt] = _pacmanAtFracNonAsync(fracInt);
-  }
-
-   */
-  return await pacmanAtFracCache[fracInt]!;
 }
 
 double getTargetSirenVolume(EndlessWorld world) {
@@ -214,7 +121,7 @@ String getRandomString(random, int length) =>
     String.fromCharCodes(Iterable.generate(
         length, (_) => chars.codeUnitAt(random.nextInt(chars.length))));
 
-void handleAcceleratorEvents(EndlessWorld world) {
+void legacyHandleAcceleratorEvents(EndlessWorld world) {
   if (useGyro) {
     accelerometerEventStream().listen(
       //start once and then runs
@@ -231,7 +138,7 @@ void handleAcceleratorEvents(EndlessWorld world) {
   }
 }
 
-Vector2 sanitizeScreenSize(Vector2 size) {
+Vector2 getSanitizedScreenSize(Vector2 size) {
   if (size.x > size.y) {
     return Vector2(kSquareNotionalSize * size.x / size.y, kSquareNotionalSize);
   } else {

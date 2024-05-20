@@ -39,9 +39,9 @@ final Vector2 kGhostStartLocation = Vector2(0, -3) * spriteWidth();
 final Vector2 kPacmanStartLocation = Vector2(0, 5) * spriteWidth();
 final Vector2 kCageLocation = Vector2(0, -1) * spriteWidth();
 final Vector2 kLeftPortalLocation =
-    Vector2(-(getMazeIntWidth() - 1) / 2 * 0.99, -1) * getSingleSquareWidth();
+    Vector2(-(getMazeIntWidth() - 1) / 2 * 0.99, -1) * singleSquareWidth();
 final Vector2 kRightPortalLocation =
-    Vector2((getMazeIntWidth() - 1) / 2 * 0.99, -1) * getSingleSquareWidth();
+    Vector2((getMazeIntWidth() - 1) / 2 * 0.99, -1) * singleSquareWidth();
 final Vector2 kCompassLocation = Vector2(0, 0) * spriteWidth();
 final Vector2 kOffScreenLocation = Vector2(0, 1000) * spriteWidth();
 const double miniPelletAndSuperPelletScaleFactor = 0.46;
