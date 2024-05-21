@@ -52,8 +52,6 @@ class EndlessRunner extends Forge2DGame<EndlessWorld>
 
   String userString = "";
 
-  Future<List<double>>? leaderboardWinTimesCache;
-
   @override
   Color backgroundColor() => palette.flameGameBackground.color;
 

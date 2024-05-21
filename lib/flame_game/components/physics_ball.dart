@@ -63,7 +63,6 @@ class PhysicsBall extends BodyComponent {
   void beginContact(Object other, Contact contact) {
     super.beginContact(other, contact);
 
-    //FIXME un-disable this
 
     /*
     if (other is PhysicsBall && other.realCharacter != null) {

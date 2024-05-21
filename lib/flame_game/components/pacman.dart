@@ -6,7 +6,6 @@ import '../constants.dart';
 import '../helper.dart';
 import 'mini_pellet.dart';
 import 'super_pellet.dart';
-import 'pacman_sprites.dart';
 import 'ghost.dart';
 import 'game_character.dart';
 import 'dart:math';
@@ -27,16 +26,16 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   Future<Map<CharacterState, SpriteAnimation>?> getAnimations() async {
     return {
       CharacterState.normal: SpriteAnimation.spriteList(
-        [await pacmanAtFrac(pacmanMouthWidthDefault)],
+        [await pacmanSprites.pacmanAtFrac(pacmanMouthWidthDefault)],
         stepTime: double.infinity,
       ),
       CharacterState.eating: SpriteAnimation.spriteList(
-        await pacmanEatingSprites(),
+        await pacmanSprites.pacmanEatingSprites(),
         stepTime:
             kPacmanHalfEatingResetTimeMillis / 1000 / pacmanEatingHalfFrames,
       ),
       CharacterState.deadPacman: SpriteAnimation.spriteList(
-          await pacmanDyingSprites(),
+          await pacmanSprites.pacmanDyingSprites(),
           stepTime:
               kPacmanDeadResetTimeAnimationMillis / 1000 / pacmanDeadFrames,
           loop: false)
@@ -68,7 +67,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
         other is SuperPelletCircle) {
       handleEatingPellets(other);
     } else if (other is Ghost) {
-      //belts and braces. Already handled by physics collisions in Ball //FIXME actually not now
+      //If turn on collision callbacks in physicsBall this would be belt and braces. Right now not
       handlePacmanMeetsGhost(other);
     }
   }
@@ -126,7 +125,8 @@ class Pacman extends GameCharacter with CollisionCallbacks {
       world.play(SfxType.pacmanDeath);
       current = CharacterState.deadPacman;
 
-      if (world.pacmanPlayersList.length == 1) {
+      if (world.pacmanPlayersList.length == 1 ||
+          numberOfAlivePacman(world.pacmanPlayersList) == 0) {
         world.physicsOn = false;
         Future.delayed(
             const Duration(milliseconds: kPacmanDeadResetTimeMillis + 100), () {

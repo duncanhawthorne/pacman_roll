@@ -185,8 +185,7 @@ class EndlessWorld extends Forge2DWorld
         handleWinGame();
       }
       if (pelletsRemainingNotifier.value == 5) {
-        game.leaderboardWinTimesCache = save
-            .getCacheLeaderboard(random); //close to the end but not at the end
+        save.cacheLeaderboardNow(); //close to the end but not at the end
       }
     });
   }

@@ -1,3 +1,5 @@
+import 'components/pacman.dart';
+import 'components/pacman_sprites.dart';
 import 'endless_world.dart';
 import 'constants.dart';
 import 'saves.dart';
@@ -15,6 +17,7 @@ import 'title_fix_stub.dart' if (dart.library.js_interop) 'title_fix_web.dart';
 final palette = Palette();
 
 Save save = Save();
+PacmanSprites pacmanSprites = PacmanSprites();
 
 double singleSquareWidth() {
   return inGameVectorPixels / getMazeIntWidth() * gameScaleFactor;
@@ -26,6 +29,16 @@ double spriteWidth() {
 
 int getMazeIntWidth() {
   return wrappedMazeLayout.isEmpty ? 0 : wrappedMazeLayout[0].length;
+}
+
+int numberOfAlivePacman(List<Pacman> pacmanPlayersList) {
+  int result = 0;
+  for (int i = 0; i<pacmanPlayersList.length; i++) {
+    if (pacmanPlayersList[i].current != CharacterState.deadPacman) {
+      result++;
+    }
+  }
+  return result;
 }
 
 void p(x) {

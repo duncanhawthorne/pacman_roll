@@ -39,8 +39,10 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   }
 
   void setPosition(Vector2 targetLoc) {
-    setUnderlyingBallPosition(targetLoc);
+    _setUnderlyingBallPosition(targetLoc);
     position.setFrom(targetLoc);
+    _lastPosition.setFrom(targetLoc); //Fixes bug. If body not initialised, which happens after setUnderlyingBallPosition, will revert to lastPosition so need that to be current position
+    _lastVelocity.setFrom(Vector2(0,0));
   }
 
   /*
@@ -57,15 +59,19 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     try {
       return _underlyingBall.position;
     } catch (e) {
-      //FIXME body not initialised. Shouldn't need this, hid error
       p(["getUnderlyingBallPosition", e, _lastPosition]);
       return _lastPosition; //Vector2(10, 0);
     }
   }
 
-  void setUnderlyingBallPosition(Vector2 targetLoc) {
+  void _setUnderlyingBallPosition(Vector2 targetLoc) {
     _underlyingBall.body.setTransform(targetLoc, angle);
     _underlyingBall.body.linearVelocity = Vector2(0, 0);
+  }
+
+  void setUnderlyingBallPosition(Vector2 targetLoc) {
+    assert(current == CharacterState.deadGhost); //shouldn't be using this function otherwise
+    _setUnderlyingBallPosition(targetLoc);
   }
 
   Vector2 _getUnderlyingBallVelocity() {
@@ -73,7 +79,6 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
       return Vector2(_underlyingBall.body.linearVelocity.x,
           _underlyingBall.body.linearVelocity.y);
     } catch (e) {
-      //FIXME body not initialised. Shouldn't need this, hid error
       p(["getUnderlyingBallVelocity", e, _lastVelocity]);
       return _lastVelocity;
     }
@@ -89,11 +94,13 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     assert(current != CharacterState.deadGhost); //as physics doesn't apply
     if (position.x > kRightPortalLocation.x) {
       Vector2 startVel = _getUnderlyingBallVelocity(); //before destroy ball
-      setUnderlyingBallPosition(kLeftPortalLocation);
+      _setUnderlyingBallPosition(kLeftPortalLocation);
+      _lastPosition.setFrom(kLeftPortalLocation); //else _lastVelocity calc produces nonsense
       _setUnderlyingVelocity(startVel);
     } else if (position.x < kLeftPortalLocation.x) {
       Vector2 startVel = _getUnderlyingBallVelocity();
-      setUnderlyingBallPosition(kRightPortalLocation); //before destroy ball
+      _setUnderlyingBallPosition(kRightPortalLocation); //before destroy ball
+      _lastPosition.setFrom(kRightPortalLocation); //else _lastVelocity calc produces nonsense
       _setUnderlyingVelocity(startVel);
     }
   }
@@ -104,7 +111,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
       try {
         tmpAngle = _underlyingBall.angle;
       } catch (e) {
-        //FIXME body not initialised. Shouldn't need this, hid error
+        p(["_getUpdatedAngle", e]);
         tmpAngle = angle;
       }
     } else {
@@ -118,9 +125,12 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
 
   void oneFrameOfPhysics() {
     assert(current != CharacterState.deadGhost);
-    position = _getUnderlyingBallPosition();
-    angle = _getUpdatedAngle();
-    _moveUnderlyingBallThroughPipePortal(); //note never called for deadGhost
+    if (current != CharacterState.deadGhost) {
+      //if statement shouldn't be necessary, but asserts aren't enforced in production
+      position = _getUnderlyingBallPosition();
+      angle = _getUpdatedAngle();
+      _moveUnderlyingBallThroughPipePortal(); //note never called for deadGhost
+    }
   }
 
   @override
@@ -142,7 +152,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   void update(double dt) {
     super.update(dt);
     _lastVelocity.setFrom(
-        (position - _lastPosition) / dt); //FIXME except ball through portal
+        (position - _lastPosition) / dt);
     _lastPosition.setFrom(position);
   }
 }

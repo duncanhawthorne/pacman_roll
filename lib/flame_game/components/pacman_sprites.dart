@@ -4,68 +4,71 @@ import 'dart:core';
 import 'dart:ui';
 import '../constants.dart';
 
-Picture _pacmanRecorderAtFrac(int mouthWidthAsInt) {
-  double mouthWidth = mouthWidthAsInt / pacmanRenderFracIncrementsNumber;
-  mouthWidth = max(0, min(1, mouthWidth));
-  final recorder = PictureRecorder();
-  final canvas = Canvas(recorder);
-  canvas.drawArc(pacmanRect, 2 * pi * ((mouthWidth / 2) + 0.5),
-      2 * pi * (1 - mouthWidth), true, yellowPacmanPaint);
-  Picture picture = recorder.endRecording();
-  return picture;
-}
+class PacmanSprites {
 
-Future<Sprite> _pacmanAtFracReal(int mouthWidthAsInt) async {
-  return Sprite(await _pacmanRecorderAtFrac(mouthWidthAsInt)
-      .toImage(pacmanRectSize, pacmanRectSize));
-}
+  Picture _pacmanRecorderAtFrac(int mouthWidthAsInt) {
+    double mouthWidth = mouthWidthAsInt / pacmanRenderFracIncrementsNumber;
+    mouthWidth = max(0, min(1, mouthWidth));
+    final recorder = PictureRecorder();
+    final canvas = Canvas(recorder);
+    canvas.drawArc(pacmanRect, 2 * pi * ((mouthWidth / 2) + 0.5),
+        2 * pi * (1 - mouthWidth), true, yellowPacmanPaint);
+    Picture picture = recorder.endRecording();
+    return picture;
+  }
 
-Map<int, Future<Sprite>> _pacmanAtFracCache = {};
+  Future<Sprite> _pacmanAtFracReal(int mouthWidthAsInt) async {
+    return Sprite(await _pacmanRecorderAtFrac(mouthWidthAsInt)
+        .toImage(pacmanRectSize, pacmanRectSize));
+  }
 
-Future<List<Sprite>> lf2fl(List<Future> lf) async {
-  //rolls from list of futures to future of a list
+  final Map<int, Future<Sprite>> _pacmanAtFracCache = {};
 
-  List<Sprite> finalItems = [];
-  // Get the item keys from the network
-  List itemsKeysList =  List<int>.generate(lf.length, (i) => i);
+  Future<List<Sprite>> lf2fl(List<Future> lf) async {
+    //rolls from list of futures to future of a list
 
-  // Future.wait will wait until I get an actual list back!
-  await Future.wait(itemsKeysList.map((item) async {
-    Sprite finalItem = await lf[item];
-    finalItems.add(finalItem);
-  }).toList());
+    List<Sprite> finalItems = [];
+    // Get the item keys from the network
+    List itemsKeysList = List<int>.generate(lf.length, (i) => i);
 
-  return finalItems;
-}
+    // Future.wait will wait until I get an actual list back!
+    await Future.wait(itemsKeysList.map((item) async {
+      Sprite finalItem = await lf[item];
+      finalItems.add(finalItem);
+    }).toList());
 
-
-Future<List<Sprite>> pacmanEatingSprites() async {
-  List<Future<Sprite>> lf = List<Future<Sprite>>.generate(
-      pacmanEatingHalfFrames * 2, //open and close
-          (int index) =>
-          pacmanAtFrac((pacmanMouthWidthDefault - (index + 1)).abs()));
-  return lf2fl(lf);
-}
-
-Future<List<Sprite>> pacmanDyingSprites() async {
-  List<Future<Sprite>> lf = List<Future<Sprite>>.generate(
-      pacmanDeadFrames + 1, //open and close
-          (int index) =>
-          pacmanAtFrac(pacmanMouthWidthDefault + index));
-  return lf2fl(lf);
-}
+    return finalItems;
+  }
 
 
-Future<void> precachePacmanAtFrac() async {
-  for (int index = 0; index < pacmanRenderFracIncrementsNumber + 1; index++) {
-    if (!_pacmanAtFracCache.keys.contains(index)) {
-      //avoid redoing if done previously
-      _pacmanAtFracCache[index] = _pacmanAtFracReal(index);
+  Future<List<Sprite>> pacmanEatingSprites() async {
+    List<Future<Sprite>> lf = List<Future<Sprite>>.generate(
+        pacmanEatingHalfFrames * 2, //open and close
+            (int index) =>
+            pacmanAtFrac((pacmanMouthWidthDefault - (index + 1)).abs()));
+    return lf2fl(lf);
+  }
+
+  Future<List<Sprite>> pacmanDyingSprites() async {
+    List<Future<Sprite>> lf = List<Future<Sprite>>.generate(
+        pacmanDeadFrames + 1, //open and close
+            (int index) =>
+            pacmanAtFrac(pacmanMouthWidthDefault + index));
+    return lf2fl(lf);
+  }
+
+
+  Future<void> precachePacmanAtFrac() async {
+    for (int index = 0; index < pacmanRenderFracIncrementsNumber + 1; index++) {
+      if (!_pacmanAtFracCache.keys.contains(index)) {
+        //avoid redoing if done previously
+        _pacmanAtFracCache[index] = _pacmanAtFracReal(index);
+      }
     }
   }
-}
 
-Future<Sprite> pacmanAtFrac(int fracInt) async {
-  fracInt = max(0, min(pacmanRenderFracIncrementsNumber, fracInt));
-  return await _pacmanAtFracCache[fracInt]!;
+  Future<Sprite> pacmanAtFrac(int fracInt) async {
+    fracInt = max(0, min(pacmanRenderFracIncrementsNumber, fracInt));
+    return await _pacmanAtFracCache[fracInt]!;
+  }
 }

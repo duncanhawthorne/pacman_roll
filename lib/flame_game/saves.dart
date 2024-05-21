@@ -9,6 +9,18 @@ class Save {
 
   FirebaseFirestore? db = fbOn ? FirebaseFirestore.instance : null;
 
+  Future<List<double>>? leaderboardWinTimesCache;
+  bool leaderboardSetOnce = false;
+
+  Random random = Random();
+
+  void cacheLeaderboardNow() async {
+    if (!leaderboardSetOnce) {
+      leaderboardWinTimesCache = getCacheLeaderboard(random);
+      leaderboardSetOnce = true;
+    }
+  }
+
   Future<void> firebasePushSingleScore(String recordID, String state) async {
     if (fbOn) {
       p("firebase push");
@@ -158,7 +170,7 @@ class Save {
           leaderboardSummary["percentilesList"].isEmpty ||
           leaderboardSummary["effectiveDate"] <
               DateTime.now().millisecondsSinceEpoch -
-                  1000 * 60 * 60 -
+                  1000 * 60 * 60 * 6 -
                   1000 * 60 * 10 * random.nextDouble()) {
         //random 10 minutes to avoid multiple hits at the same time
         p("full refresh required");
