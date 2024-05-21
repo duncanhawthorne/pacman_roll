@@ -1,4 +1,3 @@
-import 'dart:async';
 
 import 'package:flame/flame.dart';
 import 'package:flutter/material.dart';
@@ -35,11 +34,7 @@ void main() async {
 
   pacmanSprites.precachePacmanAtFrac(); //start pre-load now and store
 
-  for (int i = 0; i < 10; i++) {
-    Future.delayed(Duration(seconds: i), () {
-      fixTitle();
-    });
-  }
+  fixTitle();
 
   await Flame.device.fullScreen();
   runApp(const MyGame());

@@ -55,6 +55,7 @@ class GameScreen extends StatelessWidget {
                   GoRouter.of(context).go("/");
                   gameRunningFailsafeIndicator = false;
                   setStatusBarColor(palette.backgroundMain.color);
+                  fixTitle();
                 },
                 child: NesIcon(
                     iconData: NesIcons.leftArrowIndicator,

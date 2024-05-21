@@ -65,6 +65,7 @@ class MainMenuScreen extends StatelessWidget {
                 //audioController.playSfx(SfxType.buttonTap);
                 GoRouter.of(context).go('/session/1');
                 setStatusBarColor(palette.flameGameBackground.color);
+                fixTitle();
               },
               child: const Text('Play',
                   style: TextStyle(fontFamily: 'Press Start 2P')),

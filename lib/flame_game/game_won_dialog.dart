@@ -71,6 +71,7 @@ class GameWonDialog extends StatelessWidget {
                   context.go('/');
                   gameRunningFailsafeIndicator = false;
                   setStatusBarColor(palette.backgroundMain.color);
+                  fixTitle();
                 },
                 type: NesButtonType.primary,
                 child: const Text('Retry',
