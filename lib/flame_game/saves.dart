@@ -10,15 +10,11 @@ class Save {
   FirebaseFirestore? db = fbOn ? FirebaseFirestore.instance : null;
 
   Future<List<double>>? leaderboardWinTimesCache;
-  bool leaderboardSetOnce = false;
 
   Random random = Random();
 
   void cacheLeaderboardNow() async {
-    if (!leaderboardSetOnce) {
-      leaderboardWinTimesCache = getCacheLeaderboard(random);
-      leaderboardSetOnce = true;
-    }
+    leaderboardWinTimesCache ??= getCacheLeaderboard(random);
   }
 
   Future<void> firebasePushSingleScore(String recordID, String state) async {

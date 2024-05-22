@@ -1,7 +1,7 @@
 import 'package:flame/components.dart';
 
-import '../endless_runner.dart';
-import '../endless_world.dart';
+import '../pacman_game.dart';
+import '../pacman_world.dart';
 import '../constants.dart';
 import '../helper.dart';
 import 'physics_ball.dart';
@@ -14,8 +14,8 @@ import 'package:flame/collisions.dart';
 class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     with
         //CollisionCallbacks,
-        HasWorldReference<EndlessWorld>,
-        HasGameReference<EndlessRunner> {
+        HasWorldReference<PacmanWorld>,
+        HasGameReference<PacmanGame> {
   GameCharacter({
     super.position,
   }) : super(

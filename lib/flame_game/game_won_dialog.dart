@@ -1,4 +1,4 @@
-import 'package:pacman_roll/flame_game/endless_runner.dart';
+import 'package:pacman_roll/flame_game/pacman_game.dart';
 
 import '../level_selection/levels.dart';
 import 'constants.dart';
@@ -28,7 +28,7 @@ class GameWonDialog extends StatelessWidget {
   /// The properties of the level that was just finished.
   final GameLevel level;
 
-  final EndlessRunner game;
+  final PacmanGame game;
 
   /// How many seconds that the level was completed in.
   final double levelCompletedIn;
@@ -93,7 +93,7 @@ class GameWonDialog extends StatelessWidget {
   }
 }
 
-Future<String> endText(EndlessRunner game, double value) async {
+Future<String> endText(PacmanGame game, double value) async {
 
   double x = fbOn ? percentile(await save.leaderboardWinTimesCache!, value) * 100 : 0.0;
   String y =
@@ -101,7 +101,7 @@ Future<String> endText(EndlessRunner game, double value) async {
   return y;
 }
 
-String timeText(EndlessRunner game, double value) {
+String timeText(PacmanGame game, double value) {
   String y =
       "\nTime: ${value.toStringAsFixed(1)} seconds\n${!fbOn ? "" : "\nRank: Loading...\n"}";
   return y;

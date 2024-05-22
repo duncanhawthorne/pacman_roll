@@ -1,6 +1,6 @@
 import 'components/pacman.dart';
 import 'components/pacman_sprites.dart';
-import 'endless_world.dart';
+import 'pacman_world.dart';
 import 'constants.dart';
 import 'saves.dart';
 import 'components/game_character.dart';
@@ -99,7 +99,7 @@ double convertToSmallestDeltaAngle(double angleDelta) {
   return angleDelta - 2 * pi / 2;
 }
 
-double getTargetSirenVolume(EndlessWorld world) {
+double getTargetSirenVolume(PacmanWorld world) {
   if (!world.game.isGameLive()) {
     p("siren 0: game not live");
     return 0;
@@ -134,7 +134,7 @@ String getRandomString(random, int length) =>
     String.fromCharCodes(Iterable.generate(
         length, (_) => chars.codeUnitAt(random.nextInt(chars.length))));
 
-void legacyHandleAcceleratorEvents(EndlessWorld world) {
+void legacyHandleAcceleratorEvents(PacmanWorld world) {
   if (useGyro) {
     accelerometerEventStream().listen(
       //start once and then runs

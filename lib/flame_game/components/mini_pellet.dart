@@ -1,12 +1,12 @@
 import '../helper.dart';
 
-import '../endless_world.dart';
+import '../pacman_world.dart';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import '../constants.dart';
 
 class MiniPelletCircle extends CircleComponent
-    with HasWorldReference<EndlessWorld> {
+    with HasWorldReference<PacmanWorld> {
   MiniPelletCircle({required super.position})
       : super(
             radius: singleSquareWidth() *
@@ -44,7 +44,7 @@ class MiniPelletCircle extends CircleComponent
 /// The [MiniPellet] components are the components that the [Player] should collect
 /// to finish a level. The points are represented by Flame's mascot; Ember.
 class MiniPellet extends SpriteAnimationComponent
-    with HasGameReference, HasWorldReference<EndlessWorld> {
+    with HasGameReference, HasWorldReference<PacmanWorld> {
   MiniPellet() : super(size: spriteSize, anchor: Anchor.center);
 
   static final Vector2 spriteSize =

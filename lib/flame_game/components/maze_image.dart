@@ -1,12 +1,12 @@
 import '../helper.dart';
 
-import '../endless_world.dart';
+import '../pacman_world.dart';
 import 'package:flame/components.dart';
 
 /// The [MiniPellet] components are the components that the [Player] should collect
 /// to finish a level. The points are represented by Flame's mascot; Ember.
 class MazeImage extends SpriteAnimationComponent
-    with HasGameReference, HasWorldReference<EndlessWorld> {
+    with HasGameReference, HasWorldReference<PacmanWorld> {
   MazeImage() : super(size: spriteSize, anchor: Anchor.center);
 
   static final Vector2 spriteSize =

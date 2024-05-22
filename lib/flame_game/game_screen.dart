@@ -1,5 +1,5 @@
 import '../audio/audio_controller.dart';
-import 'endless_runner.dart';
+import 'pacman_game.dart';
 import 'constants.dart';
 
 import '../level_selection/levels.dart';
@@ -20,7 +20,7 @@ import '../flame_game/helper.dart';
 ///
 /// It mostly sets up the overlays (widgets shown on top of the Flame game) and
 /// the gets the [AudioController] from the context and passes it in to the
-/// [EndlessRunner] class so that it can play audio.
+/// [PacmanGame] class so that it can play audio.
 class GameScreen extends StatelessWidget {
   const GameScreen({required this.level, super.key});
 
@@ -37,15 +37,15 @@ class GameScreen extends StatelessWidget {
     setStatusBarColor(palette.flameGameBackground.color);
     final audioController = context.read<AudioController>();
     return Scaffold(
-      body: GameWidget<EndlessRunner>(
+      body: GameWidget<PacmanGame>(
         key: const Key('play session'),
-        game: EndlessRunner(
+        game: PacmanGame(
           level: level,
           playerProgress: context.read<PlayerProgress>(),
           audioController: audioController,
         ),
         overlayBuilderMap: {
-          backButtonKey: (BuildContext context, EndlessRunner game) {
+          backButtonKey: (BuildContext context, PacmanGame game) {
             return Positioned(
               top: 20,
               left: 30,
@@ -63,7 +63,7 @@ class GameScreen extends StatelessWidget {
               ),
             );
           },
-          statusOverlay: (BuildContext context, EndlessRunner game) {
+          statusOverlay: (BuildContext context, PacmanGame game) {
             return Positioned(
               top: 20,
               right: 30,
@@ -109,13 +109,13 @@ class GameScreen extends StatelessWidget {
               ),
             );
           },
-          loseDialogKey: (BuildContext context, EndlessRunner game) {
+          loseDialogKey: (BuildContext context, PacmanGame game) {
             return GameLoseDialog(
               level: level,
               levelCompletedIn: -1, //disabled
             );
           },
-          wonDialogKey: (BuildContext context, EndlessRunner game) {
+          wonDialogKey: (BuildContext context, PacmanGame game) {
             return GameWonDialog(
                 level: level,
                 levelCompletedIn: game.world.getLevelCompleteTimeSeconds(),

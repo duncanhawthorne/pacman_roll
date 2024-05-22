@@ -1,4 +1,4 @@
-import '../endless_world.dart';
+import '../pacman_world.dart';
 import 'package:flame/components.dart';
 import '../constants.dart';
 import '../helper.dart';
@@ -7,7 +7,7 @@ import 'dart:math';
 /// The [MiniPellet] components are the components that the [Player] should collect
 /// to finish a level. The points are represented by Flame's mascot; Ember.
 class Compass extends SpriteAnimationComponent
-    with HasGameReference, HasWorldReference<EndlessWorld> {
+    with HasGameReference, HasWorldReference<PacmanWorld> {
   Compass() : super(size: spriteSize, anchor: Anchor.center);
 
   static final Vector2 spriteSize = Vector2.all(

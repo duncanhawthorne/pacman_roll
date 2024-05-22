@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 
 void fixTitleReal() {
   if (isiOSMobile) {
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 3; i++) {
       Future.delayed(Duration(seconds: i), () {
         fixTitle1();
         fixTitle2();
@@ -14,10 +14,6 @@ void fixTitleReal() {
     }
   }
 }
-
-
-
-
 
 void fixTitle1() {
   //https://github.com/flutter/flutter/issues/98248
