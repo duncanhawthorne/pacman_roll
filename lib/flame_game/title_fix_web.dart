@@ -5,13 +5,9 @@ import 'package:flutter/services.dart';
 
 void fixTitleReal() {
   if (isiOSMobile) {
-    for (int i = 0; i < 3; i++) {
-      Future.delayed(Duration(seconds: i), () {
-        fixTitle1();
-        fixTitle2();
-        fixTitle3();
-      });
-    }
+    fixTitle1();
+    fixTitle2();
+    fixTitle3();
   }
 }
 
@@ -20,7 +16,7 @@ void fixTitle1() {
   if (true) {
     SystemChrome.setApplicationSwitcherDescription(ApplicationSwitcherDescription(
         label: appTitle,
-        primaryColor: const Color(0xFF000000)
+        primaryColor: targetTitleBarColor
             .value //Theme.of(context).primaryColor.value, // This line is required
         ));
   }

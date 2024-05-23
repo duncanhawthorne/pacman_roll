@@ -1,6 +1,5 @@
 import '../audio/audio_controller.dart';
 import 'pacman_game.dart';
-import 'constants.dart';
 
 import '../level_selection/levels.dart';
 import '../player_progress/player_progress.dart';
@@ -14,7 +13,6 @@ import 'game_lose_dialog.dart';
 import 'game_won_dialog.dart';
 import 'package:elapsed_time_display/elapsed_time_display.dart';
 import '../style/palette.dart';
-import '../flame_game/helper.dart';
 
 /// This widget defines the properties of the game screen.
 ///
@@ -33,8 +31,8 @@ class GameScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final palette = context.watch<Palette>();
-    setStatusBarColor(palette.flameGameBackground.color);
+    context.watch<Palette>();
+    //setStatusBarColor(palette.flameGameBackground.color);
     final audioController = context.read<AudioController>();
     return Scaffold(
       body: GameWidget<PacmanGame>(
@@ -53,9 +51,9 @@ class GameScreen extends StatelessWidget {
                 type: NesButtonType.normal,
                 onPressed: () {
                   GoRouter.of(context).go("/");
-                  gameRunningFailsafeIndicator = false;
-                  setStatusBarColor(palette.backgroundMain.color);
-                  fixTitle();
+                  //gameRunningFailsafeIndicator = false;
+                  //setStatusBarColor(palette.backgroundMain.color);
+                  //fixTitle();
                 },
                 child: NesIcon(
                     iconData: NesIcons.leftArrowIndicator,
@@ -101,7 +99,7 @@ class GameScreen extends StatelessWidget {
                               .truncate()
                               .toString();
                        */
-                      String timeText = game.world.secondsElapsedText();
+                      String timeText = game.secondsElapsedText();
                       return 'Time: $timeText';
                     },
                   ),
@@ -118,7 +116,7 @@ class GameScreen extends StatelessWidget {
           wonDialogKey: (BuildContext context, PacmanGame game) {
             return GameWonDialog(
                 level: level,
-                levelCompletedIn: game.world.getLevelCompleteTimeSeconds(),
+                levelCompletedIn: game.levelCompleteTimeSeconds(),
                 game: game);
           },
         },

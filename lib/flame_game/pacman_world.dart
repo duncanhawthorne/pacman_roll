@@ -13,7 +13,6 @@ import 'package:flutter/material.dart';
 //    as flame_pointer_move_event;
 
 import '../../audio/sounds.dart';
-import 'game_screen.dart';
 import 'pacman_game.dart';
 import 'components/game_character.dart';
 import 'components/maze_layout.dart';
@@ -59,14 +58,11 @@ class PacmanWorld extends Forge2DWorld
   final pelletsRemainingNotifier = ValueNotifier(0);
   int allGhostScaredTimeLatest = 0;
 
-  int _datetimeStartedMillis = -1;
-  int now = -1;
-  int _levelCompleteTimeMillis = -1;
+  int now = DateTime.now().millisecondsSinceEpoch;
   //Vector2 get size => (parent as FlameGame).size;
 
   double _lastDragAngle = 10;
   double _gravityTargetAngle = 2 * pi / 4;
-  bool _timerSet = false;
 
   final Random random;
 
@@ -89,18 +85,13 @@ class PacmanWorld extends Forge2DWorld
         numberOfDeathsNotifier.value >= level.maxAllowedDeaths;
   }
 
-  String secondsElapsedText() {
-    return !_timerSet
-        ? "0.0"
-        : ((now - _datetimeStartedMillis) / 1000).toStringAsFixed(1);
-  }
-
   void sirenVolumeUpdatedTimer() async {
     //NOTE disabled on iOS due to bug
     async.Timer.periodic(const Duration(milliseconds: 500), (timer) {
       if (game.isGameLive()) {
         game.audioController.setSirenVolume(getTargetSirenVolume(this));
       } else {
+        game.audioController.setSirenVolume(0);
         timer.cancel();
       }
     });
@@ -139,78 +130,27 @@ class PacmanWorld extends Forge2DWorld
   }
 
   void trimToThreeGhosts() {
-    while(ghostPlayersList.length > 3) {
+    while (ghostPlayersList.length > 3) {
       assert(multipleSpawningGhosts);
       remove(ghostPlayersList[ghostPlayersList.length - 1]);
     }
   }
 
-  void handleWinGame() {
-    if (game.isGameLive()) {
-      if (pelletsRemainingNotifier.value == 0) {
-        _levelCompleteTimeMillis = now;
-        if (getLevelCompleteTimeSeconds() > 10) {
-          save.firebasePushSingleScore(
-              game.userString, game.getEncodeCurrentGameState());
-        }
-        game.overlays.remove(GameScreen.statusOverlay);
-        game.overlays.remove(GameScreen.backButtonKey);
-        game.overlays.add(GameScreen.wonDialogKey);
-        trimToThreeGhosts();
-        for (int i = 0; i < ghostPlayersList.length; i++) {
-          ghostPlayersList[i].setPositionForGameEnd();
-        }
-        Future.delayed(
-            const Duration(milliseconds: kPacmanHalfEatingResetTimeMillis * 2),
+  void winGameWorldTidy() {
+    Future.delayed(
+        const Duration(milliseconds: kPacmanHalfEatingResetTimeMillis * 2),
             () {
           play(SfxType.endMusic);
         });
-      }
-    }
-  }
-
-  void winOrLoseGameListener() {
-    numberOfDeathsNotifier.addListener(() {
-      if (numberOfDeathsNotifier.value >= level.maxAllowedDeaths) {
-        handleLoseGame();
-      }
-    });
-    pelletsRemainingNotifier.addListener(() {
-      if (pelletsRemainingNotifier.value == 0) {
-        handleWinGame();
-      }
-      if (pelletsRemainingNotifier.value == 5) {
-        save.cacheLeaderboardNow(); //close to the end but not at the end
-      }
-    });
-  }
-
-  void handleLoseGame() {
-    //playerProgress.setLevelFinished(level.number, getCurrentOrCompleteLevelTimeSeconds().toInt());
-    game.pauseEngine();
-    game.overlays.add(GameScreen.loseDialogKey);
-    game.overlays.remove(GameScreen.statusOverlay);
-    game.overlays.remove(GameScreen.backButtonKey);
-  }
-
-  double getLevelCompleteTimeSeconds() {
-    assert(_levelCompleteTimeMillis != -1);
-    return (_levelCompleteTimeMillis - _datetimeStartedMillis) / 1000;
-  }
-
-  void startTimer() {
-    if (!_timerSet) {
-      _timerSet = true;
-      _datetimeStartedMillis = now;
+    trimToThreeGhosts();
+    for (int i = 0; i < ghostPlayersList.length; i++) {
+      ghostPlayersList[i].setPositionForGameEnd();
     }
   }
 
   @override
   Future<void> onLoad() async {
-    _timerSet = false;
-    now = DateTime.now().millisecondsSinceEpoch;
-    _levelCompleteTimeMillis = -1;
-
+    super.onLoad();
     play(SfxType.startMusic);
     if (sirenEnabled) {
       play(SfxType.ghostsRoamingSiren);
@@ -227,47 +167,8 @@ class PacmanWorld extends Forge2DWorld
     addAll(pelletsAndSuperPellets(pelletsRemainingNotifier));
 
     multiGhostAdderTimer();
-    winOrLoseGameListener();
+    game.winOrLoseGameListener();
   }
-
-  @override
-  void onMount() {
-    super.onMount();
-    // When the world is mounted in the game we add a back button widget as an
-    // overlay so that the player can go back to the previous screen.
-    gameRunningFailsafeIndicator = true;
-    setStatusBarColor(palette.flameGameBackground.color);
-    game.overlays.add(GameScreen.backButtonKey);
-    game.overlays.add(GameScreen.statusOverlay);
-  }
-
-  @override
-  void onRemove() {
-    gameRunningFailsafeIndicator = false;
-    game.overlays.remove(GameScreen.backButtonKey);
-    game.overlays.remove(GameScreen.statusOverlay);
-    setStatusBarColor(palette.backgroundMain.color);
-    game.audioController.stopAllSfx();
-  }
-
-  void addDeath({int amount = 1}) {
-    numberOfDeathsNotifier.value += amount;
-  }
-
-  void resetDeaths() {
-    numberOfDeathsNotifier.value -= 3;
-  }
-
-  /*
-  @override
-  void onPointerMove(flame_pointer_move_event.PointerMoveEvent event) {
-    //TODO try to capture mouse on windows
-    Vector2 eventVector = event.canvasPosition - game.canvasSize / 2;
-    if (followCursor) {
-      linearCursorMoveToGravity(Vector2(eventVector.x, eventVector.y));
-    }
-  }
-   */
 
   @override
   void update(double dt) {
@@ -278,16 +179,12 @@ class PacmanWorld extends Forge2DWorld
   @override
   void onDragStart(DragStartEvent event) {
     super.onDragStart(event);
-    startTimer(); //starts off timer first time drag
+    game.startTimer(); //starts off timer first time drag
     Vector2 eventVector = event.canvasPosition - game.canvasSize / 2;
-    if (clickAndDrag) {
-      if (iOS) {
-        _lastDragAngle = 10;
-      } else {
-        _lastDragAngle = atan2(eventVector.x, eventVector.y);
-      }
-    } else if (followCursor) {
-      linearCursorMoveToGravity(Vector2(eventVector.x, eventVector.y));
+    if (iOS) {
+      _lastDragAngle = 10;
+    } else {
+      _lastDragAngle = atan2(eventVector.x, eventVector.y);
     }
   }
 
@@ -298,19 +195,15 @@ class PacmanWorld extends Forge2DWorld
     double eventVectorLengthProportion =
         (event.canvasStartPosition - game.canvasSize / 2).length /
             (min(game.canvasSize.x, game.canvasSize.y) / 2);
-    if (clickAndDrag) {
-      if (_lastDragAngle != 10) {
-        double spinMultiplier = 4 * min(1, eventVectorLengthProportion / 0.75);
-        double currentAngleTmp = atan2(eventVector.x, eventVector.y);
-        double angleDelta =
-            convertToSmallestDeltaAngle(currentAngleTmp - _lastDragAngle);
-        _gravityTargetAngle = _gravityTargetAngle + angleDelta * spinMultiplier;
-        setGravity(Vector2(cos(_gravityTargetAngle), sin(_gravityTargetAngle)));
-      }
-      _lastDragAngle = atan2(eventVector.x, eventVector.y);
-    } else if (followCursor) {
-      linearCursorMoveToGravity(Vector2(eventVector.x, eventVector.y));
+    if (_lastDragAngle != 10) {
+      double spinMultiplier = 4 * min(1, eventVectorLengthProportion / 0.75);
+      double currentAngleTmp = atan2(eventVector.x, eventVector.y);
+      double angleDelta =
+          convertToSmallestDeltaAngle(currentAngleTmp - _lastDragAngle);
+      _gravityTargetAngle = _gravityTargetAngle + angleDelta * spinMultiplier;
+      setGravity(Vector2(cos(_gravityTargetAngle), sin(_gravityTargetAngle)));
     }
+    _lastDragAngle = atan2(eventVector.x, eventVector.y);
   }
 
   @override
@@ -318,16 +211,6 @@ class PacmanWorld extends Forge2DWorld
     super.onDragEnd(event);
     if (clickAndDrag) {
       _lastDragAngle = 10;
-    }
-  }
-
-  void linearCursorMoveToGravity(Vector2 eventVector) {
-    assert(screenRotates);
-    if (physicsOn) {
-      double impliedAngle = -eventVector.x /
-          min(game.canvasSize.x, game.canvasSize.y) *
-          pointerRotationSpeed;
-      setGravity(Vector2(cos(impliedAngle), sin(impliedAngle)));
     }
   }
 

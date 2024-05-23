@@ -36,6 +36,12 @@ void main() async {
 
   fixTitle();
 
+  //for (int i = 0; i < 3; i++) {
+  // Future.delayed(Duration(seconds: i), () {
+  //    fixTitle();
+  //  });
+  //}
+
   await Flame.device.fullScreen();
   runApp(const MyGame());
 }

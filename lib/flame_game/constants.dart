@@ -6,7 +6,9 @@ import 'package:flame/game.dart';
 import 'dart:core';
 
 //global variables
-bool gameRunningFailsafeIndicator = false;
+//bool gameRunningFailsafeIndicator = false;
+// ignore: prefer_const_constructors
+Color targetTitleBarColor = Color(0xffa2fff3);
 
 //constants
 const String appTitle = "Pacman ROLL";

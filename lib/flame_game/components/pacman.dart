@@ -143,7 +143,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
             if (!world.physicsOn) {
               //prevent multiple resets
 
-              world.addDeath(); //score counting deaths
+              world.numberOfDeathsNotifier.value++; //score counting deaths
               setPosition(kPacmanStartLocation);
               world.trimToThreeGhosts();
               for (var i = 0; i < world.ghostPlayersList.length; i++) {

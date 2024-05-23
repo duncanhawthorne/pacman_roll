@@ -2,18 +2,18 @@ import 'package:flame/camera.dart';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../audio/audio_controller.dart';
 import '../level_selection/levels.dart';
 import '../player_progress/player_progress.dart';
 
+import 'game_screen.dart';
 import 'pacman_world.dart';
 import 'constants.dart';
 import 'helper.dart';
 import 'dart:core';
-import 'dart:async' as async;
 import 'dart:convert';
-import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:flame/palette.dart';
 
 /// This is the base of the game which is added to the [GameWidget].
@@ -30,8 +30,7 @@ import 'package:flame/palette.dart';
 /// Note that both of the last are passed in to the super constructor, they
 /// could also be set inside of `onLoad` for example.
 
-class PacmanGame extends Forge2DGame<PacmanWorld>
-    with HasCollisionDetection {
+class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
   PacmanGame({
     required this.level,
     required PlayerProgress playerProgress,
@@ -51,30 +50,84 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   final AudioController audioController;
 
   String userString = "";
+  int? _datetimeStartedMillis;
+  int? _levelCompleteTimeMillis;
 
   @override
   Color backgroundColor() => palette.flameGameBackground.color;
 
   bool isGameLive() {
-    return gameRunningFailsafeIndicator && !paused && isLoaded && isMounted;
-  }
-
-  void deadMansSwitch() async {
-    //Works as separate thread to stop all audio when game stops
-    async.Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (!isGameLive()) {
-        audioController.stopAllSfx();
-        timer.cancel();
-      }
-    });
+    return !paused && isLoaded && isMounted; //gameRunningFailsafeIndicator &&
   }
 
   String getEncodeCurrentGameState() {
     Map<String, dynamic> gameTmp = {};
     gameTmp = {};
     gameTmp["userString"] = userString;
-    gameTmp["levelCompleteTime"] = world.getLevelCompleteTimeSeconds();
+    gameTmp["levelCompleteTime"] = levelCompleteTimeSeconds();
     return json.encode(gameTmp);
+  }
+
+  void startTimer() {
+    _datetimeStartedMillis ??= world.now;
+  }
+
+  String secondsElapsedText() {
+    return _datetimeStartedMillis == null
+        ? "0.0"
+        : ((world.now - _datetimeStartedMillis!) / 1000).toStringAsFixed(1);
+  }
+
+  double levelCompleteTimeSeconds() {
+    assert(_levelCompleteTimeMillis != null);
+    assert(_datetimeStartedMillis != null);
+    return (_levelCompleteTimeMillis! - _datetimeStartedMillis!) / 1000;
+  }
+
+  void winOrLoseGameListener() {
+    world.numberOfDeathsNotifier.addListener(() {
+      if (world.numberOfDeathsNotifier.value >= level.maxAllowedDeaths) {
+        handleLoseGame();
+      }
+    });
+    world.pelletsRemainingNotifier.addListener(() {
+      if (world.pelletsRemainingNotifier.value == 0) {
+        handleWinGame();
+      }
+      if (world.pelletsRemainingNotifier.value == 5) {
+        save.cacheLeaderboardNow(); //close to the end but not at the end
+      }
+    });
+  }
+
+  void handleWinGame() {
+    if (isGameLive()) {
+      if (world.pelletsRemainingNotifier.value == 0) {
+        world.winGameWorldTidy();
+
+        _levelCompleteTimeMillis = world.now;
+
+        if (levelCompleteTimeSeconds() > 10) {
+          save.firebasePushSingleScore(
+              userString, getEncodeCurrentGameState());
+        }
+        cleanOverlays();
+        overlays.add(GameScreen.wonDialogKey);
+      }
+    }
+  }
+
+  void handleLoseGame() {
+    //playerProgress.setLevelFinished(level.number, getCurrentOrCompleteLevelTimeSeconds().toInt());
+    pauseEngine();
+    audioController.stopAllSfx();
+    cleanOverlays();
+    overlays.add(GameScreen.loseDialogKey);
+  }
+
+  void cleanOverlays() {
+    overlays.remove(GameScreen.backButtonKey);
+    overlays.remove(GameScreen.statusOverlay);
   }
 
   @override
@@ -89,9 +142,24 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   /// that only needs to be set once when the level starts up.
   @override
   Future<void> onLoad() async {
-    WakelockPlus.toggle(enable: true);
-    gameRunningFailsafeIndicator = true;
+    super.onLoad();
+    //gameRunningFailsafeIndicator = true;
     userString = getRandomString(world.random, 15);
-    deadMansSwitch();
+    overlays.add(GameScreen.backButtonKey);
+    overlays.add(GameScreen.statusOverlay);
+    setStatusBarColor(palette.flameGameBackground.color);
+    fixTitle();
+    WakelockPlus.toggle(enable: true);
+  }
+
+  @override
+  Future<void> onRemove() async {
+    //gameRunningFailsafeIndicator = false;
+    cleanOverlays();
+    setStatusBarColor(palette.backgroundMain.color);
+    fixTitle();
+    WakelockPlus.toggle(enable: false);
+    audioController.stopAllSfx();
+    super.onRemove();
   }
 }

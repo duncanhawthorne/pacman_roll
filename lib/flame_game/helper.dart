@@ -163,6 +163,7 @@ void setStatusBarColor(color) {
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
     statusBarColor: color, // Status bar color
   ));
+  targetTitleBarColor = color;
 }
 
 void fixTitle() {

@@ -7,7 +7,6 @@ import '../audio/audio_controller.dart';
 import '../audio/sounds.dart';
 import '../settings/settings.dart';
 import '../style/wobbly_button.dart';
-import '../style/palette.dart';
 import '../style/responsive_screen.dart';
 import '../flame_game/constants.dart';
 import '../flame_game/helper.dart';
@@ -17,12 +16,12 @@ class MainMenuScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final palette = context.watch<Palette>();
-    setStatusBarColor(palette.backgroundMain.color);
+    //final palette = context.watch<Palette>();
+    //setStatusBarColor(palette.backgroundMain.color);
     final settingsController = context.watch<SettingsController>();
     // ignore: unused_local_variable
     final audioController = context.watch<AudioController>();
-    gameRunningFailsafeIndicator = false;
+    //gameRunningFailsafeIndicator = false;
     return Scaffold(
       backgroundColor: palette.backgroundMain.color,
       body: ResponsiveScreen(
@@ -64,8 +63,8 @@ class MainMenuScreen extends StatelessWidget {
               onPressed: () {
                 //audioController.playSfx(SfxType.buttonTap);
                 GoRouter.of(context).go('/session/1');
-                setStatusBarColor(palette.flameGameBackground.color);
-                fixTitle();
+                //setStatusBarColor(palette.flameGameBackground.color);
+                //fixTitle();
               },
               child: const Text('Play',
                   style: TextStyle(fontFamily: 'Press Start 2P')),
