@@ -139,14 +139,9 @@ class PacmanWorld extends Forge2DWorld
   }
 
   void trimToThreeGhosts() {
-    int origNumGhosts = ghostPlayersList.length;
-    for (int i = 0; i < origNumGhosts; i++) {
-      int j = origNumGhosts - 1 - i;
-      if (j < 3) {
-      } else {
-        assert(multipleSpawningGhosts);
-        remove(ghostPlayersList[j]);
-      }
+    while(ghostPlayersList.length > 3) {
+      assert(multipleSpawningGhosts);
+      remove(ghostPlayersList[ghostPlayersList.length - 1]);
     }
   }
 
@@ -214,9 +209,6 @@ class PacmanWorld extends Forge2DWorld
   Future<void> onLoad() async {
     _timerSet = false;
     now = DateTime.now().millisecondsSinceEpoch;
-    //datetimeStartedMillis = now;
-    // Used to keep track of when the level started, so that we later can
-    // calculate how long time it took to finish the level.
     _levelCompleteTimeMillis = -1;
 
     play(SfxType.startMusic);

@@ -66,23 +66,30 @@ class Ghost extends GameCharacter {
   }
 
   void setScared() {
-    current = CharacterState.scared;
-    world.allGhostScaredTimeLatest = world.now;
+    if (!world.gameWonOrLost()) {
+      if (current != CharacterState.deadGhost) {
+        // if dead, need to continue dead animation without physics applying, then get sequenced to scared via standard sequence code
+        current = CharacterState.scared;
+      }
+      world.allGhostScaredTimeLatest = world.now;
+    }
   }
 
   void setDead() {
-    current = CharacterState.deadGhost;
-    add(ReturnHomeEffect(kGhostStartLocation));
-    _ghostDeadTimeLatest = world.now;
-    if (multipleSpawningGhosts) {
-      world.remove(this);
-    } else {
-      //Move ball way offscreen. Stops any physics interactions or collisions
-      //Further physics doesn't apply in deadGhost state
-      setUnderlyingBallPosition(kOffScreenLocation +
-          Vector2.random() /
-              100); //will get moved to right position later by other code in sequence checker
-      //setUnderlyingBallStatic();
+    if (!world.gameWonOrLost()) {
+      current = CharacterState.deadGhost;
+      add(ReturnHomeEffect(kGhostStartLocation));
+      _ghostDeadTimeLatest = world.now;
+      if (multipleSpawningGhosts) {
+        world.remove(this);
+      } else {
+        //Move ball way offscreen. Stops any physics interactions or collisions
+        //Further physics doesn't apply in deadGhost state
+        setUnderlyingBallPosition(kOffScreenLocation +
+            Vector2.random() /
+                100); //will get moved to right position later by other code in sequence checker
+        //setUnderlyingBallStatic();
+      }
     }
   }
 

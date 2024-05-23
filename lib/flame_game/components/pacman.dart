@@ -43,37 +43,42 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   }
 
   void eat() {
-    if (current != CharacterState.eating) {
-      //first time
-      _pacmanSpecialStartEatingTimeLatest = world.now;
+    if (current != CharacterState.deadPacman) {
+      if (current != CharacterState.eating) {
+        //first time
+        _pacmanSpecialStartEatingTimeLatest = world.now;
+      }
+      current = CharacterState.eating;
+      _pacmanEatingTimeLatest = world.now;
+
+      int unroundedMouthOpenTime =
+          2 * kPacmanHalfEatingResetTimeMillis + _pacmanEatingTimeLatest;
+
+      //ensure animation end synced up with turned off eating state, so move forward time by a few milliseconds
+      _targetRoundedMouthOpenTime = roundUpToMult(
+              unroundedMouthOpenTime - _pacmanSpecialStartEatingTimeLatest,
+              2 * kPacmanHalfEatingResetTimeMillis) +
+          _pacmanSpecialStartEatingTimeLatest;
     }
-    current = CharacterState.eating;
-    _pacmanEatingTimeLatest = world.now;
-
-    int unroundedMouthOpenTime =
-        2 * kPacmanHalfEatingResetTimeMillis + _pacmanEatingTimeLatest;
-
-    //ensure animation end synced up with turned off eating state, so move forward time by a few milliseconds
-    _targetRoundedMouthOpenTime = roundUpToMult(
-            unroundedMouthOpenTime - _pacmanSpecialStartEatingTimeLatest,
-            2 * kPacmanHalfEatingResetTimeMillis) +
-        _pacmanSpecialStartEatingTimeLatest;
   }
 
   void handleTwoCharactersMeet(PositionComponent other) {
-    if (other is MiniPellet ||
-        other is SuperPellet ||
-        other is MiniPelletCircle ||
-        other is SuperPelletCircle) {
-      handleEatingPellets(other);
-    } else if (other is Ghost) {
-      //If turn on collision callbacks in physicsBall this would be belt and braces. Right now not
-      handlePacmanMeetsGhost(other);
+    if (current != CharacterState.deadPacman) {
+      if (other is MiniPellet ||
+          other is SuperPellet ||
+          other is MiniPelletCircle ||
+          other is SuperPelletCircle) {
+        handleEatingPellets(other);
+      } else if (other is Ghost) {
+        //If turn on collision callbacks in physicsBall this would be belt and braces. Right now not
+        handlePacmanMeetsGhost(other);
+      }
     }
   }
 
   void handlePacmanMeetsGhost(Ghost ghost) {
-    if (ghost.current == CharacterState.deadGhost) {
+    if (ghost.current == CharacterState.deadGhost ||
+        current == CharacterState.deadPacman) {
       //nothing, but need to keep if condition
     } else if (ghost.current == CharacterState.scared ||
         ghost.current == CharacterState.scaredIsh) {
@@ -104,52 +109,57 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   }
 
   void pacmanEatsGhost(Ghost ghost) {
-    //pacman visuals
-    world.play(SfxType.eatGhost);
-    eat();
+    if (current != CharacterState.deadPacman) {
+      //pacman visuals
+      world.play(SfxType.eatGhost);
+      eat();
 
-    //ghost impact
-    ghost.setDead();
+      //ghost impact
+      ghost.setDead();
 
-    //other impact
-    if (multipleSpawningPacmans) {
-      //world.addPacman(getUnderlyingBallPosition() + Vector2.random() / 100);
-      world.add(Pacman(position: position + Vector2.random() / 100));
+      //other impact
+      if (multipleSpawningPacmans) {
+        //world.addPacman(getUnderlyingBallPosition() + Vector2.random() / 100);
+        world.add(Pacman(position: position + Vector2.random() / 100));
+      }
     }
   }
 
   void ghostKillsPacman() {
-    if (world.physicsOn) {
-      //prevent multiple hits
+    if (current != CharacterState.deadPacman) {
+      if (world.physicsOn) {
+        //prevent multiple hits
 
-      world.play(SfxType.pacmanDeath);
-      current = CharacterState.deadPacman;
+        world.play(SfxType.pacmanDeath);
+        current = CharacterState.deadPacman;
 
-      if (world.pacmanPlayersList.length == 1 ||
-          numberOfAlivePacman(world.pacmanPlayersList) == 0) {
-        world.physicsOn = false;
-        Future.delayed(
-            const Duration(milliseconds: kPacmanDeadResetTimeMillis + 100), () {
-          //100 buffer
-          if (!world.physicsOn) {
-            //prevent multiple resets
+        if (world.pacmanPlayersList.length == 1 ||
+            numberOfAlivePacman(world.pacmanPlayersList) == 0) {
+          world.physicsOn = false;
+          Future.delayed(
+              const Duration(milliseconds: kPacmanDeadResetTimeMillis + 100),
+              () {
+            //100 buffer
+            if (!world.physicsOn) {
+              //prevent multiple resets
 
-            world.addDeath(); //score counting deaths
-            setPosition(kPacmanStartLocation);
-            world.trimToThreeGhosts();
-            for (var i = 0; i < world.ghostPlayersList.length; i++) {
-              world.ghostPlayersList[i].setStartPositionAfterPacmanDeath();
+              world.addDeath(); //score counting deaths
+              setPosition(kPacmanStartLocation);
+              world.trimToThreeGhosts();
+              for (var i = 0; i < world.ghostPlayersList.length; i++) {
+                world.ghostPlayersList[i].setStartPositionAfterPacmanDeath();
+              }
+              current = CharacterState.normal;
+              world.physicsOn = true;
             }
-            current = CharacterState.normal;
-            world.physicsOn = true;
-          }
-        });
-      } else {
-        assert(multipleSpawningPacmans);
-        Future.delayed(const Duration(milliseconds: kPacmanDeadResetTimeMillis),
-            () {
-          world.remove(this);
-        });
+          });
+        } else {
+          assert(multipleSpawningPacmans);
+          Future.delayed(
+              const Duration(milliseconds: kPacmanDeadResetTimeMillis), () {
+            world.remove(this);
+          });
+        }
       }
     }
   }
