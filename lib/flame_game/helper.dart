@@ -163,11 +163,10 @@ void setStatusBarColor(color) {
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
     statusBarColor: color, // Status bar color
   ));
-  targetTitleBarColor = color;
 }
 
-void fixTitle() {
-  fixTitleReal(); //either from web or stub
+void fixTitle(Color color) {
+  fixTitleReal(color); //either from web or stub
 }
 
 int roundUpToMult(int x, int roundUpMult) {

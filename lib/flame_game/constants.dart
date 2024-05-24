@@ -5,12 +5,6 @@ import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'dart:core';
 
-//global variables
-//bool gameRunningFailsafeIndicator = false;
-// ignore: prefer_const_constructors
-Color targetTitleBarColor = Color(0xffa2fff3);
-
-//constants
 const String appTitle = "Pacman ROLL";
 //const debugMode = false;
 const bool mazeOn = true;
@@ -91,6 +85,9 @@ final Paint yellowPacmanPaint = Paint()
 final Paint blackBackgroundPaint = Paint()
   ..color = palette.flameGameBackground.color;
 final Paint transparentPaint = Paint()..color = const Color(0x00000000);
+
+const black = Color(0xff000000);
+const lightBluePMR = Color(0xffa2fff3);
 
 const pacmanRectSize = 50;
 final Rect pacmanRect = Rect.fromCenter(

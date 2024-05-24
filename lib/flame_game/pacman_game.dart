@@ -85,6 +85,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
   }
 
   void winOrLoseGameListener() {
+    assert(world.pelletsRemainingNotifier.value > 0);
     world.numberOfDeathsNotifier.addListener(() {
       if (world.numberOfDeathsNotifier.value >= level.maxAllowedDeaths) {
         handleLoseGame();
@@ -148,7 +149,10 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
     overlays.add(GameScreen.backButtonKey);
     overlays.add(GameScreen.statusOverlay);
     setStatusBarColor(palette.flameGameBackground.color);
-    fixTitle();
+    fixTitle(black);
+    Future.delayed(const Duration(seconds: 1), () {
+        fixTitle(black);
+      });
     WakelockPlus.toggle(enable: true);
   }
 
@@ -157,7 +161,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
     //gameRunningFailsafeIndicator = false;
     cleanOverlays();
     setStatusBarColor(palette.backgroundMain.color);
-    fixTitle();
+    fixTitle(lightBluePMR);
     WakelockPlus.toggle(enable: false);
     audioController.stopAllSfx();
     super.onRemove();

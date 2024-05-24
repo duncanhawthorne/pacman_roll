@@ -34,7 +34,7 @@ void main() async {
 
   pacmanSprites.precachePacmanAtFrac(); //start pre-load now and store
 
-  fixTitle();
+  fixTitle(lightBluePMR);
 
   //for (int i = 0; i < 3; i++) {
   // Future.delayed(Duration(seconds: i), () {

@@ -19,6 +19,7 @@ import '../style/palette.dart';
 /// It mostly sets up the overlays (widgets shown on top of the Flame game) and
 /// the gets the [AudioController] from the context and passes it in to the
 /// [PacmanGame] class so that it can play audio.
+
 class GameScreen extends StatelessWidget {
   const GameScreen({required this.level, super.key});
 
@@ -34,92 +35,95 @@ class GameScreen extends StatelessWidget {
     context.watch<Palette>();
     //setStatusBarColor(palette.flameGameBackground.color);
     final audioController = context.read<AudioController>();
-    return Scaffold(
-      body: GameWidget<PacmanGame>(
-        key: const Key('play session'),
-        game: PacmanGame(
-          level: level,
-          playerProgress: context.read<PlayerProgress>(),
-          audioController: audioController,
-        ),
-        overlayBuilderMap: {
-          backButtonKey: (BuildContext context, PacmanGame game) {
-            return Positioned(
-              top: 20,
-              left: 30,
-              child: NesButton(
-                type: NesButtonType.normal,
-                onPressed: () {
-                  GoRouter.of(context).go("/");
-                  //gameRunningFailsafeIndicator = false;
-                  //setStatusBarColor(palette.backgroundMain.color);
-                  //fixTitle();
-                },
-                child: NesIcon(
-                    iconData: NesIcons.leftArrowIndicator,
-                    size: const Size(15, 15)),
-              ),
-            );
-          },
-          statusOverlay: (BuildContext context, PacmanGame game) {
-            return Positioned(
-              top: 20,
-              right: 30,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  ValueListenableBuilder<int>(
-                    builder: (BuildContext context, int value, Widget? child) {
-                      return Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 2, 0, 8),
-                        child: Text(
-                            "Lives: ${3 - game.world.numberOfDeathsNotifier.value}",
-                            style: const TextStyle(
-                                fontSize: 12,
-                                color: Colors.white,
-                                fontFamily: 'Press Start 2P')),
-                      );
-                    },
-                    valueListenable: game.world.numberOfDeathsNotifier,
-                  ),
-                  ElapsedTimeDisplay(
-                    startTime: DateTime.now(), //actually ignored
-                    interval: const Duration(milliseconds: 100),
-                    style: const TextStyle(
-                        fontSize: 12,
-                        color: Colors.white,
-                        fontFamily: 'Press Start 2P'),
-                    formatter: (elapsedTime) {
-                      /*
-                      String secondsStr =
-                          (elapsedTime.minutes * 60 + elapsedTime.seconds)
-                              .toString();
-                      String hundredthSecondsStr =
-                          (elapsedTime.milliseconds / 100)
-                              .truncate()
-                              .toString();
-                       */
-                      String timeText = game.secondsElapsedText();
-                      return 'Time: $timeText';
-                    },
-                  ),
-                ],
-              ),
-            );
-          },
-          loseDialogKey: (BuildContext context, PacmanGame game) {
-            return GameLoseDialog(
-              level: level,
-              levelCompletedIn: -1, //disabled
-            );
-          },
-          wonDialogKey: (BuildContext context, PacmanGame game) {
-            return GameWonDialog(
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
+        body: GameWidget<PacmanGame>(
+          key: const Key('play session'),
+          game: PacmanGame(
+            level: level,
+            playerProgress: context.read<PlayerProgress>(),
+            audioController: audioController,
+          ),
+          overlayBuilderMap: {
+            backButtonKey: (BuildContext context, PacmanGame game) {
+              return Positioned(
+                top: 20,
+                left: 30,
+                child: NesButton(
+                  type: NesButtonType.normal,
+                  onPressed: () {
+                    GoRouter.of(context).go("/");
+                    //gameRunningFailsafeIndicator = false;
+                    //setStatusBarColor(palette.backgroundMain.color);
+                    //fixTitle();
+                  },
+                  child: NesIcon(
+                      iconData: NesIcons.leftArrowIndicator,
+                      size: const Size(15, 15)),
+                ),
+              );
+            },
+            statusOverlay: (BuildContext context, PacmanGame game) {
+              return Positioned(
+                top: 20,
+                right: 30,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    ValueListenableBuilder<int>(
+                      builder: (BuildContext context, int value, Widget? child) {
+                        return Padding(
+                          padding: const EdgeInsets.fromLTRB(0, 2, 0, 8),
+                          child: Text(
+                              "Lives: ${3 - game.world.numberOfDeathsNotifier.value}",
+                              style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.white,
+                                  fontFamily: 'Press Start 2P')),
+                        );
+                      },
+                      valueListenable: game.world.numberOfDeathsNotifier,
+                    ),
+                    ElapsedTimeDisplay(
+                      startTime: DateTime.now(), //actually ignored
+                      interval: const Duration(milliseconds: 100),
+                      style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.white,
+                          fontFamily: 'Press Start 2P'),
+                      formatter: (elapsedTime) {
+                        /*
+                        String secondsStr =
+                            (elapsedTime.minutes * 60 + elapsedTime.seconds)
+                                .toString();
+                        String hundredthSecondsStr =
+                            (elapsedTime.milliseconds / 100)
+                                .truncate()
+                                .toString();
+                         */
+                        String timeText = game.secondsElapsedText();
+                        return 'Time: $timeText';
+                      },
+                    ),
+                  ],
+                ),
+              );
+            },
+            loseDialogKey: (BuildContext context, PacmanGame game) {
+              return GameLoseDialog(
                 level: level,
-                levelCompletedIn: game.levelCompleteTimeSeconds(),
-                game: game);
+                levelCompletedIn: -1, //disabled
+              );
+            },
+            wonDialogKey: (BuildContext context, PacmanGame game) {
+              return GameWonDialog(
+                  level: level,
+                  levelCompletedIn: game.levelCompleteTimeSeconds(),
+                  game: game);
+            },
           },
-        },
+        ),
       ),
     );
   }

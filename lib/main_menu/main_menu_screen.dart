@@ -6,6 +6,7 @@ import '../audio/audio_controller.dart';
 // ignore: unused_import
 import '../audio/sounds.dart';
 import '../settings/settings.dart';
+import '../style/palette.dart';
 import '../style/wobbly_button.dart';
 import '../style/responsive_screen.dart';
 import '../flame_game/constants.dart';
@@ -16,8 +17,8 @@ class MainMenuScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //final palette = context.watch<Palette>();
-    //setStatusBarColor(palette.backgroundMain.color);
+    final palette = context.watch<Palette>();
+    setStatusBarColor(palette.backgroundMain.color);
     final settingsController = context.watch<SettingsController>();
     // ignore: unused_local_variable
     final audioController = context.watch<AudioController>();

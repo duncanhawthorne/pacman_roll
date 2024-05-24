@@ -3,20 +3,20 @@ import 'constants.dart';
 import 'package:web/web.dart' as web;
 import 'package:flutter/services.dart';
 
-void fixTitleReal() {
+void fixTitleReal(Color color) {
   if (isiOSMobile) {
-    fixTitle1();
+    fixTitle1(color);
     fixTitle2();
     fixTitle3();
   }
 }
 
-void fixTitle1() {
+void fixTitle1(Color color) {
   //https://github.com/flutter/flutter/issues/98248
   if (true) {
     SystemChrome.setApplicationSwitcherDescription(ApplicationSwitcherDescription(
         label: appTitle,
-        primaryColor: targetTitleBarColor
+        primaryColor: color
             .value //Theme.of(context).primaryColor.value, // This line is required
         ));
   }
