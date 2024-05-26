@@ -23,7 +23,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   //await Flame.device.setLandscape();
-cd
+
   if (fbOn) {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
