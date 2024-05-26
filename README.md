@@ -10,6 +10,8 @@ Pacman ROLL is Pacman plus physics.
 * Play for speed to top the leaderboard. 
 * Play Pacman ROLL at https://pacman-roll.web.app  
 
+![](https://raw.githubusercontent.com/duncanhawthorne/pacman-roll/main/pacman_roll.png)
+
 How to play
 -----------
 
