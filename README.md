@@ -1,8 +1,4 @@
 # Pacman ROLL
-
-https://pacman-roll.web.app 
-
-
 Pacman ROLL is Pacman plus physics.
 
 * Rotate the maze and gravity will do its work on Pacman and the ghosts.
