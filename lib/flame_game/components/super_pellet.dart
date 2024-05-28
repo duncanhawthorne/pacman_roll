@@ -9,9 +9,8 @@ class SuperPelletCircle extends CircleComponent
     with HasWorldReference<PacmanWorld> {
   SuperPelletCircle({required super.position})
       : super(
-            radius: singleSquareWidth() *
-                miniPelletAndSuperPelletScaleFactor /
-                2,
+            radius:
+                singleSquareWidth() * miniPelletAndSuperPelletScaleFactor / 2,
             anchor: Anchor.center);
 
   @override

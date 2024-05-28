@@ -72,7 +72,8 @@ class GameScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     ValueListenableBuilder<int>(
-                      builder: (BuildContext context, int value, Widget? child) {
+                      builder:
+                          (BuildContext context, int value, Widget? child) {
                         return Padding(
                           padding: const EdgeInsets.fromLTRB(0, 2, 0, 8),
                           child: Text(
@@ -93,16 +94,8 @@ class GameScreen extends StatelessWidget {
                           color: Colors.white,
                           fontFamily: 'Press Start 2P'),
                       formatter: (elapsedTime) {
-                        /*
-                        String secondsStr =
-                            (elapsedTime.minutes * 60 + elapsedTime.seconds)
-                                .toString();
-                        String hundredthSecondsStr =
-                            (elapsedTime.milliseconds / 100)
-                                .truncate()
-                                .toString();
-                         */
-                        String timeText = game.secondsElapsedText();
+                        String timeText =
+                            game.stopwatchSeconds().toStringAsFixed(1);
                         return 'Time: $timeText';
                       },
                     ),
@@ -119,7 +112,7 @@ class GameScreen extends StatelessWidget {
             wonDialogKey: (BuildContext context, PacmanGame game) {
               return GameWonDialog(
                   level: level,
-                  levelCompletedIn: game.levelCompleteTimeSeconds(),
+                  levelCompletedIn: game.stopwatchSeconds(),
                   game: game);
             },
           },

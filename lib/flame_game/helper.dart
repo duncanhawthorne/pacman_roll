@@ -1,3 +1,4 @@
+import 'components/ghost.dart';
 import 'components/pacman.dart';
 import 'components/pacman_sprites.dart';
 import 'pacman_world.dart';
@@ -33,8 +34,8 @@ int getMazeIntWidth() {
 
 int numberOfAlivePacman(List<Pacman> pacmanPlayersList) {
   int result = 0;
-  for (int i = 0; i<pacmanPlayersList.length; i++) {
-    if (pacmanPlayersList[i].current != CharacterState.deadPacman) {
+  for (Pacman pacman in pacmanPlayersList) {
+    if (pacman.current != CharacterState.deadPacman) {
       result++;
     }
   }
@@ -106,16 +107,12 @@ double getTargetSirenVolume(PacmanWorld world) {
   }
   double tmpSirenVolume = 0;
   try {
-    for (int i = 0; i < world.ghostPlayersList.length; i++) {
-      tmpSirenVolume +=
-          world.ghostPlayersList[i].current == CharacterState.normal
-              ? world.ghostPlayersList[i].getVelocity().length /
-                  world.ghostPlayersList.length
-              : 0;
+    for (Ghost ghost in world.ghostPlayersList) {
+      tmpSirenVolume += ghost.current == CharacterState.normal
+          ? ghost.getVelocity().length / world.ghostPlayersList.length
+          : 0;
     }
-    if ((world.pacmanPlayersList.isNotEmpty &&
-            world.pacmanPlayersList[0].current == CharacterState.deadPacman) ||
-        !world.physicsOn) {
+    if (numberOfAlivePacman(world.pacmanPlayersList) == 0 || !world.physicsOn) {
       tmpSirenVolume = 0;
     }
   } catch (e) {

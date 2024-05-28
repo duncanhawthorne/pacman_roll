@@ -9,8 +9,7 @@ import 'dart:core';
 
 import 'package:flame/collisions.dart';
 
-/// The [GameCharacter] is the component that the physical player of the game is
-/// controlling.
+/// The [GameCharacter] is the generic object that is linked to a [PhysicsBall]
 class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     with
         //CollisionCallbacks,
@@ -41,8 +40,9 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   void setPosition(Vector2 targetLoc) {
     _setUnderlyingBallPosition(targetLoc);
     position.setFrom(targetLoc);
-    _lastPosition.setFrom(targetLoc); //Fixes bug. If body not initialised, which happens after setUnderlyingBallPosition, will revert to lastPosition so need that to be current position
-    _lastVelocity.setFrom(Vector2(0,0));
+    _lastPosition.setFrom(
+        targetLoc); //Fixes bug. If body not initialised, which happens after setUnderlyingBallPosition, will revert to lastPosition so need that to be current position
+    _lastVelocity.setFrom(Vector2(0, 0));
   }
 
   /*
@@ -70,7 +70,8 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   }
 
   void setUnderlyingBallPosition(Vector2 targetLoc) {
-    assert(current == CharacterState.deadGhost); //shouldn't be using this function otherwise
+    assert(current ==
+        CharacterState.deadGhost); //shouldn't be using this function otherwise
     _setUnderlyingBallPosition(targetLoc);
   }
 
@@ -95,12 +96,14 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     if (position.x > kRightPortalLocation.x) {
       Vector2 startVel = _getUnderlyingBallVelocity(); //before destroy ball
       _setUnderlyingBallPosition(kLeftPortalLocation);
-      _lastPosition.setFrom(kLeftPortalLocation); //else _lastVelocity calc produces nonsense
+      _lastPosition.setFrom(
+          kLeftPortalLocation); //else _lastVelocity calc produces nonsense
       _setUnderlyingVelocity(startVel);
     } else if (position.x < kLeftPortalLocation.x) {
       Vector2 startVel = _getUnderlyingBallVelocity();
       _setUnderlyingBallPosition(kRightPortalLocation); //before destroy ball
-      _lastPosition.setFrom(kRightPortalLocation); //else _lastVelocity calc produces nonsense
+      _lastPosition.setFrom(
+          kRightPortalLocation); //else _lastVelocity calc produces nonsense
       _setUnderlyingVelocity(startVel);
     }
   }
@@ -151,8 +154,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   @override
   void update(double dt) {
     super.update(dt);
-    _lastVelocity.setFrom(
-        (position - _lastPosition) / dt);
+    _lastVelocity.setFrom((position - _lastPosition) / dt);
     _lastPosition.setFrom(position);
   }
 }

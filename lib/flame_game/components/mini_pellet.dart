@@ -20,15 +20,11 @@ class MiniPelletCircle extends CircleComponent
     super.onLoad();
     CircleHitbox x = CircleHitbox(
         isSolid: true,
-        position: Vector2.all(singleSquareWidth() *
-            miniPelletAndSuperPelletScaleFactor /
-            2 /
-            3),
+        position: Vector2.all(
+            singleSquareWidth() * miniPelletAndSuperPelletScaleFactor / 2 / 3),
         anchor: Anchor.center,
-        radius: singleSquareWidth() *
-            miniPelletAndSuperPelletScaleFactor /
-            2 /
-            3,
+        radius:
+            singleSquareWidth() * miniPelletAndSuperPelletScaleFactor / 2 / 3,
         collisionType: CollisionType.passive);
     add(x);
     world.pelletsRemainingNotifier.value += 1;

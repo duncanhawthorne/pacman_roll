@@ -15,8 +15,8 @@ List<Component> pelletsAndSuperPellets(ValueNotifier pelletsRemainingNotifier) {
   List<Component> result = [];
   pelletsRemainingNotifier.value = 0;
   double scale = singleSquareWidth();
-  for (var i = 0; i < wrappedMazeLayout.length; i++) {
-    for (var j = 0; j < wrappedMazeLayout[i].length; j++) {
+  for (int i = 0; i < wrappedMazeLayout.length; i++) {
+    for (int j = 0; j < wrappedMazeLayout[i].length; j++) {
       Vector2 center = Vector2(j + 1 / 2 - wrappedMazeLayout[0].length / 2,
               i + 1 / 2 - wrappedMazeLayout.length / 2) *
           scale;
@@ -70,8 +70,8 @@ List<Component> mazeWalls() {
   List<Component> result = [];
   double scale = singleSquareWidth();
   if (mazeOn) {
-    for (var i = 0; i < wrappedMazeLayout.length; i++) {
-      for (var j = 0; j < wrappedMazeLayout[i].length; j++) {
+    for (int i = 0; i < wrappedMazeLayout.length; i++) {
+      for (int j = 0; j < wrappedMazeLayout[i].length; j++) {
         Vector2 center = Vector2(j + 1 / 2 - wrappedMazeLayout[0].length / 2,
                 i + 1 / 2 - wrappedMazeLayout.length / 2) *
             scale;
@@ -91,8 +91,8 @@ List<Component> mazeWalls() {
       }
     }
 
-    for (var i = 0; i < wrappedMazeLayout.length; i++) {
-      for (var j = 0; j < wrappedMazeLayout[i].length; j++) {
+    for (int i = 0; i < wrappedMazeLayout.length; i++) {
+      for (int j = 0; j < wrappedMazeLayout[i].length; j++) {
         Vector2 center = Vector2(j + 1 / 2 - wrappedMazeLayout[0].length / 2,
                 i + 1 / 2 - wrappedMazeLayout.length / 2) *
             scale;

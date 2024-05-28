@@ -29,7 +29,7 @@ class Ghost extends GameCharacter {
   int _ghostDeadTimeLatest = 0; //a long time ago
   int ghostSpriteChooserNumber = 100;
 
-  Future<Map<CharacterState, SpriteAnimation>?> getAnimations() async {
+  Future<Map<CharacterState, SpriteAnimation>?> _getAnimations() async {
     return {
       CharacterState.normal: SpriteAnimation.spriteList(
         [
@@ -105,7 +105,7 @@ class Ghost extends GameCharacter {
     world.allGhostScaredTimeLatest = 0;
   }
 
-  void ghostDeadScaredScaredIshNormalSequence() {
+  void _ghostDeadScaredScaredIshNormalSequence() {
     if (current == CharacterState.deadGhost) {
       if (world.now - _ghostDeadTimeLatest > kGhostResetTimeMillis) {
         if (!world.gameWonOrLost() && _ghostDeadTimeLatest != 0) {
@@ -135,7 +135,7 @@ class Ghost extends GameCharacter {
   Future<void> onLoad() async {
     super.onLoad();
     world.ghostPlayersList.add(this);
-    animations = await getAnimations();
+    animations = await _getAnimations();
     current = CharacterState.scared;
   }
 
@@ -148,7 +148,7 @@ class Ghost extends GameCharacter {
 
   @override
   void update(double dt) {
-    ghostDeadScaredScaredIshNormalSequence();
+    _ghostDeadScaredScaredIshNormalSequence();
 
     if (world.physicsOn) {
       if (current == CharacterState.deadGhost) {

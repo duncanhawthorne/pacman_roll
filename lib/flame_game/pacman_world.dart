@@ -137,14 +137,14 @@ class PacmanWorld extends Forge2DWorld
   }
 
   void winGameWorldTidy() {
-    Future.delayed(
-        const Duration(milliseconds: kPacmanHalfEatingResetTimeMillis * 2),
-            () {
-          play(SfxType.endMusic);
-        });
+    //Future.delayed(
+    //    const Duration(milliseconds: kPacmanHalfEatingResetTimeMillis * 2), () {
+    //  play(SfxType.endMusic);
+    //});
+    play(SfxType.endMusic);
     trimToThreeGhosts();
-    for (int i = 0; i < ghostPlayersList.length; i++) {
-      ghostPlayersList[i].setPositionForGameEnd();
+    for (Ghost ghost in ghostPlayersList) {
+      ghost.setPositionForGameEnd();
     }
   }
 
@@ -179,7 +179,7 @@ class PacmanWorld extends Forge2DWorld
   @override
   void onDragStart(DragStartEvent event) {
     super.onDragStart(event);
-    game.startTimer(); //starts off timer first time drag
+    game.stopwatch.start();
     Vector2 eventVector = event.canvasPosition - game.canvasSize / 2;
     if (iOS) {
       _lastDragAngle = 10;

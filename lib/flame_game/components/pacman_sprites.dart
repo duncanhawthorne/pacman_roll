@@ -5,7 +5,6 @@ import 'dart:ui';
 import '../constants.dart';
 
 class PacmanSprites {
-
   Picture _pacmanRecorderAtFrac(int mouthWidthAsInt) {
     double mouthWidth = mouthWidthAsInt / pacmanRenderFracIncrementsNumber;
     mouthWidth = max(0, min(1, mouthWidth));
@@ -40,11 +39,10 @@ class PacmanSprites {
     return finalItems;
   }
 
-
   Future<List<Sprite>> pacmanEatingSprites() async {
     List<Future<Sprite>> lf = List<Future<Sprite>>.generate(
         pacmanEatingHalfFrames * 2, //open and close
-            (int index) =>
+        (int index) =>
             pacmanAtFrac((pacmanMouthWidthDefault - (index + 1)).abs()));
     return lf2fl(lf);
   }
@@ -52,11 +50,9 @@ class PacmanSprites {
   Future<List<Sprite>> pacmanDyingSprites() async {
     List<Future<Sprite>> lf = List<Future<Sprite>>.generate(
         pacmanDeadFrames + 1, //open and close
-            (int index) =>
-            pacmanAtFrac(pacmanMouthWidthDefault + index));
+        (int index) => pacmanAtFrac(pacmanMouthWidthDefault + index));
     return lf2fl(lf);
   }
-
 
   Future<void> precachePacmanAtFrac() async {
     for (int index = 0; index < pacmanRenderFracIncrementsNumber + 1; index++) {

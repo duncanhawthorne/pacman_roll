@@ -6,7 +6,6 @@ import 'constants.dart';
 import 'dart:convert';
 
 class Save {
-
   FirebaseFirestore? db = fbOn ? FirebaseFirestore.instance : null;
 
   Future<List<double>>? leaderboardWinTimesCache;
@@ -59,15 +58,14 @@ class Save {
       try {
         final docRef = db!.collection(summaryDB).doc("percentiles");
         await docRef.get().then(
-              (DocumentSnapshot doc) {
+          (DocumentSnapshot doc) {
             final gameEncodedTmp = doc.data() as Map<String, dynamic>;
             gameEncoded = gameEncodedTmp["data"];
           },
           onError: (e) => p("Error getting document: $e"),
         );
-      }
-      catch(e) {
-        p(["no matching fb entries",e]);
+      } catch (e) {
+        p(["no matching fb entries", e]);
       }
     }
     return gameEncoded;
@@ -93,13 +91,13 @@ class Save {
                 allFirebaseEntries.add(singleEntry);
               }
             } catch (e) {
-              p(["ill formed firebase entry",e]);
+              p(["ill formed firebase entry", e]);
             }
           }
           return allFirebaseEntries;
         }
       } catch (e) {
-        p(["full firebase entries error",e]);
+        p(["full firebase entries error", e]);
       }
     }
     return allFirebaseEntries;
@@ -141,7 +139,7 @@ class Save {
 
   Future<Map<String, dynamic>> downloadLeaderboardSummary() async {
     String firebaseDownloadCacheEncoded =
-    await save.firebasePullSummaryLeaderboard();
+        await save.firebasePullSummaryLeaderboard();
     Map<String, dynamic> gameTmp = {};
     if (firebaseDownloadCacheEncoded != "") {
       gameTmp = json.decode(firebaseDownloadCacheEncoded) ?? {};
@@ -159,7 +157,7 @@ class Save {
         leaderboardSummary = await downloadLeaderboardSummary();
       } catch (e) {
         //likely firebase database blank, i.e. first run
-        p(["ill-formed leaderboard",e]);
+        p(["ill-formed leaderboard", e]);
       }
 
       if (leaderboardSummary.isEmpty ||
@@ -184,5 +182,4 @@ class Save {
     }
     return leaderboardWinTimesTmp;
   }
-
 }

@@ -54,8 +54,8 @@ class GameWonDialog extends StatelessWidget {
             //  textAlign: TextAlign.center,
             //),
             FutureBuilder(
-                future: endText(game, levelCompletedIn),
-                initialData: timeText(game, levelCompletedIn),
+                future: _endText(levelCompletedIn),
+                initialData: _timeText(levelCompletedIn),
                 builder: (BuildContext context, AsyncSnapshot<String> text) {
                   return Text(
                     text.data!,
@@ -69,9 +69,6 @@ class GameWonDialog extends StatelessWidget {
               NesButton(
                 onPressed: () {
                   context.go('/');
-                  //gameRunningFailsafeIndicator = false;
-                  //setStatusBarColor(palette.backgroundMain.color);
-                  //fixTitle();
                 },
                 type: NesButtonType.primary,
                 child: const Text('Retry',
@@ -93,24 +90,25 @@ class GameWonDialog extends StatelessWidget {
   }
 }
 
-Future<String> endText(PacmanGame game, double value) async {
-
-  double x = fbOn ? percentile(await save.leaderboardWinTimesCache!, value) * 100 : 0.0;
+Future<String> _endText(double levelCompletedIn) async {
+  double x = fbOn
+      ? _percentile(await save.leaderboardWinTimesCache!, levelCompletedIn) *
+          100
+      : 0.0;
   String y =
-      "\nTime: ${value.toStringAsFixed(1)} seconds\n${!fbOn || (await save.leaderboardWinTimesCache)!.isEmpty ? "" : "\nRank: ${x == 0 ? "World Record" : "Top ${x.toStringAsFixed(0)}%"}\n"}";
+      "\nTime: ${levelCompletedIn.toStringAsFixed(1)} seconds\n${!fbOn || (await save.leaderboardWinTimesCache)!.isEmpty ? "" : "\nRank: ${x == 0 ? "World Record" : "Top ${x.toStringAsFixed(0)}%"}\n"}";
   return y;
 }
 
-String timeText(PacmanGame game, double value) {
+String _timeText(double levelCompletedIn) {
   String y =
-      "\nTime: ${value.toStringAsFixed(1)} seconds\n${!fbOn ? "" : "\nRank: Loading...\n"}";
+      "\nTime: ${levelCompletedIn.toStringAsFixed(1)} seconds\n${!fbOn ? "" : "\nRank: Loading...\n"}";
   return y;
 }
 
-
-double percentile(List<double> list, double value) {
-  List<double> newList = List<double>.from(list);
-  newList.add(value);
-  newList.sort();
-  return newList.indexOf(value) / newList.length;
+double _percentile(List<double> currentWinTimes, double levelCompletedIn) {
+  List<double> tmpList = List<double>.from(currentWinTimes);
+  tmpList.add(levelCompletedIn);
+  tmpList.sort();
+  return tmpList.indexOf(levelCompletedIn) / tmpList.length;
 }

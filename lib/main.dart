@@ -1,4 +1,3 @@
-
 import 'package:flame/flame.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -22,8 +21,6 @@ import 'firebase_options.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  //await Flame.device.setLandscape();
-
   if (fbOn) {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
@@ -34,14 +31,7 @@ void main() async {
   }
 
   pacmanSprites.precachePacmanAtFrac(); //start pre-load now and store
-
   fixTitle(lightBluePMR);
-
-  //for (int i = 0; i < 3; i++) {
-  // Future.delayed(Duration(seconds: i), () {
-  //    fixTitle();
-  //  });
-  //}
 
   FlutterNativeSplash.remove();
   await Flame.device.fullScreen();

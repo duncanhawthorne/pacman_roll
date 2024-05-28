@@ -23,7 +23,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   int _pacmanEatingTimeLatest = 0; //a long time ago
   int _pacmanEatingSoundTimeLatest = 0; //a long time ago
 
-  Future<Map<CharacterState, SpriteAnimation>?> getAnimations() async {
+  Future<Map<CharacterState, SpriteAnimation>?> _getAnimations() async {
     return {
       CharacterState.normal: SpriteAnimation.spriteList(
         [await pacmanSprites.pacmanAtFrac(pacmanMouthWidthDefault)],
@@ -42,7 +42,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     };
   }
 
-  void eat() {
+  void _eatAnimation() {
     if (current != CharacterState.deadPacman) {
       if (current != CharacterState.eating) {
         //first time
@@ -62,57 +62,64 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     }
   }
 
-  void handleTwoCharactersMeet(PositionComponent other) {
+  void _eatPelletSound() {
+    if (!world.gameWonOrLost()) {
+      if (_pacmanEatingSoundTimeLatest <
+          world.now - kPacmanHalfEatingResetTimeMillis * 2) {
+        _pacmanEatingSoundTimeLatest = world.now;
+        world.play(SfxType.waka);
+      }
+    }
+  }
+
+  void _onCollideWith(PositionComponent other) {
     if (current != CharacterState.deadPacman) {
       if (other is MiniPellet ||
           other is SuperPellet ||
           other is MiniPelletCircle ||
           other is SuperPelletCircle) {
-        handleEatingPellets(other);
+        _onCollideWithPellet(other);
       } else if (other is Ghost) {
         //If turn on collision callbacks in physicsBall this would be belt and braces. Right now not
-        handlePacmanMeetsGhost(other);
+        _onCollideWithGhost(other);
       }
     }
   }
 
-  void handlePacmanMeetsGhost(Ghost ghost) {
+  void _onCollideWithPellet(PositionComponent pellet) {
+    if (current != CharacterState.deadPacman) {
+      // can simultaneously eat pellet and die to ghost so don't want to do this if just died
+      world.remove(pellet); //do this first so checks based on game over apply
+      if (pellet is MiniPellet || pellet is MiniPelletCircle) {
+        _eatPelletSound();
+      } else {
+        //superPellet
+        world.play(SfxType.ghostsScared);
+        for (Ghost ghost in world.ghostPlayersList) {
+          ghost.setScared();
+        }
+      }
+      _eatAnimation();
+    }
+  }
+
+  void _onCollideWithGhost(Ghost ghost) {
     if (ghost.current == CharacterState.deadGhost ||
         current == CharacterState.deadPacman) {
       //nothing, but need to keep if condition
     } else if (ghost.current == CharacterState.scared ||
         ghost.current == CharacterState.scaredIsh) {
-      pacmanEatsGhost(ghost);
+      _eatGhost(ghost);
     } else {
-      ghostKillsPacman();
+      _dieFromGhost();
     }
   }
 
-  void handleEatingPellets(PositionComponent pellet) {
-    if (current != CharacterState.deadPacman) {
-      // can simultaneously eat pellet and die to ghost so don't want to do this if just died
-      if (pellet is MiniPellet || pellet is MiniPelletCircle) {
-        if (_pacmanEatingSoundTimeLatest <
-            world.now - kPacmanHalfEatingResetTimeMillis * 2) {
-          _pacmanEatingSoundTimeLatest = world.now;
-          world.play(SfxType.waka);
-        }
-      } else {
-        world.play(SfxType.ghostsScared);
-        for (int i = 0; i < world.ghostPlayersList.length; i++) {
-          world.ghostPlayersList[i].setScared();
-        }
-      }
-      eat();
-      world.remove(pellet);
-    }
-  }
-
-  void pacmanEatsGhost(Ghost ghost) {
+  void _eatGhost(Ghost ghost) {
     if (current != CharacterState.deadPacman) {
       //pacman visuals
       world.play(SfxType.eatGhost);
-      eat();
+      _eatAnimation();
 
       //ghost impact
       ghost.setDead();
@@ -125,7 +132,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     }
   }
 
-  void ghostKillsPacman() {
+  void _dieFromGhost() {
     if (current != CharacterState.deadPacman) {
       if (world.physicsOn) {
         //prevent multiple hits
@@ -146,8 +153,8 @@ class Pacman extends GameCharacter with CollisionCallbacks {
               world.numberOfDeathsNotifier.value++; //score counting deaths
               setPosition(kPacmanStartLocation);
               world.trimToThreeGhosts();
-              for (var i = 0; i < world.ghostPlayersList.length; i++) {
-                world.ghostPlayersList[i].setStartPositionAfterPacmanDeath();
+              for (Ghost ghost in world.ghostPlayersList) {
+                ghost.setStartPositionAfterPacmanDeath();
               }
               current = CharacterState.normal;
               world.physicsOn = true;
@@ -164,7 +171,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     }
   }
 
-  void pacmanEatingNormalSequence() {
+  void _pacmanEatingNormalSequence() {
     if (current == CharacterState.eating) {
       if (world.now > _targetRoundedMouthOpenTime) {
         current = CharacterState.normal;
@@ -173,19 +180,10 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   }
 
   @override
-  void onCollisionStart(
-    Set<Vector2> intersectionPoints,
-    PositionComponent other,
-  ) {
-    super.onCollisionStart(intersectionPoints, other);
-    handleTwoCharactersMeet(other);
-  }
-
-  @override
   Future<void> onLoad() async {
     super.onLoad();
     world.pacmanPlayersList.add(this);
-    animations = await getAnimations();
+    animations = await _getAnimations();
     current = CharacterState.normal;
     angle = 2 * pi / 2;
   }
@@ -197,13 +195,20 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   }
 
   @override
-  void update(double dt) {
-    pacmanEatingNormalSequence();
+  void onCollisionStart(
+    Set<Vector2> intersectionPoints,
+    PositionComponent other,
+  ) {
+    super.onCollisionStart(intersectionPoints, other);
+    _onCollideWith(other);
+  }
 
+  @override
+  void update(double dt) {
+    _pacmanEatingNormalSequence();
     if (world.physicsOn) {
       oneFrameOfPhysics();
     }
-
     super.update(dt);
   }
 }

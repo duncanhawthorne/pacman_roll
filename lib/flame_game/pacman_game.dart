@@ -2,7 +2,6 @@ import 'package:flame/camera.dart';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
-import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../audio/audio_controller.dart';
 import '../level_selection/levels.dart';
@@ -50,8 +49,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
   final AudioController audioController;
 
   String userString = "";
-  int? _datetimeStartedMillis;
-  int? _levelCompleteTimeMillis;
+  final stopwatch = Stopwatch();
 
   @override
   Color backgroundColor() => palette.flameGameBackground.color;
@@ -64,24 +62,12 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
     Map<String, dynamic> gameTmp = {};
     gameTmp = {};
     gameTmp["userString"] = userString;
-    gameTmp["levelCompleteTime"] = levelCompleteTimeSeconds();
+    gameTmp["levelCompleteTime"] = stopwatchSeconds();
     return json.encode(gameTmp);
   }
 
-  void startTimer() {
-    _datetimeStartedMillis ??= world.now;
-  }
-
-  String secondsElapsedText() {
-    return _datetimeStartedMillis == null
-        ? "0.0"
-        : ((world.now - _datetimeStartedMillis!) / 1000).toStringAsFixed(1);
-  }
-
-  double levelCompleteTimeSeconds() {
-    assert(_levelCompleteTimeMillis != null);
-    assert(_datetimeStartedMillis != null);
-    return (_levelCompleteTimeMillis! - _datetimeStartedMillis!) / 1000;
+  double stopwatchSeconds() {
+    return stopwatch.elapsed.inMilliseconds / 1000;
   }
 
   void winOrLoseGameListener() {
@@ -105,12 +91,9 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
     if (isGameLive()) {
       if (world.pelletsRemainingNotifier.value == 0) {
         world.winGameWorldTidy();
-
-        _levelCompleteTimeMillis = world.now;
-
-        if (levelCompleteTimeSeconds() > 10) {
-          save.firebasePushSingleScore(
-              userString, getEncodeCurrentGameState());
+        stopwatch.stop();
+        if (stopwatchSeconds() > 10) {
+          save.firebasePushSingleScore(userString, getEncodeCurrentGameState());
         }
         cleanOverlays();
         overlays.add(GameScreen.wonDialogKey);
@@ -119,7 +102,6 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
   }
 
   void handleLoseGame() {
-    //playerProgress.setLevelFinished(level.number, getCurrentOrCompleteLevelTimeSeconds().toInt());
     pauseEngine();
     audioController.stopAllSfx();
     cleanOverlays();
@@ -151,9 +133,9 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
     setStatusBarColor(palette.flameGameBackground.color);
     fixTitle(black);
     Future.delayed(const Duration(seconds: 1), () {
-        fixTitle(black);
-      });
-    WakelockPlus.toggle(enable: true);
+      fixTitle(black);
+    });
+    //WakelockPlus.toggle(enable: true);
   }
 
   @override
@@ -162,7 +144,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
     cleanOverlays();
     setStatusBarColor(palette.backgroundMain.color);
     fixTitle(lightBluePMR);
-    WakelockPlus.toggle(enable: false);
+    //WakelockPlus.toggle(enable: false);
     audioController.stopAllSfx();
     super.onRemove();
   }

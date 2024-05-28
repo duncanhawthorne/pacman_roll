@@ -63,11 +63,8 @@ pureVectorPacmanTwoAlt() {
             singleSquareWidth() *
             tan(1 / 2 * pacmanMouthWidthDefault * 2 * pi)),
     Vector2(0, 0),
-    Vector2(
-        1 * singleSquareWidth(),
-        1 *
-            singleSquareWidth() *
-            tan(1 / 2 * pacmanMouthWidthDefault * 2 * pi))
+    Vector2(1 * singleSquareWidth(),
+        1 * singleSquareWidth() * tan(1 / 2 * pacmanMouthWidthDefault * 2 * pi))
   ],
       anchor: Anchor.centerLeft,
       position: Vector2.all(singleSquareWidth() / 2),
