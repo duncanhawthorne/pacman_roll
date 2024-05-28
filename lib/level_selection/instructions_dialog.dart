@@ -1,7 +1,7 @@
 import 'package:flame/components.dart';
 import 'package:flame/widgets.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:google_fonts/google_fonts.dart';
+//import 'package:google_fonts/google_fonts.dart';
 import 'package:nes_ui/nes_ui.dart';
 
 class InstructionsDialog extends StatefulWidget {
@@ -19,10 +19,10 @@ class _InstructionsDialogState extends State<InstructionsDialog> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(
+        const Text(
           'Instructions',
           style: TextStyle(
-            fontFamily: GoogleFonts.pressStart2p().fontFamily,
+            fontFamily: 'Press Start 2P',
             fontSize: 25,
           ),
         ),

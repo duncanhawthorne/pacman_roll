@@ -110,7 +110,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
 
   void cleanOverlays() {
     overlays.remove(GameScreen.backButtonKey);
-    overlays.remove(GameScreen.statusOverlay);
+    overlays.remove(GameScreen.statusOverlayKey);
   }
 
   @override
@@ -129,7 +129,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
     //gameRunningFailsafeIndicator = true;
     userString = getRandomString(world.random, 15);
     overlays.add(GameScreen.backButtonKey);
-    overlays.add(GameScreen.statusOverlay);
+    overlays.add(GameScreen.statusOverlayKey);
     setStatusBarColor(palette.flameGameBackground.color);
     fixTitle(black);
     Future.delayed(const Duration(seconds: 1), () {

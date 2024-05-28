@@ -28,12 +28,11 @@ class GameScreen extends StatelessWidget {
   static const String loseDialogKey = 'lose_dialog';
   static const String wonDialogKey = 'won_dialog';
   static const String backButtonKey = 'back_buttton';
-  static const String statusOverlay = 'status_overlay';
+  static const String statusOverlayKey = 'status_overlay';
 
   @override
   Widget build(BuildContext context) {
     context.watch<Palette>();
-    //setStatusBarColor(palette.flameGameBackground.color);
     final audioController = context.read<AudioController>();
     return PopScope(
       canPop: false,
@@ -47,61 +46,10 @@ class GameScreen extends StatelessWidget {
           ),
           overlayBuilderMap: {
             backButtonKey: (BuildContext context, PacmanGame game) {
-              return Positioned(
-                top: 20,
-                left: 30,
-                child: NesButton(
-                  type: NesButtonType.normal,
-                  onPressed: () {
-                    GoRouter.of(context).go("/");
-                    //gameRunningFailsafeIndicator = false;
-                    //setStatusBarColor(palette.backgroundMain.color);
-                    //fixTitle();
-                  },
-                  child: NesIcon(
-                      iconData: NesIcons.leftArrowIndicator,
-                      size: const Size(15, 15)),
-                ),
-              );
+              return backButtonWidget(context, game);
             },
-            statusOverlay: (BuildContext context, PacmanGame game) {
-              return Positioned(
-                top: 20,
-                right: 30,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    ValueListenableBuilder<int>(
-                      builder:
-                          (BuildContext context, int value, Widget? child) {
-                        return Padding(
-                          padding: const EdgeInsets.fromLTRB(0, 2, 0, 8),
-                          child: Text(
-                              "Lives: ${3 - game.world.numberOfDeathsNotifier.value}",
-                              style: const TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.white,
-                                  fontFamily: 'Press Start 2P')),
-                        );
-                      },
-                      valueListenable: game.world.numberOfDeathsNotifier,
-                    ),
-                    ElapsedTimeDisplay(
-                      startTime: DateTime.now(), //actually ignored
-                      interval: const Duration(milliseconds: 100),
-                      style: const TextStyle(
-                          fontSize: 12,
-                          color: Colors.white,
-                          fontFamily: 'Press Start 2P'),
-                      formatter: (elapsedTime) {
-                        String timeText =
-                            game.stopwatchSeconds().toStringAsFixed(1);
-                        return 'Time: $timeText';
-                      },
-                    ),
-                  ],
-                ),
-              );
+            statusOverlayKey: (BuildContext context, PacmanGame game) {
+              return statusOverlayWidget(context, game);
             },
             loseDialogKey: (BuildContext context, PacmanGame game) {
               return GameLoseDialog(
@@ -120,4 +68,66 @@ class GameScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+Widget backButtonWidget(BuildContext context, PacmanGame game) {
+  return Positioned(
+    top: 20,
+    left: 30,
+    child: NesButton(
+      type: NesButtonType.normal,
+      onPressed: () {
+        GoRouter.of(context).go("/");
+      },
+      child: NesIcon(
+          iconData: NesIcons.leftArrowIndicator, size: const Size(15, 15)),
+    ),
+  );
+}
+
+Widget statusOverlayWidget(BuildContext context, PacmanGame game) {
+  return Positioned(
+    top: 20,
+    right: 30,
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        ValueListenableBuilder<int>(
+          builder: (BuildContext context, int value, Widget? child) {
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(0, 2, 0, 8),
+              child: Text(
+                  "Lives: ${3 - game.world.numberOfDeathsNotifier.value}",
+                  style: const TextStyle(
+                      fontSize: 12,
+                      color: Colors.white,
+                      fontFamily: 'Press Start 2P')),
+            );
+          },
+          valueListenable: game.world.numberOfDeathsNotifier,
+        ),
+        Row(
+          children: [
+            const Text('Time: ',
+                style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.white,
+                    fontFamily: 'Press Start 2P')),
+            ElapsedTimeDisplay(
+              startTime: DateTime.now(), //actually ignored
+              interval: const Duration(milliseconds: 100),
+              style: const TextStyle(
+                  fontSize: 12,
+                  color: Colors.white,
+                  fontFamily: 'Press Start 2P'),
+              formatter: (elapsedTime) {
+                String timeText = game.stopwatchSeconds().toStringAsFixed(1);
+                return timeText;
+              },
+            ),
+          ],
+        ),
+      ],
+    ),
+  );
 }

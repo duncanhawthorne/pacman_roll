@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'dart:math';
 import 'package:flame/components.dart';
 import 'dart:core';
-import 'package:sensors_plus/sensors_plus.dart';
+//import 'package:sensors_plus/sensors_plus.dart';
 import '../style/palette.dart';
 import 'package:flutter/services.dart';
 
@@ -131,6 +131,7 @@ String getRandomString(random, int length) =>
     String.fromCharCodes(Iterable.generate(
         length, (_) => chars.codeUnitAt(random.nextInt(chars.length))));
 
+/*
 void legacyHandleAcceleratorEvents(PacmanWorld world) {
   if (useGyro) {
     accelerometerEventStream().listen(
@@ -147,6 +148,7 @@ void legacyHandleAcceleratorEvents(PacmanWorld world) {
     );
   }
 }
+ */
 
 Vector2 getSanitizedScreenSize(Vector2 size) {
   if (size.x > size.y) {

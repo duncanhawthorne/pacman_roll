@@ -47,12 +47,7 @@ class GameWonDialog extends StatelessWidget {
             Text('You won',
                 style: Theme.of(context).textTheme.headlineMedium,
                 textAlign: TextAlign.center),
-            //Text(scoreboardItems.toString()),
             const SizedBox(height: 16),
-            //Text(
-            //  'You completed level ${level.number} in $levelCompletedIn seconds.',
-            //  textAlign: TextAlign.center,
-            //),
             FutureBuilder(
                 future: _endText(levelCompletedIn),
                 initialData: _timeText(levelCompletedIn),
@@ -62,8 +57,6 @@ class GameWonDialog extends StatelessWidget {
                     style: const TextStyle(fontFamily: 'Press Start 2P'),
                   );
                 }),
-            //Text(endText(game, levelCompletedIn),
-            //    style: const TextStyle(fontFamily: 'Press Start 2P')),
             const SizedBox(height: 16),
             if (true) ...[
               NesButton(
