@@ -30,7 +30,6 @@ void main() async {
     p("fb off");
   }
 
-  pacmanSprites.precachePacmanAtFrac(); //start pre-load now and store
   fixTitle(lightBluePMR);
 
   FlutterNativeSplash.remove();

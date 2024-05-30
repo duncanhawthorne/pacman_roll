@@ -84,6 +84,7 @@ class GameWonDialog extends StatelessWidget {
 }
 
 Future<String> _endText(double levelCompletedIn) async {
+  save.cacheLeaderboardNow(); //belts and braces. should have been called earlier in prep
   double x = fbOn
       ? _percentile(await save.leaderboardWinTimesCache!, levelCompletedIn) *
           100
