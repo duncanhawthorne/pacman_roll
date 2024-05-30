@@ -50,24 +50,18 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
 
   String userString = "";
   final stopwatch = Stopwatch();
+  double get stopwatchSeconds => stopwatch.elapsed.inMilliseconds / 1000;
+  bool get isGameLive => !paused && isLoaded && isMounted;
 
   @override
   Color backgroundColor() => palette.flameGameBackground.color;
-
-  bool isGameLive() {
-    return !paused && isLoaded && isMounted; //gameRunningFailsafeIndicator &&
-  }
 
   String getEncodeCurrentGameState() {
     Map<String, dynamic> gameTmp = {};
     gameTmp = {};
     gameTmp["userString"] = userString;
-    gameTmp["levelCompleteTime"] = stopwatchSeconds();
+    gameTmp["levelCompleteTime"] = stopwatchSeconds;
     return json.encode(gameTmp);
-  }
-
-  double stopwatchSeconds() {
-    return stopwatch.elapsed.inMilliseconds / 1000;
   }
 
   void winOrLoseGameListener() {
@@ -88,11 +82,11 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
   }
 
   void handleWinGame() {
-    if (isGameLive()) {
+    if (isGameLive) {
       if (world.pelletsRemainingNotifier.value == 0) {
         world.winGameWorldTidy();
         stopwatch.stop();
-        if (stopwatchSeconds() > 10) {
+        if (stopwatchSeconds > 10) {
           save.firebasePushSingleScore(userString, getEncodeCurrentGameState());
         }
         cleanOverlays();
@@ -115,7 +109,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
 
   @override
   Future<void> onGameResize(size) async {
-    Vector2 targetViewPortSize = getSanitizedScreenSize(size);
+    Vector2 targetViewPortSize = sanitizeScreenSize(size);
     camera.viewport = FixedResolutionViewport(
         resolution: Vector2(targetViewPortSize.x, targetViewPortSize.y));
     super.onGameResize(size);

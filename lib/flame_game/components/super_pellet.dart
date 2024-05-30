@@ -10,7 +10,7 @@ class SuperPelletCircle extends CircleComponent
   SuperPelletCircle({required super.position})
       : super(
             radius:
-                singleSquareWidth() * miniPelletAndSuperPelletScaleFactor / 2,
+                blockWidth() * miniPelletAndSuperPelletScaleFactor / 2,
             anchor: Anchor.center);
 
   @override
@@ -20,8 +20,8 @@ class SuperPelletCircle extends CircleComponent
       isSolid: true,
       collisionType: CollisionType.passive,
       position: Vector2.all(
-          singleSquareWidth() * miniPelletAndSuperPelletScaleFactor / 2),
-      radius: singleSquareWidth() * miniPelletAndSuperPelletScaleFactor / 2,
+          blockWidth() * miniPelletAndSuperPelletScaleFactor / 2),
+      radius: blockWidth() * miniPelletAndSuperPelletScaleFactor / 2,
       anchor: Anchor.center,
     );
     add(x);
@@ -42,7 +42,7 @@ class SuperPellet extends SpriteAnimationComponent
   SuperPellet() : super(size: spriteSize, anchor: Anchor.center);
 
   static final Vector2 spriteSize =
-      Vector2.all(singleSquareWidth() * miniPelletAndSuperPelletScaleFactor);
+      Vector2.all(blockWidth() * miniPelletAndSuperPelletScaleFactor);
   final speed = 0;
   Vector2 absPosition = Vector2(0, 0);
 

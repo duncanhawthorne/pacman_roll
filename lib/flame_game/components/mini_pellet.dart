@@ -9,7 +9,7 @@ class MiniPelletCircle extends CircleComponent
     with HasWorldReference<PacmanWorld> {
   MiniPelletCircle({required super.position})
       : super(
-            radius: singleSquareWidth() *
+            radius: blockWidth() *
                 miniPelletAndSuperPelletScaleFactor /
                 2 /
                 3,
@@ -21,10 +21,10 @@ class MiniPelletCircle extends CircleComponent
     CircleHitbox x = CircleHitbox(
         isSolid: true,
         position: Vector2.all(
-            singleSquareWidth() * miniPelletAndSuperPelletScaleFactor / 2 / 3),
+            blockWidth() * miniPelletAndSuperPelletScaleFactor / 2 / 3),
         anchor: Anchor.center,
         radius:
-            singleSquareWidth() * miniPelletAndSuperPelletScaleFactor / 2 / 3,
+            blockWidth() * miniPelletAndSuperPelletScaleFactor / 2 / 3,
         collisionType: CollisionType.passive);
     add(x);
     world.pelletsRemainingNotifier.value += 1;
@@ -44,7 +44,7 @@ class MiniPellet extends SpriteAnimationComponent
   MiniPellet() : super(size: spriteSize, anchor: Anchor.center);
 
   static final Vector2 spriteSize =
-      Vector2.all(singleSquareWidth() * miniPelletAndSuperPelletScaleFactor);
+      Vector2.all(blockWidth() * miniPelletAndSuperPelletScaleFactor);
   final speed = 0;
   Vector2 absPosition = Vector2(0, 0);
 

@@ -114,7 +114,17 @@ class AudioController {
     _sfxPlayersNew[type]!.stop();
   }
 
-  void setSirenVolume(double volume) {
+  double getTargetSirenVolume(double averageGhostSpeed) {
+    double tmpSirenVolume = averageGhostSpeed / 30;
+    if (tmpSirenVolume < 0.01) {
+      tmpSirenVolume = 0;
+    }
+    tmpSirenVolume = min(0.4, tmpSirenVolume);
+    return tmpSirenVolume;
+  }
+
+  void setSirenVolume(double averageGhostSpeed) {
+    double volume = getTargetSirenVolume(averageGhostSpeed);
     _sfxPlayersNew[SfxType.ghostsRoamingSiren]!.setVolume(volume);
   }
 

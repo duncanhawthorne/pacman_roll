@@ -15,7 +15,7 @@ const mazeWallWidthFactor = 0.7;
 List<Component> pelletsAndSuperPellets(ValueNotifier pelletsRemainingNotifier) {
   List<Component> result = [];
   pelletsRemainingNotifier.value = 0;
-  double scale = singleSquareWidth();
+  double scale = blockWidth();
   for (int i = 0; i < wrappedMazeLayout.length; i++) {
     for (int j = 0; j < wrappedMazeLayout[i].length; j++) {
       Vector2 center = Vector2(j + 1 / 2 - wrappedMazeLayout[0].length / 2,
@@ -69,7 +69,7 @@ const double pixelationBuffer = 1.03;
 
 List<Component> mazeWalls() {
   List<Component> result = [];
-  double scale = singleSquareWidth();
+  double scale = blockWidth();
   if (mazeOn) {
     for (int i = 0; i < wrappedMazeLayout.length; i++) {
       for (int j = 0; j < wrappedMazeLayout[i].length; j++) {

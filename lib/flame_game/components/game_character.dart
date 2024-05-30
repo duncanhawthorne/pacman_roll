@@ -108,22 +108,27 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     }
   }
 
+  int _spinParity() {
+    Vector2 vel = _getUnderlyingBallVelocity();
+    if (vel.x.abs() > vel.y.abs()) {
+      return (world.gravity.y > 0 ? 1 : -1) * (vel.x > 0 ? 1 : -1);
+    } else {
+      return (world.gravity.x > 0 ? -1 : 1) * (vel.y > 0 ? 1 : -1);
+    }
+  }
+
   double _getUpdatedAngle() {
-    double tmpAngle = 0;
     if (useForgePhysicsBallRotation) {
       try {
-        tmpAngle = _underlyingBall.angle;
+        return _underlyingBall.angle;
       } catch (e) {
         p(["_getUpdatedAngle", e]);
-        tmpAngle = angle;
+        return angle;
       }
     } else {
-      tmpAngle = angle +
-          (position - _lastPosition).length /
-              (size.x / 2) *
-              getRollSpinDirection(_getUnderlyingBallVelocity(), world.gravity);
+      return angle +
+          (position - _lastPosition).length / (size.x / 2) * _spinParity();
     }
-    return tmpAngle;
   }
 
   void oneFrameOfPhysics() {

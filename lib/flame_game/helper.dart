@@ -1,12 +1,7 @@
-import 'components/ghost.dart';
-import 'components/pacman.dart';
 import 'components/pacman_sprites.dart';
-import 'pacman_world.dart';
 import 'constants.dart';
 import 'saves.dart';
-import 'components/game_character.dart';
 import 'package:flutter/material.dart';
-import 'dart:math';
 import 'package:flame/components.dart';
 import 'dart:core';
 //import 'package:sensors_plus/sensors_plus.dart';
@@ -20,111 +15,20 @@ final palette = Palette();
 Save save = Save();
 PacmanSprites pacmanSprites = PacmanSprites();
 
-double singleSquareWidth() {
-  return inGameVectorPixels / getMazeIntWidth() * gameScaleFactor;
+double blockWidth() {
+  return inGameVectorPixels / mazeLayoutLength() * gameScaleFactor;
 }
 
 double spriteWidth() {
-  return singleSquareWidth() * (expandedMaze ? 2 : 1);
+  return blockWidth() * (expandedMaze ? 2 : 1);
 }
 
-int getMazeIntWidth() {
+int mazeLayoutLength() {
   return wrappedMazeLayout.isEmpty ? 0 : wrappedMazeLayout[0].length;
 }
 
-int numberOfAlivePacman(List<Pacman> pacmanPlayersList) {
-  int result = 0;
-  for (Pacman pacman in pacmanPlayersList) {
-    if (pacman.current != CharacterState.deadPacman) {
-      result++;
-    }
-  }
-  return result;
-}
-
 void p(x) {
-  // ignore: prefer_interpolation_to_compose_strings
-  debugPrint("///// A " + DateTime.now().toString() + " " + x.toString());
-}
-
-int getRollSpinDirection(Vector2 vel, Vector2 gravity) {
-  if (vel.x.abs() > vel.y.abs()) {
-    //moving left or right
-    if (gravity.y > 0) {
-      //onWall = WallLocation.bottom;
-      if ((vel.x) > 0) {
-        //clockwise = true;
-        return 1;
-      } else {
-        //clockwise = false;
-        return -1;
-      }
-    } else {
-      //onWall = WallLocation.top;
-      if ((vel.x) > 0) {
-        //clockwise = false;
-        return -1;
-      } else {
-        //clockwise = true;
-        return 1;
-      }
-    }
-  } else {
-    //moving up or down
-    if (gravity.x > 0) {
-      //onWall = WallLocation.right;
-      if ((vel.y) > 0) {
-        //clockwise = false;
-        return -1;
-      } else {
-        //clockwise = true;
-        return 1;
-      }
-    } else {
-      //onWall = WallLocation.left;
-      if ((vel.y) > 0) {
-        //clockwise = true;
-        return 1;
-      } else {
-        //clockwise = false;
-        return -1;
-      }
-    }
-  }
-}
-
-double convertToSmallestDeltaAngle(double angleDelta) {
-  //avoid indicating  +2*pi-delta jump when go around the circle, instead give -delta
-  angleDelta = angleDelta + 2 * pi / 2;
-  angleDelta = angleDelta % (2 * pi);
-  return angleDelta - 2 * pi / 2;
-}
-
-double getTargetSirenVolume(PacmanWorld world) {
-  if (!world.game.isGameLive()) {
-    p("siren 0: game not live");
-    return 0;
-  }
-  double tmpSirenVolume = 0;
-  try {
-    for (Ghost ghost in world.ghostPlayersList) {
-      tmpSirenVolume += ghost.current == CharacterState.normal
-          ? ghost.getVelocity().length / world.ghostPlayersList.length
-          : 0;
-    }
-    if (numberOfAlivePacman(world.pacmanPlayersList) == 0 || !world.physicsOn) {
-      tmpSirenVolume = 0;
-    }
-  } catch (e) {
-    tmpSirenVolume = 0;
-    p([e, "tmpSirenVolume error"]);
-  }
-  tmpSirenVolume = tmpSirenVolume / 30;
-  if (tmpSirenVolume < 0.05) {
-    tmpSirenVolume = 0;
-  }
-  tmpSirenVolume = min(0.4, tmpSirenVolume);
-  return tmpSirenVolume;
+  debugPrint("///// A ${DateTime.now()} $x");
 }
 
 String getRandomString(random, int length) =>
@@ -150,7 +54,7 @@ void legacyHandleAcceleratorEvents(PacmanWorld world) {
 }
  */
 
-Vector2 getSanitizedScreenSize(Vector2 size) {
+Vector2 sanitizeScreenSize(Vector2 size) {
   if (size.x > size.y) {
     return Vector2(kSquareNotionalSize * size.x / size.y, kSquareNotionalSize);
   } else {

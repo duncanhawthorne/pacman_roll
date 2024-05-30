@@ -8,6 +8,7 @@ import '../constants.dart';
 import '../helper.dart';
 
 class PacmanSprites {
+  // ignore: unused_element
   void _savePictureAtFrac(int mouthWidthAsInt) async {
     p("save picture");
     Picture picture = _pacmanRecorderAtFrac(mouthWidthAsInt);
@@ -22,12 +23,8 @@ class PacmanSprites {
     mouthWidth = max(0, min(1, mouthWidth));
     final recorder = PictureRecorder();
     final canvas = Canvas(recorder);
-    canvas.drawArc(
-        pacmanRect,
-        2 * pi * ((mouthWidth / 2) + 0.5), //((mouthWidth / 2) + 0.5)
-        2 * pi * (1 - mouthWidth),
-        true,
-        yellowPacmanPaint);
+    canvas.drawArc(pacmanRect, 2 * pi * ((mouthWidth / 2) + 0.5),
+        2 * pi * (1 - mouthWidth), true, yellowPacmanPaint);
     Picture picture = recorder.endRecording();
     return picture;
   }
@@ -72,9 +69,11 @@ class PacmanSprites {
   }
 
   Future<void> _precacheAllPacmanAtFrac() async {
-    if (_pacmanAtFracCache.isEmpty) { //call first time, later times no effect
-      for (int index = 0; index <
-          pacmanRenderFracIncrementsNumber + 1; index++) {
+    if (_pacmanAtFracCache.isEmpty) {
+      //call first time, later times no effect
+      for (int index = 0;
+          index < pacmanRenderFracIncrementsNumber + 1;
+          index++) {
         //_savePictureAtFrac(index);
         if (!_pacmanAtFracCache.keys.contains(index)) {
           //avoid redoing if done previously
@@ -85,7 +84,8 @@ class PacmanSprites {
   }
 
   Future<Sprite> pacmanAtFrac(int fracInt) async {
-    pacmanSprites._precacheAllPacmanAtFrac(); //call first time, later times no effect
+    pacmanSprites
+        ._precacheAllPacmanAtFrac(); //call first time, later times no effect
     fracInt = max(0, min(pacmanRenderFracIncrementsNumber, fracInt));
     return await _pacmanAtFracCache[fracInt]!;
   }

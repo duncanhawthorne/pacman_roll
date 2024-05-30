@@ -56,6 +56,10 @@ class PacmanWorld extends Forge2DWorld
 
   final numberOfDeathsNotifier = ValueNotifier(0);
   final pelletsRemainingNotifier = ValueNotifier(0);
+  bool get gameWonOrLost =>
+      pelletsRemainingNotifier.value <= 0 ||
+      numberOfDeathsNotifier.value >= level.maxAllowedDeaths;
+
   int allGhostScaredTimeLatest = 0;
 
   int now = DateTime.now().millisecondsSinceEpoch;
@@ -80,16 +84,31 @@ class PacmanWorld extends Forge2DWorld
     }
   }
 
-  bool gameWonOrLost() {
-    return pelletsRemainingNotifier.value <= 0 ||
-        numberOfDeathsNotifier.value >= level.maxAllowedDeaths;
+  int numberAlivePacman() {
+    return pacmanPlayersList
+        .map((Pacman pacman) =>
+            pacman.current != CharacterState.deadPacman ? 1 : 0)
+        .reduce((value, element) => value + element);
+  }
+
+  double averageGhostSpeed() {
+    if (!game.isGameLive || numberAlivePacman() == 0 || !physicsOn) {
+      return 0;
+    } else {
+      return ghostPlayersList
+              .map((Ghost ghost) => ghost.current == CharacterState.normal
+                  ? ghost.getVelocity().length
+                  : 0.0)
+              .reduce((value, element) => value + element) /
+          ghostPlayersList.length;
+    }
   }
 
   void sirenVolumeUpdatedTimer() async {
     //NOTE disabled on iOS due to bug
-    async.Timer.periodic(const Duration(milliseconds: 500), (timer) {
-      if (game.isGameLive()) {
-        game.audioController.setSirenVolume(getTargetSirenVolume(this));
+    async.Timer.periodic(const Duration(milliseconds: 250), (timer) {
+      if (game.isGameLive) {
+        game.audioController.setSirenVolume(averageGhostSpeed());
       } else {
         game.audioController.setSirenVolume(0);
         timer.cancel();
@@ -100,7 +119,7 @@ class PacmanWorld extends Forge2DWorld
   void addGhost(int ghostSpriteChooserNumber) {
     Vector2 target = kGhostStartLocation +
         Vector2(
-            singleSquareWidth() *
+            blockWidth() *
                 (ghostSpriteChooserNumber <= 2
                     ? (ghostSpriteChooserNumber - 1)
                     : 0),
@@ -118,8 +137,8 @@ class PacmanWorld extends Forge2DWorld
   void multiGhostAdderTimer() {
     if (multipleSpawningGhosts) {
       async.Timer.periodic(const Duration(milliseconds: 5000), (timer) {
-        if (game.isGameLive()) {
-          if (!gameWonOrLost()) {
+        if (game.isGameLive) {
+          if (!gameWonOrLost) {
             addGhost(100);
           }
         } else {
@@ -198,8 +217,7 @@ class PacmanWorld extends Forge2DWorld
     if (_lastDragAngle != 10) {
       double spinMultiplier = 4 * min(1, eventVectorLengthProportion / 0.75);
       double currentAngleTmp = atan2(eventVector.x, eventVector.y);
-      double angleDelta =
-          convertToSmallestDeltaAngle(currentAngleTmp - _lastDragAngle);
+      double angleDelta = _smallAngle(currentAngleTmp - _lastDragAngle);
       _gravityTargetAngle = _gravityTargetAngle + angleDelta * spinMultiplier;
       setGravity(Vector2(cos(_gravityTargetAngle), sin(_gravityTargetAngle)));
     }
@@ -224,5 +242,14 @@ class PacmanWorld extends Forge2DWorld
         game.camera.viewfinder.angle = -atan2(gravity.x, gravity.y);
       }
     }
+  }
+}
+
+double _smallAngle(double angleDelta) {
+  //avoid +2*pi-delta jump when go around the circle, instead give -delta
+  if (angleDelta > 2 * pi / 2) {
+    return angleDelta - 2 * pi;
+  } else {
+    return angleDelta;
   }
 }

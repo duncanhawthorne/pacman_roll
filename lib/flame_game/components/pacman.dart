@@ -63,7 +63,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   }
 
   void _eatPelletSound() {
-    if (!world.gameWonOrLost()) {
+    if (!world.gameWonOrLost) {
       if (_pacmanEatingSoundTimeLatest <
           world.now - kPacmanHalfEatingResetTimeMillis * 2) {
         _pacmanEatingSoundTimeLatest = world.now;
@@ -141,7 +141,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
         current = CharacterState.deadPacman;
 
         if (world.pacmanPlayersList.length == 1 ||
-            numberOfAlivePacman(world.pacmanPlayersList) == 0) {
+            world.numberAlivePacman() == 0) {
           world.physicsOn = false;
           Future.delayed(
               const Duration(milliseconds: kPacmanDeadResetTimeMillis + 100),

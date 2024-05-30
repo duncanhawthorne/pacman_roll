@@ -20,7 +20,7 @@ final isiOSMobile = kIsWeb && defaultTargetPlatform == TargetPlatform.iOS;
 const useForgePhysicsBallRotation = false;
 const bool normaliseGravity = true; //android ? false : true;
 const bool screenRotates = true; //android ? false : true;
-const useGyro = !screenRotates;
+//const useGyro = !screenRotates;
 const followCursor = false; //windows;
 const clickAndDrag = true; //!windows && !useGyro;
 
@@ -33,9 +33,9 @@ final Vector2 kGhostStartLocation = Vector2(0, -3) * spriteWidth();
 final Vector2 kPacmanStartLocation = Vector2(0, 5) * spriteWidth();
 final Vector2 kCageLocation = Vector2(0, -1) * spriteWidth();
 final Vector2 kLeftPortalLocation =
-    Vector2(-(getMazeIntWidth() - 1) / 2 * 0.99, -1) * singleSquareWidth();
+    Vector2(-(mazeLayoutLength() - 1) / 2 * 0.99, -1) * blockWidth();
 final Vector2 kRightPortalLocation =
-    Vector2((getMazeIntWidth() - 1) / 2 * 0.99, -1) * singleSquareWidth();
+    Vector2((mazeLayoutLength() - 1) / 2 * 0.99, -1) * blockWidth();
 final Vector2 kCompassLocation = Vector2(0, 0) * spriteWidth();
 final Vector2 kOffScreenLocation = Vector2(0, 1000) * spriteWidth();
 const double miniPelletAndSuperPelletScaleFactor = 0.46;

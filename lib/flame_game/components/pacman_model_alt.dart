@@ -42,36 +42,36 @@ pureVectorPacmanAlt() {
       Vector2(1, 0),
     ],
     position: Vector2(0, 0),
-    size: Vector2.all(singleSquareWidth()),
+    size: Vector2.all(blockWidth()),
     children: [
       CircleComponent(
-          radius: singleSquareWidth() / 2, paint: yellowPacmanPaint),
+          radius: blockWidth() / 2, paint: yellowPacmanPaint),
     ],
   );
 }
 
 pureVectorPacmanTwoAlt() {
   CircleComponent d = CircleComponent(
-      radius: singleSquareWidth() / 2,
+      radius: blockWidth() / 2,
       paint: yellowPacmanPaint,
       anchor: Anchor.topLeft,
       position: Vector2(0, 0));
   PolygonComponent b = PolygonComponent([
     Vector2(
-        1 * singleSquareWidth(),
+        1 * blockWidth(),
         -1 *
-            singleSquareWidth() *
+            blockWidth() *
             tan(1 / 2 * pacmanMouthWidthDefault * 2 * pi)),
     Vector2(0, 0),
-    Vector2(1 * singleSquareWidth(),
-        1 * singleSquareWidth() * tan(1 / 2 * pacmanMouthWidthDefault * 2 * pi))
+    Vector2(1 * blockWidth(),
+        1 * blockWidth() * tan(1 / 2 * pacmanMouthWidthDefault * 2 * pi))
   ],
       anchor: Anchor.centerLeft,
-      position: Vector2.all(singleSquareWidth() / 2),
+      position: Vector2.all(blockWidth() / 2),
       paint: blackBackgroundPaint);
   ClipComponent c = ClipComponent.circle(
       anchor: Anchor.center,
-      size: Vector2.all(singleSquareWidth()),
+      size: Vector2.all(blockWidth()),
       children: [d, b]);
 
   final effectClose = ScaleEffect.to(
