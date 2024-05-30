@@ -6,7 +6,7 @@ import 'constants.dart';
 import 'dart:convert';
 
 class Save {
-  FirebaseFirestore? db = fbOn ? FirebaseFirestore.instance : null;
+  FirebaseFirestore? db;
 
   Future<List<double>>? leaderboardWinTimesCache;
 

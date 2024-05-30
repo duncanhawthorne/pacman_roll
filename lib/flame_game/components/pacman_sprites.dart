@@ -1,24 +1,41 @@
+import 'dart:io';
 import 'dart:math';
 import 'package:flame/components.dart';
+import 'package:flame/flame.dart';
 import 'dart:core';
 import 'dart:ui';
 import '../constants.dart';
+import '../helper.dart';
 
 class PacmanSprites {
+  void savePictureAtFrac(int mouthWidthAsInt) async {
+    p("save picture");
+    Picture picture = _pacmanRecorderAtFrac(mouthWidthAsInt);
+    final image = await picture.toImage(pacmanRectSize, pacmanRectSize);
+    final imageBytes = await image.toByteData(format: ImageByteFormat.png);
+    await File('C:/tmp/$mouthWidthAsInt.png')
+        .writeAsBytes(imageBytes!.buffer.asUint8List());
+  }
+
   Picture _pacmanRecorderAtFrac(int mouthWidthAsInt) {
     double mouthWidth = mouthWidthAsInt / pacmanRenderFracIncrementsNumber;
     mouthWidth = max(0, min(1, mouthWidth));
     final recorder = PictureRecorder();
     final canvas = Canvas(recorder);
-    canvas.drawArc(pacmanRect, 2 * pi * ((mouthWidth / 2) + 0.5),
-        2 * pi * (1 - mouthWidth), true, yellowPacmanPaint);
+    canvas.drawArc(
+        pacmanRect,
+        2 * pi * ((mouthWidth / 2) + 0.5), //((mouthWidth / 2) + 0.5)
+        2 * pi * (1 - mouthWidth),
+        true,
+        yellowPacmanPaint);
     Picture picture = recorder.endRecording();
     return picture;
   }
 
   Future<Sprite> _pacmanAtFracReal(int mouthWidthAsInt) async {
-    return Sprite(await _pacmanRecorderAtFrac(mouthWidthAsInt)
-        .toImage(pacmanRectSize, pacmanRectSize));
+    return Sprite(await Flame.images.load('dash/$mouthWidthAsInt.png'));
+    //return Sprite(await _pacmanRecorderAtFrac(mouthWidthAsInt)
+    //    .toImage(pacmanRectSize, pacmanRectSize));
   }
 
   final Map<int, Future<Sprite>> _pacmanAtFracCache = {};
@@ -56,6 +73,7 @@ class PacmanSprites {
 
   Future<void> precachePacmanAtFrac() async {
     for (int index = 0; index < pacmanRenderFracIncrementsNumber + 1; index++) {
+      //savePictureAtFrac(index);
       if (!_pacmanAtFracCache.keys.contains(index)) {
         //avoid redoing if done previously
         _pacmanAtFracCache[index] = _pacmanAtFracReal(index);

@@ -1,5 +1,6 @@
 //import 'package:flutter/cupertino.dart';
 
+import 'package:flutter/foundation.dart';
 import '../constants.dart';
 import '../helper.dart';
 import 'package:flame/components.dart';
