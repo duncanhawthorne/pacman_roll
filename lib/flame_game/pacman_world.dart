@@ -134,6 +134,13 @@ class PacmanWorld extends Forge2DWorld
     add(ghost);
   }
 
+  void scareGhosts() {
+    play(SfxType.ghostsScared);
+    for (Ghost ghost in ghostPlayersList) {
+      ghost.setScared();
+    }
+  }
+
   void multiGhostAdderTimer() {
     if (multipleSpawningGhosts) {
       async.Timer.periodic(const Duration(milliseconds: 5000), (timer) {
@@ -149,22 +156,39 @@ class PacmanWorld extends Forge2DWorld
   }
 
   void trimToThreeGhosts() {
-    while (ghostPlayersList.length > 3) {
-      assert(multipleSpawningGhosts);
-      remove(ghostPlayersList[ghostPlayersList.length - 1]);
+    for (int i = 0; i < ghostPlayersList.length; i++) {
+      int j = ghostPlayersList.length - 1 - i;
+      if (j >= 3) {
+        assert(multipleSpawningGhosts);
+        remove(ghostPlayersList[j]);
+      }
     }
   }
 
   void winGameWorldTidy() {
-    //Future.delayed(
-    //    const Duration(milliseconds: kPacmanHalfEatingResetTimeMillis * 2), () {
-    //  play(SfxType.endMusic);
-    //});
     play(SfxType.endMusic);
     trimToThreeGhosts();
     for (Ghost ghost in ghostPlayersList) {
       ghost.setPositionForGameEnd();
     }
+  }
+
+  void resetWorldAfterPacmanDeath(Pacman dyingPacman) {
+    physicsOn = false;
+    Future.delayed(
+        const Duration(milliseconds: kPacmanDeadResetTimeMillis + 100), () {
+      //100 buffer
+      if (!physicsOn) {
+        //prevent multiple resets
+        numberOfDeathsNotifier.value++; //score counting deaths
+        dyingPacman.setStartPositionAfterDeath();
+        trimToThreeGhosts();
+        for (Ghost ghost in ghostPlayersList) {
+          ghost.setStartPositionAfterPacmanDeath();
+        }
+        physicsOn = true;
+      }
+    });
   }
 
   @override

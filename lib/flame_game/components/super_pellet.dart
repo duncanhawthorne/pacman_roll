@@ -9,13 +9,14 @@ class SuperPelletCircle extends CircleComponent
     with HasWorldReference<PacmanWorld> {
   SuperPelletCircle({required super.position})
       : super(
-            radius:
-                blockWidth() * miniPelletAndSuperPelletScaleFactor / 2,
+            radius: blockWidth() / 2 * pelletScaleFactor,
             anchor: Anchor.center);
 
   @override
   Future<void> onLoad() async {
     super.onLoad();
+    add(CircleHitbox());
+    /*
     CircleHitbox x = CircleHitbox(
       isSolid: true,
       collisionType: CollisionType.passive,
@@ -25,6 +26,8 @@ class SuperPelletCircle extends CircleComponent
       anchor: Anchor.center,
     );
     add(x);
+    //x.debugMode = true;
+     */
     world.pelletsRemainingNotifier.value += 1;
   }
 
@@ -42,7 +45,7 @@ class SuperPelletSprite extends SpriteAnimationComponent
   SuperPelletSprite() : super(size: spriteSize, anchor: Anchor.center);
 
   static final Vector2 spriteSize =
-      Vector2.all(blockWidth() * miniPelletAndSuperPelletScaleFactor);
+      Vector2.all(blockWidth() * pelletScaleFactor);
   final speed = 0;
   Vector2 absPosition = Vector2(0, 0);
 

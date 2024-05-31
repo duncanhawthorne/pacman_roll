@@ -41,6 +41,8 @@ class PacmanSprites {
     //rolls from list of futures to future of a list
 
     List<Sprite> finalItems = [];
+
+    /*
     // Get the item keys from the network
     List itemsKeysList = List<int>.generate(lf.length, (i) => i);
 
@@ -49,6 +51,13 @@ class PacmanSprites {
       Sprite finalItem = await lf[item];
       finalItems.add(finalItem);
     }).toList());
+
+     */
+
+    for (var item in lf) {
+      Sprite finalItem = await item;
+      finalItems.add(finalItem);
+    }
 
     return finalItems;
   }

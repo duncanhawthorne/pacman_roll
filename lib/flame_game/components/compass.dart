@@ -10,8 +10,8 @@ class Compass extends SpriteAnimationComponent
     with HasGameReference, HasWorldReference<PacmanWorld> {
   Compass() : super(size: spriteSize, anchor: Anchor.center);
 
-  static final Vector2 spriteSize = Vector2.all(
-      blockWidth() * miniPelletAndSuperPelletScaleFactor / 2);
+  static final Vector2 spriteSize =
+      Vector2.all(blockWidth() * pelletScaleFactor / 2);
   Vector2 absPosition = kCompassLocation;
 
   @override
@@ -29,7 +29,6 @@ class Compass extends SpriteAnimationComponent
   @override
   void update(double dt) {
     super.update(dt);
-    position =
-        kCompassLocation + capVector(world.gravity / 25) * blockWidth();
+    position = kCompassLocation + capVector(world.gravity / 25) * blockWidth();
   }
 }

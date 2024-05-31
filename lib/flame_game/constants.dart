@@ -38,7 +38,7 @@ final Vector2 kRightPortalLocation =
     Vector2((mazeLayoutLength() - 1) / 2 * 0.99, -1) * blockWidth();
 final Vector2 kCompassLocation = Vector2(0, 0) * spriteWidth();
 final Vector2 kOffScreenLocation = Vector2(0, 1000) * spriteWidth();
-const double miniPelletAndSuperPelletScaleFactor = 0.46;
+const double pelletScaleFactor = 0.46;
 const pointerRotationSpeed = 10;
 
 const int kGhostResetTimeMillis = 1000;

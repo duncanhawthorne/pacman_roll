@@ -94,10 +94,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
         _eatPelletSound();
       } else {
         //superPellet
-        world.play(SfxType.ghostsScared);
-        for (Ghost ghost in world.ghostPlayersList) {
-          ghost.setScared();
-        }
+        world.scareGhosts();
       }
       _eatAnimation();
     }
@@ -142,24 +139,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
 
         if (world.pacmanPlayersList.length == 1 ||
             world.numberAlivePacman() == 0) {
-          world.physicsOn = false;
-          Future.delayed(
-              const Duration(milliseconds: kPacmanDeadResetTimeMillis + 100),
-              () {
-            //100 buffer
-            if (!world.physicsOn) {
-              //prevent multiple resets
-
-              world.numberOfDeathsNotifier.value++; //score counting deaths
-              setPosition(kPacmanStartLocation);
-              world.trimToThreeGhosts();
-              for (Ghost ghost in world.ghostPlayersList) {
-                ghost.setStartPositionAfterPacmanDeath();
-              }
-              current = CharacterState.normal;
-              world.physicsOn = true;
-            }
-          });
+          world.resetWorldAfterPacmanDeath(this);
         } else {
           assert(multipleSpawningPacmans);
           Future.delayed(
@@ -169,6 +149,11 @@ class Pacman extends GameCharacter with CollisionCallbacks {
         }
       }
     }
+  }
+
+  void setStartPositionAfterDeath() {
+    setPosition(kPacmanStartLocation);
+    current = CharacterState.normal;
   }
 
   void _pacmanEatingNormalSequence() {
