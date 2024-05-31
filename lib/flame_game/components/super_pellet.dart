@@ -37,9 +37,9 @@ class SuperPelletCircle extends CircleComponent
 
 /// The [Point] components are the components that the [Player] should collect
 /// to finish a level. The points are represented by Flame's mascot; Ember.
-class SuperPellet extends SpriteAnimationComponent
+class SuperPelletSprite extends SpriteAnimationComponent
     with HasGameReference, HasWorldReference<PacmanWorld> {
-  SuperPellet() : super(size: spriteSize, anchor: Anchor.center);
+  SuperPelletSprite() : super(size: spriteSize, anchor: Anchor.center);
 
   static final Vector2 spriteSize =
       Vector2.all(blockWidth() * miniPelletAndSuperPelletScaleFactor);

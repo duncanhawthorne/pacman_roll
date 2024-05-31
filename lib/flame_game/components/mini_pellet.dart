@@ -37,11 +37,11 @@ class MiniPelletCircle extends CircleComponent
   }
 }
 
-/// The [MiniPellet] components are the components that the [Player] should collect
+/// The [MiniPelletSprite] components are the components that the [Player] should collect
 /// to finish a level. The points are represented by Flame's mascot; Ember.
-class MiniPellet extends SpriteAnimationComponent
+class MiniPelletSprite extends SpriteAnimationComponent
     with HasGameReference, HasWorldReference<PacmanWorld> {
-  MiniPellet() : super(size: spriteSize, anchor: Anchor.center);
+  MiniPelletSprite() : super(size: spriteSize, anchor: Anchor.center);
 
   static final Vector2 spriteSize =
       Vector2.all(blockWidth() * miniPelletAndSuperPelletScaleFactor);

@@ -74,8 +74,8 @@ class Pacman extends GameCharacter with CollisionCallbacks {
 
   void _onCollideWith(PositionComponent other) {
     if (current != CharacterState.deadPacman) {
-      if (other is MiniPellet ||
-          other is SuperPellet ||
+      if (other is MiniPelletSprite ||
+          other is SuperPelletSprite ||
           other is MiniPelletCircle ||
           other is SuperPelletCircle) {
         _onCollideWithPellet(other);
@@ -90,7 +90,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     if (current != CharacterState.deadPacman) {
       // can simultaneously eat pellet and die to ghost so don't want to do this if just died
       world.remove(pellet); //do this first so checks based on game over apply
-      if (pellet is MiniPellet || pellet is MiniPelletCircle) {
+      if (pellet is MiniPelletSprite || pellet is MiniPelletCircle) {
         _eatPelletSound();
       } else {
         //superPellet

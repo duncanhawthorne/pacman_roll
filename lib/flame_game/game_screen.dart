@@ -27,7 +27,7 @@ class GameScreen extends StatelessWidget {
 
   static const String loseDialogKey = 'lose_dialog';
   static const String wonDialogKey = 'won_dialog';
-  static const String backButtonKey = 'back_buttton';
+  static const String backButtonKey = 'back_button';
   static const String statusOverlayKey = 'status_overlay';
 
   @override
