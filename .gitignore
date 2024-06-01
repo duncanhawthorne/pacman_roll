@@ -51,7 +51,7 @@ lib/generated_plugin_registrant.dart
 lib/firebase_options.dart
 lib/secrets.dart
 /android/
-/test/
+#  /test/
 /windows/
 /.metadata
 /analysis_options.yaml
