@@ -48,15 +48,22 @@ class GameWonDialog extends StatelessWidget {
                 style: Theme.of(context).textTheme.headlineMedium,
                 textAlign: TextAlign.center),
             const SizedBox(height: 16),
-            FutureBuilder(
-                future: _endText(levelCompletedIn),
-                initialData: _timeText(levelCompletedIn),
-                builder: (BuildContext context, AsyncSnapshot<String> text) {
-                  return Text(
-                    text.data!,
-                    style: const TextStyle(fontFamily: 'Press Start 2P'),
-                  );
-                }),
+            Text(
+              _levelCompleteText(levelCompletedIn),
+              style: const TextStyle(fontFamily: 'Press Start 2P'),
+            ),
+            !fbOn
+                ? const SizedBox.shrink()
+                : FutureBuilder(
+                    future: _scoreboardRankText(levelCompletedIn),
+                    initialData: _scoreboardLoadingText(),
+                    builder:
+                        (BuildContext context, AsyncSnapshot<String> text) {
+                      return Text(
+                        text.data!,
+                        style: const TextStyle(fontFamily: 'Press Start 2P'),
+                      );
+                    }),
             const SizedBox(height: 16),
             if (true) ...[
               NesButton(
@@ -69,13 +76,6 @@ class GameWonDialog extends StatelessWidget {
               ),
               const SizedBox(height: 16),
             ],
-            //NesButton(
-            //  onPressed: () {
-            //    context.go('/play');
-            //  },
-            //  type: NesButtonType.normal,
-            //  child: const Text('Level selection'),
-            //),
           ],
         ),
       ),
@@ -83,20 +83,25 @@ class GameWonDialog extends StatelessWidget {
   }
 }
 
-Future<String> _endText(double levelCompletedIn) async {
+String _levelCompleteText(double levelCompletedIn) {
+  String y = "\nTime: ${levelCompletedIn.toStringAsFixed(1)} seconds\n";
+  return y;
+}
+
+String _scoreboardLoadingText() {
+  String y = !fbOn ? "" : "Rank: Loading...\n";
+  return y;
+}
+
+Future<String> _scoreboardRankText(double levelCompletedIn) async {
   save.cacheLeaderboardNow(); //belts and braces. should have been called earlier in prep
   double x = fbOn
       ? _percentileOf(await save.leaderboardWinTimesCache!, levelCompletedIn) *
           100
       : 0.0;
-  String y =
-      "\nTime: ${levelCompletedIn.toStringAsFixed(1)} seconds\n${!fbOn || (await save.leaderboardWinTimesCache)!.isEmpty ? "" : "\nRank: ${x == 0 ? "World Record" : "Top ${x.toStringAsFixed(0)}%"}\n"}";
-  return y;
-}
-
-String _timeText(double levelCompletedIn) {
-  String y =
-      "\nTime: ${levelCompletedIn.toStringAsFixed(1)} seconds\n${!fbOn ? "" : "\nRank: Loading...\n"}";
+  String y = !fbOn || (await save.leaderboardWinTimesCache)!.isEmpty
+      ? ""
+      : "Rank: ${x == 0 ? "World Record" : "Top ${x.toStringAsFixed(0)}%"}\n";
   return y;
 }
 
