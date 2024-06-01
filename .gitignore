@@ -46,7 +46,6 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-
 lib/generated_plugin_registrant.dart
 lib/firebase_options.dart
 lib/secrets.dart
@@ -56,3 +55,7 @@ lib/secrets.dart
 /.metadata
 /analysis_options.yaml
 /pubspec.lock
+
+# FVM Version Cache
+.fvm/
+.fvmrc
