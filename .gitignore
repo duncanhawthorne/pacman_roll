@@ -58,3 +58,5 @@ lib/secrets.dart
 # FVM Version Cache
 .fvm/
 .fvmrc
+
+.firebaserc
