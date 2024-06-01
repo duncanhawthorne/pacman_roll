@@ -60,3 +60,4 @@ lib/secrets.dart
 .fvmrc
 
 .firebaserc
+firebase-debug.log
