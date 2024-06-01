@@ -46,9 +46,9 @@ flutter:
   assets:
     - assets/images/
     - assets/images/dash/
-    - assets/images/enemies/
-    - assets/images/scenery/
-    - assets/music/
+#    - assets/images/enemies/
+#    - assets/images/scenery/
+#    - assets/music/
     - assets/sfx/
 
   fonts:

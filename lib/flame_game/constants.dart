@@ -64,8 +64,8 @@ const multipleSpawningPacmans = false;
 const multipleSpawningGhosts = false;
 
 final bool fbOn = !(windows && !kIsWeb);
-const String mainDB = "PMR3";
-const String summaryDB = "PMRpercent";
+const String mainDB = "scores";
+const String summaryDB = "summary";
 //String userName = "ABC";
 
 // With the `TextPaint` we define what properties the text that we are going
