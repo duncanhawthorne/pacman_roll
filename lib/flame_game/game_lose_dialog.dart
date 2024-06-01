@@ -39,20 +39,12 @@ class GameLoseDialog extends StatelessWidget {
               style: Theme.of(context).textTheme.headlineMedium,
               textAlign: TextAlign.center,
             ),
-            //Text(scoreboardItems.toString()),
             const SizedBox(height: 16),
-            //Text(
-            //  'You completed level ${level.number} in $levelCompletedIn seconds.',
-            //  textAlign: TextAlign.center,
-            //),
             const SizedBox(height: 16),
             if (true) ...[
               NesButton(
                 onPressed: () {
                   context.go('/');
-                  //gameRunningFailsafeIndicator = false;
-                  //setStatusBarColor(palette.backgroundMain.color);
-                  //fixTitle();
                 },
                 type: NesButtonType.primary,
                 child: const Text('Retry',
