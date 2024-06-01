@@ -103,16 +103,25 @@ class Save {
     return allFirebaseEntries;
   }
 
+  double percentile(int percentile, List origList) {
+    List<double> list = List<double>.from(origList);
+    list.sort();
+    double firstPositionUnrounded = (percentile / 100 * (list.length - 1));
+    int firstPosition = firstPositionUnrounded.floor();
+    double first = list[firstPosition];
+    int secondPosition = firstPosition + 1;
+    double second = secondPosition >= list.length ? 1 : list[secondPosition];
+    return (firstPositionUnrounded - firstPosition) / (secondPosition - firstPosition) * (second - first) + first;
+  }
+
+
   List<double> summariseLeaderboard(List<double> startList) {
     List<double> percentilesList = [];
-
     List<double> newList = List<double>.from(startList);
-
     if (newList.isNotEmpty) {
       newList.sort();
-
       for (int i = 0; i < 101; i++) {
-        percentilesList.add(newList[(i / 100 * (newList.length - 1)).floor()]);
+        percentilesList.add((percentile(i, newList) * 1000).round() / 1000);
       }
     }
     return percentilesList;

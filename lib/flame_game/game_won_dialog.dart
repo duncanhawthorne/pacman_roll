@@ -86,7 +86,7 @@ class GameWonDialog extends StatelessWidget {
 Future<String> _endText(double levelCompletedIn) async {
   save.cacheLeaderboardNow(); //belts and braces. should have been called earlier in prep
   double x = fbOn
-      ? _percentile(await save.leaderboardWinTimesCache!, levelCompletedIn) *
+      ? _percentileOf(await save.leaderboardWinTimesCache!, levelCompletedIn) *
           100
       : 0.0;
   String y =
@@ -100,9 +100,9 @@ String _timeText(double levelCompletedIn) {
   return y;
 }
 
-double _percentile(List<double> currentWinTimes, double levelCompletedIn) {
-  List<double> tmpList = List<double>.from(currentWinTimes);
-  tmpList.add(levelCompletedIn);
+double _percentileOf(List<double> list, double value) {
+  List<double> tmpList = List<double>.from(list);
+  tmpList.add(value);
   tmpList.sort();
-  return tmpList.indexOf(levelCompletedIn) / tmpList.length;
+  return tmpList.indexOf(value) / (tmpList.length - 1);
 }
