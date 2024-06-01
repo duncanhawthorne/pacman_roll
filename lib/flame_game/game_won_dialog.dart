@@ -9,13 +9,10 @@ import 'package:go_router/go_router.dart';
 import 'package:nes_ui/nes_ui.dart';
 import 'package:provider/provider.dart';
 
-/// This dialog is shown when a level is completed.
+/// This dialog is shown when a level is won.
 ///
-/// It shows what time the level was completed in and if there are more levels
-/// it lets the user go to the next level, or otherwise back to the level
-/// selection screen.
-///
-///
+/// It shows what time the level was completed
+/// and a comparison vs the leaderboard
 
 class GameWonDialog extends StatelessWidget {
   const GameWonDialog({

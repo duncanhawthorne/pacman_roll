@@ -30,8 +30,8 @@ import 'dart:async' as async;
 /// are removed, since the player can't interact with those anymore.
 ///
 /// The [PacmanWorld] has two mixins added to it:
-///  - The [TapCallbacks] that makes it possible to react to taps (or mouse
-///  clicks) on the world.
+///  - The [DragCallbacks] that makes it possible to react to taps and drags
+///  (or mouse clicks) on the world.
 ///  - The [HasGameReference] that gives the world access to a variable called
 ///  `game`, which is a reference to the game class that the world is attached
 ///  to.

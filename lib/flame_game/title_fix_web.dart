@@ -3,6 +3,8 @@ import 'constants.dart';
 import 'package:web/web.dart' as web;
 import 'package:flutter/services.dart';
 
+/// This file runs only on the web and contains fixes for iOS safari / chrome
+
 void fixTitleReal(Color color) {
   if (isiOSMobile) {
     fixTitle1(color);

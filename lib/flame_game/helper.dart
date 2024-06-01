@@ -7,8 +7,9 @@ import 'dart:core';
 //import 'package:sensors_plus/sensors_plus.dart';
 import '../style/palette.dart';
 import 'package:flutter/services.dart';
-
 import 'title_fix_stub.dart' if (dart.library.js_interop) 'title_fix_web.dart';
+
+/// This file has utilities used by other bits of code
 
 final palette = Palette();
 
@@ -69,7 +70,7 @@ void setStatusBarColor(color) {
 }
 
 void fixTitle(Color color) {
-  fixTitleReal(color); //either from web or stub
+  fixTitleReal(color); //either from web or stub depedning on platform
 }
 
 int roundUpToMult(int x, int roundUpMult) {

@@ -1,9 +1,10 @@
 import 'dart:math';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'helper.dart';
 import 'constants.dart';
 import 'dart:convert';
+
+/// This file has utilities for loading and saving the leaderboard in firebase
 
 class Save {
   FirebaseFirestore? db;

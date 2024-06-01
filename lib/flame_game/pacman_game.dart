@@ -18,10 +18,9 @@ import 'package:flame/palette.dart';
 /// This is the base of the game which is added to the [GameWidget].
 ///
 /// This class defines a few different properties for the game:
-///  - That it should run collision detection, this is done through the
-///  [HasCollisionDetection] mixin.
-///  - That it should have a [FixedResolutionViewport] with a size of 1600x720,
-///  this means that even if you resize the window, the game itself will keep
+///  - That it should have a [FixedResolutionViewport] containing
+///  a square of size [kSquareNotionalSize]
+///  this means that even if you resize the window, the square itself will keep
 ///  the defined virtual resolution.
 ///  - That the default world that the camera is looking at should be the
 ///  [PacmanWorld].
