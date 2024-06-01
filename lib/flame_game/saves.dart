@@ -111,9 +111,11 @@ class Save {
     double first = list[firstPosition];
     int secondPosition = firstPosition + 1;
     double second = secondPosition >= list.length ? 1 : list[secondPosition];
-    return (firstPositionUnrounded - firstPosition) / (secondPosition - firstPosition) * (second - first) + first;
+    return (firstPositionUnrounded - firstPosition) /
+            (secondPosition - firstPosition) *
+            (second - first) +
+        first;
   }
-
 
   List<double> summariseLeaderboard(List<double> startList) {
     List<double> percentilesList = [];
