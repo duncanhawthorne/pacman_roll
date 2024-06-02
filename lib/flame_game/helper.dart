@@ -36,6 +36,19 @@ String getRandomString(random, int length) =>
     String.fromCharCodes(Iterable.generate(
         length, (_) => chars.codeUnitAt(random.nextInt(chars.length))));
 
+List<List<int>> decodeMazeLayout(encodedmazeLayout) {
+  List<List<int>> result = [];
+  for (String row in encodedmazeLayout) {
+    List rowListString = row.split("");
+    List<int> rowListInt = [];
+    for (String letter in rowListString) {
+      rowListInt.add(int.parse(letter));
+    }
+    result.add(rowListInt);
+  }
+  return result;
+}
+
 /*
 void legacyHandleAcceleratorEvents(PacmanWorld world) {
   if (useGyro) {

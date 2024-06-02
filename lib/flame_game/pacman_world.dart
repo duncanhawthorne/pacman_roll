@@ -206,7 +206,7 @@ class PacmanWorld extends Forge2DWorld
       addGhost(i);
     }
     addAll(mazeWalls());
-    addAll(screenEdgeBoundaries(game.camera));
+    //addAll(screenEdgeBoundaries(game.camera));
     addAll(pelletsAndSuperPellets(pelletsRemainingNotifier));
 
     multiGhostAdderTimer();

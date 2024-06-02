@@ -121,6 +121,14 @@ List<Component> mazeWalls() {
                 widthx: scale * mazeWallWidthFactor,
                 heightx: scale * pixelationBuffer));
           }
+          if (mazeWallAt(i + 1, j) &&
+              mazeWallAt(i, j + 1) &&
+              mazeWallAt(i + 1, j + 1)) {
+            result.add(MazeWallSquareVisual(
+                position: center + Vector2(scale / 2, scale / 2),
+                widthx: scale * mazeWallWidthFactor,
+                heightx: scale * pixelationBuffer));
+          }
         }
       }
     }
