@@ -18,9 +18,16 @@ List<Component> pelletsAndSuperPellets(ValueNotifier pelletsRemainingNotifier) {
   double scale = blockWidth();
   for (int i = 0; i < wrappedMazeLayout.length; i++) {
     for (int j = 0; j < wrappedMazeLayout[i].length; j++) {
-      Vector2 center = Vector2(j + 1 / 2 - wrappedMazeLayout[0].length / 2,
-              i + 1 / 2 - wrappedMazeLayout.length / 2) *
-          scale;
+      Vector2 center = Vector2(0, 0);
+      if (expandedMaze) {
+        center = Vector2(j + 1 - wrappedMazeLayout[0].length / 2,
+                i + 1 - wrappedMazeLayout.length / 2) *
+            scale;
+      } else {
+        center = Vector2(j + 1 / 2 - wrappedMazeLayout[0].length / 2,
+                i + 1 / 2 - wrappedMazeLayout.length / 2) *
+            scale;
+      }
       if (wrappedMazeLayout[i][j] == 0) {
         result.add(MiniPelletCircle(position: center));
       }

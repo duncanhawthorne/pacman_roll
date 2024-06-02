@@ -9,7 +9,7 @@ class MiniPelletCircle extends CircleComponent
     with HasWorldReference<PacmanWorld> {
   MiniPelletCircle({required super.position})
       : super(
-            radius: blockWidth() / 2 * pelletScaleFactor / 3,
+            radius: spriteWidth() / 2 * pelletScaleFactor / 3,
             anchor: Anchor.center);
 
   @override

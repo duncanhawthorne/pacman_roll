@@ -119,7 +119,7 @@ class PacmanWorld extends Forge2DWorld
   void addGhost(int ghostSpriteChooserNumber) {
     Vector2 target = kGhostStartLocation +
         Vector2(
-            blockWidth() *
+            spriteWidth() *
                 (ghostSpriteChooserNumber <= 2
                     ? (ghostSpriteChooserNumber - 1)
                     : 0),
