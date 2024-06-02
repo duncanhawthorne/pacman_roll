@@ -130,11 +130,12 @@ class Save {
     return percentilesList;
   }
 
-  String encodeSummarisedLeaderboard(percentilesList) {
+  String encodeSummarisedLeaderboard(int length, List<double> percentilesList) {
     Map<String, dynamic> gameTmp = {};
     gameTmp = {};
     gameTmp["effectiveDate"] = DateTime.now().millisecondsSinceEpoch;
     gameTmp["percentilesList"] = percentilesList;
+    gameTmp["leaderboardLength"] = length;
     String result = json.encode(gameTmp);
     //p(["encoded percentiles", result]);
     return result;
@@ -177,11 +178,15 @@ class Save {
           leaderboardSummary["effectiveDate"] <
               DateTime.now().millisecondsSinceEpoch -
                   1000 * 60 * 60 * 6 -
-                  1000 * 60 * 10 * random.nextDouble()) {
+                  1000 * 60 * 10 * random.nextDouble() ||
+          !leaderboardSummary.keys.contains("leaderboardLength") ||
+          leaderboardSummary["leaderboardLength"] < 20) {
         //random 10 minutes to avoid multiple hits at the same time
         p("full refresh required");
+        List<double> downloadedLeaderboard = await downloadLeaderboardFull();
         await save.firebasePushSummaryLeaderboard(encodeSummarisedLeaderboard(
-            summariseLeaderboard(await downloadLeaderboardFull())));
+            downloadedLeaderboard.length,
+            summariseLeaderboard(downloadedLeaderboard)));
         p("pushed new summary");
         leaderboardSummary = await downloadLeaderboardSummary();
         p("refreshed summary download");
