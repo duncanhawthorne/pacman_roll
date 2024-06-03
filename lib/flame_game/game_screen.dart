@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import '../audio/audio_controller.dart';
 import 'pacman_game.dart';
 
@@ -88,47 +90,48 @@ Widget backButtonWidget(BuildContext context, PacmanGame game) {
 
 Widget statusOverlayWidget(BuildContext context, PacmanGame game) {
   return Positioned(
-    top: 20,
+    top: 27,
     right: 30,
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(0, 3, 0, 0),
+          child: ElapsedTimeDisplay(
+            startTime: DateTime.now(), //actually ignored
+            interval: const Duration(milliseconds: 100),
+            style: const TextStyle(
+                fontSize: 18,
+                color: Colors.white,
+                fontFamily: 'Press Start 2P'),
+            formatter: (elapsedTime) {
+              return game.stopwatchSeconds.toStringAsFixed(1);
+            },
+          ),
+        ),
+        const SizedBox(width: 20, height: 1),
         ValueListenableBuilder<int>(
           builder: (BuildContext context, int value, Widget? child) {
-            return Padding(
-              padding: const EdgeInsets.fromLTRB(0, 2, 0, 8),
-              child: Text(
-                  "Lives: ${3 - game.world.numberOfDeathsNotifier.value}",
-                  style: const TextStyle(
-                      fontSize: 12,
-                      color: Colors.white,
-                      fontFamily: 'Press Start 2P')),
-            );
+            return Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: List.generate(
+                    3 - game.world.numberOfDeathsNotifier.value,
+                    (index) => _pacmanIcon()));
           },
           valueListenable: game.world.numberOfDeathsNotifier,
         ),
-        Row(
-          children: [
-            const Text('Time: ',
-                style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.white,
-                    fontFamily: 'Press Start 2P')),
-            ElapsedTimeDisplay(
-              startTime: DateTime.now(), //actually ignored
-              interval: const Duration(milliseconds: 100),
-              style: const TextStyle(
-                  fontSize: 12,
-                  color: Colors.white,
-                  fontFamily: 'Press Start 2P'),
-              formatter: (elapsedTime) {
-                String timeText = game.stopwatchSeconds.toStringAsFixed(1);
-                return timeText;
-              },
-            ),
-          ],
-        ),
       ],
+    ),
+  );
+}
+
+Widget _pacmanIcon() {
+  return Padding(
+    padding: const EdgeInsets.fromLTRB(4, 0, 4, 0),
+    child: Transform.rotate(
+      angle: 2 * pi / 2,
+      child: Image.asset('assets/images/dash/8.png',
+          filterQuality: FilterQuality.none, height: 30, width: 30),
     ),
   );
 }
