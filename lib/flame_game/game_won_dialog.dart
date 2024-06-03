@@ -49,7 +49,7 @@ class GameWonDialog extends StatelessWidget {
               _levelCompleteText(levelCompletedIn),
               style: const TextStyle(fontFamily: 'Press Start 2P'),
             ),
-            !fbOn
+            !firebaseOn
                 ? const SizedBox.shrink()
                 : FutureBuilder(
                     future: _scoreboardRankText(levelCompletedIn),
@@ -86,17 +86,17 @@ String _levelCompleteText(double levelCompletedIn) {
 }
 
 String _scoreboardLoadingText() {
-  String y = !fbOn ? "" : "Rank: Loading...\n";
+  String y = !firebaseOn ? "" : "Rank: Loading...\n";
   return y;
 }
 
 Future<String> _scoreboardRankText(double levelCompletedIn) async {
   save.cacheLeaderboardNow(); //belts and braces. should have been called earlier in prep
-  double x = fbOn
+  double x = firebaseOn
       ? _percentileOf(await save.leaderboardWinTimesCache!, levelCompletedIn) *
           100
       : 0.0;
-  String y = !fbOn || (await save.leaderboardWinTimesCache)!.isEmpty
+  String y = !firebaseOn || (await save.leaderboardWinTimesCache)!.isEmpty
       ? ""
       : "Rank: ${x == 0 ? "World Record" : "Top ${x.toStringAsFixed(0)}%"}\n";
   return y;

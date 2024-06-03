@@ -19,7 +19,7 @@ class Save {
   Random random = Random();
 
   void fbStart() async {
-    if (fbOn) {
+    if (firebaseOn) {
       await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
       );
@@ -34,10 +34,10 @@ class Save {
   }
 
   Future<void> firebasePushSingleScore(String recordID, String state) async {
-    if (fbOn) {
+    if (firebaseOn) {
       p("firebase push");
       try {
-        if (fbOn) {
+        if (firebaseOn) {
           final dhState = <String, dynamic>{"data": state};
           db!
               .collection(mainDB)
@@ -52,10 +52,10 @@ class Save {
   }
 
   Future<void> firebasePushSummaryLeaderboard(String state) async {
-    if (fbOn) {
+    if (firebaseOn) {
       p("firebase push percentiles");
       try {
-        if (fbOn) {
+        if (firebaseOn) {
           final dhState = <String, dynamic>{"data": state};
           db!
               .collection(summaryDB)
@@ -71,7 +71,7 @@ class Save {
 
   Future<String> firebasePullSummaryLeaderboard() async {
     String gameEncoded = "";
-    if (fbOn) {
+    if (firebaseOn) {
       try {
         final docRef = db!.collection(summaryDB).doc("percentiles");
         await docRef.get().then(
@@ -90,9 +90,9 @@ class Save {
 
   Future<List> firebasePullFullLeaderboard() async {
     List<Map<String, dynamic>> allFirebaseEntries = [];
-    if (fbOn) {
+    if (firebaseOn) {
       try {
-        if (fbOn) {
+        if (firebaseOn) {
           final collectionRef = db!.collection(mainDB);
           QuerySnapshot querySnapshot = await collectionRef.get();
           final allData = querySnapshot.docs

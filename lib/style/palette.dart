@@ -32,8 +32,10 @@ class Palette {
 
   static const _black = Color(0xff000000);
   static const _lightBluePMR = Color(0xffa2fff3);
+  static const _blueMaze = Color(0xFF3B32D4);
 
   get black => _black;
-
   get lightBluePMR => _lightBluePMR;
+
+  get blueMaze => _blueMaze;
 }

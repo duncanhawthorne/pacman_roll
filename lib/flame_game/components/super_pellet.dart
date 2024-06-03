@@ -1,16 +1,14 @@
 import '../pacman_world.dart';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
-import '../constants.dart';
 import 'dart:math';
-
 import 'maze.dart';
 
 class SuperPelletCircle extends CircleComponent
     with HasWorldReference<PacmanWorld> {
   SuperPelletCircle({required super.position})
       : super(
-            radius: maze.spriteWidth() / 2 * pelletScaleFactor,
+            radius: maze.spriteWidth() / 2 * maze.pelletScaleFactor,
             anchor: Anchor.center);
 
   @override
@@ -46,7 +44,7 @@ class SuperPelletSprite extends SpriteAnimationComponent
   SuperPelletSprite() : super(size: spriteSize, anchor: Anchor.center);
 
   static final Vector2 spriteSize =
-      Vector2.all(maze.blockWidth() * pelletScaleFactor);
+      Vector2.all(maze.blockWidth() * maze.pelletScaleFactor);
   final speed = 0;
   Vector2 absPosition = Vector2(0, 0);
 

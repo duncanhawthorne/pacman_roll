@@ -1,4 +1,3 @@
-import 'components/maze.dart';
 import 'constants.dart';
 import 'package:flutter/material.dart';
 import 'dart:core';
@@ -9,7 +8,7 @@ import 'title_fix_stub.dart' if (dart.library.js_interop) 'title_fix_web.dart';
 
 /// This file has utilities used by other bits of code
 
-final globalPalette = Palette(); //FIXME
+final globalPalette = Palette(); //FIXME ideally would not re-initialise this
 
 void p(x) {
   debugPrint("///// A ${DateTime.now()} $x");
