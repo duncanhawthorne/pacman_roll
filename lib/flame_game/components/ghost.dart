@@ -10,6 +10,9 @@ import 'dart:core';
 import 'package:flame/effects.dart';
 import 'package:flutter/animation.dart';
 
+const int kGhostChaseTimeMillis = 6000;
+const int kGhostResetTimeMillis = 1000;
+
 /// The [JumpEffect] is simply a [MoveByEffect] which has the properties of the
 /// effect pre-defined.
 class ReturnHomeEffect extends MoveToEffect {
@@ -78,14 +81,14 @@ class Ghost extends GameCharacter {
   void setDead() {
     if (!world.gameWonOrLost) {
       current = CharacterState.deadGhost;
-      add(ReturnHomeEffect(kGhostStartLocation));
+      add(ReturnHomeEffect(maze.ghostStart));
       _ghostDeadTimeLatest = world.now;
       if (multipleSpawningGhosts) {
         world.remove(this);
       } else {
         //Move ball way offscreen. Stops any physics interactions or collisions
         //Further physics doesn't apply in deadGhost state
-        setUnderlyingBallPosition(kOffScreenLocation +
+        setUnderlyingBallPosition(maze.offScreen +
             Vector2.random() /
                 100); //will get moved to right position later by other code in sequence checker
         //setUnderlyingBallStatic();
@@ -94,13 +97,13 @@ class Ghost extends GameCharacter {
   }
 
   void setStartPositionAfterPacmanDeath() {
-    setPosition(kGhostStartLocation + Vector2.random() / 100);
+    setPosition(maze.ghostStart + Vector2.random() / 100);
     _ghostDeadTimeLatest = 0;
     world.allGhostScaredTimeLatest = 0;
   }
 
   void setPositionForGameEnd() {
-    setPosition(kCageLocation + Vector2.random() / 100);
+    setPosition(maze.cage + Vector2.random() / 100);
     _ghostDeadTimeLatest = 0;
     world.allGhostScaredTimeLatest = 0;
   }
@@ -110,7 +113,7 @@ class Ghost extends GameCharacter {
       if (world.now - _ghostDeadTimeLatest > kGhostResetTimeMillis) {
         if (!world.gameWonOrLost && _ghostDeadTimeLatest != 0) {
           //dont set on game over or after pacman death
-          setPosition(kGhostStartLocation + Vector2.random() / 100);
+          setPosition(maze.ghostStart + Vector2.random() / 100);
           //setUnderlyingBallDynamic();
         }
         current = CharacterState.scared;

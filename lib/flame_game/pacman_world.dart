@@ -15,7 +15,6 @@ import 'package:flutter/material.dart';
 import '../../audio/sounds.dart';
 import 'pacman_game.dart';
 import 'components/game_character.dart';
-import 'components/maze_layout.dart';
 import 'components/pacman.dart';
 import 'components/ghost.dart';
 import 'constants.dart';
@@ -117,7 +116,7 @@ class PacmanWorld extends Forge2DWorld
   }
 
   void addGhost(int ghostSpriteChooserNumber) {
-    Vector2 target = kGhostStartLocation +
+    Vector2 target = maze.ghostStart +
         Vector2(
             spriteWidth() *
                 (ghostSpriteChooserNumber <= 2
@@ -201,13 +200,13 @@ class PacmanWorld extends Forge2DWorld
       sirenVolumeUpdatedTimer();
     }
 
-    add(Pacman(position: kPacmanStartLocation));
+    add(Pacman(position: maze.pacmanStart));
     for (int i = 0; i < 3; i++) {
       addGhost(i);
     }
-    addAll(mazeWalls());
+    addAll(maze.mazeWalls());
     //addAll(screenEdgeBoundaries(game.camera));
-    addAll(pelletsAndSuperPellets(pelletsRemainingNotifier));
+    addAll(maze.pelletsAndSuperPellets(pelletsRemainingNotifier));
 
     multiGhostAdderTimer();
     game.winOrLoseGameListener();
@@ -251,20 +250,13 @@ class PacmanWorld extends Forge2DWorld
   @override
   void onDragEnd(DragEndEvent event) {
     super.onDragEnd(event);
-    if (clickAndDrag) {
-      _lastDragAngle = 10;
-    }
+    _lastDragAngle = 10;
   }
 
   void setGravity(Vector2 targetGravity) {
     if (physicsOn) {
-      gravity = targetGravity;
-      if (normaliseGravity) {
-        gravity = gravity.normalized() * 50;
-      }
-      if (screenRotates) {
-        game.camera.viewfinder.angle = -atan2(gravity.x, gravity.y);
-      }
+      gravity = targetGravity.normalized() * 50;
+      game.camera.viewfinder.angle = -atan2(gravity.x, gravity.y);
     }
   }
 }

@@ -1,5 +1,7 @@
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
+import '../firebase_options.dart';
 import 'helper.dart';
 import 'constants.dart';
 import 'dart:convert';
@@ -7,11 +9,25 @@ import 'dart:convert';
 /// This file has utilities for loading and saving the leaderboard in firebase
 
 class Save {
+  static const String mainDB = "scores";
+  static const String summaryDB = "summary";
+
   FirebaseFirestore? db;
 
   Future<List<double>>? leaderboardWinTimesCache;
 
   Random random = Random();
+
+  void fbStart() async {
+    if (fbOn) {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+      db = FirebaseFirestore.instance;
+    } else {
+      p("fb off");
+    }
+  }
 
   void cacheLeaderboardNow() async {
     leaderboardWinTimesCache ??= getCacheLeaderboard(random);

@@ -93,17 +93,17 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
 
   void _moveUnderlyingBallThroughPipePortal() {
     assert(current != CharacterState.deadGhost); //as physics doesn't apply
-    if (position.x > kRightPortalLocation.x) {
+    if (position.x > maze.rightPortal.x) {
       Vector2 startVel = _getUnderlyingBallVelocity(); //before destroy ball
-      _setUnderlyingBallPosition(kLeftPortalLocation);
-      _lastPosition.setFrom(
-          kLeftPortalLocation); //else _lastVelocity calc produces nonsense
+      _setUnderlyingBallPosition(maze.leftPortal);
+      _lastPosition
+          .setFrom(maze.leftPortal); //else _lastVelocity calc produces nonsense
       _setUnderlyingVelocity(startVel);
-    } else if (position.x < kLeftPortalLocation.x) {
+    } else if (position.x < maze.leftPortal.x) {
       Vector2 startVel = _getUnderlyingBallVelocity();
-      _setUnderlyingBallPosition(kRightPortalLocation); //before destroy ball
+      _setUnderlyingBallPosition(maze.rightPortal); //before destroy ball
       _lastPosition.setFrom(
-          kRightPortalLocation); //else _lastVelocity calc produces nonsense
+          maze.rightPortal); //else _lastVelocity calc produces nonsense
       _setUnderlyingVelocity(startVel);
     }
   }

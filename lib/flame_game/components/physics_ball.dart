@@ -32,7 +32,7 @@ class PhysicsBall extends BodyComponent {
             ],
             bodyDef: BodyDef(
               angularDamping: useForgePhysicsBallRotation ? 0.1 : 0.1,
-              position: initialPosition ?? kCageLocation,
+              position: initialPosition ?? maze.cage,
               type: BodyType.dynamic,
               userData: PhysicsBall,
             ));

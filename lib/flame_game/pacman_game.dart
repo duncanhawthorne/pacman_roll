@@ -124,9 +124,9 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
     overlays.add(GameScreen.backButtonKey);
     overlays.add(GameScreen.statusOverlayKey);
     setStatusBarColor(palette.flameGameBackground.color);
-    fixTitle(black);
+    fixTitle(palette.black);
     Future.delayed(const Duration(seconds: 1), () {
-      fixTitle(black);
+      fixTitle(palette.black);
     });
     //WakelockPlus.toggle(enable: true);
   }
@@ -136,9 +136,17 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
     //gameRunningFailsafeIndicator = false;
     cleanOverlays();
     setStatusBarColor(palette.backgroundMain.color);
-    fixTitle(lightBluePMR);
+    fixTitle(palette.lightBluePMR);
     //WakelockPlus.toggle(enable: false);
     audioController.stopAllSfx();
     super.onRemove();
+  }
+}
+
+Vector2 sanitizeScreenSize(Vector2 size) {
+  if (size.x > size.y) {
+    return Vector2(kSquareNotionalSize * size.x / size.y, kSquareNotionalSize);
+  } else {
+    return Vector2(kSquareNotionalSize, kSquareNotionalSize * size.y / size.x);
   }
 }

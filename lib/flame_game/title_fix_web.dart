@@ -1,9 +1,13 @@
+import 'package:flutter/foundation.dart';
+
 import 'constants.dart';
 // ignore: depend_on_referenced_packages
 import 'package:web/web.dart' as web;
 import 'package:flutter/services.dart';
 
 /// This file runs only on the web and contains fixes for iOS safari / chrome
+
+final isiOSMobile = kIsWeb && defaultTargetPlatform == TargetPlatform.iOS;
 
 void fixTitleReal(Color color) {
   if (isiOSMobile) {

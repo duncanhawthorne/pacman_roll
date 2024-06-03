@@ -2,12 +2,28 @@ import 'dart:io';
 import 'dart:math';
 import 'package:flame/components.dart';
 import 'package:flame/flame.dart';
+import 'package:flutter/material.dart';
 import 'dart:core';
 import 'dart:ui';
-import '../constants.dart';
 import '../helper.dart';
 
+const int pacmanRenderFracIncrementsNumber = 32;
+const int pacmanMouthWidthDefault =
+    pacmanRenderFracIncrementsNumber ~/ 4; //8 / 32; //5/32
+const int pacmanDeadFrames = (pacmanRenderFracIncrementsNumber * 3) ~/
+    4; //(kPacmanDeadResetTimeAnimationMillis / 33).ceil();
+const int pacmanEatingHalfFrames = (pacmanRenderFracIncrementsNumber * 1) ~/
+    4; //(kPacmanHalfEatingResetTimeMillis / 67).ceil();
+final Paint yellowPacmanPaint = Paint()
+  ..color = Colors.yellowAccent; //blue; //yellowAccent;
+
 class PacmanSprites {
+  static const pacmanRectSize = 50;
+  final Rect pacmanRect = Rect.fromCenter(
+      center: const Offset(pacmanRectSize / 2, pacmanRectSize / 2),
+      width: pacmanRectSize.toDouble(),
+      height: pacmanRectSize.toDouble());
+
   // ignore: unused_element
   void _savePictureAtFrac(int mouthWidthAsInt) async {
     p("save picture");

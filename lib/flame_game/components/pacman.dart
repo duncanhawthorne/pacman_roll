@@ -1,5 +1,6 @@
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
+import 'package:pacman_roll/flame_game/components/pacman_sprites.dart';
 
 import '../../audio/sounds.dart';
 import '../constants.dart';
@@ -10,6 +11,10 @@ import 'ghost.dart';
 import 'game_character.dart';
 import 'dart:math';
 import 'dart:core';
+
+const int kPacmanDeadResetTimeMillis = 1700;
+const int kPacmanDeadResetTimeAnimationMillis = 1250;
+const int kPacmanHalfEatingResetTimeMillis = 180;
 
 /// The [GameCharacter] is the component that the physical player of the game is
 /// controlling.
@@ -152,7 +157,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   }
 
   void setStartPositionAfterDeath() {
-    setPosition(kPacmanStartLocation);
+    setPosition(maze.pacmanStart);
     current = CharacterState.normal;
   }
 
@@ -196,4 +201,8 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     }
     super.update(dt);
   }
+}
+
+int roundUpToMult(int x, int roundUpMult) {
+  return (x / roundUpMult).ceil() * roundUpMult;
 }
