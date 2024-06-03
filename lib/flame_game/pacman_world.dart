@@ -190,15 +190,19 @@ class PacmanWorld extends Forge2DWorld
     });
   }
 
-  @override
-  Future<void> onLoad() async {
-    super.onLoad();
-    play(SfxType.startMusic);
+  void startSiren() {
     if (sirenEnabled) {
       play(SfxType.ghostsRoamingSiren);
       game.audioController.setSirenVolume(0);
       sirenVolumeUpdatedTimer();
     }
+  }
+
+  @override
+  Future<void> onLoad() async {
+    super.onLoad();
+    play(SfxType.startMusic);
+    startSiren();
 
     add(Pacman(position: maze.pacmanStart));
     for (int i = 0; i < 3; i++) {
@@ -206,7 +210,7 @@ class PacmanWorld extends Forge2DWorld
     }
     addAll(maze.mazeWalls());
     //addAll(screenEdgeBoundaries(game.camera));
-    addAll(maze.pelletsAndSuperPellets(pelletsRemainingNotifier));
+    addAll(maze.pellets(pelletsRemainingNotifier));
 
     multiGhostAdderTimer();
     game.winOrLoseGameListener();

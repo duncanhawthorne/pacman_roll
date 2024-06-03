@@ -15,147 +15,6 @@ final Paint blackBackgroundPaint = Paint()
 final Paint blueMazePaint = Paint()..color = globalPalette.blueMaze;
 
 class Maze {
-  get ghostStart => Vector2(0, maze1 ? -3.5 : -3) * blockWidth();
-
-  get pacmanStart => Vector2(0, maze1 ? 8.5 : 5) * blockWidth();
-
-  get cage => Vector2(0, maze1 ? -0.5 : -1) * blockWidth();
-
-  get leftPortal =>
-      Vector2(-(_mazeLayoutLength() - 1) / 2 * 0.99, maze1 ? -0.5 : -1) *
-      blockWidth();
-
-  get rightPortal =>
-      Vector2((_mazeLayoutLength() - 1) / 2 * 0.99, maze1 ? -0.5 : -1) *
-      blockWidth();
-
-  get offScreen => Vector2(0, 1000) * spriteWidth();
-
-  static const mazeWallWidthFactor = 0.7;
-  static const double pixelationBuffer = 1.03;
-  static const bool maze1 = true;
-  static const gameScaleFactor = maze1 ? 1.0 : 0.95;
-
-  get pelletScaleFactor => maze1 ? 0.4 : 0.46;
-
-  double blockWidth() {
-    return kSquareNotionalSize /
-        flameGameZoom /
-        _mazeLayoutLength() *
-        gameScaleFactor;
-  }
-
-  double spriteWidth() {
-    return blockWidth() * (maze1 ? 2 : 1);
-  }
-
-  int _mazeLayoutLength() {
-    return _wrappedMazeLayout.isEmpty ? 0 : _wrappedMazeLayout[0].length;
-  }
-
-  List<Component> pelletsAndSuperPellets(
-      ValueNotifier pelletsRemainingNotifier) {
-    List<Component> result = [];
-    pelletsRemainingNotifier.value = 0;
-    double scale = blockWidth();
-    for (int i = 0; i < _wrappedMazeLayout.length; i++) {
-      for (int j = 0; j < _wrappedMazeLayout[i].length; j++) {
-        Vector2 center = Vector2(0, 0);
-        if (maze1) {
-          center = Vector2(j + 1 - _wrappedMazeLayout[0].length / 2,
-                  i + 1 - _wrappedMazeLayout.length / 2) *
-              scale;
-        } else {
-          center = Vector2(j + 1 / 2 - _wrappedMazeLayout[0].length / 2,
-                  i + 1 / 2 - _wrappedMazeLayout.length / 2) *
-              scale;
-        }
-        if (_wrappedMazeLayout[i][j] == 0) {
-          result.add(MiniPelletCircle(position: center));
-        }
-        if (_wrappedMazeLayout[i][j] == 3) {
-          result.add(SuperPelletCircle(position: center));
-        }
-      }
-    }
-    return result;
-  }
-
-  bool _center(int i, int j) {
-    if (i >= _wrappedMazeLayout.length ||
-        i < 0 ||
-        j >= _wrappedMazeLayout[i].length ||
-        j < 0) {
-      return false;
-    } else {
-      return _wrappedMazeLayout[i][j] == 1;
-    }
-  }
-
-  bool _circleAt(int i, int j) {
-    assert(_center(i, j));
-    return !(_center(i - 1, j) && _center(i + 1, j) ||
-        _center(i, j - 1) && _center(i, j + 1));
-  }
-
-  List<Component> mazeWalls() {
-    List<Component> result = [];
-    double scale = blockWidth();
-    for (int i = 0; i < _wrappedMazeLayout.length; i++) {
-      for (int j = 0; j < _wrappedMazeLayout[i].length; j++) {
-        Vector2 center = Vector2(j + 1 / 2 - _wrappedMazeLayout[0].length / 2,
-                i + 1 / 2 - _wrappedMazeLayout.length / 2) *
-            scale;
-        if (_center(i, j)) {
-          if (_circleAt(i, j)) {
-            result.add(MazeWallCircleGround(center, scale / 2));
-          }
-          if (_center(i, j + 1)) {
-            result.add(MazeWallRectangleGround(center + Vector2(scale / 2, 0),
-                scale * pixelationBuffer, scale));
-          }
-          if (_center(i + 1, j)) {
-            result.add(MazeWallRectangleGround(center + Vector2(0, scale / 2),
-                scale, scale * pixelationBuffer));
-          }
-        }
-      }
-    }
-
-    for (int i = 0; i < _wrappedMazeLayout.length; i++) {
-      for (int j = 0; j < _wrappedMazeLayout[i].length; j++) {
-        Vector2 center = Vector2(j + 1 / 2 - _wrappedMazeLayout[0].length / 2,
-                i + 1 / 2 - _wrappedMazeLayout.length / 2) *
-            scale;
-        if (_center(i, j)) {
-          if (_circleAt(i, j)) {
-            result.add(MazeWallCircleVisual(
-                position: center, radius: scale / 2 * mazeWallWidthFactor));
-          }
-          if (_center(i, j + 1)) {
-            result.add(MazeWallSquareVisual(
-                position: center + Vector2(scale / 2, 0),
-                widthx: scale * pixelationBuffer,
-                heightx: scale * mazeWallWidthFactor));
-          }
-          if (_center(i + 1, j)) {
-            result.add(MazeWallSquareVisual(
-                position: center + Vector2(0, scale / 2),
-                widthx: scale * mazeWallWidthFactor,
-                heightx: scale * pixelationBuffer));
-          }
-          if (_center(i + 1, j) && _center(i, j + 1) && _center(i + 1, j + 1)) {
-            result.add(MazeWallSquareVisual(
-                position: center + Vector2(scale / 2, scale / 2),
-                widthx: scale * mazeWallWidthFactor,
-                heightx: scale * pixelationBuffer));
-          }
-        }
-      }
-    }
-    return result;
-  }
-
   static const _maze1Layout = [
     '555555555555555555555555555555555',
     '551111111111111111111111111111155',
@@ -216,8 +75,146 @@ class Maze {
     [5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 5]
   ];
 
-  final _wrappedMazeLayout =
-      maze1 ? _decodeMazeLayout(_maze1Layout) : _maze2Layout;
+  static const mazeWallWidthFactor = 0.7;
+  static const double pixelationBuffer = 1.03;
+  static const bool maze1 = true;
+  static const gameScaleFactor = maze1 ? 1.0 : 0.95;
+  final _mazeLayout = maze1 ? _decodeMazeLayout(_maze1Layout) : _maze2Layout;
+
+  late final ghostStart = Vector2(0, maze1 ? -3.5 : -3) * blockWidth();
+
+  late final pacmanStart = Vector2(0, maze1 ? 8.5 : 5) * blockWidth();
+
+  late final cage = Vector2(0, maze1 ? -0.5 : -1) * blockWidth();
+
+  late final leftPortal =
+      Vector2(-(_mazeLayoutLength() - 1) / 2 * 0.99, maze1 ? -0.5 : -1) *
+          blockWidth();
+
+  late final rightPortal =
+      Vector2((_mazeLayoutLength() - 1) / 2 * 0.99, maze1 ? -0.5 : -1) *
+          blockWidth();
+
+  late final offScreen = Vector2(0, 1000) * spriteWidth();
+
+  late final pelletScaleFactor = maze1 ? 0.4 : 0.46;
+
+  double blockWidth() {
+    return kSquareNotionalSize /
+        flameGameZoom /
+        _mazeLayoutLength() *
+        gameScaleFactor;
+  }
+
+  double spriteWidth() {
+    return blockWidth() * (maze1 ? 2 : 1);
+  }
+
+  int _mazeLayoutLength() {
+    return _mazeLayout.isEmpty ? 0 : _mazeLayout[0].length;
+  }
+
+  bool _wallAt(int i, int j) {
+    if (i >= _mazeLayout.length ||
+        i < 0 ||
+        j >= _mazeLayout[i].length ||
+        j < 0) {
+      return false;
+    } else {
+      return _mazeLayout[i][j] == 1;
+    }
+  }
+
+  bool _circleAt(int i, int j) {
+    assert(_wallAt(i, j));
+    return !(_wallAt(i - 1, j) && _wallAt(i + 1, j) ||
+        _wallAt(i, j - 1) && _wallAt(i, j + 1));
+  }
+
+  List<Component> pellets(ValueNotifier pelletsRemainingNotifier) {
+    List<Component> result = [];
+    pelletsRemainingNotifier.value = 0;
+    double scale = blockWidth();
+    for (int i = 0; i < _mazeLayout.length; i++) {
+      for (int j = 0; j < _mazeLayout[i].length; j++) {
+        Vector2 center = Vector2(0, 0);
+        if (maze1) {
+          center = Vector2(j + 1 - _mazeLayout[0].length / 2,
+                  i + 1 - _mazeLayout.length / 2) *
+              scale;
+        } else {
+          center = Vector2(j + 1 / 2 - _mazeLayout[0].length / 2,
+                  i + 1 / 2 - _mazeLayout.length / 2) *
+              scale;
+        }
+        if (_mazeLayout[i][j] == 0) {
+          result.add(MiniPelletCircle(position: center));
+        }
+        if (_mazeLayout[i][j] == 3) {
+          result.add(SuperPelletCircle(position: center));
+        }
+      }
+    }
+    return result;
+  }
+
+  List<Component> mazeWalls() {
+    List<Component> result = [];
+    double scale = blockWidth();
+    for (int i = 0; i < _mazeLayout.length; i++) {
+      for (int j = 0; j < _mazeLayout[i].length; j++) {
+        Vector2 center = Vector2(j + 1 / 2 - _mazeLayout[0].length / 2,
+                i + 1 / 2 - _mazeLayout.length / 2) *
+            scale;
+        if (_wallAt(i, j)) {
+          if (_circleAt(i, j)) {
+            result.add(MazeWallCircleGround(center, scale / 2));
+          }
+          if (_wallAt(i, j + 1)) {
+            result.add(MazeWallRectangleGround(center + Vector2(scale / 2, 0),
+                scale * pixelationBuffer, scale));
+          }
+          if (_wallAt(i + 1, j)) {
+            result.add(MazeWallRectangleGround(center + Vector2(0, scale / 2),
+                scale, scale * pixelationBuffer));
+          }
+        }
+      }
+    }
+
+    for (int i = 0; i < _mazeLayout.length; i++) {
+      for (int j = 0; j < _mazeLayout[i].length; j++) {
+        Vector2 center = Vector2(j + 1 / 2 - _mazeLayout[0].length / 2,
+                i + 1 / 2 - _mazeLayout.length / 2) *
+            scale;
+        if (_wallAt(i, j)) {
+          if (_circleAt(i, j)) {
+            result.add(MazeWallCircleVisual(
+                position: center, radius: scale / 2 * mazeWallWidthFactor));
+          }
+          if (_wallAt(i, j + 1)) {
+            result.add(MazeWallSquareVisual(
+                position: center + Vector2(scale / 2, 0),
+                widthx: scale * pixelationBuffer,
+                heightx: scale * mazeWallWidthFactor));
+          }
+          if (_wallAt(i + 1, j)) {
+            result.add(MazeWallSquareVisual(
+                position: center + Vector2(0, scale / 2),
+                widthx: scale * mazeWallWidthFactor,
+                heightx: scale * pixelationBuffer));
+          }
+          if (_wallAt(i + 1, j) && _wallAt(i, j + 1) && _wallAt(i + 1, j + 1)) {
+            result.add(MazeWallSquareVisual(
+                position: center + Vector2(scale / 2, scale / 2),
+                widthx: scale * mazeWallWidthFactor,
+                heightx: scale * pixelationBuffer));
+          }
+        }
+      }
+    }
+    return result;
+  }
 }
 
 class MazeWallSquareVisual extends RectangleComponent {
