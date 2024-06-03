@@ -11,19 +11,35 @@ import 'mini_pellet.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 
 final Paint blackBackgroundPaint = Paint()
-  ..color = palette.flameGameBackground.color;
+  ..color = globalPalette.flameGameBackground.color;
 
 class Maze {
-  final Vector2 ghostStart = Vector2(0, maze1 ? -3.5 : -3) * blockWidth();
-  final Vector2 pacmanStart = Vector2(0, maze1 ? 8.5 : 5) * blockWidth();
-  final Vector2 cage = Vector2(0, maze1 ? -0.25 : -1) * blockWidth();
-  final Vector2 leftPortal =
+  get ghostStart => Vector2(0, maze1 ? -3.5 : -3) * blockWidth();
+
+  get pacmanStart => Vector2(0, maze1 ? 8.5 : 5) * blockWidth();
+
+  get cage => Vector2(0, maze1 ? -0.25 : -1) * blockWidth();
+
+  get leftPortal =>
       Vector2(-(maze.mazeLayoutLength() - 1) / 2 * 0.99, maze1 ? -0.25 : -1) *
           blockWidth();
-  final Vector2 rightPortal =
+
+  get rightPortal =>
       Vector2((maze.mazeLayoutLength() - 1) / 2 * 0.99, maze1 ? -0.25 : -1) *
           blockWidth();
-  final Vector2 offScreen = Vector2(0, 1000) * spriteWidth();
+
+  get offScreen => Vector2(0, 1000) * spriteWidth();
+
+  double blockWidth() {
+    return kSquareNotionalSize /
+        flameGameZoom /
+        maze.mazeLayoutLength() *
+        gameScaleFactor;
+  }
+
+  double spriteWidth() {
+    return blockWidth() * (maze1 ? 2 : 1);
+  }
 
   int mazeLayoutLength() {
     return wrappedMazeLayout.isEmpty ? 0 : wrappedMazeLayout[0].length;
@@ -279,5 +295,7 @@ List<List<int>> decodeMazeLayout(encodedMazeLayout) {
   }
   return result;
 }
+
+Maze maze = Maze();
 
 final Paint blueMazePaint = Paint()..color = const Color(0xFF3B32D4);

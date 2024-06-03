@@ -2,11 +2,13 @@ import 'package:flame/camera.dart';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
+import 'package:pacman_roll/flame_game/saves.dart';
 
 import '../audio/audio_controller.dart';
 import '../level_selection/levels.dart';
 import '../player_progress/player_progress.dart';
 
+import '../style/palette.dart';
 import 'game_screen.dart';
 import 'pacman_world.dart';
 import 'constants.dart';
@@ -33,6 +35,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
     required this.level,
     required PlayerProgress playerProgress,
     required this.audioController,
+    required this.palette,
   }) : super(
           world: PacmanWorld(level: level, playerProgress: playerProgress),
           camera: CameraComponent.withFixedResolution(
@@ -46,6 +49,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
 
   /// A helper for playing sound effects and background audio.
   final AudioController audioController;
+  final Palette palette;
 
   String userString = "";
   final stopwatch = Stopwatch();

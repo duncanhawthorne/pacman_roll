@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:nes_ui/nes_ui.dart';
 import 'package:provider/provider.dart';
 
+import 'flame_game/saves.dart';
 import 'router.dart';
 import 'flame_game/constants.dart';
 import 'flame_game/helper.dart';
@@ -20,7 +21,7 @@ void main() async {
 
   save.fbStart();
 
-  fixTitle(palette.lightBluePMR);
+  fixTitle(globalPalette.lightBluePMR);
 
   FlutterNativeSplash.remove();
   await Flame.device.fullScreen();

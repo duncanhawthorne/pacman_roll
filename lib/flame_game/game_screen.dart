@@ -34,6 +34,7 @@ class GameScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     context.watch<Palette>();
     final audioController = context.read<AudioController>();
+    final palette = context.read<Palette>();
     return PopScope(
       canPop: false,
       child: Scaffold(
@@ -43,6 +44,7 @@ class GameScreen extends StatelessWidget {
             level: level,
             playerProgress: context.read<PlayerProgress>(),
             audioController: audioController,
+            palette: palette,
           ),
           overlayBuilderMap: {
             backButtonKey: (BuildContext context, PacmanGame game) {

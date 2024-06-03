@@ -4,6 +4,7 @@ import '../pacman_game.dart';
 import '../pacman_world.dart';
 import '../constants.dart';
 import '../helper.dart';
+import 'maze.dart';
 import 'physics_ball.dart';
 import 'dart:core';
 
@@ -18,7 +19,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   GameCharacter({
     super.position,
   }) : super(
-            size: Vector2.all(spriteWidth()),
+            size: Vector2.all(maze.spriteWidth()),
             anchor: Anchor.center,
             priority: 1);
 

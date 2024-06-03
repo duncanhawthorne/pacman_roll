@@ -13,12 +13,12 @@ import 'package:flutter/material.dart';
 //    as flame_pointer_move_event;
 
 import '../../audio/sounds.dart';
+import 'components/maze.dart';
 import 'pacman_game.dart';
 import 'components/game_character.dart';
 import 'components/pacman.dart';
 import 'components/ghost.dart';
 import 'constants.dart';
-import 'helper.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:async' as async;
 
@@ -118,7 +118,7 @@ class PacmanWorld extends Forge2DWorld
   void addGhost(int ghostSpriteChooserNumber) {
     Vector2 target = maze.ghostStart +
         Vector2(
-            spriteWidth() *
+            maze.spriteWidth() *
                 (ghostSpriteChooserNumber <= 2
                     ? (ghostSpriteChooserNumber - 1)
                     : 0),

@@ -1,7 +1,5 @@
 import 'components/maze.dart';
-import 'components/pacman_sprites.dart';
 import 'constants.dart';
-import 'saves.dart';
 import 'package:flutter/material.dart';
 import 'dart:core';
 //import 'package:sensors_plus/sensors_plus.dart';
@@ -11,21 +9,7 @@ import 'title_fix_stub.dart' if (dart.library.js_interop) 'title_fix_web.dart';
 
 /// This file has utilities used by other bits of code
 
-final palette = Palette();
-Save save = Save();
-PacmanSprites pacmanSprites = PacmanSprites();
-Maze maze = Maze();
-
-double blockWidth() {
-  return kSquareNotionalSize /
-      flameGameZoom /
-      maze.mazeLayoutLength() *
-      gameScaleFactor;
-}
-
-double spriteWidth() {
-  return blockWidth() * (maze1 ? 2 : 1);
-}
+final globalPalette = Palette(); //FIXME
 
 void p(x) {
   debugPrint("///// A ${DateTime.now()} $x");

@@ -2,7 +2,7 @@ import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flutter/material.dart';
 import '../constants.dart';
 import 'game_character.dart';
-import '../helper.dart';
+import 'maze.dart';
 
 class PhysicsBall extends BodyComponent {
   //with TapCallbacks, ContactCallbacks
@@ -24,7 +24,8 @@ class PhysicsBall extends BodyComponent {
                 ]),
 
                  */
-                CircleShape()..radius = size ?? spriteWidth() / 2 * 0.99, //0.95
+                CircleShape()
+                  ..radius = size ?? maze.spriteWidth() / 2 * 0.99, //0.95
                 restitution: 0.0,
                 friction: useForgePhysicsBallRotation ? 1 : 0,
                 userData: PhysicsBall,

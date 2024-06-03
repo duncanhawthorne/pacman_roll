@@ -4,7 +4,7 @@ import 'package:pacman_roll/flame_game/components/pacman_sprites.dart';
 
 import '../../audio/sounds.dart';
 import '../constants.dart';
-import '../helper.dart';
+import 'maze.dart';
 import 'mini_pellet.dart';
 import 'super_pellet.dart';
 import 'ghost.dart';

@@ -10,6 +10,8 @@ import 'dart:core';
 import 'package:flame/effects.dart';
 import 'package:flutter/animation.dart';
 
+import 'maze.dart';
+
 const int kGhostChaseTimeMillis = 6000;
 const int kGhostResetTimeMillis = 1000;
 

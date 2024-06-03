@@ -115,3 +115,5 @@ class PacmanSprites {
     return await _pacmanAtFracCache[fracInt]!;
   }
 }
+
+PacmanSprites pacmanSprites = PacmanSprites();

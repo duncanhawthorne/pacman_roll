@@ -216,3 +216,5 @@ class Save {
     return leaderboardWinTimesTmp;
   }
 }
+
+Save save = Save();
