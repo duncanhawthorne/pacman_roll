@@ -21,21 +21,16 @@ class Palette {
       const PaletteEntry(Colors.yellowAccent); //Color(0xFF000000) //0xFF0050bc
   PaletteEntry get text => const PaletteEntry(Color(0xee352b42));
   PaletteEntry get backgroundMain =>
-      const PaletteEntry(_lightBluePMR); //0xffa2fff3
+      const PaletteEntry(lightBluePMR); //0xffa2fff3
   PaletteEntry get backgroundLevelSelection =>
       const PaletteEntry(Color(0xffffcd75));
   PaletteEntry get backgroundPlaySession =>
-      const PaletteEntry(_lightBluePMR); //0xffa2fff3
+      const PaletteEntry(lightBluePMR); //0xffa2fff3
   PaletteEntry get backgroundSettings => const PaletteEntry(Color(0xffbfc8e3));
 
-  PaletteEntry get flameGameBackground => const PaletteEntry(_black);
+  PaletteEntry get flameGameBackground => const PaletteEntry(black);
 
-  static const _black = Color(0xff000000);
-  static const _lightBluePMR = Color(0xffa2fff3);
-  static const _blueMaze = Color(0xFF3B32D4);
-
-  get black => _black;
-  get lightBluePMR => _lightBluePMR;
-
-  get blueMaze => _blueMaze;
+  static const black = Color(0xff000000);
+  static const lightBluePMR = Color(0xffa2fff3);
+  static const blueMaze = Color(0xFF3B32D4);
 }

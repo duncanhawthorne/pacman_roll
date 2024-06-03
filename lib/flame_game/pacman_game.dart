@@ -112,7 +112,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
 
   @override
   Future<void> onGameResize(size) async {
-    Vector2 targetViewPortSize = sanitizeScreenSize(size);
+    Vector2 targetViewPortSize = _sanitizeScreenSize(size);
     camera.viewport = FixedResolutionViewport(
         resolution: Vector2(targetViewPortSize.x, targetViewPortSize.y));
     super.onGameResize(size);
@@ -124,13 +124,13 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
   Future<void> onLoad() async {
     super.onLoad();
     //gameRunningFailsafeIndicator = true;
-    userString = getRandomString(world.random, 15);
+    userString = _getRandomString(world.random, 15);
     overlays.add(GameScreen.backButtonKey);
     overlays.add(GameScreen.statusOverlayKey);
     setStatusBarColor(palette.flameGameBackground.color);
-    fixTitle(palette.black);
+    fixTitle(Palette.black);
     Future.delayed(const Duration(seconds: 1), () {
-      fixTitle(palette.black);
+      fixTitle(Palette.black);
     });
     //WakelockPlus.toggle(enable: true);
   }
@@ -140,17 +140,24 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
     //gameRunningFailsafeIndicator = false;
     cleanOverlays();
     setStatusBarColor(palette.backgroundMain.color);
-    fixTitle(palette.lightBluePMR);
+    fixTitle(Palette.lightBluePMR);
     //WakelockPlus.toggle(enable: false);
     audioController.stopAllSfx();
     super.onRemove();
   }
 }
 
-Vector2 sanitizeScreenSize(Vector2 size) {
+Vector2 _sanitizeScreenSize(Vector2 size) {
   if (size.x > size.y) {
     return Vector2(kSquareNotionalSize * size.x / size.y, kSquareNotionalSize);
   } else {
     return Vector2(kSquareNotionalSize, kSquareNotionalSize * size.y / size.x);
   }
 }
+
+const String _chars =
+    'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
+
+String _getRandomString(random, int length) =>
+    String.fromCharCodes(Iterable.generate(
+        length, (_) => _chars.codeUnitAt(random.nextInt(_chars.length))));

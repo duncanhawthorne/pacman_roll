@@ -3,12 +3,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import '../firebase_options.dart';
 import 'helper.dart';
-import 'constants.dart';
 import 'dart:convert';
 
 /// This file has utilities for loading and saving the leaderboard in firebase
 
 class Save {
+  static const bool firebaseOn = true; //!(windows && !kIsWeb);
+
   static const String mainDB = "scores";
   static const String summaryDB = "summary";
 
@@ -25,7 +26,7 @@ class Save {
       );
       db = FirebaseFirestore.instance;
     } else {
-      p("fb off");
+      debug("fb off");
     }
   }
 
@@ -35,7 +36,7 @@ class Save {
 
   Future<void> firebasePushSingleScore(String recordID, String state) async {
     if (firebaseOn) {
-      p("firebase push");
+      debug("firebase push");
       try {
         if (firebaseOn) {
           final dhState = <String, dynamic>{"data": state};
@@ -43,17 +44,17 @@ class Save {
               .collection(mainDB)
               .doc(recordID)
               .set(dhState)
-              .onError((e, _) => p("Error writing document: $e"));
+              .onError((e, _) => debug("Error writing document: $e"));
         }
       } catch (e) {
-        p(e);
+        debug(e);
       }
     }
   }
 
   Future<void> firebasePushSummaryLeaderboard(String state) async {
     if (firebaseOn) {
-      p("firebase push percentiles");
+      debug("firebase push percentiles");
       try {
         if (firebaseOn) {
           final dhState = <String, dynamic>{"data": state};
@@ -61,10 +62,10 @@ class Save {
               .collection(summaryDB)
               .doc("percentiles")
               .set(dhState)
-              .onError((e, _) => p("Error writing document: $e"));
+              .onError((e, _) => debug("Error writing document: $e"));
         }
       } catch (e) {
-        p(e);
+        debug(e);
       }
     }
   }
@@ -79,10 +80,10 @@ class Save {
             final gameEncodedTmp = doc.data() as Map<String, dynamic>;
             gameEncoded = gameEncodedTmp["data"];
           },
-          onError: (e) => p("Error getting document: $e"),
+          onError: (e) => debug("Error getting document: $e"),
         );
       } catch (e) {
-        p(["no matching fb entries", e]);
+        debug(["no matching fb entries", e]);
       }
     }
     return gameEncoded;
@@ -108,13 +109,13 @@ class Save {
                 allFirebaseEntries.add(singleEntry);
               }
             } catch (e) {
-              p(["ill formed firebase entry", e]);
+              debug(["ill formed firebase entry", e]);
             }
           }
           return allFirebaseEntries;
         }
       } catch (e) {
-        p(["full firebase entries error", e]);
+        debug(["full firebase entries error", e]);
       }
     }
     return allFirebaseEntries;
@@ -186,7 +187,7 @@ class Save {
         leaderboardSummary = await downloadLeaderboardSummary();
       } catch (e) {
         //likely firebase database blank, i.e. first run
-        p(["ill-formed leaderboard", e]);
+        debug(["ill-formed leaderboard", e]);
       }
 
       if (leaderboardSummary.isEmpty ||
@@ -198,20 +199,20 @@ class Save {
           !leaderboardSummary.keys.contains("leaderboardLength") ||
           leaderboardSummary["leaderboardLength"] < 20) {
         //random 10 minutes to avoid multiple hits at the same time
-        p("full refresh required");
+        debug("full refresh required");
         List<double> downloadedLeaderboard = await downloadLeaderboardFull();
         await save.firebasePushSummaryLeaderboard(encodeSummarisedLeaderboard(
             downloadedLeaderboard.length,
             summariseLeaderboard(downloadedLeaderboard)));
-        p("pushed new summary");
+        debug("pushed new summary");
         leaderboardSummary = await downloadLeaderboardSummary();
-        p("refreshed summary download");
+        debug("refreshed summary download");
       }
 
       for (int i = 0; i < leaderboardSummary["percentilesList"].length; i++) {
         leaderboardWinTimesTmp.add(leaderboardSummary["percentilesList"][i]);
       }
-      p("summary saved locally");
+      debug("summary saved locally");
     }
     return leaderboardWinTimesTmp;
   }

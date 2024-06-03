@@ -1,24 +1,28 @@
-//import 'package:flutter/cupertino.dart';
-
 import 'dart:ui';
-
 import 'package:flutter/foundation.dart';
+import 'package:pacman_roll/style/palette.dart';
 import '../constants.dart';
-import '../helper.dart';
 import 'package:flame/components.dart';
 import 'super_pellet.dart';
 import 'mini_pellet.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 
-final Paint blackBackgroundPaint = Paint()
-  ..color = globalPalette.flameGameBackground.color;
-final Paint blueMazePaint = Paint()..color = globalPalette.blueMaze;
+final Paint _blackBackgroundPaint = Paint()..color = Palette.black;
+final Paint _blueMazePaint = Paint()..color = Palette.blueMaze;
 
 class GameSize {}
 
 GameSize gameSize = GameSize();
 
 class Maze {
+// 0 - pac-dots
+// 1 - wall
+// 2 - ghost-lair
+// 3 - power-pellet
+// 4 - empty
+// 5 - outside
+// 6 - below 0
+
   static const _maze1Layout = [
     '555555555555555555555555555555555',
     '551111111111111111111111111111155',
@@ -200,20 +204,20 @@ class Maze {
           if (_wallAt(i, j + 1)) {
             result.add(MazeWallSquareVisual(
                 position: center + Vector2(scale / 2, 0),
-                widthx: scale * _pixelationBuffer,
-                heightx: scale * _mazeInnerWallWidthFactor));
+                width: scale * _pixelationBuffer,
+                height: scale * _mazeInnerWallWidthFactor));
           }
           if (_wallAt(i + 1, j)) {
             result.add(MazeWallSquareVisual(
                 position: center + Vector2(0, scale / 2),
-                widthx: scale * _mazeInnerWallWidthFactor,
-                heightx: scale * _pixelationBuffer));
+                width: scale * _mazeInnerWallWidthFactor,
+                height: scale * _pixelationBuffer));
           }
           if (_wallAt(i + 1, j) && _wallAt(i, j + 1) && _wallAt(i + 1, j + 1)) {
             result.add(MazeWallSquareVisual(
                 position: center + Vector2(scale / 2, scale / 2),
-                widthx: scale * _mazeInnerWallWidthFactor,
-                heightx: scale * _pixelationBuffer));
+                width: scale * _mazeInnerWallWidthFactor,
+                height: scale * _pixelationBuffer));
           }
         }
       }
@@ -224,31 +228,30 @@ class Maze {
 
 class MazeWallSquareVisual extends RectangleComponent {
   MazeWallSquareVisual(
-      {required super.position, required widthx, required heightx})
+      {required super.position, required width, required height})
       : super(
-            size: Vector2(widthx, heightx),
+            size: Vector2(width, height),
             anchor: Anchor.center,
-            paint: blackBackgroundPaint);
-  double widthx = 0;
-  double heightx = 0;
+            paint: _blackBackgroundPaint);
 }
 
 class MazeWallCircleVisual extends CircleComponent {
   MazeWallCircleVisual({required super.radius, required super.position})
-      : super(anchor: Anchor.center, paint: blackBackgroundPaint); //NOTE BLACK
+      : super(anchor: Anchor.center, paint: _blackBackgroundPaint); //NOTE BLACK
 }
 
 class MazeWallRectangleGround extends BodyComponent {
-  final Vector2 _position;
+  @override
+  final Vector2 position;
   final double width;
   final double height;
 
-  MazeWallRectangleGround(this._position, this.width, this.height);
+  MazeWallRectangleGround(this.position, this.width, this.height);
 
   @override
   Body createBody() {
     final shape = PolygonShape();
-    paint = blueMazePaint;
+    paint = _blueMazePaint;
 
     final List<Vector2> vertices = [
       Vector2(0, 0),
@@ -262,26 +265,27 @@ class MazeWallRectangleGround extends BodyComponent {
 
     final bodyDef = BodyDef(
         type: BodyType.static,
-        position: _position - Vector2(width / 2, height / 2));
+        position: position - Vector2(width / 2, height / 2));
     return world.createBody(bodyDef)..createFixture(fixtureDef);
   }
 }
 
 class MazeWallCircleGround extends BodyComponent {
-  final Vector2 _position;
-  final double _radius;
+  @override
+  final Vector2 position;
+  final double radius;
 
-  MazeWallCircleGround(this._position, this._radius);
+  MazeWallCircleGround(this.position, this.radius);
 
   @override
   Body createBody() {
     final shape = CircleShape();
-    paint = blueMazePaint;
+    paint = _blueMazePaint;
 
-    shape.radius = _radius;
+    shape.radius = radius;
     final fixtureDef = FixtureDef(shape);
 
-    final bodyDef = BodyDef(type: BodyType.static, position: _position);
+    final bodyDef = BodyDef(type: BodyType.static, position: position);
     return world.createBody(bodyDef)..createFixture(fixtureDef);
   }
 }

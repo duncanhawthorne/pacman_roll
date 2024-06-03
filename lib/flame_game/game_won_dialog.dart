@@ -2,7 +2,6 @@ import 'package:pacman_roll/flame_game/pacman_game.dart';
 import 'package:pacman_roll/flame_game/saves.dart';
 
 import '../level_selection/levels.dart';
-import 'constants.dart';
 import '../style/palette.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -49,7 +48,7 @@ class GameWonDialog extends StatelessWidget {
               _levelCompleteText(levelCompletedIn),
               style: const TextStyle(fontFamily: 'Press Start 2P'),
             ),
-            !firebaseOn
+            !Save.firebaseOn
                 ? const SizedBox.shrink()
                 : FutureBuilder(
                     future: _scoreboardRankText(levelCompletedIn),
@@ -86,17 +85,17 @@ String _levelCompleteText(double levelCompletedIn) {
 }
 
 String _scoreboardLoadingText() {
-  String y = !firebaseOn ? "" : "Rank: Loading...\n";
+  String y = !Save.firebaseOn ? "" : "Rank: Loading...\n";
   return y;
 }
 
 Future<String> _scoreboardRankText(double levelCompletedIn) async {
   save.cacheLeaderboardNow(); //belts and braces. should have been called earlier in prep
-  double x = firebaseOn
+  double x = Save.firebaseOn
       ? _percentileOf(await save.leaderboardWinTimesCache!, levelCompletedIn) *
           100
       : 0.0;
-  String y = !firebaseOn || (await save.leaderboardWinTimesCache)!.isEmpty
+  String y = !Save.firebaseOn || (await save.leaderboardWinTimesCache)!.isEmpty
       ? ""
       : "Rank: ${x == 0 ? "World Record" : "Top ${x.toStringAsFixed(0)}%"}\n";
   return y;

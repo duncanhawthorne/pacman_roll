@@ -21,7 +21,7 @@ void main() async {
 
   save.fbStart();
 
-  fixTitle(globalPalette.lightBluePMR);
+  fixTitle(Palette.lightBluePMR);
 
   FlutterNativeSplash.remove();
   await Flame.device.fullScreen();

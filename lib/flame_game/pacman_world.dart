@@ -78,6 +78,7 @@ class PacmanWorld extends Forge2DWorld
   List<Pacman> pacmanPlayersList = [];
 
   void play(SfxType type) {
+    const soundOn = true; //!(windows && !kIsWeb);
     if (soundOn) {
       game.audioController.playSfx(type);
     }
@@ -191,6 +192,7 @@ class PacmanWorld extends Forge2DWorld
   }
 
   void startSiren() {
+    final bool sirenEnabled = !iOS;
     if (sirenEnabled) {
       play(SfxType.ghostsRoamingSiren);
       game.audioController.setSirenVolume(0);

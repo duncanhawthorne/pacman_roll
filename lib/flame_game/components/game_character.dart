@@ -60,7 +60,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     try {
       return _underlyingBall.position;
     } catch (e) {
-      p(["getUnderlyingBallPosition", e, _lastPosition]);
+      debug(["getUnderlyingBallPosition", e, _lastPosition]);
       return _lastPosition; //Vector2(10, 0);
     }
   }
@@ -81,7 +81,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
       return Vector2(_underlyingBall.body.linearVelocity.x,
           _underlyingBall.body.linearVelocity.y);
     } catch (e) {
-      p(["getUnderlyingBallVelocity", e, _lastVelocity]);
+      debug(["getUnderlyingBallVelocity", e, _lastVelocity]);
       return _lastVelocity;
     }
   }
@@ -123,7 +123,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
       try {
         return _underlyingBall.angle;
       } catch (e) {
-        p(["_getUpdatedAngle", e]);
+        debug(["_getUpdatedAngle", e]);
         return angle;
       }
     } else {

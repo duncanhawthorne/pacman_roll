@@ -26,7 +26,7 @@ class PacmanSprites {
 
   // ignore: unused_element
   void _savePictureAtFrac(int mouthWidthAsInt) async {
-    p("save picture");
+    debug("save picture");
     Picture picture = _pacmanRecorderAtFrac(mouthWidthAsInt);
     final image = await picture.toImage(pacmanRectSize, pacmanRectSize);
     final imageBytes = await image.toByteData(format: ImageByteFormat.png);
