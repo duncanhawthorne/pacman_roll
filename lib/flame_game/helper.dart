@@ -36,9 +36,9 @@ String getRandomString(random, int length) =>
     String.fromCharCodes(Iterable.generate(
         length, (_) => chars.codeUnitAt(random.nextInt(chars.length))));
 
-List<List<int>> decodeMazeLayout(encodedmazeLayout) {
+List<List<int>> decodeMazeLayout(encodedMazeLayout) {
   List<List<int>> result = [];
-  for (String row in encodedmazeLayout) {
+  for (String row in encodedMazeLayout) {
     List rowListString = row.split("");
     List<int> rowListInt = [];
     for (String letter in rowListString) {

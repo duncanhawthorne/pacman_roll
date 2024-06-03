@@ -34,7 +34,8 @@ final Vector2 kGhostStartLocation =
     Vector2(0, expandedMaze ? -1.75 : -3) * spriteWidth();
 final Vector2 kPacmanStartLocation =
     Vector2(0, expandedMaze ? 4.25 : 5) * spriteWidth();
-final Vector2 kCageLocation = Vector2(0, -1) * spriteWidth();
+final Vector2 kCageLocation =
+    Vector2(0, expandedMaze ? -0.25 / 2 : -1) * spriteWidth();
 final Vector2 kLeftPortalLocation =
     Vector2(-(mazeLayoutLength() - 1) / 2 * 0.99, expandedMaze ? -0.25 : -1) *
         blockWidth();
