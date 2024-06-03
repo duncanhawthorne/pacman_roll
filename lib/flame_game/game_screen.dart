@@ -22,6 +22,8 @@ import '../style/palette.dart';
 /// the gets the [AudioController] from the context and passes it in to the
 /// [PacmanGame] class so that it can play audio.
 
+const double _factor = 0.75;
+
 class GameScreen extends StatelessWidget {
   const GameScreen({required this.level, super.key});
 
@@ -92,46 +94,52 @@ Widget statusOverlayWidget(BuildContext context, PacmanGame game) {
   return Positioned(
     top: 27,
     right: 30,
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(0, 3, 0, 0),
-          child: ElapsedTimeDisplay(
-            startTime: DateTime.now(), //actually ignored
-            interval: const Duration(milliseconds: 100),
-            style: const TextStyle(
-                fontSize: 18,
-                color: Colors.white,
-                fontFamily: 'Press Start 2P'),
-            formatter: (elapsedTime) {
-              return game.stopwatchSeconds.toStringAsFixed(1);
-            },
+    child: Container(
+      height: 30,
+      alignment: Alignment.center,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(0, 3, 0, 0),
+            child: ElapsedTimeDisplay(
+              startTime: DateTime.now(), //actually ignored
+              interval: const Duration(milliseconds: 100),
+              style: const TextStyle(
+                  fontSize: 18 * _factor,
+                  color: Colors.white,
+                  fontFamily: 'Press Start 2P'),
+              formatter: (elapsedTime) {
+                return game.stopwatchSeconds.toStringAsFixed(1);
+              },
+            ),
           ),
-        ),
-        const SizedBox(width: 20, height: 1),
-        ValueListenableBuilder<int>(
-          builder: (BuildContext context, int value, Widget? child) {
-            return Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: List.generate(
-                    3 - game.world.numberOfDeathsNotifier.value,
-                    (index) => _pacmanIcon()));
-          },
-          valueListenable: game.world.numberOfDeathsNotifier,
-        ),
-      ],
+          const SizedBox(width: 20 * _factor, height: 1),
+          ValueListenableBuilder<int>(
+            builder: (BuildContext context, int value, Widget? child) {
+              return Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: List.generate(
+                      3 - game.world.numberOfDeathsNotifier.value,
+                      (index) => _pacmanIcon()));
+            },
+            valueListenable: game.world.numberOfDeathsNotifier,
+          ),
+        ],
+      ),
     ),
   );
 }
 
 Widget _pacmanIcon() {
   return Padding(
-    padding: const EdgeInsets.fromLTRB(4, 0, 4, 0),
+    padding: const EdgeInsets.fromLTRB(4 * _factor, 0, 4 * _factor, 0),
     child: Transform.rotate(
       angle: 2 * pi / 2,
       child: Image.asset('assets/images/dash/8.png',
-          filterQuality: FilterQuality.none, height: 30, width: 30),
+          filterQuality: FilterQuality.none,
+          height: 30 * _factor,
+          width: 30 * _factor),
     ),
   );
 }
