@@ -14,6 +14,10 @@ final Paint blackBackgroundPaint = Paint()
   ..color = globalPalette.flameGameBackground.color;
 final Paint blueMazePaint = Paint()..color = globalPalette.blueMaze;
 
+class GameSize {}
+
+GameSize gameSize = GameSize();
+
 class Maze {
   static const _maze1Layout = [
     '555555555555555555555555555555555',
@@ -75,39 +79,39 @@ class Maze {
     [5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 5]
   ];
 
-  static const mazeWallWidthFactor = 0.7;
-  static const double pixelationBuffer = 1.03;
-  static const bool maze1 = true;
-  static const gameScaleFactor = maze1 ? 1.0 : 0.95;
-  final _mazeLayout = maze1 ? _decodeMazeLayout(_maze1Layout) : _maze2Layout;
+  static const _mazeInnerWallWidthFactor = 0.7;
+  static const double _pixelationBuffer = 1.03;
+  static const bool _maze1 = true;
+  static const _mazeScaleFactor = _maze1 ? 1.0 : 0.95;
+  final _mazeLayout = _maze1 ? _decodeMazeLayout(_maze1Layout) : _maze2Layout;
 
-  late final ghostStart = Vector2(0, maze1 ? -3.5 : -3) * blockWidth();
+  late final ghostStart = Vector2(0, _maze1 ? -3.5 : -3) * blockWidth();
 
-  late final pacmanStart = Vector2(0, maze1 ? 8.5 : 5) * blockWidth();
+  late final pacmanStart = Vector2(0, _maze1 ? 8.5 : 5) * blockWidth();
 
-  late final cage = Vector2(0, maze1 ? -0.5 : -1) * blockWidth();
+  late final cage = Vector2(0, _maze1 ? -0.5 : -1) * blockWidth();
 
   late final leftPortal =
-      Vector2(-(_mazeLayoutLength() - 1) / 2 * 0.99, maze1 ? -0.5 : -1) *
+      Vector2(-(_mazeLayoutLength() - 1) / 2 * 0.99, _maze1 ? -0.5 : -1) *
           blockWidth();
 
   late final rightPortal =
-      Vector2((_mazeLayoutLength() - 1) / 2 * 0.99, maze1 ? -0.5 : -1) *
+      Vector2((_mazeLayoutLength() - 1) / 2 * 0.99, _maze1 ? -0.5 : -1) *
           blockWidth();
 
   late final offScreen = Vector2(0, 1000) * spriteWidth();
 
-  late final pelletScaleFactor = maze1 ? 0.4 : 0.46;
+  late final pelletScaleFactor = _maze1 ? 0.4 : 0.46;
 
   double blockWidth() {
     return kSquareNotionalSize /
         flameGameZoom /
         _mazeLayoutLength() *
-        gameScaleFactor;
+        _mazeScaleFactor;
   }
 
   double spriteWidth() {
-    return blockWidth() * (maze1 ? 2 : 1);
+    return blockWidth() * (_maze1 ? 2 : 1);
   }
 
   int _mazeLayoutLength() {
@@ -138,7 +142,7 @@ class Maze {
     for (int i = 0; i < _mazeLayout.length; i++) {
       for (int j = 0; j < _mazeLayout[i].length; j++) {
         Vector2 center = Vector2(0, 0);
-        if (maze1) {
+        if (_maze1) {
           center = Vector2(j + 1 - _mazeLayout[0].length / 2,
                   i + 1 - _mazeLayout.length / 2) *
               scale;
@@ -172,11 +176,11 @@ class Maze {
           }
           if (_wallAt(i, j + 1)) {
             result.add(MazeWallRectangleGround(center + Vector2(scale / 2, 0),
-                scale * pixelationBuffer, scale));
+                scale * _pixelationBuffer, scale));
           }
           if (_wallAt(i + 1, j)) {
             result.add(MazeWallRectangleGround(center + Vector2(0, scale / 2),
-                scale, scale * pixelationBuffer));
+                scale, scale * _pixelationBuffer));
           }
         }
       }
@@ -190,25 +194,26 @@ class Maze {
         if (_wallAt(i, j)) {
           if (_circleAt(i, j)) {
             result.add(MazeWallCircleVisual(
-                position: center, radius: scale / 2 * mazeWallWidthFactor));
+                position: center,
+                radius: scale / 2 * _mazeInnerWallWidthFactor));
           }
           if (_wallAt(i, j + 1)) {
             result.add(MazeWallSquareVisual(
                 position: center + Vector2(scale / 2, 0),
-                widthx: scale * pixelationBuffer,
-                heightx: scale * mazeWallWidthFactor));
+                widthx: scale * _pixelationBuffer,
+                heightx: scale * _mazeInnerWallWidthFactor));
           }
           if (_wallAt(i + 1, j)) {
             result.add(MazeWallSquareVisual(
                 position: center + Vector2(0, scale / 2),
-                widthx: scale * mazeWallWidthFactor,
-                heightx: scale * pixelationBuffer));
+                widthx: scale * _mazeInnerWallWidthFactor,
+                heightx: scale * _pixelationBuffer));
           }
           if (_wallAt(i + 1, j) && _wallAt(i, j + 1) && _wallAt(i + 1, j + 1)) {
             result.add(MazeWallSquareVisual(
                 position: center + Vector2(scale / 2, scale / 2),
-                widthx: scale * mazeWallWidthFactor,
-                heightx: scale * pixelationBuffer));
+                widthx: scale * _mazeInnerWallWidthFactor,
+                heightx: scale * _pixelationBuffer));
           }
         }
       }
