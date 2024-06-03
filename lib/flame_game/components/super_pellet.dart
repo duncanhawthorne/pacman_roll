@@ -14,19 +14,14 @@ class SuperPelletCircle extends CircleComponent
   @override
   Future<void> onLoad() async {
     super.onLoad();
-    add(CircleHitbox(isSolid: true, collisionType: CollisionType.passive));
-    /*
-    CircleHitbox x = CircleHitbox(
+    add(CircleHitbox(
       isSolid: true,
       collisionType: CollisionType.passive,
-      position: Vector2.all(
-          blockWidth() * miniPelletAndSuperPelletScaleFactor / 2),
-      radius: blockWidth() * miniPelletAndSuperPelletScaleFactor / 2,
+      radius: 0,
+      position: Vector2.all(maze.spriteWidth() / 2 * maze.pelletScaleFactor),
       anchor: Anchor.center,
-    );
-    add(x);
-    //x.debugMode = true;
-     */
+    ));
+    //debugMode = true;
     world.pelletsRemainingNotifier.value += 1;
   }
 

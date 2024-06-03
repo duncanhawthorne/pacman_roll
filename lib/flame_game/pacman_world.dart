@@ -92,7 +92,10 @@ class PacmanWorld extends Forge2DWorld
   }
 
   double averageGhostSpeed() {
-    if (!game.isGameLive || numberAlivePacman() == 0 || !physicsOn) {
+    if (!game.isGameLive ||
+        numberAlivePacman() == 0 ||
+        !physicsOn ||
+        ghostPlayersList.isEmpty) {
       return 0;
     } else {
       return ghostPlayersList

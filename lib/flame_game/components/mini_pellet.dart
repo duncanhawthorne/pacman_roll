@@ -13,19 +13,15 @@ class MiniPelletCircle extends CircleComponent
   @override
   Future<void> onLoad() async {
     super.onLoad();
-    add(CircleHitbox(isSolid: true, collisionType: CollisionType.passive));
-    /*
-    CircleHitbox x = CircleHitbox(
-        isSolid: true,
-        position: Vector2.all(
-            blockWidth() * miniPelletAndSuperPelletScaleFactor / 2 / 3),
-        anchor: Anchor.center,
-        radius:
-            blockWidth() * miniPelletAndSuperPelletScaleFactor / 2 / 3,
-        collisionType: CollisionType.passive);
-    add(x);
-    //x.debugMode = true;
-     */
+    add(CircleHitbox(
+      isSolid: true,
+      collisionType: CollisionType.passive,
+      radius: 0,
+      position:
+          Vector2.all(maze.spriteWidth() / 2 * maze.pelletScaleFactor / 3),
+      anchor: Anchor.center,
+    ));
+    //debugMode = true;
     world.pelletsRemainingNotifier.value += 1;
   }
 
