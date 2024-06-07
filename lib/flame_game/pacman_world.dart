@@ -55,6 +55,9 @@ class PacmanWorld extends Forge2DWorld
 
   final numberOfDeathsNotifier = ValueNotifier(0);
   final pelletsRemainingNotifier = ValueNotifier(0);
+
+  final pacmanDyingNotifier = ValueNotifier(0);
+
   bool get gameWonOrLost =>
       pelletsRemainingNotifier.value <= 0 ||
       numberOfDeathsNotifier.value >= level.maxAllowedDeaths;
@@ -185,6 +188,7 @@ class PacmanWorld extends Forge2DWorld
 
   void resetWorldAfterPacmanDeath(Pacman dyingPacman) {
     physicsOn = false;
+    pacmanDyingNotifier.value++;
     //game.stopwatch.stop();
     Future.delayed(
         const Duration(milliseconds: kPacmanDeadResetTimeMillis + 100), () {

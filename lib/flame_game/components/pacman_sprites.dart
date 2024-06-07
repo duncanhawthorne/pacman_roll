@@ -4,7 +4,6 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:flame/components.dart';
-import 'package:flame/flame.dart';
 import 'package:flutter/material.dart';
 
 import '../helper.dart';
@@ -48,9 +47,9 @@ class PacmanSprites {
   }
 
   Future<Sprite> _pacmanAtFracReal(int mouthWidthAsInt) async {
-    return Sprite(await Flame.images.load('dash/$mouthWidthAsInt.png'));
-    //return Sprite(await _pacmanRecorderAtFrac(mouthWidthAsInt)
-    //    .toImage(pacmanRectSize, pacmanRectSize));
+    //return Sprite(await Flame.images.load('dash/$mouthWidthAsInt.png'));
+    return Sprite(await _pacmanRecorderAtFrac(mouthWidthAsInt)
+        .toImage(pacmanRectSize, pacmanRectSize));
   }
 
   final Map<int, Future<Sprite>> _pacmanAtFracCache = {};
@@ -111,8 +110,7 @@ class PacmanSprites {
   }
 
   Future<Sprite> pacmanAtFrac(int fracInt) async {
-    pacmanSprites
-        ._precacheAllPacmanAtFrac(); //call first time, later times no effect
+    _precacheAllPacmanAtFrac(); //call first time, later times no effect
     fracInt = max(0, min(pacmanRenderFracIncrementsNumber, fracInt));
     return await _pacmanAtFracCache[fracInt]!;
   }
