@@ -65,7 +65,7 @@ class PacmanWorld extends Forge2DWorld
   //Vector2 get size => (parent as FlameGame).size;
 
   double _lastDragAngle = 10;
-  double _gravityTargetAngle = 2 * pi / 4;
+  double _lastGravityAngle = 2 * pi / 4;
 
   final Random random;
 
@@ -200,7 +200,7 @@ class PacmanWorld extends Forge2DWorld
         }
          */
         physicsOn = true;
-        setGravity(Vector2(0, 10));
+        setGravityAngle(2 * pi / 4);
       }
     });
   }
@@ -259,8 +259,8 @@ class PacmanWorld extends Forge2DWorld
       double spinMultiplier = 4 * min(1, eventVectorLengthProportion / 0.75);
       double currentAngleTmp = atan2(eventVector.x, eventVector.y);
       double angleDelta = _smallAngle(currentAngleTmp - _lastDragAngle);
-      _gravityTargetAngle = _gravityTargetAngle + angleDelta * spinMultiplier;
-      setGravity(Vector2(cos(_gravityTargetAngle), sin(_gravityTargetAngle)));
+      angleDelta = angleDelta * spinMultiplier;
+      moveGravityAngleByDelta(angleDelta);
     }
     _lastDragAngle = atan2(eventVector.x, eventVector.y);
   }
@@ -271,7 +271,19 @@ class PacmanWorld extends Forge2DWorld
     _lastDragAngle = 10;
   }
 
-  void setGravity(Vector2 targetGravity) {
+  void moveGravityAngleByDelta(double angleDelta) {
+    setGravityAngle(_lastGravityAngle + angleDelta);
+  }
+
+  void setGravityAngle(double angle) {
+    if (physicsOn) {
+      _lastGravityAngle = angle;
+      gravity = Vector2(cos(_lastGravityAngle), sin(_lastGravityAngle)) * 50;
+      game.camera.viewfinder.angle = angle - 2 * pi / 4;
+    }
+  }
+
+  void xsetGravity(Vector2 targetGravity) {
     if (physicsOn) {
       gravity = targetGravity.normalized() * 50;
       game.camera.viewfinder.angle = -atan2(gravity.x, gravity.y);
