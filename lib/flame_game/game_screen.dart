@@ -1,20 +1,19 @@
 import 'dart:math';
 
-import '../audio/audio_controller.dart';
-import 'pacman_game.dart';
-
-import '../level_selection/levels.dart';
-import '../player_progress/player_progress.dart';
+import 'package:elapsed_time_display/elapsed_time_display.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nes_ui/nes_ui.dart';
 import 'package:provider/provider.dart';
 
+import '../audio/audio_controller.dart';
+import '../level_selection/levels.dart';
+import '../player_progress/player_progress.dart';
+import '../style/palette.dart';
 import 'game_lose_dialog.dart';
 import 'game_won_dialog.dart';
-import 'package:elapsed_time_display/elapsed_time_display.dart';
-import '../style/palette.dart';
+import 'pacman_game.dart';
 
 /// This widget defines the properties of the game screen.
 ///
@@ -100,6 +99,17 @@ Widget statusOverlayWidget(BuildContext context, PacmanGame game) {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          ValueListenableBuilder<int>(
+            builder: (BuildContext context, int value, Widget? child) {
+              return Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: List.generate(
+                      3 - game.world.numberOfDeathsNotifier.value,
+                      (index) => _pacmanIcon()));
+            },
+            valueListenable: game.world.numberOfDeathsNotifier,
+          ),
+          const SizedBox(width: 20 * _factor, height: 1),
           Padding(
             padding: const EdgeInsets.fromLTRB(0, 3, 0, 0),
             child: ElapsedTimeDisplay(
@@ -113,17 +123,6 @@ Widget statusOverlayWidget(BuildContext context, PacmanGame game) {
                 return game.stopwatchSeconds.toStringAsFixed(1);
               },
             ),
-          ),
-          const SizedBox(width: 20 * _factor, height: 1),
-          ValueListenableBuilder<int>(
-            builder: (BuildContext context, int value, Widget? child) {
-              return Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: List.generate(
-                      3 - game.world.numberOfDeathsNotifier.value,
-                      (index) => _pacmanIcon()));
-            },
-            valueListenable: game.world.numberOfDeathsNotifier,
           ),
         ],
       ),
