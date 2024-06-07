@@ -64,7 +64,8 @@ class PacmanWorld extends Forge2DWorld
   int now = DateTime.now().millisecondsSinceEpoch;
   //Vector2 get size => (parent as FlameGame).size;
 
-  double _lastDragAngle = 10;
+  final Map<int, double?> _fingersLastDragAngle = {};
+
   double _lastMazeAngle = 0;
 
   final Random random;
@@ -242,9 +243,10 @@ class PacmanWorld extends Forge2DWorld
     game.stopwatch.start();
     Vector2 eventVector = event.canvasPosition - game.canvasSize / 2;
     if (iOS) {
-      _lastDragAngle = 10;
+      _fingersLastDragAngle[event.pointerId] = null;
     } else {
-      _lastDragAngle = atan2(eventVector.x, eventVector.y);
+      _fingersLastDragAngle[event.pointerId] =
+          atan2(eventVector.x, eventVector.y);
     }
   }
 
@@ -255,30 +257,28 @@ class PacmanWorld extends Forge2DWorld
     double eventVectorLengthProportion =
         (event.canvasStartPosition - game.canvasSize / 2).length /
             (min(game.canvasSize.x, game.canvasSize.y) / 2);
-    if (_lastDragAngle != 10) {
+    if (_fingersLastDragAngle.containsKey(event.pointerId) &&
+        _fingersLastDragAngle[event.pointerId] != null) {
       double spinMultiplier = 4 * min(1, eventVectorLengthProportion / 0.75);
       double currentAngleTmp = atan2(eventVector.x, eventVector.y);
-      double angleDelta = _smallAngle(currentAngleTmp - _lastDragAngle);
+      double angleDelta = _smallAngle(
+          currentAngleTmp - _fingersLastDragAngle[event.pointerId]!);
       angleDelta = angleDelta * spinMultiplier;
       moveMazeAngleByDelta(angleDelta);
     }
-    _lastDragAngle = atan2(eventVector.x, eventVector.y);
+    _fingersLastDragAngle[event.pointerId] =
+        atan2(eventVector.x, eventVector.y);
   }
 
   @override
   void onDragEnd(DragEndEvent event) {
     super.onDragEnd(event);
-    _lastDragAngle = 10;
+    if (_fingersLastDragAngle.containsKey(event.pointerId)) {
+      _fingersLastDragAngle.remove(event.pointerId);
+    }
   }
 
   void moveMazeAngleByDelta(double angleDelta) {
-    /*
-    if (angleDelta.abs() > 2 * pi / 16) {
-      //clear any large jumps
-      angleDelta = 2 * pi / 16 * angleDelta.sign;
-    }
-
-     */
     setMazeAngle(_lastMazeAngle + angleDelta);
   }
 
