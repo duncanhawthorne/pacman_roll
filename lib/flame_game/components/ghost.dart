@@ -1,15 +1,14 @@
+import 'dart:core';
+
 import 'package:flame/components.dart';
+import 'package:flame/effects.dart';
+import 'package:flutter/animation.dart';
 
 import '../../audio/sounds.dart';
 import '../constants.dart';
 // ignore: unused_import
 import '../helper.dart';
 import 'game_character.dart';
-import 'dart:core';
-
-import 'package:flame/effects.dart';
-import 'package:flutter/animation.dart';
-
 import 'maze.dart';
 
 const int kGhostChaseTimeMillis = 6000;

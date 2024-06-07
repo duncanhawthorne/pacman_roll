@@ -1,11 +1,13 @@
 import 'dart:ui';
+
+import 'package:flame/components.dart';
+import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flutter/foundation.dart';
 import 'package:pacman_roll/style/palette.dart';
+
 import '../constants.dart';
-import 'package:flame/components.dart';
-import 'super_pellet.dart';
 import 'mini_pellet.dart';
-import 'package:flame_forge2d/flame_forge2d.dart';
+import 'super_pellet.dart';
 
 final Paint _blackBackgroundPaint = Paint()..color = Palette.black;
 final Paint _blueMazePaint = Paint()..color = Palette.blueMaze;

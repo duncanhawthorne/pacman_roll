@@ -1,7 +1,9 @@
-import '../pacman_world.dart';
+import 'dart:math';
+
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
-import 'dart:math';
+
+import '../pacman_world.dart';
 import 'maze.dart';
 
 class SuperPelletCircle extends CircleComponent

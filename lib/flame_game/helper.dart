@@ -1,6 +1,8 @@
-import 'package:flutter/material.dart';
 import 'dart:core';
+
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
 import 'title_fix_stub.dart' if (dart.library.js_interop) 'title_fix_web.dart';
 
 /// This file has utilities used by other bits of code

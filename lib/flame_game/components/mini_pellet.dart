@@ -1,6 +1,7 @@
-import '../pacman_world.dart';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
+
+import '../pacman_world.dart';
 import 'maze.dart';
 
 class MiniPelletCircle extends CircleComponent

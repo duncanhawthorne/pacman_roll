@@ -1,5 +1,6 @@
-import 'package:flutter/foundation.dart';
 import 'dart:core';
+
+import 'package:flutter/foundation.dart';
 
 const String appTitle = "Pacman ROLL";
 

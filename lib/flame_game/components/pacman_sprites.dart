@@ -1,10 +1,12 @@
+import 'dart:core';
 import 'dart:io';
 import 'dart:math';
+import 'dart:ui';
+
 import 'package:flame/components.dart';
 import 'package:flame/flame.dart';
 import 'package:flutter/material.dart';
-import 'dart:core';
-import 'dart:ui';
+
 import '../helper.dart';
 
 const int pacmanRenderFracIncrementsNumber = 32;

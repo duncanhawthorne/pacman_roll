@@ -1,14 +1,14 @@
-import 'package:flame/components.dart';
-
-import '../pacman_game.dart';
-import '../pacman_world.dart';
-import '../constants.dart';
-import '../helper.dart';
-import 'maze.dart';
-import 'physics_ball.dart';
 import 'dart:core';
 
 import 'package:flame/collisions.dart';
+import 'package:flame/components.dart';
+
+import '../constants.dart';
+import '../helper.dart';
+import '../pacman_game.dart';
+import '../pacman_world.dart';
+import 'maze.dart';
+import 'physics_ball.dart';
 
 /// The [GameCharacter] is the generic object that is linked to a [PhysicsBall]
 class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
