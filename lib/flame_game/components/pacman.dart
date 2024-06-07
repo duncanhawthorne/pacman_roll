@@ -1,16 +1,17 @@
+import 'dart:core';
+import 'dart:math';
+
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:pacman_roll/flame_game/components/pacman_sprites.dart';
 
 import '../../audio/sounds.dart';
 import '../constants.dart';
+import 'game_character.dart';
+import 'ghost.dart';
 import 'maze.dart';
 import 'mini_pellet.dart';
 import 'super_pellet.dart';
-import 'ghost.dart';
-import 'game_character.dart';
-import 'dart:math';
-import 'dart:core';
 
 const int kPacmanDeadResetTimeMillis = 1700;
 const int kPacmanDeadResetTimeAnimationMillis = 1250;
@@ -158,6 +159,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
 
   void setStartPositionAfterDeath() {
     setPosition(maze.pacmanStart);
+    angle = 2 * pi / 2;
     current = CharacterState.normal;
   }
 

@@ -1,26 +1,26 @@
+import 'dart:async' as async;
 import 'dart:async';
 import 'dart:math';
 
-import 'package:flame_forge2d/flame_forge2d.dart';
-
-import '../level_selection/levels.dart';
-import '../player_progress/player_progress.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
+import 'package:flame_forge2d/flame_forge2d.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
 // ignore: implementation_imports
 //import 'package:flame/src/events/messages/pointer_move_event.dart'
 //    as flame_pointer_move_event;
 
 import '../../audio/sounds.dart';
-import 'components/maze.dart';
-import 'pacman_game.dart';
+import '../level_selection/levels.dart';
+import '../player_progress/player_progress.dart';
 import 'components/game_character.dart';
-import 'components/pacman.dart';
 import 'components/ghost.dart';
+import 'components/maze.dart';
+import 'components/pacman.dart';
 import 'constants.dart';
-import 'package:flutter/foundation.dart';
-import 'dart:async' as async;
+import 'pacman_game.dart';
 
 /// The world is where you place all the components that should live inside of
 /// the game, like the player, enemies, obstacles and points for example.
@@ -137,6 +137,12 @@ class PacmanWorld extends Forge2DWorld
     add(ghost);
   }
 
+  void addThreeGhosts() {
+    for (int i = 0; i < 3; i++) {
+      addGhost(i);
+    }
+  }
+
   void scareGhosts() {
     play(SfxType.ghostsScared);
     for (Ghost ghost in ghostPlayersList) {
@@ -158,11 +164,11 @@ class PacmanWorld extends Forge2DWorld
     }
   }
 
-  void trimToThreeGhosts() {
+  void trimAllGhosts() {
     for (int i = 0; i < ghostPlayersList.length; i++) {
       int j = ghostPlayersList.length - 1 - i;
-      if (j >= 3) {
-        assert(multipleSpawningGhosts);
+      if (j >= 0) {
+        //assert(multipleSpawningGhosts);
         remove(ghostPlayersList[j]);
       }
     }
@@ -170,7 +176,7 @@ class PacmanWorld extends Forge2DWorld
 
   void winGameWorldTidy() {
     play(SfxType.endMusic);
-    trimToThreeGhosts();
+    trimAllGhosts();
     for (Ghost ghost in ghostPlayersList) {
       ghost.setPositionForGameEnd();
     }
@@ -178,6 +184,7 @@ class PacmanWorld extends Forge2DWorld
 
   void resetWorldAfterPacmanDeath(Pacman dyingPacman) {
     physicsOn = false;
+    //game.stopwatch.stop();
     Future.delayed(
         const Duration(milliseconds: kPacmanDeadResetTimeMillis + 100), () {
       //100 buffer
@@ -185,11 +192,15 @@ class PacmanWorld extends Forge2DWorld
         //prevent multiple resets
         numberOfDeathsNotifier.value++; //score counting deaths
         dyingPacman.setStartPositionAfterDeath();
-        trimToThreeGhosts();
+        trimAllGhosts();
+        addThreeGhosts();
+        /*
         for (Ghost ghost in ghostPlayersList) {
           ghost.setStartPositionAfterPacmanDeath();
         }
+         */
         physicsOn = true;
+        setGravity(Vector2(0, 10));
       }
     });
   }
@@ -210,9 +221,7 @@ class PacmanWorld extends Forge2DWorld
     startSiren();
 
     add(Pacman(position: maze.pacmanStart));
-    for (int i = 0; i < 3; i++) {
-      addGhost(i);
-    }
+    addThreeGhosts();
     addAll(maze.mazeWalls());
     //addAll(screenEdgeBoundaries(game.camera));
     addAll(maze.pellets(pelletsRemainingNotifier));
