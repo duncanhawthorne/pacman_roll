@@ -19,17 +19,17 @@ final Paint yellowPacmanPaint = Paint()
   ..color = Colors.yellowAccent; //blue; //yellowAccent;
 
 class PacmanSprites {
-  static const pacmanRectSize = 50;
-  final Rect pacmanRect = Rect.fromCenter(
-      center: const Offset(pacmanRectSize / 2, pacmanRectSize / 2),
-      width: pacmanRectSize.toDouble(),
-      height: pacmanRectSize.toDouble());
+  static const _pacmanRectSize = 50;
+  final Rect _pacmanRect = Rect.fromCenter(
+      center: const Offset(_pacmanRectSize / 2, _pacmanRectSize / 2),
+      width: _pacmanRectSize.toDouble(),
+      height: _pacmanRectSize.toDouble());
 
   // ignore: unused_element
   void _savePictureAtFrac(int mouthWidthAsInt) async {
     debug("save picture");
     Picture picture = _pacmanRecorderAtFrac(mouthWidthAsInt);
-    final image = await picture.toImage(pacmanRectSize, pacmanRectSize);
+    final image = await picture.toImage(_pacmanRectSize, _pacmanRectSize);
     final imageBytes = await image.toByteData(format: ImageByteFormat.png);
     await File('C:/tmp/$mouthWidthAsInt.png')
         .writeAsBytes(imageBytes!.buffer.asUint8List());
@@ -40,7 +40,7 @@ class PacmanSprites {
     mouthWidth = max(0, min(1, mouthWidth));
     final recorder = PictureRecorder();
     final canvas = Canvas(recorder);
-    canvas.drawArc(pacmanRect, 2 * pi * ((mouthWidth / 2) + 0.5),
+    canvas.drawArc(_pacmanRect, 2 * pi * ((mouthWidth / 2) + 0.5),
         2 * pi * (1 - mouthWidth), true, yellowPacmanPaint);
     Picture picture = recorder.endRecording();
     return picture;
@@ -49,12 +49,12 @@ class PacmanSprites {
   Future<Sprite> _pacmanAtFracReal(int mouthWidthAsInt) async {
     //return Sprite(await Flame.images.load('dash/$mouthWidthAsInt.png'));
     return Sprite(await _pacmanRecorderAtFrac(mouthWidthAsInt)
-        .toImage(pacmanRectSize, pacmanRectSize));
+        .toImage(_pacmanRectSize, _pacmanRectSize));
   }
 
   final Map<int, Future<Sprite>> _pacmanAtFracCache = {};
 
-  Future<List<Sprite>> lf2fl(List<Future> lf) async {
+  Future<List<Sprite>> _lf2fl(List<Future> lf) async {
     //rolls from list of futures to future of a list
 
     List<Sprite> finalItems = [];
@@ -84,14 +84,14 @@ class PacmanSprites {
         pacmanEatingHalfFrames * 2, //open and close
         (int index) =>
             pacmanAtFrac((pacmanMouthWidthDefault - (index + 1)).abs()));
-    return lf2fl(lf);
+    return _lf2fl(lf);
   }
 
   Future<List<Sprite>> pacmanDyingSprites() async {
     List<Future<Sprite>> lf = List<Future<Sprite>>.generate(
         pacmanDeadFrames + 1, //open and close
         (int index) => pacmanAtFrac(pacmanMouthWidthDefault + index));
-    return lf2fl(lf);
+    return _lf2fl(lf);
   }
 
   Future<void> _precacheAllPacmanAtFrac() async {
