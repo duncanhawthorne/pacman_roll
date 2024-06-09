@@ -4,8 +4,6 @@ import 'package:nes_ui/nes_ui.dart';
 import 'package:provider/provider.dart';
 
 import '../audio/audio_controller.dart';
-// ignore: unused_import
-import '../audio/sounds.dart';
 import '../player_progress/player_progress.dart';
 import '../style/palette.dart';
 import '../style/wobbly_button.dart';

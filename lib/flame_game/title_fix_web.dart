@@ -11,8 +11,8 @@ final isiOSMobile = kIsWeb && defaultTargetPlatform == TargetPlatform.iOS;
 
 void fixTitleReal(Color color) {
   if (isiOSMobile) {
-    fixTitle1(color);
-    fixTitle2();
+    //fixTitle1(color);
+    //fixTitle2();
     fixTitle3();
   }
 }

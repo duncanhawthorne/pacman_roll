@@ -8,10 +8,6 @@ import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-// ignore: implementation_imports
-//import 'package:flame/src/events/messages/pointer_move_event.dart'
-//    as flame_pointer_move_event;
-
 import '../../audio/sounds.dart';
 import '../level_selection/levels.dart';
 import '../player_progress/player_progress.dart';

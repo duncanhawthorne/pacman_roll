@@ -6,8 +6,6 @@ import 'package:flutter/animation.dart';
 
 import '../../audio/sounds.dart';
 import '../constants.dart';
-// ignore: unused_import
-import '../helper.dart';
 import 'game_character.dart';
 import 'maze.dart';
 
