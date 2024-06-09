@@ -91,12 +91,14 @@ Widget backButtonWidget(BuildContext context, PacmanGame game) {
   );
 }
 
+const _statusWidgetHeight = 30;
+
 Widget statusOverlayWidget(BuildContext context, PacmanGame game) {
   return Positioned(
     top: 27,
     right: 30,
     child: Container(
-      height: 30,
+      height: _statusWidgetHeight.toDouble(),
       alignment: Alignment.center,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -116,7 +118,9 @@ Widget statusOverlayWidget(BuildContext context, PacmanGame game) {
                               child: index == 0
                                   ? _animatedPacmanIcon(game,
                                       game.world.pacmanDyingNotifier.value)
-                                  : _pacmanIconCache[8]))));
+                                  : _pacmanIconCache[
+                                      pacmanRenderFracIncrementsNumber ~/
+                                          4]))));
             },
           ),
           const SizedBox(width: 20 * _factor, height: 1),
@@ -140,14 +144,20 @@ Widget statusOverlayWidget(BuildContext context, PacmanGame game) {
   );
 }
 
+// ignore: unused_element
 Widget _animatedPacmanIcon(PacmanGame game, int startValue) {
   return ValueListenableBuilder<int>(
       valueListenable: game.world.pacmanDyingNotifier,
       builder: (BuildContext context, int value, Widget? child) {
         int currentValue = game.world.pacmanDyingNotifier.value;
         return TweenAnimationBuilder(
-            tween:
-                IntTween(begin: 8, end: 8 + 24 * (currentValue - startValue)),
+            tween: IntTween(
+                begin: pacmanRenderFracIncrementsNumber ~/ 4,
+                end: pacmanRenderFracIncrementsNumber ~/ 4 +
+                    pacmanRenderFracIncrementsNumber *
+                        3 ~/
+                        4 *
+                        (currentValue - startValue)),
             duration: Duration(
                 milliseconds: currentValue == startValue
                     ? 0
@@ -158,28 +168,32 @@ Widget _animatedPacmanIcon(PacmanGame game, int startValue) {
       });
 }
 
-final _pacmanIconCache =
-    List.generate(33, (int index) => _pacmanIconFromPainter(mouthInt: index));
+final _pacmanIconCache = List.generate(pacmanRenderFracIncrementsNumber + 1,
+    (int index) => _pacmanIconFromPainter(mouthInt: index));
 
 // ignore: unused_element
-Widget _pacmanIconFromFile({int mouthInt = 8}) {
+Widget _pacmanIconFromFile(
+    {int mouthInt = pacmanRenderFracIncrementsNumber ~/ 4}) {
   return Image.asset('assets/images/dash/$mouthInt.png',
       filterQuality: FilterQuality.none,
-      height: 30 * _factor,
-      width: 30 * _factor);
+      height: _statusWidgetHeight * _factor,
+      width: _statusWidgetHeight * _factor);
 }
 
-Widget _pacmanIconFromPainter({int mouthInt = 8}) {
+Widget _pacmanIconFromPainter(
+    {int mouthInt = pacmanRenderFracIncrementsNumber ~/ 4}) {
   return CustomPaint(
-      size: const Size(30 * _factor, 30 * _factor),
+      size: const Size(
+          _statusWidgetHeight * _factor, _statusWidgetHeight * _factor),
       painter: MyPainter(mouthInt: mouthInt));
 }
 
-const _pacmanRectSize = 30 * _factor;
-final Rect _pacmanRect = Rect.fromCenter(
-    center: const Offset(_pacmanRectSize / 2, _pacmanRectSize / 2),
-    width: _pacmanRectSize.toDouble(),
-    height: _pacmanRectSize.toDouble());
+const _pacmanRectStatusBarSize = _statusWidgetHeight * _factor;
+final Rect _pacmanRectStatusBar = Rect.fromCenter(
+    center: const Offset(
+        _pacmanRectStatusBarSize / 2, _pacmanRectStatusBarSize / 2),
+    width: _pacmanRectStatusBarSize.toDouble(),
+    height: _pacmanRectStatusBarSize.toDouble());
 
 class MyPainter extends CustomPainter {
   MyPainter({required this.mouthInt});
@@ -190,12 +204,59 @@ class MyPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     double mouthWidth = mouthInt / pacmanRenderFracIncrementsNumber;
     mouthWidth = max(0, min(1, mouthWidth));
-    canvas.drawArc(_pacmanRect, 2 * pi * ((mouthWidth / 2) + 0.5),
+    canvas.drawArc(_pacmanRectStatusBar, 2 * pi * ((mouthWidth / 2) + 0.5),
         2 * pi * (1 - mouthWidth), true, yellowPacmanPaint);
   }
 
   @override
   bool shouldRepaint(CustomPainter oldDelegate) {
     return false;
+  }
+}
+
+// ignore: unused_element
+Widget _animatedPacmanIconDirect(PacmanGame game, int startValue) {
+  return ValueListenableBuilder<int>(
+      valueListenable: game.world.pacmanDyingNotifier,
+      builder: (BuildContext context, int value, Widget? child) {
+        if (game.world.pacmanDyingNotifier.value != startValue) {
+          return _pacmanIconFromPainterDirect();
+        } else {
+          return _pacmanIconCache[pacmanRenderFracIncrementsNumber ~/ 4];
+        }
+      });
+}
+
+Widget _pacmanIconFromPainterDirect(
+    {int mouthInt = pacmanRenderFracIncrementsNumber ~/ 4}) {
+  return CustomPaint(
+      size: const Size(
+          _statusWidgetHeight * _factor, _statusWidgetHeight * _factor),
+      painter: MyPainterDirect(mouthInt: mouthInt));
+}
+
+class MyPainterDirect extends CustomPainter {
+  MyPainterDirect({required this.mouthInt});
+
+  int mouthInt;
+  int startTime = DateTime.now().millisecondsSinceEpoch;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    double mouthDouble = pacmanRenderFracIncrementsNumber ~/ 4 +
+        pacmanRenderFracIncrementsNumber *
+            3 ~/
+            4 *
+            (DateTime.now().millisecondsSinceEpoch - startTime) /
+            kPacmanDeadResetTimeAnimationMillis;
+    double mouthWidth = mouthDouble / pacmanRenderFracIncrementsNumber;
+    mouthWidth = max(0, min(1, mouthWidth));
+    canvas.drawArc(_pacmanRectStatusBar, 2 * pi * ((mouthWidth / 2) + 0.5),
+        2 * pi * (1 - mouthWidth), true, yellowPacmanPaint);
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) {
+    return true;
   }
 }
