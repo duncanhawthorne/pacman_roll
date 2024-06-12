@@ -19,7 +19,8 @@ class SuperPelletCircle extends CircleComponent
     add(CircleHitbox(
       isSolid: true,
       collisionType: CollisionType.passive,
-      radius: 0,
+      radius: maze.spriteWidth() / 2 * maze.pelletScaleFactor / 2,
+      //generous
       position: Vector2.all(maze.spriteWidth() / 2 * maze.pelletScaleFactor),
       anchor: Anchor.center,
     ));
