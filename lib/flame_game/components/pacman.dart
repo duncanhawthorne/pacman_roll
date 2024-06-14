@@ -28,20 +28,21 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   int _targetRoundedMouthOpenTime = 0; //a long time ago
   int _pacmanEatingTimeLatest = 0; //a long time ago
   int _pacmanEatingSoundTimeLatest = 0; //a long time ago
+  final Vector2 _screenSizeLast = Vector2(0, 0);
 
-  Future<Map<CharacterState, SpriteAnimation>?> _getAnimations() async {
+  Future<Map<CharacterState, SpriteAnimation>?> _getAnimations(int size) async {
     return {
       CharacterState.normal: SpriteAnimation.spriteList(
-        [await pacmanSprites.pacmanAtFrac(pacmanMouthWidthDefault)],
+        await pacmanSprites.pacmanNormalSprites(size),
         stepTime: double.infinity,
       ),
       CharacterState.eating: SpriteAnimation.spriteList(
-        await pacmanSprites.pacmanEatingSprites(),
+        await pacmanSprites.pacmanEatingSprites(size),
         stepTime:
             kPacmanHalfEatingResetTimeMillis / 1000 / pacmanEatingHalfFrames,
       ),
       CharacterState.deadPacman: SpriteAnimation.spriteList(
-          await pacmanSprites.pacmanDyingSprites(),
+          await pacmanSprites.pacmanDyingSprites(size),
           stepTime:
               kPacmanDeadResetTimeAnimationMillis / 1000 / pacmanDeadFrames,
           loop: false)
@@ -175,9 +176,17 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   Future<void> onLoad() async {
     super.onLoad();
     world.pacmanPlayersList.add(this);
-    animations = await _getAnimations();
     current = CharacterState.normal;
     angle = 2 * pi / 2;
+  }
+
+  @override
+  Future<void> onGameResize(Vector2 size) async {
+    if (size.x != _screenSizeLast.x || size.y != _screenSizeLast.y) {
+      _screenSizeLast.setFrom(size);
+      animations = await _getAnimations(2 * maze.spriteWidthOnScreen(size));
+    }
+    super.onGameResize(size);
   }
 
   @override

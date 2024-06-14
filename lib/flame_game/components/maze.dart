@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:flame/components.dart';
@@ -108,6 +109,13 @@ class Maze {
   late final offScreen = Vector2(0, 1000) * spriteWidth();
 
   late final pelletScaleFactor = _maze1 ? 0.4 : 0.46;
+
+  int spriteWidthOnScreen(Vector2 size) {
+    return (spriteWidth() /
+            (kSquareNotionalSize / flameGameZoom) *
+            min(size.x, size.y))
+        .toInt();
+  }
 
   double blockWidth() {
     return kSquareNotionalSize /

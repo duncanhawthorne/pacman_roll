@@ -111,7 +111,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
   }
 
   @override
-  Future<void> onGameResize(size) async {
+  Future<void> onGameResize(Vector2 size) async {
     Vector2 targetViewPortSize = _sanitizeScreenSize(size);
     camera.viewport = FixedResolutionViewport(
         resolution: Vector2(targetViewPortSize.x, targetViewPortSize.y));
