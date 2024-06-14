@@ -144,9 +144,11 @@ class PacmanWorld extends Forge2DWorld
   }
 
   void scareGhosts() {
-    play(SfxType.ghostsScared);
-    for (Ghost ghost in ghostPlayersList) {
-      ghost.setScared();
+    if (pelletsRemainingNotifier.value != 0) {
+      play(SfxType.ghostsScared);
+      for (Ghost ghost in ghostPlayersList) {
+        ghost.setScared();
+      }
     }
   }
 
@@ -175,9 +177,12 @@ class PacmanWorld extends Forge2DWorld
   }
 
   void winGameWorldTidy() {
+    allGhostScaredTimeLatest = 0;
+    game.audioController.stopSfx(SfxType.ghostsScared);
     play(SfxType.endMusic);
     trimAllGhosts();
     for (Ghost ghost in ghostPlayersList) {
+      /// now defunct as [trimAllGhosts]
       ghost.setPositionForGameEnd();
     }
   }
@@ -195,6 +200,8 @@ class PacmanWorld extends Forge2DWorld
         dyingPacman.setStartPositionAfterDeath();
         trimAllGhosts();
         addThreeGhosts();
+        allGhostScaredTimeLatest = 0;
+        game.audioController.stopSfx(SfxType.ghostsScared);
         /*
         for (Ghost ghost in ghostPlayersList) {
           ghost.setStartPositionAfterPacmanDeath();
