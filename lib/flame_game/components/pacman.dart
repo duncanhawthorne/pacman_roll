@@ -137,7 +137,8 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   }
 
   void _dieFromGhost() {
-    if (current != CharacterState.deadPacman) {
+    if (current != CharacterState.deadPacman &&
+        world.pelletsRemainingNotifier.value != 0) {
       if (world.physicsOn) {
         //prevent multiple hits
 

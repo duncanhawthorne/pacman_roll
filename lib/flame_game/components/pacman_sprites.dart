@@ -69,7 +69,7 @@ class PacmanSprites {
 
   Future<List<Sprite>> pacmanNormalSprites(int size) async {
     List<Future<Sprite>> lf = List<Future<Sprite>>.generate(
-        1, (int index) => pacmanAtFrac(size, pacmanMouthWidthDefault));
+        1, (int index) => _pacmanAtFrac(size, pacmanMouthWidthDefault));
     return _lf2fl(lf);
   }
 
@@ -77,14 +77,14 @@ class PacmanSprites {
     List<Future<Sprite>> lf = List<Future<Sprite>>.generate(
         pacmanEatingHalfFrames * 2, //open and close
         (int index) =>
-            pacmanAtFrac(size, (pacmanMouthWidthDefault - (index + 1)).abs()));
+            _pacmanAtFrac(size, (pacmanMouthWidthDefault - (index + 1)).abs()));
     return _lf2fl(lf);
   }
 
   Future<List<Sprite>> pacmanDyingSprites(int size) async {
     List<Future<Sprite>> lf = List<Future<Sprite>>.generate(
         pacmanDeadFrames + 1, //open and close
-        (int index) => pacmanAtFrac(size, pacmanMouthWidthDefault + index));
+        (int index) => _pacmanAtFrac(size, pacmanMouthWidthDefault + index));
     return _lf2fl(lf);
   }
 
@@ -105,7 +105,7 @@ class PacmanSprites {
     }
   }
 
-  Future<Sprite> pacmanAtFrac(int size, int fracInt) async {
+  Future<Sprite> _pacmanAtFrac(int size, int fracInt) async {
     _precacheAllPacmanAtFrac(size); //call first time, later times no effect
     fracInt = max(0, min(pacmanRenderFracIncrementsNumber, fracInt));
     return await _pacmanAtFracCache[fracInt]!;
