@@ -184,7 +184,7 @@ class Save {
     Map<String, dynamic> leaderboardSummary = {};
     List<double> leaderboardWinTimesTmp = [];
 
-    if (true) {
+    if (firebaseOn) {
       //so don't re-download
       try {
         leaderboardSummary = await downloadLeaderboardSummary();
