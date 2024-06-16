@@ -31,6 +31,7 @@ class Palette {
   PaletteEntry get flameGameBackground => const PaletteEntry(black);
 
   static const black = Color(0xff000000);
+  static const darkGrey = Color(0xff222222);
   static const lightBluePMR = Color(0xffa2fff3);
   static const blueMaze = Color(0xFF3B32D4);
   static const transp = Color(0x00000000);
