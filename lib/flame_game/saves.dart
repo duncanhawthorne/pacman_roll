@@ -10,7 +10,8 @@ import 'helper.dart';
 /// This file has utilities for loading and saving the leaderboard in firebase
 
 class Save {
-  static const bool firebaseOn = true; //!(windows && !kIsWeb);
+  static const bool firebaseOn =
+      true && firebaseOnReal; //!(windows && !kIsWeb);
 
   static const String mainDB = "scores";
   static const String summaryDB = "summary";
