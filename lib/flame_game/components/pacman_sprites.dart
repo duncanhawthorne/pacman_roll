@@ -18,7 +18,7 @@ const int pacmanEatingHalfFrames = (pacmanRenderFracIncrementsNumber * 1) ~/
     4; //(kPacmanHalfEatingResetTimeMillis / 67).ceil();
 final Paint yellowPacmanPaint = Paint()
   ..color = Colors.yellowAccent; //blue; //yellowAccent;
-const loadFromFile = false;
+const _loadFromFile = false;
 
 class PacmanSprites {
   // ignore: unused_element
@@ -47,7 +47,7 @@ class PacmanSprites {
   }
 
   Future<Sprite> _pacmanAtFracReal(int size, int mouthWidthAsInt) async {
-    if (loadFromFile) {
+    if (_loadFromFile) {
       return Sprite(await Flame.images.load('dash/$mouthWidthAsInt.png'));
     } else {
       return Sprite(await _pacmanRecorderAtFrac(size, mouthWidthAsInt)
