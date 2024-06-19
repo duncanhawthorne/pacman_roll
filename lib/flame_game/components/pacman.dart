@@ -3,7 +3,6 @@ import 'dart:math';
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
-import 'package:pacman_roll/flame_game/components/pacman_sprites.dart';
 
 import '../../audio/sounds.dart';
 import '../constants.dart';
@@ -11,6 +10,7 @@ import 'game_character.dart';
 import 'ghost.dart';
 import 'maze.dart';
 import 'mini_pellet.dart';
+import 'pacman_sprites.dart';
 import 'super_pellet.dart';
 
 const int kPacmanDeadResetTimeMillis = 1700;

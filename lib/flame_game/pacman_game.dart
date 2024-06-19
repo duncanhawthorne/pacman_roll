@@ -6,9 +6,9 @@ import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flame/palette.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
-import 'package:pacman_roll/firebase/firebase_saves.dart';
 
 import '../audio/audio_controller.dart';
+import '../firebase/firebase_saves.dart';
 import '../level_selection/levels.dart';
 import '../player_progress/player_progress.dart';
 import '../style/palette.dart';
