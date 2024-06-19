@@ -3,13 +3,13 @@ import 'dart:core';
 import 'package:flame/components.dart';
 
 import '../../audio/sounds.dart';
-import '../constants.dart';
 import '../effects/return_home_effect.dart';
 import 'game_character.dart';
 import 'maze.dart';
 
 const int kGhostChaseTimeMillis = 6000;
 const int kGhostResetTimeMillis = 1000;
+const multipleSpawningGhosts = false;
 
 class Ghost extends GameCharacter {
   Ghost({

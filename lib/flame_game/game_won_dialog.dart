@@ -40,7 +40,7 @@ class GameWonDialog extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('You won',
+            Text('Level complete',
                 style: Theme.of(context).textTheme.headlineMedium,
                 textAlign: TextAlign.center),
             const SizedBox(height: 16),

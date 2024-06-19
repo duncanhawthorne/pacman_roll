@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 // ignore: depend_on_referenced_packages
 import 'package:web/web.dart' as web;
 
-import '../flame_game/constants.dart';
+import 'constants.dart';
 
 /// This file runs only on the web and contains fixes for iOS safari / chrome
 

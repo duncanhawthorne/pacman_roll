@@ -1,9 +1,10 @@
 import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flutter/material.dart';
 
-import '../constants.dart';
 import 'game_character.dart';
 import 'maze.dart';
+
+const useForgePhysicsBallRotation = false;
 
 class PhysicsBall extends BodyComponent {
   //with TapCallbacks, ContactCallbacks

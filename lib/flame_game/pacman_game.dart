@@ -13,7 +13,6 @@ import '../level_selection/levels.dart';
 import '../player_progress/player_progress.dart';
 import '../style/palette.dart';
 import '../utils/helper.dart';
-import 'constants.dart';
 import 'game_screen.dart';
 import 'pacman_world.dart';
 
@@ -29,6 +28,9 @@ import 'pacman_world.dart';
 ///
 /// Note that both of the last are passed in to the super constructor, they
 /// could also be set inside of `onLoad` for example.
+
+const flameGameZoom = 30.0; //determines speed of game
+const double kSquareNotionalSize = 1700; //determines speed of game
 
 class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
   PacmanGame({

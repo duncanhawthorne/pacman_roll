@@ -6,7 +6,7 @@ import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../style/palette.dart';
-import '../constants.dart';
+import '../pacman_game.dart';
 import 'mini_pellet.dart';
 import 'super_pellet.dart';
 

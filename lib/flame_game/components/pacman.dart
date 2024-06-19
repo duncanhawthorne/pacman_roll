@@ -5,7 +5,6 @@ import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 
 import '../../audio/sounds.dart';
-import '../constants.dart';
 import 'game_character.dart';
 import 'ghost.dart';
 import 'maze.dart';
@@ -16,6 +15,7 @@ import 'super_pellet.dart';
 const int kPacmanDeadResetTimeMillis = 1700;
 const int kPacmanDeadResetTimeAnimationMillis = 1250;
 const int kPacmanHalfEatingResetTimeMillis = 180;
+const multipleSpawningPacmans = false;
 
 /// The [GameCharacter] is the component that the physical player of the game is
 /// controlling.

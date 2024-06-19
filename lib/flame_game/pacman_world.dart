@@ -6,7 +6,6 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 
 import '../../audio/sounds.dart';
 import '../level_selection/levels.dart';
@@ -15,8 +14,9 @@ import 'components/game_character.dart';
 import 'components/ghost.dart';
 import 'components/maze.dart';
 import 'components/pacman.dart';
-import 'constants.dart';
 import 'pacman_game.dart';
+
+final bool iOS = defaultTargetPlatform == TargetPlatform.iOS;
 
 /// The world is where you place all the components that should live inside of
 /// the game, like the player, enemies, obstacles and points for example.
