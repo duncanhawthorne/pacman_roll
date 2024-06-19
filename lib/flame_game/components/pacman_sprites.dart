@@ -7,7 +7,7 @@ import 'package:flame/components.dart';
 import 'package:flame/flame.dart';
 import 'package:flutter/material.dart';
 
-import '../helper.dart';
+import '../../utils/helper.dart';
 
 const int pacmanRenderFracIncrementsNumber = 32;
 const int pacmanMouthWidthDefault =

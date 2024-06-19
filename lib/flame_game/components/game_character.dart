@@ -3,8 +3,8 @@ import 'dart:core';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 
+import '../../utils/helper.dart';
 import '../constants.dart';
-import '../helper.dart';
 import '../pacman_game.dart';
 import '../pacman_world.dart';
 import 'maze.dart';

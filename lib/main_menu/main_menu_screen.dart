@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../flame_game/constants.dart';
-import '../flame_game/helper.dart';
+import '../utils/helper.dart';
 import '../settings/settings.dart';
 import '../style/palette.dart';
 import '../style/wobbly_button.dart';

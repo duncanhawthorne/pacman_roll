@@ -7,13 +7,13 @@ import 'package:provider/provider.dart';
 
 import 'app_lifecycle/app_lifecycle.dart';
 import 'audio/audio_controller.dart';
+import 'firebase/firebase_saves.dart';
 import 'flame_game/constants.dart';
-import 'flame_game/helper.dart';
-import 'flame_game/saves.dart';
 import 'player_progress/player_progress.dart';
 import 'router.dart';
 import 'settings/settings.dart';
 import 'style/palette.dart';
+import 'utils/helper.dart';
 //firebase_options.dart as per direct download from google, not included in repo
 
 void main() async {

@@ -1,26 +1,15 @@
 import 'dart:core';
 
 import 'package:flame/components.dart';
-import 'package:flame/effects.dart';
-import 'package:flutter/animation.dart';
 
 import '../../audio/sounds.dart';
 import '../constants.dart';
+import '../effects/return_home_effect.dart';
 import 'game_character.dart';
 import 'maze.dart';
 
 const int kGhostChaseTimeMillis = 6000;
 const int kGhostResetTimeMillis = 1000;
-
-/// The [JumpEffect] is simply a [MoveByEffect] which has the properties of the
-/// effect pre-defined.
-class ReturnHomeEffect extends MoveToEffect {
-  ReturnHomeEffect(Vector2 destination)
-      : super(
-            destination,
-            EffectController(
-                duration: kGhostResetTimeMillis / 1000, curve: Curves.linear));
-}
 
 class Ghost extends GameCharacter {
   Ghost({
