@@ -197,8 +197,8 @@ class Save {
           leaderboardSummary["percentilesList"].isEmpty ||
           leaderboardSummary["effectiveDate"] <
               DateTime.now().millisecondsSinceEpoch -
-                  1000 * 60 * 60 * 6 -
-                  1000 * 60 * 10 * random.nextDouble() ||
+                  1000 * 60 * 60 * 24 -
+                  1000 * 60 * 60 * random.nextDouble() ||
           !leaderboardSummary.keys.contains("leaderboardLength") ||
           leaderboardSummary["leaderboardLength"] < 20) {
         //random 10 minutes to avoid multiple hits at the same time
