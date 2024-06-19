@@ -2,9 +2,9 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import '../components/pacman.dart';
 import '../game_screen.dart';
 import '../pacman_game.dart';
-import 'pacman.dart';
 import 'pacman_sprites.dart';
 
 Widget animatedPacmanIcon(PacmanGame game, int startValue) {

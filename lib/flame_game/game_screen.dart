@@ -11,10 +11,10 @@ import '../audio/audio_controller.dart';
 import '../level_selection/levels.dart';
 import '../player_progress/player_progress.dart';
 import '../style/palette.dart';
-import 'components/pacman_icons.dart';
-import 'components/pacman_sprites.dart';
 import 'game_lose_dialog.dart';
 import 'game_won_dialog.dart';
+import 'icons/pacman_icons.dart';
+import 'icons/pacman_sprites.dart';
 import 'pacman_game.dart';
 
 /// This widget defines the properties of the game screen.

@@ -5,11 +5,11 @@ import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 
 import '../../audio/sounds.dart';
+import '../icons/pacman_sprites.dart';
 import 'game_character.dart';
 import 'ghost.dart';
 import 'maze.dart';
 import 'mini_pellet.dart';
-import 'pacman_sprites.dart';
 import 'super_pellet.dart';
 
 const int kPacmanDeadResetTimeMillis = 1700;
