@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import '../game_screen.dart';
 import '../pacman_game.dart';
 import 'pacman.dart';
-// ignore: unused_element
 import 'pacman_sprites.dart';
 
 Widget animatedPacmanIcon(PacmanGame game, int startValue) {
