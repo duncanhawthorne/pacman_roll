@@ -26,6 +26,7 @@ class Maze {
 // 5 - outside
 // 6 - below 0
 
+  // ignore: unused_field
   static const _maze1Layout = [
     '555555555555555555555555555555555',
     '551111111111111111111111111111155',
@@ -87,7 +88,7 @@ class Maze {
   ];
 
   // ignore: unused_field
-  static const _maze1LayoutPortals = [
+  static const _maze1LayoutP = [
     '551441555555515514455555555144155',
     '111441111111114414411111111144111',
     '444000000000000610000000000006444',
