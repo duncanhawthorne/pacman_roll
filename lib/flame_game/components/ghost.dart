@@ -76,22 +76,20 @@ class Ghost extends GameCharacter {
       } else {
         //Move ball way offscreen. Stops any physics interactions or collisions
         //Further physics doesn't apply in deadGhost state
-        setUnderlyingBallPosition(maze.offScreen +
-            Vector2.random() /
-                100); //will get moved to right position later by other code in sequence checker
+        setUnderlyingBallOutOfTheWay(); //will get moved to right position later by other code in sequence checker
         //setUnderlyingBallStatic();
       }
     }
   }
 
   void setStartPositionAfterPacmanDeath() {
-    setPosition(maze.ghostStart + Vector2.random() / 100);
+    setPositionStatic(maze.ghostStart + Vector2.random() / 100);
     _ghostDeadTimeLatest = 0;
     world.allGhostScaredTimeLatest = 0;
   }
 
   void setPositionForGameEnd() {
-    setPosition(maze.cage + Vector2.random() / 100);
+    setPositionStatic(maze.cage + Vector2.random() / 100);
     _ghostDeadTimeLatest = 0;
     world.allGhostScaredTimeLatest = 0;
   }
@@ -101,7 +99,7 @@ class Ghost extends GameCharacter {
       if (world.now - _ghostDeadTimeLatest > kGhostResetTimeMillis) {
         if (!world.gameWonOrLost && _ghostDeadTimeLatest != 0) {
           //dont set on game over or after pacman death
-          setPosition(maze.ghostStart + Vector2.random() / 100);
+          setPositionStatic(maze.ghostStart + Vector2.random() / 100);
           //setUnderlyingBallDynamic();
         }
         current = CharacterState.scared;

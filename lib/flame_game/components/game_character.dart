@@ -37,12 +37,15 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     return _getUnderlyingBallVelocity();
   }
 
-  void setPosition(Vector2 targetLoc) {
-    _setUnderlyingBallPosition(targetLoc);
+  void setPositionStatic(Vector2 targetLoc) {
+    _setUnderlyingBallPositionStatic(targetLoc);
     position.setFrom(targetLoc);
-    _lastPosition.setFrom(
-        targetLoc); //Fixes bug. If body not initialised, which happens after setUnderlyingBallPosition, will revert to lastPosition so need that to be current position
-    _lastVelocity.setFrom(Vector2(0, 0));
+  }
+
+  void setUnderlyingBallOutOfTheWay() {
+    //shouldn't be using this function otherwise
+    assert(current == CharacterState.deadGhost);
+    _setUnderlyingBallPositionMoving(maze.offScreen + Vector2.random() / 100);
   }
 
   /*
@@ -64,15 +67,18 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     }
   }
 
-  void _setUnderlyingBallPosition(Vector2 targetLoc) {
+  void _setUnderlyingBallPositionStatic(Vector2 targetLoc) {
     _underlyingBall.body.setTransform(targetLoc, angle);
+    _lastPosition
+        .setFrom(targetLoc); //else _lastVelocity calc produces nonsense
     _underlyingBall.body.linearVelocity = Vector2(0, 0);
+    _lastVelocity.setFrom(Vector2(0, 0));
   }
 
-  void setUnderlyingBallPosition(Vector2 targetLoc) {
-    assert(current ==
-        CharacterState.deadGhost); //shouldn't be using this function otherwise
-    _setUnderlyingBallPosition(targetLoc);
+  void _setUnderlyingBallPositionMoving(Vector2 targetLoc) {
+    _underlyingBall.body.setTransform(targetLoc, angle);
+    _lastPosition
+        .setFrom(targetLoc); //else _lastVelocity calc produces nonsense
   }
 
   Vector2 _getUnderlyingBallVelocity() {
@@ -85,6 +91,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     }
   }
 
+  // ignore: unused_element
   void _setUnderlyingVelocity(Vector2 vel) {
     Future.delayed(const Duration(seconds: 0), () {
       _underlyingBall.body.linearVelocity = vel;
@@ -93,18 +100,11 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
 
   void _moveUnderlyingBallThroughPipePortal() {
     assert(current != CharacterState.deadGhost); //as physics doesn't apply
-    if (position.x > maze.rightPortal.x) {
-      Vector2 startVel = _getUnderlyingBallVelocity(); //before destroy ball
-      _setUnderlyingBallPosition(maze.leftPortal);
-      _lastPosition
-          .setFrom(maze.leftPortal); //else _lastVelocity calc produces nonsense
-      _setUnderlyingVelocity(startVel);
-    } else if (position.x < maze.leftPortal.x) {
-      Vector2 startVel = _getUnderlyingBallVelocity();
-      _setUnderlyingBallPosition(maze.rightPortal); //before destroy ball
-      _lastPosition.setFrom(
-          maze.rightPortal); //else _lastVelocity calc produces nonsense
-      _setUnderlyingVelocity(startVel);
+    if (position.x.abs() > maze.mazeWidth() / 2 ||
+        position.y.abs() > maze.mazeWidth() / 2) {
+      _setUnderlyingBallPositionMoving(Vector2(
+          _mod(position.x, maze.mazeWidth()),
+          _mod(position.y, maze.mazeWidth())));
     }
   }
 
@@ -135,9 +135,9 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     assert(current != CharacterState.deadGhost);
     if (current != CharacterState.deadGhost) {
       //if statement shouldn't be necessary, but asserts aren't enforced in production
+      _moveUnderlyingBallThroughPipePortal(); //note never called for deadGhost
       position = _getUnderlyingBallPosition();
       angle = _getUpdatedAngle();
-      _moveUnderlyingBallThroughPipePortal(); //note never called for deadGhost
     }
   }
 
@@ -165,3 +165,13 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
 }
 
 enum CharacterState { normal, scared, scaredIsh, eating, deadGhost, deadPacman }
+
+double _mod(double position, double mod) {
+  if (position > mod / 2) {
+    return position - mod;
+  } else if (position < -mod / 2) {
+    return position + mod;
+  } else {
+    return position;
+  }
+}

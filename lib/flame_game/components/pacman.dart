@@ -160,7 +160,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   }
 
   void setStartPositionAfterDeath() {
-    setPosition(maze.pacmanStart);
+    setPositionStatic(maze.pacmanStart);
     angle = 2 * pi / 2;
     current = CharacterState.normal;
   }
