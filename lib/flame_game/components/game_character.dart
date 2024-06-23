@@ -68,11 +68,8 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   }
 
   void _setUnderlyingBallPositionStatic(Vector2 targetLoc) {
-    _underlyingBall.body.setTransform(targetLoc, angle);
-    _lastPosition
-        .setFrom(targetLoc); //else _lastVelocity calc produces nonsense
-    _underlyingBall.body.linearVelocity = Vector2(0, 0);
-    _lastVelocity.setFrom(Vector2(0, 0));
+    _setUnderlyingBallPositionMoving(targetLoc);
+    _setUnderlyingVelocity(Vector2(0, 0));
   }
 
   void _setUnderlyingBallPositionMoving(Vector2 targetLoc) {
@@ -91,11 +88,9 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     }
   }
 
-  // ignore: unused_element
   void _setUnderlyingVelocity(Vector2 vel) {
-    Future.delayed(const Duration(seconds: 0), () {
-      _underlyingBall.body.linearVelocity = vel;
-    });
+    _underlyingBall.body.linearVelocity.setFrom(vel);
+    _lastVelocity.setFrom(vel);
   }
 
   void _moveUnderlyingBallThroughPipePortal() {
