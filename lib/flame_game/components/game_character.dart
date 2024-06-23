@@ -95,10 +95,11 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
 
   void _moveUnderlyingBallThroughPipePortal() {
     assert(current != CharacterState.deadGhost); //as physics doesn't apply
-    if (position.x.abs() > maze.mazeWidth() / 2 * 0.97 ||
-        position.y.abs() > maze.mazeWidth() / 2 * 0.97) {
-      _setUnderlyingBallPositionMoving(
-          Vector2(_mod(position.x), _mod(position.y)));
+    if (position.x.abs() > maze.mazeWidth() / 2 * _portalMargin ||
+        position.y.abs() > maze.mazeHeight() / 2 * _portalMargin) {
+      _setUnderlyingBallPositionMoving(Vector2(
+          _mod(position.x, maze.mazeWidth() * _portalMargin),
+          _mod(position.y, maze.mazeHeight() * _portalMargin)));
     }
   }
 
@@ -160,8 +161,9 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
 
 enum CharacterState { normal, scared, scaredIsh, eating, deadGhost, deadPacman }
 
-double _mod(double position) {
-  double mod = maze.mazeWidth() * 0.97;
+const _portalMargin = 0.97;
+
+double _mod(double position, double mod) {
   if (position > mod / 2) {
     return position - mod;
   } else if (position < -mod / 2) {
