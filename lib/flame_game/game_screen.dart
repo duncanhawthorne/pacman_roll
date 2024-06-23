@@ -62,6 +62,7 @@ class GameScreen extends StatelessWidget {
             loseDialogKey: (BuildContext context, PacmanGame game) {
               return GameLoseDialog(
                 level: level,
+                game: game,
               );
             },
             wonDialogKey: (BuildContext context, PacmanGame game) {

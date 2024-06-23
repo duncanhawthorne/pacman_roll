@@ -44,6 +44,7 @@ class GameWonDialog extends StatelessWidget {
                 style: Theme.of(context).textTheme.headlineMedium,
                 textAlign: TextAlign.center),
             const SizedBox(height: 16),
+            const SizedBox(height: 16),
             Text(
               _levelCompleteText(levelCompletedIn),
               style: const TextStyle(fontFamily: 'Press Start 2P'),
@@ -60,6 +61,7 @@ class GameWonDialog extends StatelessWidget {
                         style: const TextStyle(fontFamily: 'Press Start 2P'),
                       );
                     }),
+            const SizedBox(height: 16),
             const SizedBox(height: 16),
             if (true) ...[
               NesButton(
@@ -80,12 +82,12 @@ class GameWonDialog extends StatelessWidget {
 }
 
 String _levelCompleteText(double levelCompletedIn) {
-  String y = "\nTime: ${levelCompletedIn.toStringAsFixed(1)} seconds\n";
+  String y = "Time: ${levelCompletedIn.toStringAsFixed(1)} seconds";
   return y;
 }
 
 String _scoreboardLoadingText() {
-  String y = !Save.firebaseOn ? "" : "Rank: Loading...\n";
+  String y = !Save.firebaseOn ? "" : "\nRank: Loading...";
   return y;
 }
 
@@ -97,7 +99,7 @@ Future<String> _scoreboardRankText(double levelCompletedIn) async {
       : 0.0;
   String y = !Save.firebaseOn || (await save.leaderboardWinTimesCache)!.isEmpty
       ? ""
-      : "Rank: ${x == 0 ? "World Record" : "Top ${x.toStringAsFixed(0)}%"}\n";
+      : "\nRank: ${x == 0 ? "World Record" : "Top ${x.toStringAsFixed(0)}%"}";
   return y;
 }
 
