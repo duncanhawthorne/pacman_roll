@@ -25,6 +25,9 @@ class Maze {
 // 4 - empty
 // 5 - outside
 // 6 - below 0
+// 7 - ghostStart
+// 8 - pacmanStart
+// 9 - cage
 
   // ignore: unused_field
   static const _maze1Layout = [
@@ -40,10 +43,10 @@ class Maze {
     '551000000610000610000610000006155',
     '551666660616644614646610666666155',
     '551111110611114414411110611111155',
-    '555555510614444444444410615555555',
+    '555555510614444474444410615555555',
     '555555510614444444444410615555555',
     '111111110614411111114410611111111',
-    '444444440644412222214440644444444',
+    '444444440644412292214440644444444',
     '444444440644412222214440644444444',
     '111111110614411111114410611111111',
     '555555510614444444444410615555555',
@@ -52,7 +55,7 @@ class Maze {
     '551000000000000610000000000006155',
     '551066660666660610666660666606155',
     '551341110611110410611110611136155',
-    '551000410000000440000000610006155',
+    '551000410000000480000000610006155',
     '551640410660666646660660610466155',
     '551110410610411111110610610411155',
     '551000000610000610000610000006155',
@@ -63,32 +66,8 @@ class Maze {
     '551111111111111111111111111111155'
   ];
 
-  static const _maze2Layout = [
-    [5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 5],
-    [5, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 5],
-    [5, 1, 3, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 3, 1, 5],
-    [5, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 5],
-    [5, 1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 0, 1, 5],
-    [5, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 5],
-    [5, 1, 1, 1, 1, 0, 1, 1, 1, 4, 1, 4, 1, 1, 1, 0, 1, 1, 1, 1, 5],
-    [5, 5, 5, 5, 1, 0, 1, 4, 4, 4, 4, 4, 4, 4, 1, 0, 1, 5, 5, 5, 5],
-    [1, 1, 1, 1, 1, 0, 1, 4, 1, 1, 1, 1, 1, 4, 1, 0, 1, 1, 1, 1, 1],
-    [4, 4, 4, 4, 4, 0, 4, 4, 1, 2, 2, 2, 1, 4, 4, 0, 4, 4, 4, 4, 4],
-    [1, 1, 1, 1, 1, 0, 1, 4, 1, 1, 1, 1, 1, 4, 1, 0, 1, 1, 1, 1, 1],
-    [5, 5, 5, 5, 1, 0, 1, 4, 4, 4, 4, 4, 4, 4, 1, 0, 1, 5, 5, 5, 5],
-    [5, 1, 1, 1, 1, 0, 1, 4, 1, 1, 1, 1, 1, 4, 1, 0, 1, 1, 1, 1, 5],
-    [5, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 5],
-    [5, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 5],
-    [5, 1, 3, 0, 1, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 1, 0, 3, 1, 5],
-    [5, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 5],
-    [5, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 5],
-    [5, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 5],
-    [5, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 5],
-    [5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 5]
-  ];
-
   // ignore: unused_field
-  static const _maze3LayoutP = [
+  static const _maze2LayoutP = [
     '551441555555515514455555555144155',
     '111441111111114414411111111144111',
     '444000000000000610000000000006444',
@@ -101,10 +80,10 @@ class Maze {
     '444000000610000610000610000006444',
     '444666660616644614646610666666444',
     '111111110611114414411110611111111',
-    '555555510614444444444410615555555',
+    '555555510614444474444410615555555',
     '555555510614444444444410615555555',
     '111111110614411111114410611111111',
-    '444444440644412222214440644444444',
+    '444444440644412292214440644444444',
     '444444440644412222214440644444444',
     '111111110614411111114410611111111',
     '555555510614444444444410615555555',
@@ -113,7 +92,7 @@ class Maze {
     '444000000000000610000000000006444',
     '444066660666660610666660666606444',
     '111341110611110410611110611136111',
-    '551000410000000440000000610006155',
+    '551000410000000480000000610006155',
     '551640410660666646660660610466155',
     '551110410610411111110610610411155',
     '551000000610000610000610000006155',
@@ -125,84 +104,47 @@ class Maze {
   ];
 
   // ignore: unused_field
-  static const _maze4LayoutH = [
-    '551111111111111111111111111111155',
-    '551000000000000610000000000006155',
-    '551066660666660610666660666606155',
-    '551341110611110410611110611136155',
-    '551000410000000440000000610006155',
-    '551640410660666646660660610466155',
-    '551110410610411111110610610411155',
-    '551000000610000610000610000006155',
-    '551066666616640610646616666606155',
-    '551041111111110410611111111106155',
-    '551000000000000000000000000006155',
-    '551666666666666646666666666666155',
-    '551111111111111111111111111111155'
+  static const _smallSpritesMazeXLayout = [
+    '511111111111111111115',
+    '510000000010000000015',
+    '513110111010111011315',
+    '510000000000000000015',
+    '510110101111101011015',
+    '510000100010001000015',
+    '511110111414111011115',
+    '555510144474441015555',
+    '111110141111141011111',
+    '444440441292144044444',
+    '111110141111141011111',
+    '555510144444441015555',
+    '511110141111141011115',
+    '510000000010000000015',
+    '510110111010111011015',
+    '513010000080000010315',
+    '511010101111101010115',
+    '510000100010001000015',
+    '510111111010111111015',
+    '510000000000000000015',
+    '511111111111111111115'
   ];
 
-  // ignore: unused_field
-  static const _maze5LayoutV = [
-    '55555555555555555',
-    '55111111111111111',
-    '55100000000000061',
-    '55106666066666061',
-    '55136111061111041',
-    '55106111061111041',
-    '55100000000000001',
-    '55106666066066661',
-    '55106111061041111',
-    '55100000061000061',
-    '55166666061664461',
-    '55111111061111441',
-    '55555551061444441',
-    '55555551061444441',
-    '11111111061441111',
-    '44444444064441221',
-    '44444444064441221',
-    '11111111061441111',
-    '55555551061444441',
-    '55555551061444441',
-    '55111111061441111',
-    '55100000000000061',
-    '55106666066666061',
-    '55134111061111041',
-    '55100041000000041',
-    '55164041066066661',
-    '55111041061041111',
-    '55100000061000061',
-    '55106666661664061',
-    '55104111111111041',
-    '55100000000000001',
-    '55166666666666661',
-    '55111111111111111'
-  ];
+  static const chosenMaze = _maze1Layout;
 
   static const _mazeInnerWallWidthFactor = 0.7;
   static const double _pixelationBuffer = 1.03;
-  static const bool _maze1 = true;
-  static const _mazeScaleFactor = _maze1 ? 1.0 : 0.95;
-  final _mazeLayout = _maze1 ? _decodeMazeLayout(_maze1Layout) : _maze2Layout;
+  static const bool _largeSprites = chosenMaze != _smallSpritesMazeXLayout;
+  static const _mazeScaleFactor = _largeSprites ? 1.0 : 0.95;
+  final _mazeLayout = _decodeMazeLayout(chosenMaze);
 
-  late final ghostStart = Vector2(0, _maze1 ? -3.5 : -3) * blockWidth();
+  late final ghostStart = _vectorOfMazeListTargetNumber(7);
 
-  late final pacmanStart = Vector2(0, _maze1 ? 8.5 : 5) * blockWidth();
+  late final pacmanStart = _vectorOfMazeListTargetNumber(8);
 
-  late final cage = Vector2(0, _maze1 ? -0.5 : -1) * blockWidth();
+  late final cage = _vectorOfMazeListTargetNumber(9);
 
-  /*
-  late final leftPortal =
-      Vector2(-(_mazeLayoutLength() - 1) / 2 * 0.99, _maze1 ? -0.5 : -1) *
-          blockWidth();
+  late final offScreen = _vectorOfMazeListIndex(100, 0);
 
-  late final rightPortal =
-      Vector2((_mazeLayoutLength() - 1) / 2 * 0.99, _maze1 ? -0.5 : -1) *
-          blockWidth();
-   */
-
-  late final offScreen = Vector2(0, 1000) * spriteWidth();
-
-  late final pelletScaleFactor = _maze1 ? 0.4 : 0.46;
+  static const pelletScaleFactor = _largeSprites ? 0.4 : 0.46;
 
   int spriteWidthOnScreen(Vector2 size) {
     return (spriteWidth() /
@@ -219,7 +161,7 @@ class Maze {
   }
 
   double spriteWidth() {
-    return blockWidth() * (_maze1 ? 2 : 1);
+    return blockWidth() * (_largeSprites ? 2 : 1);
   }
 
   double mazeWidth() {
@@ -255,22 +197,34 @@ class Maze {
         _wallAt(i, j - 1) && _wallAt(i, j + 1));
   }
 
+  Vector2 _vectorOfMazeListIndex(int icore, int jcore,
+      {double ioffset = 0, double joffset = 0}) {
+    double i = ioffset + icore;
+    double j = joffset + jcore;
+    return Vector2(j + 1 / 2 - _mazeLayout[0].length / 2,
+            i + 1 / 2 - _mazeLayout.length / 2) *
+        blockWidth();
+  }
+
+  Vector2 _vectorOfMazeListTargetNumber(int targetNumber) {
+    for (int i = 0; i < _mazeLayout.length; i++) {
+      for (int j = 0; j < _mazeLayout[i].length; j++) {
+        if (_mazeLayout[i][j] == targetNumber) {
+          return _vectorOfMazeListIndex(i, j, ioffset: _largeSprites ? 0.5 : 0);
+        }
+      }
+    }
+    return Vector2(0, 0);
+  }
+
   List<Component> pellets(ValueNotifier pelletsRemainingNotifier) {
     List<Component> result = [];
     pelletsRemainingNotifier.value = 0;
-    double scale = blockWidth();
     for (int i = 0; i < _mazeLayout.length; i++) {
       for (int j = 0; j < _mazeLayout[i].length; j++) {
-        Vector2 center = Vector2(0, 0);
-        if (_maze1) {
-          center = Vector2(j + 1 - _mazeLayout[0].length / 2,
-                  i + 1 - _mazeLayout.length / 2) *
-              scale;
-        } else {
-          center = Vector2(j + 1 / 2 - _mazeLayout[0].length / 2,
-                  i + 1 / 2 - _mazeLayout.length / 2) *
-              scale;
-        }
+        Vector2 center = _vectorOfMazeListIndex(i, j,
+            ioffset: _largeSprites ? 1 / 2 : 0,
+            joffset: _largeSprites ? 1 / 2 : 0);
         if (_mazeLayout[i][j] == 0) {
           result.add(MiniPelletCircle(position: center));
         }
@@ -287,9 +241,7 @@ class Maze {
     double scale = blockWidth();
     for (int i = 0; i < _mazeLayout.length; i++) {
       for (int j = 0; j < _mazeLayout[i].length; j++) {
-        Vector2 center = Vector2(j + 1 / 2 - _mazeLayout[0].length / 2,
-                i + 1 / 2 - _mazeLayout.length / 2) *
-            scale;
+        Vector2 center = _vectorOfMazeListIndex(i, j);
         if (_wallAt(i, j)) {
           if (_circleAt(i, j)) {
             result.add(MazeWallCircleGround(center, scale / 2));
@@ -308,9 +260,7 @@ class Maze {
 
     for (int i = 0; i < _mazeLayout.length; i++) {
       for (int j = 0; j < _mazeLayout[i].length; j++) {
-        Vector2 center = Vector2(j + 1 / 2 - _mazeLayout[0].length / 2,
-                i + 1 / 2 - _mazeLayout.length / 2) *
-            scale;
+        Vector2 center = _vectorOfMazeListIndex(i, j);
         if (_wallAt(i, j)) {
           if (_circleAt(i, j)) {
             result.add(MazeWallCircleVisual(

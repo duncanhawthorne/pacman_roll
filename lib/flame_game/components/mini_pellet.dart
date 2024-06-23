@@ -8,7 +8,7 @@ class MiniPelletCircle extends CircleComponent
     with HasWorldReference<PacmanWorld> {
   MiniPelletCircle({required super.position})
       : super(
-            radius: maze.spriteWidth() / 2 * maze.pelletScaleFactor / 3,
+            radius: maze.spriteWidth() / 2 * Maze.pelletScaleFactor / 3,
             anchor: Anchor.center);
 
   @override
@@ -19,7 +19,7 @@ class MiniPelletCircle extends CircleComponent
       collisionType: CollisionType.passive,
       radius: 0,
       position:
-          Vector2.all(maze.spriteWidth() / 2 * maze.pelletScaleFactor / 3),
+          Vector2.all(maze.spriteWidth() / 2 * Maze.pelletScaleFactor / 3),
       anchor: Anchor.center,
     ));
     //debugMode = true;
@@ -40,7 +40,7 @@ class MiniPelletSprite extends SpriteAnimationComponent
   MiniPelletSprite() : super(size: spriteSize, anchor: Anchor.center);
 
   static final Vector2 spriteSize =
-      Vector2.all(maze.blockWidth() * maze.pelletScaleFactor);
+      Vector2.all(maze.blockWidth() * Maze.pelletScaleFactor);
   final speed = 0;
   Vector2 absPosition = Vector2(0, 0);
 
