@@ -12,9 +12,9 @@ import 'maze.dart';
 import 'mini_pellet.dart';
 import 'super_pellet.dart';
 
-const int kPacmanDeadResetTimeMillis = 1700;
+const int _kPacmanDeadResetTimeMillis = 1700;
 const int kPacmanDeadResetTimeAnimationMillis = 1250;
-const int kPacmanHalfEatingResetTimeMillis = 180;
+const int _kPacmanHalfEatingResetTimeMillis = 180;
 const multipleSpawningPacmans = false;
 
 /// The [GameCharacter] is the component that the physical player of the game is
@@ -22,7 +22,7 @@ const multipleSpawningPacmans = false;
 class Pacman extends GameCharacter with CollisionCallbacks {
   Pacman({
     required super.position,
-  }) : super();
+  }) : super(priority: 2);
 
   int _pacmanSpecialStartEatingTimeLatest = 0; //a long time ago
   int _targetRoundedMouthOpenTime = 0; //a long time ago
@@ -39,7 +39,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
       CharacterState.eating: SpriteAnimation.spriteList(
         await pacmanSprites.pacmanEatingSprites(size),
         stepTime:
-            kPacmanHalfEatingResetTimeMillis / 1000 / pacmanEatingHalfFrames,
+            _kPacmanHalfEatingResetTimeMillis / 1000 / pacmanEatingHalfFrames,
       ),
       CharacterState.deadPacman: SpriteAnimation.spriteList(
           await pacmanSprites.pacmanDyingSprites(size),
@@ -59,12 +59,12 @@ class Pacman extends GameCharacter with CollisionCallbacks {
       _pacmanEatingTimeLatest = world.now;
 
       int unroundedMouthOpenTime =
-          2 * kPacmanHalfEatingResetTimeMillis + _pacmanEatingTimeLatest;
+          2 * _kPacmanHalfEatingResetTimeMillis + _pacmanEatingTimeLatest;
 
       //ensure animation end synced up with turned off eating state, so move forward time by a few milliseconds
       _targetRoundedMouthOpenTime = roundUpToMult(
               unroundedMouthOpenTime - _pacmanSpecialStartEatingTimeLatest,
-              2 * kPacmanHalfEatingResetTimeMillis) +
+              2 * _kPacmanHalfEatingResetTimeMillis) +
           _pacmanSpecialStartEatingTimeLatest;
     }
   }
@@ -72,7 +72,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   void _eatPelletSound() {
     if (!world.gameWonOrLost) {
       if (_pacmanEatingSoundTimeLatest <
-          world.now - kPacmanHalfEatingResetTimeMillis * 2) {
+          world.now - _kPacmanHalfEatingResetTimeMillis * 2) {
         _pacmanEatingSoundTimeLatest = world.now;
         world.play(SfxType.waka);
       }
@@ -139,28 +139,28 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   void _dieFromGhost() {
     if (current != CharacterState.deadPacman &&
         world.pelletsRemainingNotifier.value != 0) {
-      if (world.physicsOn) {
-        //prevent multiple hits
+      world.play(SfxType.pacmanDeath);
+      current = CharacterState.deadPacman;
+      disconnectFromBall();
+      //world.disconnectGhostsFromBalls();
+      world.pacmanDyingNotifier.value++;
 
-        world.play(SfxType.pacmanDeath);
-        current = CharacterState.deadPacman;
-
+      Future.delayed(
+          const Duration(milliseconds: _kPacmanDeadResetTimeMillis + 100), () {
         if (world.pacmanPlayersList.length == 1 ||
             world.numberAlivePacman() == 0) {
+          world.numberOfDeathsNotifier.value++; //score counting deaths
           world.resetWorldAfterPacmanDeath(this);
         } else {
           assert(multipleSpawningPacmans);
-          Future.delayed(
-              const Duration(milliseconds: kPacmanDeadResetTimeMillis), () {
-            world.remove(this);
-          });
+          world.remove(this);
         }
-      }
+      });
     }
   }
 
   void setStartPositionAfterDeath() {
-    setPositionStatic(maze.pacmanStart);
+    setPositionStill(maze.pacmanStart);
     angle = 2 * pi / 2;
     current = CharacterState.normal;
   }
@@ -208,9 +208,6 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   @override
   void update(double dt) {
     _pacmanEatingNormalSequence();
-    if (world.physicsOn) {
-      oneFrameOfPhysics();
-    }
     super.update(dt);
   }
 }

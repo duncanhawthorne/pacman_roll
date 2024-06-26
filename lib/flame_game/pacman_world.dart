@@ -69,8 +69,6 @@ class PacmanWorld extends Forge2DWorld
 
   final Random random;
 
-  bool physicsOn = true;
-
   /// The gravity is defined in virtual pixels per second squared.
   /// These pixels are in relation to how big the [FixedResolutionViewport] is.
 
@@ -94,7 +92,7 @@ class PacmanWorld extends Forge2DWorld
   double averageGhostSpeed() {
     if (!game.isGameLive ||
         numberAlivePacman() == 0 ||
-        !physicsOn ||
+        gameWonOrLost ||
         ghostPlayersList.isEmpty) {
       return 0;
     } else {
@@ -176,6 +174,12 @@ class PacmanWorld extends Forge2DWorld
     }
   }
 
+  void disconnectGhostsFromBalls() {
+    for (int i = 0; i < ghostPlayersList.length; i++) {
+      ghostPlayersList[i].disconnectFromBall();
+    }
+  }
+
   void winGameWorldTidy() {
     allGhostScaredTimeLatest = 0;
     game.audioController.stopSfx(SfxType.ghostsScared);
@@ -188,29 +192,16 @@ class PacmanWorld extends Forge2DWorld
   }
 
   void resetWorldAfterPacmanDeath(Pacman dyingPacman) {
-    physicsOn = false;
-    pacmanDyingNotifier.value++;
-    //game.stopwatch.stop();
-    Future.delayed(
-        const Duration(milliseconds: kPacmanDeadResetTimeMillis + 100), () {
-      //100 buffer
-      if (!physicsOn) {
-        //prevent multiple resets
-        numberOfDeathsNotifier.value++; //score counting deaths
-        dyingPacman.setStartPositionAfterDeath();
-        trimAllGhosts();
-        addThreeGhosts();
-        allGhostScaredTimeLatest = 0;
-        game.audioController.stopSfx(SfxType.ghostsScared);
-        /*
-        for (Ghost ghost in ghostPlayersList) {
-          ghost.setStartPositionAfterPacmanDeath();
-        }
-         */
-        physicsOn = true;
-        setMazeAngle(0);
-      }
-    });
+    //reset ghost scared status. Shouldn't be relevant as just died
+    game.audioController.stopSfx(SfxType.ghostsScared);
+    allGhostScaredTimeLatest = 0;
+
+    if (!gameWonOrLost) {
+      dyingPacman.setStartPositionAfterDeath();
+      trimAllGhosts();
+      addThreeGhosts();
+      setMazeAngle(0);
+    }
   }
 
   void startSiren() {
@@ -290,13 +281,11 @@ class PacmanWorld extends Forge2DWorld
   }
 
   void setMazeAngle(double angle) {
-    if (physicsOn) {
-      _lastMazeAngle = angle;
-      gravity = Vector2(cos(_lastMazeAngle + 2 * pi / 4),
-              sin(_lastMazeAngle + 2 * pi / 4)) *
-          50;
-      game.camera.viewfinder.angle = angle;
-    }
+    _lastMazeAngle = angle;
+    gravity = Vector2(cos(_lastMazeAngle + 2 * pi / 4),
+            sin(_lastMazeAngle + 2 * pi / 4)) *
+        50;
+    game.camera.viewfinder.angle = angle;
   }
 }
 

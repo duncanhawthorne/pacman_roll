@@ -101,7 +101,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
   }
 
   void handleLoseGame() {
-    pauseEngine();
+    //pauseEngine();
     audioController.stopAllSfx();
     cleanOverlays();
     overlays.add(GameScreen.loseDialogKey);

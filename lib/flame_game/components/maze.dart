@@ -142,7 +142,7 @@ class Maze {
 
   late final cage = _vectorOfMazeListTargetNumber(9);
 
-  late final offScreen = _vectorOfMazeListIndex(100, 0);
+  late final offScreen = cage; //_vectorOfMazeListIndex(100, 0);
 
   static const pelletScaleFactor = _largeSprites ? 0.4 : 0.46;
 

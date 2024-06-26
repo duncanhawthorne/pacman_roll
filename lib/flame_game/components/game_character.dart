@@ -2,6 +2,7 @@ import 'dart:core';
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
+import 'package:flame_forge2d/flame_forge2d.dart';
 
 import '../../utils/helper.dart';
 import '../pacman_game.dart';
@@ -17,10 +18,8 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
         HasGameReference<PacmanGame> {
   GameCharacter({
     super.position,
-  }) : super(
-            size: Vector2.all(maze.spriteWidth()),
-            anchor: Anchor.center,
-            priority: 1);
+    super.priority = 1,
+  }) : super(size: Vector2.all(maze.spriteWidth()), anchor: Anchor.center);
 
   //final Vector2 startingPosition;
   late final PhysicsBall _underlyingBall = PhysicsBall(
@@ -32,31 +31,37 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   // determine which direction that the player is moving.
   final Vector2 _lastPosition = Vector2.zero();
   final Vector2 _lastVelocity = Vector2.zero();
+  bool _connectedToBall = true;
 
   Vector2 getVelocity() {
     return _getUnderlyingBallVelocity();
   }
 
-  void setPositionStatic(Vector2 targetLoc) {
-    _setUnderlyingBallPositionStatic(targetLoc);
+  void setPositionStill(Vector2 targetLoc) {
+    _setUnderlyingBallPositionStill(targetLoc);
     position.setFrom(targetLoc);
+    _setUnderlyingBallDynamic();
   }
 
-  void setUnderlyingBallOutOfTheWay() {
+  void disconnectFromBall() {
     //shouldn't be using this function otherwise
-    assert(current == CharacterState.deadGhost);
+    //assert(current == CharacterState.deadGhost ||
+    //    current == CharacterState.deadPacman);
+    _setUnderlyingBallStatic();
     _setUnderlyingBallPositionMoving(maze.offScreen + Vector2.random() / 100);
   }
 
-  /*
-  void setUnderlyingBallDynamic() {
+  void _setUnderlyingBallDynamic() {
     _underlyingBall.body.setType(BodyType.dynamic);
+    _underlyingBall.body.setActive(true);
+    _connectedToBall = true;
   }
 
-  void setUnderlyingBallStatic() {
+  void _setUnderlyingBallStatic() {
     _underlyingBall.body.setType(BodyType.static);
+    _underlyingBall.body.setActive(false);
+    _connectedToBall = false;
   }
-   */
 
   Vector2 _getUnderlyingBallPosition() {
     try {
@@ -67,7 +72,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     }
   }
 
-  void _setUnderlyingBallPositionStatic(Vector2 targetLoc) {
+  void _setUnderlyingBallPositionStill(Vector2 targetLoc) {
     _setUnderlyingBallPositionMoving(targetLoc);
     _setUnderlyingVelocity(Vector2(0, 0));
   }
@@ -153,6 +158,9 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
 
   @override
   void update(double dt) {
+    if (_connectedToBall) {
+      oneFrameOfPhysics();
+    }
     super.update(dt);
     _lastVelocity.setFrom((position - _lastPosition) / dt);
     _lastPosition.setFrom(position);
