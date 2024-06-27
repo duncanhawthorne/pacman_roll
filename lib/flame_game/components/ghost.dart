@@ -18,17 +18,17 @@ class Ghost extends GameCharacter {
 
   //int ghostScaredTimeLatest = 0; //a long time ago
   int _ghostDeadTimeLatest = 0; //a long time ago
-  int ghostSpriteChooserNumber = 100;
+  int idNum = 100;
 
   Future<Map<CharacterState, SpriteAnimation>?> _getAnimations() async {
     return {
       CharacterState.normal: SpriteAnimation.spriteList(
         [
-          await game.loadSprite(ghostSpriteChooserNumber == 0
+          await game.loadSprite(idNum == 0
               ? 'dash/ghost1.png'
-              : ghostSpriteChooserNumber == 1
+              : idNum == 1
                   ? 'dash/ghost3.png'
-                  : ghostSpriteChooserNumber == 2
+                  : idNum == 2
                       ? 'dash/ghost2.png'
                       : [
                           'dash/ghost1.png',
@@ -68,16 +68,14 @@ class Ghost extends GameCharacter {
 
   void setDead() {
     if (!world.gameWonOrLost) {
-      current = CharacterState.deadGhost;
-      add(ReturnHomeEffect(maze.ghostStart));
+      current = CharacterState.deadGhost; //stops further interactions
       _ghostDeadTimeLatest = world.now;
       if (multipleSpawningGhosts) {
         world.remove(this);
       } else {
-        //Move ball way offscreen. Stops any physics interactions or collisions
-        //Further physics doesn't apply in deadGhost state
-        disconnectFromBall(); //will get moved to right position later by other code in sequence checker
-        //setUnderlyingBallStatic();
+        disconnectSpriteFromBall();
+        add(ReturnHomeEffect(maze.ghostStart));
+        //will get moved to right position later by code in sequence checker
       }
     }
   }

@@ -117,21 +117,11 @@ class PacmanWorld extends Forge2DWorld
     });
   }
 
-  void addGhost(int ghostSpriteChooserNumber) {
+  void addGhost(int idNum) {
     Vector2 target = maze.ghostStart +
-        Vector2(
-            maze.spriteWidth() *
-                (ghostSpriteChooserNumber <= 2
-                    ? (ghostSpriteChooserNumber - 1)
-                    : 0),
-            0);
+        Vector2(maze.spriteWidth() * (idNum <= 2 ? (idNum - 1) : 0), 0);
     Ghost ghost = Ghost(position: target);
-    ghost.ghostSpriteChooserNumber = ghostSpriteChooserNumber;
-    if (multipleSpawningGhosts && ghostPlayersList.isNotEmpty) {
-      //new ghosts are also scared
-      ghost.current =
-          CharacterState.scared; //and then will get sequenced to correct state
-    }
+    ghost.idNum = idNum;
     add(ghost);
   }
 
@@ -174,9 +164,9 @@ class PacmanWorld extends Forge2DWorld
     }
   }
 
-  void disconnectGhostsFromBalls() {
+  void disconnectGhostsFromGravity() {
     for (int i = 0; i < ghostPlayersList.length; i++) {
-      ghostPlayersList[i].disconnectFromBall();
+      ghostPlayersList[i].disconnectFromPhysics();
     }
   }
 
@@ -255,17 +245,15 @@ class PacmanWorld extends Forge2DWorld
     double eventVectorLengthProportion =
         (event.canvasStartPosition - game.canvasSize / 2).length /
             (min(game.canvasSize.x, game.canvasSize.y) / 2);
+    double currentAngleTmp = atan2(eventVector.x, eventVector.y);
     if (_fingersLastDragAngle.containsKey(event.pointerId) &&
         _fingersLastDragAngle[event.pointerId] != null) {
-      double spinMultiplier = 4 * min(1, eventVectorLengthProportion / 0.75);
-      double currentAngleTmp = atan2(eventVector.x, eventVector.y);
       double angleDelta = _smallAngle(
           currentAngleTmp - _fingersLastDragAngle[event.pointerId]!);
-      angleDelta = angleDelta * spinMultiplier;
-      moveMazeAngleByDelta(angleDelta);
+      double spinMultiplier = 4 * min(1, eventVectorLengthProportion / 0.75);
+      moveMazeAngleByDelta(angleDelta * spinMultiplier);
     }
-    _fingersLastDragAngle[event.pointerId] =
-        atan2(eventVector.x, eventVector.y);
+    _fingersLastDragAngle[event.pointerId] = currentAngleTmp;
   }
 
   @override
@@ -293,6 +281,8 @@ double _smallAngle(double angleDelta) {
   //avoid +2*pi-delta jump when go around the circle, instead give -delta
   if (angleDelta > 2 * pi / 2) {
     return angleDelta - 2 * pi;
+  } else if (angleDelta < -2 * pi / 2) {
+    return angleDelta + 2 * pi;
   } else {
     return angleDelta;
   }

@@ -43,12 +43,13 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     _setUnderlyingBallDynamic();
   }
 
-  void disconnectFromBall() {
-    //shouldn't be using this function otherwise
-    //assert(current == CharacterState.deadGhost ||
-    //    current == CharacterState.deadPacman);
+  void disconnectSpriteFromBall() {
     _setUnderlyingBallStatic();
-    _setUnderlyingBallPositionMoving(maze.offScreen + Vector2.random() / 100);
+    _connectedToBall = false;
+  }
+
+  void disconnectFromPhysics() {
+    _setUnderlyingBallStatic();
   }
 
   void _setUnderlyingBallDynamic() {
@@ -60,7 +61,6 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   void _setUnderlyingBallStatic() {
     _underlyingBall.body.setType(BodyType.static);
     _underlyingBall.body.setActive(false);
-    _connectedToBall = false;
   }
 
   Vector2 _getUnderlyingBallPosition() {

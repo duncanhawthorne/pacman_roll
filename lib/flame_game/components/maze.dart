@@ -31,7 +31,7 @@ class Maze {
 
   // ignore: unused_field
   static const _maze1Layout = [
-    '555555555555555555555555555555555',
+    //'555555555555555555555555555555555',
     '551111111111111111111111111111155',
     '551000000000000610000000000006155',
     '551066660666660610666660666606155',
@@ -142,7 +142,7 @@ class Maze {
 
   late final cage = _vectorOfMazeListTargetNumber(9);
 
-  late final offScreen = cage; //_vectorOfMazeListIndex(100, 0);
+  //late final offScreen = cage; //_vectorOfMazeListIndex(100, 0);
 
   static const pelletScaleFactor = _largeSprites ? 0.4 : 0.46;
 
