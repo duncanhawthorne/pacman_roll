@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:nes_ui/nes_ui.dart';
 import 'package:provider/provider.dart';
 
 import '../firebase/firebase_saves.dart';
 import '../level_selection/levels.dart';
 import '../style/palette.dart';
+import 'game_screen.dart';
 import 'pacman_game.dart';
+import 'pacman_world.dart';
 
 /// This dialog is shown when a level is won.
 ///
@@ -33,48 +34,83 @@ class GameWonDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final palette = context.read<Palette>();
     return Center(
-      child: NesContainer(
-        width: 480,
-        height: 300,
-        backgroundColor: palette.backgroundPlaySession.color,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('Complete',
-                style: Theme.of(context).textTheme.headlineMedium,
-                textAlign: TextAlign.center),
-            const SizedBox(height: 16),
-            const SizedBox(height: 16),
-            Text(
-              _levelCompleteText(levelCompletedIn),
-              style: const TextStyle(fontFamily: 'Press Start 2P'),
-            ),
-            !Save.firebaseOn
-                ? const SizedBox.shrink()
-                : FutureBuilder(
-                    future: _scoreboardRankText(levelCompletedIn),
-                    initialData: _scoreboardLoadingText(),
-                    builder:
-                        (BuildContext context, AsyncSnapshot<String> text) {
-                      return Text(
-                        text.data!,
-                        style: const TextStyle(fontFamily: 'Press Start 2P'),
-                      );
-                    }),
-            const SizedBox(height: 16),
-            const SizedBox(height: 16),
-            if (true) ...[
-              NesButton(
-                onPressed: () {
-                  context.go('/');
-                },
-                type: NesButtonType.primary,
-                child: const Text('Retry',
-                    style: TextStyle(fontFamily: 'Press Start 2P')),
-              ),
+      child: Container(
+        //width: 480,
+        //height: 300,
+        decoration: BoxDecoration(
+            border: Border.all(color: palette.borderColor.color, width: 3),
+            borderRadius: BorderRadius.circular(10),
+            color: palette.playSessionBackground.color),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(40.0, 20, 40, 20),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Complete',
+                  style: Theme.of(context).textTheme.headlineMedium,
+                  textAlign: TextAlign.center),
               const SizedBox(height: 16),
+              const SizedBox(height: 16),
+              Text(
+                _levelCompleteText(levelCompletedIn),
+                style: const TextStyle(fontFamily: 'Press Start 2P'),
+              ),
+              !Save.firebaseOn
+                  ? const SizedBox.shrink()
+                  : FutureBuilder(
+                      future: _scoreboardRankText(levelCompletedIn),
+                      initialData: _scoreboardLoadingText(),
+                      builder:
+                          (BuildContext context, AsyncSnapshot<String> text) {
+                        return Text(
+                          text.data!,
+                          style: const TextStyle(fontFamily: 'Press Start 2P'),
+                        );
+                      }),
+              const SizedBox(height: 16),
+              const SizedBox(height: 16),
+              if (true) ...[
+                TextButton(
+                    style: TextButton.styleFrom(
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(8)),
+                        side: BorderSide(
+                          color: Palette.blueMaze,
+                          width: 3,
+                        ),
+                      ),
+                    ),
+                    onPressed: () {
+                      if (overlayMainMenu) {
+                        game.overlays.remove(GameScreen.wonDialogKey);
+                        game.start();
+                      } else {
+                        context.go('/');
+                      }
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Text('Retry',
+                          style: TextStyle(
+                              fontFamily: 'Press Start 2P',
+                              color: palette.playSessionContrast.color)),
+                    )),
+                /*
+                NesButton(
+                  onPressed: () {
+                    context.go('/');
+                  },
+                  type: NesButtonType.primary,
+                  child: const Text('Retry',
+                      style: TextStyle(fontFamily: 'Press Start 2P')),
+                ),
+
+                 */
+                //const SizedBox(height: 16),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );

@@ -1,5 +1,4 @@
 import 'package:flame/palette.dart';
-import 'package:flutter/material.dart';
 
 /// A palette of colors to be used in the game.
 ///
@@ -18,15 +17,22 @@ import 'package:flutter/material.dart';
 /// or even get the colors from the network.
 class Palette {
   PaletteEntry get seed =>
-      const PaletteEntry(Colors.yellowAccent); //Color(0xFF000000) //0xFF0050bc
-  PaletteEntry get text => const PaletteEntry(Color(0xee352b42));
-  PaletteEntry get backgroundMain =>
-      const PaletteEntry(lightBluePMR); //0xffa2fff3
+      const PaletteEntry(blueMaze); //Color(0xFF000000) //0xFF0050bc
+  PaletteEntry get text =>
+      const PaletteEntry(white); //const PaletteEntry(Color(0xee352b42));
+  PaletteEntry get mainBackground => const PaletteEntry(black); //0xffa2fff3
+  PaletteEntry get mainContrast => const PaletteEntry(white);
   PaletteEntry get backgroundLevelSelection =>
       const PaletteEntry(Color(0xffffcd75));
-  PaletteEntry get backgroundPlaySession =>
-      const PaletteEntry(lightBluePMR); //0xffa2fff3
+
+  PaletteEntry get playSessionBackground =>
+      const PaletteEntry(black); //0xffa2fff3
+  PaletteEntry get playSessionContrast =>
+      const PaletteEntry(white); //0xffa2fff3
+  PaletteEntry get borderColor => const PaletteEntry(blueMaze); //0xffa2fff3
   PaletteEntry get backgroundSettings => const PaletteEntry(Color(0xffbfc8e3));
+
+  PaletteEntry get pageTransition => const PaletteEntry(black); //0xffa2fff3
 
   PaletteEntry get flameGameBackground => const PaletteEntry(black);
 
@@ -35,6 +41,7 @@ class Palette {
   static const lightBluePMR = Color(0xffa2fff3);
   static const blueMaze = Color(0xFF3B32D4);
   static const transp = Color(0x00000000);
+  static const white = Color(0xffffffff);
 
   PaletteEntry get transpPalette => const PaletteEntry(transp);
 }

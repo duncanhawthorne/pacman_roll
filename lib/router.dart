@@ -4,9 +4,10 @@ import 'package:provider/provider.dart';
 
 import 'flame_game/game_screen.dart';
 //import 'level_selection/level_selection_screen.dart';
+import 'flame_game/pacman_world.dart';
 import 'level_selection/levels.dart';
-import 'main_menu/main_menu_screen.dart';
 //import 'settings/settings_screen.dart';
+import 'main_menu/main_menu_screen.dart';
 import 'style/page_transition.dart';
 import 'style/palette.dart';
 
@@ -17,7 +18,9 @@ final router = GoRouter(
     GoRoute(
       path: '/',
       builder: (context, state) {
-        return const MainMenuScreen(key: Key('main menu'));
+        return overlayMainMenu
+            ? GameScreen(level: gameLevels[0])
+            : const MainMenuScreen(key: Key('main menu'));
       },
       //routes: [
       //  GoRoute(
@@ -40,7 +43,7 @@ final router = GoRouter(
 
             return buildPageTransition<void>(
               key: const ValueKey('level'),
-              color: context.watch<Palette>().backgroundPlaySession.color,
+              color: context.watch<Palette>().pageTransition.color,
               child: GameScreen(level: level),
             );
           },

@@ -17,6 +17,8 @@ import 'game_won_dialog.dart';
 import 'icons/pacman_icons.dart';
 import 'icons/pacman_sprites.dart';
 import 'pacman_game.dart';
+import 'pacman_world.dart';
+import 'start_dialog.dart';
 
 /// This widget defines the properties of the game screen.
 ///
@@ -34,6 +36,7 @@ class GameScreen extends StatelessWidget {
 
   static const String loseDialogKey = 'lose_dialog';
   static const String wonDialogKey = 'won_dialog';
+  static const String startDialogKey = 'start_dialog';
   static const String backButtonKey = 'back_button';
   static const String statusOverlayKey = 'status_overlay';
 
@@ -72,6 +75,12 @@ class GameScreen extends StatelessWidget {
                   levelCompletedIn: game.stopwatchSeconds,
                   game: game);
             },
+            startDialogKey: (BuildContext context, PacmanGame game) {
+              return StartDialog(
+                  level: level,
+                  levelCompletedIn: game.stopwatchSeconds,
+                  game: game);
+            }
           },
         ),
       ),
@@ -83,9 +92,11 @@ Widget backButtonWidget(BuildContext context, PacmanGame game) {
   final settingsController = context.watch<SettingsController>();
   return Positioned(
     top: 20,
-    left: 30,
+    left: 25, //30
     child: Row(
       crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
         /*
         NesButton(
@@ -115,10 +126,20 @@ Widget backButtonWidget(BuildContext context, PacmanGame game) {
 
          */
 
-        const SizedBox(width: 20 * statusWidgetHeightFactor, height: 1),
+        //const SizedBox(width: 20 * statusWidgetHeightFactor, height: 1),
         IconButton(
-          onPressed: () => {GoRouter.of(context).go("/")},
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => {
+            if (overlayMainMenu)
+              {
+                game.overlays.add(GameScreen.startDialogKey),
+                game.reset(),
+                game.end(),
+              }
+            else
+              {GoRouter.of(context).go("/")}
+          },
+          icon: const Icon(overlayMainMenu ? Icons.refresh : Icons.arrow_back,
+              color: Colors.white),
         ),
         const SizedBox(width: 20 * statusWidgetHeightFactor, height: 1),
         audioOnOffButton(settingsController, color: Colors.white),

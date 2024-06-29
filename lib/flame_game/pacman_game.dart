@@ -56,7 +56,12 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
   String userString = "";
   final stopwatch = Stopwatch();
   double get stopwatchSeconds => stopwatch.elapsed.inMilliseconds / 1000;
-  bool get isGameLive => !paused && isLoaded && isMounted;
+
+  bool get isGameLive =>
+      !paused &&
+      isLoaded &&
+      isMounted &&
+      !overlays.isActive(GameScreen.startDialogKey);
 
   @override
   Color backgroundColor() => palette.flameGameBackground.color;
@@ -107,9 +112,19 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
     overlays.add(GameScreen.loseDialogKey);
   }
 
+  void addOverlays() {
+    overlays.add(GameScreen.backButtonKey);
+    overlays.add(GameScreen.statusOverlayKey);
+  }
+
   void cleanOverlays() {
     overlays.remove(GameScreen.backButtonKey);
     overlays.remove(GameScreen.statusOverlayKey);
+  }
+
+  void cleanDialogues() {
+    overlays.remove(GameScreen.loseDialogKey);
+    overlays.remove(GameScreen.wonDialogKey);
   }
 
   @override
@@ -120,27 +135,54 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
     super.onGameResize(size);
   }
 
+  void reset() {
+    cleanDialogues();
+    cleanOverlays();
+    addOverlays();
+    stopwatch.stop();
+    stopwatch.reset();
+    world.reset();
+  }
+
+  void start() {
+    resumeEngine();
+    reset();
+    world.start();
+  }
+
   /// In the [onLoad] method you load different type of assets and set things
   /// that only needs to be set once when the level starts up.
   @override
   Future<void> onLoad() async {
     super.onLoad();
+    if (overlayMainMenu) {
+      overlays.add(GameScreen.startDialogKey);
+    }
     userString = _getRandomString(world.random, 15);
-    overlays.add(GameScreen.backButtonKey);
-    overlays.add(GameScreen.statusOverlayKey);
+    reset();
     setStatusBarColor(palette.flameGameBackground.color);
     fixTitle(Palette.black);
     Future.delayed(const Duration(seconds: 1), () {
       fixTitle(Palette.black);
     });
+    if (overlayMainMenu) {
+      Future.delayed(const Duration(milliseconds: 1), () {
+        pauseEngine();
+      });
+    }
+  }
+
+  void end() {
+    world.end();
+    audioController.stopAllSfx();
   }
 
   @override
   Future<void> onRemove() async {
     cleanOverlays();
-    setStatusBarColor(palette.backgroundMain.color);
+    setStatusBarColor(palette.mainBackground.color);
     fixTitle(Palette.lightBluePMR);
-    audioController.stopAllSfx();
+    end();
     super.onRemove();
   }
 }

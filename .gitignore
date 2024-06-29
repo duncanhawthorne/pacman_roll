@@ -61,3 +61,4 @@ lib/secrets.dart
 
 .firebaserc
 firebase-debug.log
+devtools_options.yaml

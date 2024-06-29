@@ -14,11 +14,14 @@ import '../utils/helper.dart';
 import 'components/game_character.dart';
 import 'components/ghost.dart';
 import 'components/maze.dart';
+import 'components/mini_pellet.dart';
 import 'components/pacman.dart';
+import 'components/super_pellet.dart';
 import 'effects/return_home_effect.dart';
 import 'pacman_game.dart';
 
 final bool iOS = defaultTargetPlatform == TargetPlatform.iOS;
+const bool overlayMainMenu = true;
 
 /// The world is where you place all the components that should live inside of
 /// the game, like the player, enemies, obstacles and points for example.
@@ -68,7 +71,7 @@ class PacmanWorld extends Forge2DWorld
   final Map<int, double?> _fingersLastDragAngle = {};
 
   double _lastMazeAngle = 0;
-  bool _cameraRotateable = true;
+  bool cameraRotateable = false;
 
   final Random random;
 
@@ -111,7 +114,7 @@ class PacmanWorld extends Forge2DWorld
   void sirenVolumeUpdatedTimer() async {
     //NOTE disabled on iOS due to bug
     async.Timer.periodic(const Duration(milliseconds: 250), (timer) {
-      if (game.isGameLive) {
+      if (game.isGameLive && !gameWonOrLost) {
         game.audioController.setSirenVolume(averageGhostSpeed());
       } else {
         game.audioController.setSirenVolume(0);
@@ -145,10 +148,8 @@ class PacmanWorld extends Forge2DWorld
   void multiGhostAdderTimer() {
     if (multipleSpawningGhosts) {
       async.Timer.periodic(const Duration(milliseconds: 5000), (timer) {
-        if (game.isGameLive) {
-          if (!gameWonOrLost) {
-            addGhost(100);
-          }
+        if (game.isGameLive && !gameWonOrLost) {
+          addGhost(100);
         } else {
           timer.cancel();
         }
@@ -191,7 +192,7 @@ class PacmanWorld extends Forge2DWorld
 
     if (!gameWonOrLost) {
       if (_gradualWorldReset) {
-        _cameraRotateable = false;
+        cameraRotateable = false;
         dyingPacman.slideToStartPositionAfterDeath();
         for (Ghost ghost in ghostPlayersList) {
           ghost.slideToStartPositionAfterPacmanDeath();
@@ -200,7 +201,10 @@ class PacmanWorld extends Forge2DWorld
             .add(RotateHomeEffect(smallAngle(-_lastMazeAngle)));
 
         Future.delayed(const Duration(milliseconds: kGhostResetTimeMillis), () {
-          _cameraRotateable = true;
+          if (game.isGameLive) {
+            //reset might have happened while waiting for delayed
+            cameraRotateable = true;
+          }
           _resetWorldAfterPacmanDeathReal(dyingPacman);
         });
       } else {
@@ -232,20 +236,71 @@ class PacmanWorld extends Forge2DWorld
     }
   }
 
+  void reset() {
+    if (multipleSpawningPacmans) {
+      for (Pacman pacman in pacmanPlayersList) {
+        remove(pacman);
+      }
+      add(Pacman(position: maze.pacmanStart));
+    } else {
+      if (pacmanPlayersList.isEmpty) {
+        add(Pacman(position: maze.pacmanStart));
+      } else {
+        pacmanPlayersList[0].setStartPositionAfterDeath();
+      }
+    }
+    if (multipleSpawningGhosts) {
+      for (Ghost ghost in ghostPlayersList) {
+        remove(ghost);
+      }
+      addThreeGhosts();
+    } else {
+      if (ghostPlayersList.isEmpty) {
+        addThreeGhosts();
+      } else {
+        for (Ghost ghost in ghostPlayersList) {
+          ghost.setStartPositionAfterPacmanDeath();
+        }
+      }
+    }
+
+    pelletsRemainingNotifier.value += 1; //to avoid hitting zero in reset
+    for (var child in children) {
+      if (child is MiniPelletSprite ||
+          child is MiniPelletCircle ||
+          child is SuperPelletSprite ||
+          child is SuperPelletCircle) {
+        remove(child);
+      }
+    }
+    addAll(maze.pellets(pelletsRemainingNotifier, level.superPelletsEnabled));
+    pelletsRemainingNotifier.value -= 1; //to avoid hitting zero in reset
+
+    numberOfDeathsNotifier.value = 0;
+    setMazeAngle(0);
+
+    //addAll(screenEdgeBoundaries(game.camera));
+  }
+
+  void start() {
+    play(SfxType.startMusic);
+    startSiren();
+    multiGhostAdderTimer();
+    cameraRotateable = true;
+  }
+
+  void end() {
+    cameraRotateable = false;
+  }
+
   @override
   Future<void> onLoad() async {
     super.onLoad();
-    play(SfxType.startMusic);
-    startSiren();
-
-    add(Pacman(position: maze.pacmanStart));
-    addThreeGhosts();
     addAll(maze.mazeWalls());
-    //addAll(screenEdgeBoundaries(game.camera));
-    addAll(maze.pellets(pelletsRemainingNotifier, level.superPelletsEnabled));
-
-    multiGhostAdderTimer();
-    game.winOrLoseGameListener();
+    if (!overlayMainMenu) {
+      start();
+    }
+    game.winOrLoseGameListener(); //after have created pellets //isn't disposed so don't call on start
   }
 
   @override
@@ -257,7 +312,9 @@ class PacmanWorld extends Forge2DWorld
   @override
   void onDragStart(DragStartEvent event) {
     super.onDragStart(event);
-    game.stopwatch.start();
+    if (game.isGameLive) {
+      game.stopwatch.start();
+    }
     Vector2 eventVector = event.canvasPosition - game.canvasSize / 2;
     if (iOS) {
       _fingersLastDragAngle[event.pointerId] = null;
@@ -295,16 +352,16 @@ class PacmanWorld extends Forge2DWorld
   }
 
   void moveMazeAngleByDelta(double angleDelta) {
-    setMazeAngle(_lastMazeAngle + angleDelta);
+    if (cameraRotateable) {
+      setMazeAngle(_lastMazeAngle + angleDelta);
+    }
   }
 
   void setMazeAngle(double angle) {
-    if (_cameraRotateable) {
-      _lastMazeAngle = angle;
-      gravity = Vector2(cos(_lastMazeAngle + 2 * pi / 4),
-              sin(_lastMazeAngle + 2 * pi / 4)) *
-          50;
-      game.camera.viewfinder.angle = angle;
-    }
+    _lastMazeAngle = angle;
+    gravity = Vector2(cos(_lastMazeAngle + 2 * pi / 4),
+            sin(_lastMazeAngle + 2 * pi / 4)) *
+        50;
+    game.camera.viewfinder.angle = angle;
   }
 }

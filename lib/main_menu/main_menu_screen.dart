@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 
 import '../settings/settings.dart';
 import '../style/palette.dart';
-import '../style/wobbly_button.dart';
 import '../utils/constants.dart';
 import '../utils/helper.dart';
 
@@ -14,10 +13,10 @@ class MainMenuScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = context.watch<Palette>();
-    setStatusBarColor(palette.backgroundMain.color);
+    setStatusBarColor(palette.mainBackground.color);
     final settingsController = context.watch<SettingsController>();
     return Scaffold(
-      backgroundColor: palette.backgroundMain.color,
+      backgroundColor: palette.mainBackground.color,
       body: Center(
         child: FittedBox(
           fit: BoxFit.contain,
@@ -28,26 +27,47 @@ class MainMenuScreen extends StatelessWidget {
               _gap,
               _gap,
               Image.asset('assets/images/dash/ghost1.png',
-                  filterQuality: FilterQuality.none, height: 192, width: 192),
+                  filterQuality: FilterQuality.none, height: 160, width: 160),
               _gap,
               Transform.rotate(
                 angle: -0.1,
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 500),
-                  child: const Text(
+                  child: Text(
                     appTitle,
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontFamily: 'Press Start 2P',
-                      fontSize: 32,
-                      height: 1,
-                    ),
+                        fontFamily: 'Press Start 2P',
+                        fontSize: 32,
+                        height: 1,
+                        color: palette.mainContrast.color),
                   ),
                 ),
               ),
               _gap,
               _gap,
               _gap,
+              TextButton(
+                  style: TextButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: const BorderRadius.all(Radius.circular(8)),
+                      side: BorderSide(
+                        color: palette.borderColor.color,
+                        width: 3,
+                      ),
+                    ),
+                  ),
+                  onPressed: () {
+                    GoRouter.of(context).go('/session/1');
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text('Play',
+                        style: TextStyle(
+                            fontFamily: 'Press Start 2P',
+                            color: palette.mainContrast.color)),
+                  )),
+              /*
               WobblyButton(
                 onPressed: () {
                   GoRouter.of(context).go('/session/1');
@@ -55,8 +75,10 @@ class MainMenuScreen extends StatelessWidget {
                 child: const Text('Play',
                     style: TextStyle(fontFamily: 'Press Start 2P')),
               ),
+               */
               _gap,
-              audioOnOffButton(settingsController),
+              audioOnOffButton(settingsController,
+                  color: palette.mainContrast.color),
               _gap,
             ],
           ),

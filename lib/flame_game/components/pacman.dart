@@ -153,13 +153,16 @@ class Pacman extends GameCharacter with CollisionCallbacks {
 
       Future.delayed(
           const Duration(milliseconds: _kPacmanDeadResetTimeMillis + 100), () {
-        if (world.pacmanPlayersList.length == 1 ||
-            world.numberAlivePacman() == 0) {
-          world.numberOfDeathsNotifier.value++; //score counting deaths
-          world.resetWorldAfterPacmanDeath(this);
-        } else {
-          assert(multipleSpawningPacmans);
-          world.remove(this);
+        if (game.isGameLive) {
+          //reset might have happened while waiting for delayed
+          if (world.pacmanPlayersList.length == 1 ||
+              world.numberAlivePacman() == 0) {
+            world.numberOfDeathsNotifier.value++; //score counting deaths
+            world.resetWorldAfterPacmanDeath(this);
+          } else {
+            assert(multipleSpawningPacmans);
+            world.remove(this);
+          }
         }
       });
     }

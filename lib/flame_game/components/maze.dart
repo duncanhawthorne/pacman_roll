@@ -225,7 +225,7 @@ class Maze {
   List<Component> pellets(
       ValueNotifier pelletsRemainingNotifier, bool superPelletsEnabled) {
     List<Component> result = [];
-    pelletsRemainingNotifier.value = 0;
+    //pelletsRemainingNotifier.value = 0;
     for (int i = 0; i < _mazeLayout.length; i++) {
       for (int j = 0; j < _mazeLayout[i].length; j++) {
         Vector2 center = _vectorOfMazeListIndex(i, j,
