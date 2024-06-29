@@ -31,7 +31,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   // determine which direction that the player is moving.
   final Vector2 _lastPosition = Vector2.zero();
   final Vector2 _lastVelocity = Vector2.zero();
-  bool _connectedToBall = true;
+  bool connectedToBall = true;
 
   Vector2 getVelocity() {
     return _getUnderlyingBallVelocity();
@@ -45,7 +45,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
 
   void disconnectSpriteFromBall() {
     _setUnderlyingBallStatic();
-    _connectedToBall = false;
+    connectedToBall = false;
   }
 
   void disconnectFromPhysics() {
@@ -55,7 +55,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   void _setUnderlyingBallDynamic() {
     _underlyingBall.body.setType(BodyType.dynamic);
     _underlyingBall.body.setActive(true);
-    _connectedToBall = true;
+    connectedToBall = true;
   }
 
   void _setUnderlyingBallStatic() {
@@ -158,7 +158,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
 
   @override
   void update(double dt) {
-    if (_connectedToBall) {
+    if (connectedToBall) {
       oneFrameOfPhysics();
     }
     super.update(dt);
@@ -167,7 +167,15 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   }
 }
 
-enum CharacterState { normal, scared, scaredIsh, eating, deadGhost, deadPacman }
+enum CharacterState {
+  normal,
+  scared,
+  scaredIsh,
+  eating,
+  deadGhost,
+  deadPacman,
+  birthing
+}
 
 const _portalMargin = 0.97;
 

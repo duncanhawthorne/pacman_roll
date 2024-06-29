@@ -45,6 +45,10 @@ class Pacman extends GameCharacter with CollisionCallbacks {
           await pacmanSprites.pacmanDyingSprites(size),
           stepTime:
               kPacmanDeadResetTimeAnimationMillis / 1000 / pacmanDeadFrames,
+          loop: false),
+      CharacterState.birthing: SpriteAnimation.spriteList(
+          await pacmanSprites.pacmanBirthingSprites(size),
+          stepTime: kGhostResetTimeMillis / 1000 / pacmanDeadFrames,
           loop: false)
     };
   }
@@ -109,7 +113,9 @@ class Pacman extends GameCharacter with CollisionCallbacks {
 
   void _onCollideWithGhost(Ghost ghost) {
     if (ghost.current == CharacterState.deadGhost ||
-        current == CharacterState.deadPacman) {
+        current == CharacterState.deadPacman ||
+        !connectedToBall ||
+        !ghost.connectedToBall) {
       //nothing, but need to keep if condition
     } else if (ghost.current == CharacterState.scared ||
         ghost.current == CharacterState.scaredIsh) {
@@ -142,7 +148,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
       world.play(SfxType.pacmanDeath);
       current = CharacterState.deadPacman;
       disconnectFromPhysics();
-      //world.disconnectGhostsFromGravity();
+      //world.disconnectGhostsFromPhysics();
       world.pacmanDyingNotifier.value++;
 
       Future.delayed(
@@ -163,6 +169,13 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     setPositionStill(maze.pacmanStart);
     angle = 2 * pi / 2;
     current = CharacterState.normal;
+  }
+
+  void slideToStartPositionAfterDeath() {
+    setPositionStill(maze.pacmanStart);
+    disconnectFromPhysics();
+    angle = 2 * pi / 2;
+    current = CharacterState.birthing;
   }
 
   void _pacmanEatingNormalSequence() {

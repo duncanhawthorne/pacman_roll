@@ -4,12 +4,13 @@ import 'package:elapsed_time_display/elapsed_time_display.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:nes_ui/nes_ui.dart';
 import 'package:provider/provider.dart';
 
 import '../audio/audio_controller.dart';
 import '../level_selection/levels.dart';
+import '../main_menu/main_menu_screen.dart';
 import '../player_progress/player_progress.dart';
+import '../settings/settings.dart';
 import '../style/palette.dart';
 import 'game_lose_dialog.dart';
 import 'game_won_dialog.dart';
@@ -79,16 +80,49 @@ class GameScreen extends StatelessWidget {
 }
 
 Widget backButtonWidget(BuildContext context, PacmanGame game) {
+  final settingsController = context.watch<SettingsController>();
   return Positioned(
     top: 20,
     left: 30,
-    child: NesButton(
-      type: NesButtonType.normal,
-      onPressed: () {
-        GoRouter.of(context).go("/");
-      },
-      child: NesIcon(
-          iconData: NesIcons.leftArrowIndicator, size: const Size(15, 15)),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        /*
+        NesButton(
+          type: NesButtonType.normal,
+          onPressed: () {
+            GoRouter.of(context).go("/");
+          },
+          child: NesIcon(
+              iconData: NesIcons.leftArrowIndicator, size: const Size(15, 15)),
+        ),
+         */
+        /*
+        const SizedBox(width: 20 * statusWidgetHeightFactor, height: 1),
+        NesButton(
+            type: NesButtonType.normal,
+            onPressed: () {
+              settingsController.toggleAudioOn();
+            },
+            child: ValueListenableBuilder<bool>(
+              valueListenable: settingsController.audioOn,
+              builder: (context, audioOn, child) {
+                return NesIcon(
+                    iconData: audioOn ? NesIcons.musicNote : NesIcons.radio,
+                    size: const Size(15, 15));
+              },
+            )),
+
+         */
+
+        const SizedBox(width: 20 * statusWidgetHeightFactor, height: 1),
+        IconButton(
+          onPressed: () => {GoRouter.of(context).go("/")},
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+        ),
+        const SizedBox(width: 20 * statusWidgetHeightFactor, height: 1),
+        audioOnOffButton(settingsController, color: Colors.white),
+      ],
     ),
   );
 }

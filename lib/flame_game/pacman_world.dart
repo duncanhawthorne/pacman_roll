@@ -10,10 +10,12 @@ import 'package:flutter/foundation.dart';
 import '../../audio/sounds.dart';
 import '../level_selection/levels.dart';
 import '../player_progress/player_progress.dart';
+import '../utils/helper.dart';
 import 'components/game_character.dart';
 import 'components/ghost.dart';
 import 'components/maze.dart';
 import 'components/pacman.dart';
+import 'effects/return_home_effect.dart';
 import 'pacman_game.dart';
 
 final bool iOS = defaultTargetPlatform == TargetPlatform.iOS;
@@ -66,6 +68,7 @@ class PacmanWorld extends Forge2DWorld
   final Map<int, double?> _fingersLastDragAngle = {};
 
   double _lastMazeAngle = 0;
+  bool _cameraRotateable = true;
 
   final Random random;
 
@@ -118,8 +121,7 @@ class PacmanWorld extends Forge2DWorld
   }
 
   void addGhost(int idNum) {
-    Vector2 target = maze.ghostStart +
-        Vector2(maze.spriteWidth() * (idNum <= 2 ? (idNum - 1) : 0), 0);
+    Vector2 target = maze.ghostStartForId(idNum);
     Ghost ghost = Ghost(position: target);
     ghost.idNum = idNum;
     add(ghost);
@@ -164,7 +166,7 @@ class PacmanWorld extends Forge2DWorld
     }
   }
 
-  void disconnectGhostsFromGravity() {
+  void disconnectGhostsFromPhysics() {
     for (int i = 0; i < ghostPlayersList.length; i++) {
       ghostPlayersList[i].disconnectFromPhysics();
     }
@@ -181,17 +183,44 @@ class PacmanWorld extends Forge2DWorld
     }
   }
 
+  final bool _gradualWorldReset = true;
   void resetWorldAfterPacmanDeath(Pacman dyingPacman) {
     //reset ghost scared status. Shouldn't be relevant as just died
     game.audioController.stopSfx(SfxType.ghostsScared);
     allGhostScaredTimeLatest = 0;
 
     if (!gameWonOrLost) {
-      dyingPacman.setStartPositionAfterDeath();
+      if (_gradualWorldReset) {
+        _cameraRotateable = false;
+        dyingPacman.slideToStartPositionAfterDeath();
+        for (Ghost ghost in ghostPlayersList) {
+          ghost.slideToStartPositionAfterPacmanDeath();
+        }
+        game.camera.viewfinder
+            .add(RotateHomeEffect(smallAngle(-_lastMazeAngle)));
+
+        Future.delayed(const Duration(milliseconds: kGhostResetTimeMillis), () {
+          _cameraRotateable = true;
+          _resetWorldAfterPacmanDeathReal(dyingPacman);
+        });
+      } else {
+        _resetWorldAfterPacmanDeathReal(dyingPacman);
+      }
+    }
+  }
+
+  void _resetWorldAfterPacmanDeathReal(Pacman dyingPacman) {
+    //_fingersLastDragAngle.clear(); //so you have to re-press
+    dyingPacman.setStartPositionAfterDeath();
+    if (multipleSpawningGhosts) {
       trimAllGhosts();
       addThreeGhosts();
-      setMazeAngle(0);
+    } else {
+      for (Ghost ghost in ghostPlayersList) {
+        ghost.setStartPositionAfterPacmanDeath();
+      }
     }
+    setMazeAngle(0);
   }
 
   void startSiren() {
@@ -213,7 +242,7 @@ class PacmanWorld extends Forge2DWorld
     addThreeGhosts();
     addAll(maze.mazeWalls());
     //addAll(screenEdgeBoundaries(game.camera));
-    addAll(maze.pellets(pelletsRemainingNotifier));
+    addAll(maze.pellets(pelletsRemainingNotifier, level.superPelletsEnabled));
 
     multiGhostAdderTimer();
     game.winOrLoseGameListener();
@@ -246,14 +275,15 @@ class PacmanWorld extends Forge2DWorld
         (event.canvasStartPosition - game.canvasSize / 2).length /
             (min(game.canvasSize.x, game.canvasSize.y) / 2);
     double currentAngleTmp = atan2(eventVector.x, eventVector.y);
-    if (_fingersLastDragAngle.containsKey(event.pointerId) &&
-        _fingersLastDragAngle[event.pointerId] != null) {
-      double angleDelta = _smallAngle(
-          currentAngleTmp - _fingersLastDragAngle[event.pointerId]!);
-      double spinMultiplier = 4 * min(1, eventVectorLengthProportion / 0.75);
-      moveMazeAngleByDelta(angleDelta * spinMultiplier);
+    if (_fingersLastDragAngle.containsKey(event.pointerId)) {
+      if (_fingersLastDragAngle[event.pointerId] != null) {
+        double angleDelta = smallAngle(
+            currentAngleTmp - _fingersLastDragAngle[event.pointerId]!);
+        double spinMultiplier = 4 * min(1, eventVectorLengthProportion / 0.75);
+        moveMazeAngleByDelta(angleDelta * spinMultiplier);
+      }
+      _fingersLastDragAngle[event.pointerId] = currentAngleTmp;
     }
-    _fingersLastDragAngle[event.pointerId] = currentAngleTmp;
   }
 
   @override
@@ -269,21 +299,12 @@ class PacmanWorld extends Forge2DWorld
   }
 
   void setMazeAngle(double angle) {
-    _lastMazeAngle = angle;
-    gravity = Vector2(cos(_lastMazeAngle + 2 * pi / 4),
-            sin(_lastMazeAngle + 2 * pi / 4)) *
-        50;
-    game.camera.viewfinder.angle = angle;
-  }
-}
-
-double _smallAngle(double angleDelta) {
-  //avoid +2*pi-delta jump when go around the circle, instead give -delta
-  if (angleDelta > 2 * pi / 2) {
-    return angleDelta - 2 * pi;
-  } else if (angleDelta < -2 * pi / 2) {
-    return angleDelta + 2 * pi;
-  } else {
-    return angleDelta;
+    if (_cameraRotateable) {
+      _lastMazeAngle = angle;
+      gravity = Vector2(cos(_lastMazeAngle + 2 * pi / 4),
+              sin(_lastMazeAngle + 2 * pi / 4)) *
+          50;
+      game.camera.viewfinder.angle = angle;
+    }
   }
 }

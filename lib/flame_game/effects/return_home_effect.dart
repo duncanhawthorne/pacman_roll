@@ -13,3 +13,11 @@ class ReturnHomeEffect extends MoveToEffect {
             EffectController(
                 duration: kGhostResetTimeMillis / 1000, curve: Curves.linear));
 }
+
+class RotateHomeEffect extends RotateEffect {
+  RotateHomeEffect(double destination)
+      : super.by(
+            destination,
+            EffectController(
+                duration: kGhostResetTimeMillis / 1000, curve: Curves.linear));
+}

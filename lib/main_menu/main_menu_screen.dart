@@ -56,15 +56,7 @@ class MainMenuScreen extends StatelessWidget {
                     style: TextStyle(fontFamily: 'Press Start 2P')),
               ),
               _gap,
-              ValueListenableBuilder<bool>(
-                valueListenable: settingsController.audioOn,
-                builder: (context, audioOn, child) {
-                  return IconButton(
-                    onPressed: () => settingsController.toggleAudioOn(),
-                    icon: Icon(audioOn ? Icons.volume_up : Icons.volume_off),
-                  );
-                },
-              ),
+              audioOnOffButton(settingsController),
               _gap,
             ],
           ),
@@ -74,4 +66,16 @@ class MainMenuScreen extends StatelessWidget {
   }
 
   static const _gap = SizedBox(height: 40);
+}
+
+Widget audioOnOffButton(settingsController, {Color? color}) {
+  return ValueListenableBuilder<bool>(
+    valueListenable: settingsController.audioOn,
+    builder: (context, audioOn, child) {
+      return IconButton(
+        onPressed: () => settingsController.toggleAudioOn(),
+        icon: Icon(audioOn ? Icons.volume_up : Icons.volume_off, color: color),
+      );
+    },
+  );
 }

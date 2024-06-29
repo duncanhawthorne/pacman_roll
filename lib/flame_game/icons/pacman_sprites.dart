@@ -88,6 +88,14 @@ class PacmanSprites {
     return _lf2fl(lf);
   }
 
+  Future<List<Sprite>> pacmanBirthingSprites(int size) async {
+    List<Future<Sprite>> lf = List<Future<Sprite>>.generate(
+        pacmanDeadFrames + 1, //open and close
+        (int index) => _pacmanAtFrac(
+            size, pacmanMouthWidthDefault + (pacmanDeadFrames + 1 - index)));
+    return _lf2fl(lf);
+  }
+
   Future<void> _precacheAllPacmanAtFrac(size) async {
     if (_pacmanAtFracCache.isEmpty || _pacmanAtFracCacheSize != size) {
       //call first time, later times no effect

@@ -146,6 +146,11 @@ class Maze {
 
   static const pelletScaleFactor = _largeSprites ? 0.4 : 0.46;
 
+  Vector2 ghostStartForId(int idNum) {
+    return ghostStart +
+        Vector2(maze.spriteWidth() * (idNum <= 2 ? (idNum - 1) : 0), 0);
+  }
+
   int spriteWidthOnScreen(Vector2 size) {
     return (spriteWidth() /
             (kSquareNotionalSize / flameGameZoom) *
@@ -217,7 +222,8 @@ class Maze {
     return Vector2(0, 0);
   }
 
-  List<Component> pellets(ValueNotifier pelletsRemainingNotifier) {
+  List<Component> pellets(
+      ValueNotifier pelletsRemainingNotifier, bool superPelletsEnabled) {
     List<Component> result = [];
     pelletsRemainingNotifier.value = 0;
     for (int i = 0; i < _mazeLayout.length; i++) {
@@ -229,7 +235,11 @@ class Maze {
           result.add(MiniPelletCircle(position: center));
         }
         if (_mazeLayout[i][j] == 3) {
-          result.add(SuperPelletCircle(position: center));
+          if (superPelletsEnabled) {
+            result.add(SuperPelletCircle(position: center));
+          } else {
+            result.add(MiniPelletCircle(position: center));
+          }
         }
       }
     }

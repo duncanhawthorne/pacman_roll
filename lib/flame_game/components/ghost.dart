@@ -3,6 +3,7 @@ import 'dart:core';
 import 'package:flame/components.dart';
 
 import '../../audio/sounds.dart';
+import '../../utils/helper.dart';
 import '../effects/return_home_effect.dart';
 import 'game_character.dart';
 import 'maze.dart';
@@ -75,15 +76,24 @@ class Ghost extends GameCharacter {
       } else {
         disconnectSpriteFromBall();
         add(ReturnHomeEffect(maze.ghostStart));
+        add(RotateHomeEffect(smallAngle(-angle)));
         //will get moved to right position later by code in sequence checker
       }
     }
   }
 
   void setStartPositionAfterPacmanDeath() {
-    setPositionStill(maze.ghostStart + Vector2.random() / 100);
+    setPositionStill(maze.ghostStartForId(idNum));
+    angle = 0;
     _ghostDeadTimeLatest = 0;
     world.allGhostScaredTimeLatest = 0;
+  }
+
+  void slideToStartPositionAfterPacmanDeath() {
+    disconnectSpriteFromBall();
+    add(ReturnHomeEffect(maze.ghostStartForId(idNum)));
+    add(RotateHomeEffect(smallAngle(-angle)));
+    disconnectFromPhysics();
   }
 
   void setPositionForGameEnd() {
