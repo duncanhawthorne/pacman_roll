@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 
 import 'flame_game/game_screen.dart';
 //import 'level_selection/level_selection_screen.dart';
@@ -43,7 +42,7 @@ final router = GoRouter(
 
             return buildPageTransition<void>(
               key: const ValueKey('level'),
-              color: context.watch<Palette>().pageTransition.color,
+              color: Palette.pageTransition.color,
               child: GameScreen(level: level),
             );
           },

@@ -64,6 +64,7 @@ class PacmanWorld extends Forge2DWorld
       numberOfDeathsNotifier.value >= level.maxAllowedDeaths;
 
   int allGhostScaredTimeLatest = 0;
+  bool doingLevelResetFlourish = false;
 
   int now = DateTime.now().millisecondsSinceEpoch;
   //Vector2 get size => (parent as FlameGame).size;
@@ -71,7 +72,7 @@ class PacmanWorld extends Forge2DWorld
   final Map<int, double?> _fingersLastDragAngle = {};
 
   double _lastMazeAngle = 0;
-  bool cameraRotateable = false;
+  bool cameraRotateableOnPacmanDeathFlourish = true;
 
   final Random random;
 
@@ -184,15 +185,15 @@ class PacmanWorld extends Forge2DWorld
     }
   }
 
-  final bool _gradualWorldReset = true;
+  final bool _slideCharactersAfterPacmanDeath = true;
   void resetWorldAfterPacmanDeath(Pacman dyingPacman) {
     //reset ghost scared status. Shouldn't be relevant as just died
     game.audioController.stopSfx(SfxType.ghostsScared);
     allGhostScaredTimeLatest = 0;
 
     if (!gameWonOrLost) {
-      if (_gradualWorldReset) {
-        cameraRotateable = false;
+      if (_slideCharactersAfterPacmanDeath) {
+        cameraRotateableOnPacmanDeathFlourish = false;
         dyingPacman.slideToStartPositionAfterDeath();
         for (Ghost ghost in ghostPlayersList) {
           ghost.slideToStartPositionAfterPacmanDeath();
@@ -201,15 +202,15 @@ class PacmanWorld extends Forge2DWorld
             .add(RotateHomeEffect(smallAngle(-_lastMazeAngle)));
 
         Future.delayed(const Duration(milliseconds: kGhostResetTimeMillis), () {
-          if (game.isGameLive) {
-            //reset might have happened while waiting for delayed
-            cameraRotateable = true;
-          }
+          //Note reset might have happened while waiting for delayed
+          cameraRotateableOnPacmanDeathFlourish = true;
           _resetWorldAfterPacmanDeathReal(dyingPacman);
         });
       } else {
         _resetWorldAfterPacmanDeathReal(dyingPacman);
       }
+    } else {
+      doingLevelResetFlourish = false;
     }
   }
 
@@ -225,6 +226,7 @@ class PacmanWorld extends Forge2DWorld
       }
     }
     setMazeAngle(0);
+    doingLevelResetFlourish = false;
   }
 
   void startSiren() {
@@ -286,11 +288,7 @@ class PacmanWorld extends Forge2DWorld
     play(SfxType.startMusic);
     startSiren();
     multiGhostAdderTimer();
-    cameraRotateable = true;
-  }
-
-  void end() {
-    cameraRotateable = false;
+    cameraRotateableOnPacmanDeathFlourish = true;
   }
 
   @override
@@ -352,7 +350,7 @@ class PacmanWorld extends Forge2DWorld
   }
 
   void moveMazeAngleByDelta(double angleDelta) {
-    if (cameraRotateable) {
+    if (cameraRotateableOnPacmanDeathFlourish && game.isGameLive) {
       setMazeAngle(_lastMazeAngle + angleDelta);
     }
   }

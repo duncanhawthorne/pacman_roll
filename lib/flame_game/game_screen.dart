@@ -11,7 +11,6 @@ import '../level_selection/levels.dart';
 import '../main_menu/main_menu_screen.dart';
 import '../player_progress/player_progress.dart';
 import '../settings/settings.dart';
-import '../style/palette.dart';
 import 'game_lose_dialog.dart';
 import 'game_won_dialog.dart';
 import 'icons/pacman_icons.dart';
@@ -42,9 +41,9 @@ class GameScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    context.watch<Palette>();
+    //context.watch<Palette>();
     final audioController = context.read<AudioController>();
-    final palette = context.read<Palette>();
+    //final palette = context.read<Palette>();
     return PopScope(
       canPop: false,
       child: Scaffold(
@@ -54,7 +53,7 @@ class GameScreen extends StatelessWidget {
             level: level,
             playerProgress: context.read<PlayerProgress>(),
             audioController: audioController,
-            palette: palette,
+            //palette: palette,
           ),
           overlayBuilderMap: {
             backButtonKey: (BuildContext context, PacmanGame game) {
@@ -128,17 +127,16 @@ Widget backButtonWidget(BuildContext context, PacmanGame game) {
 
         //const SizedBox(width: 20 * statusWidgetHeightFactor, height: 1),
         IconButton(
-          onPressed: () => {
-            if (overlayMainMenu)
-              {
-                game.overlays.add(GameScreen.startDialogKey),
-                game.reset(),
-                game.end(),
-              }
-            else
-              {GoRouter.of(context).go("/")}
+          onPressed: () {
+            if (overlayMainMenu) {
+              game.overlays.add(GameScreen.startDialogKey);
+              //game.pauseEngine();
+              //game.stopwatch.stop();
+            } else {
+              GoRouter.of(context).go("/");
+            }
           },
-          icon: const Icon(overlayMainMenu ? Icons.refresh : Icons.arrow_back,
+          icon: const Icon(overlayMainMenu ? Icons.menu : Icons.arrow_back,
               color: Colors.white),
         ),
         const SizedBox(width: 20 * statusWidgetHeightFactor, height: 1),

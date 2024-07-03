@@ -12,11 +12,11 @@ class MainMenuScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final palette = context.watch<Palette>();
-    setStatusBarColor(palette.mainBackground.color);
+    //context.watch<Palette>();
+    setStatusBarColor(Palette.mainBackground.color);
     final settingsController = context.watch<SettingsController>();
     return Scaffold(
-      backgroundColor: palette.mainBackground.color,
+      backgroundColor: Palette.mainBackground.color,
       body: Center(
         child: FittedBox(
           fit: BoxFit.contain,
@@ -40,7 +40,7 @@ class MainMenuScreen extends StatelessWidget {
                         fontFamily: 'Press Start 2P',
                         fontSize: 32,
                         height: 1,
-                        color: palette.mainContrast.color),
+                        color: Palette.mainContrast.color),
                   ),
                 ),
               ),
@@ -48,24 +48,13 @@ class MainMenuScreen extends StatelessWidget {
               _gap,
               _gap,
               TextButton(
-                  style: TextButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: const BorderRadius.all(Radius.circular(8)),
-                      side: BorderSide(
-                        color: palette.borderColor.color,
-                        width: 3,
-                      ),
-                    ),
-                  ),
+                  style: buttonStyle,
                   onPressed: () {
                     GoRouter.of(context).go('/session/1');
                   },
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
-                    child: Text('Play',
-                        style: TextStyle(
-                            fontFamily: 'Press Start 2P',
-                            color: palette.mainContrast.color)),
+                    child: Text('Play', style: bodyTextStyle),
                   )),
               /*
               WobblyButton(
@@ -78,7 +67,7 @@ class MainMenuScreen extends StatelessWidget {
                */
               _gap,
               audioOnOffButton(settingsController,
-                  color: palette.mainContrast.color),
+                  color: Palette.mainContrast.color),
               _gap,
             ],
           ),

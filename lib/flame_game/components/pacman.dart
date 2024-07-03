@@ -142,27 +142,32 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     }
   }
 
+  static const bool _freezeGhostsOnKillPacman = false;
   void _dieFromGhost() {
     if (current != CharacterState.deadPacman &&
         world.pelletsRemainingNotifier.value != 0) {
       world.play(SfxType.pacmanDeath);
       current = CharacterState.deadPacman;
       disconnectFromPhysics();
-      //world.disconnectGhostsFromPhysics();
+      if (_freezeGhostsOnKillPacman) {
+        world.disconnectGhostsFromPhysics();
+      }
       world.pacmanDyingNotifier.value++;
 
+      if (world.pacmanPlayersList.length == 1 ||
+          world.numberAlivePacman() == 0) {
+        world.doingLevelResetFlourish = true;
+      }
       Future.delayed(
           const Duration(milliseconds: _kPacmanDeadResetTimeMillis + 100), () {
-        if (game.isGameLive) {
-          //reset might have happened while waiting for delayed
-          if (world.pacmanPlayersList.length == 1 ||
-              world.numberAlivePacman() == 0) {
-            world.numberOfDeathsNotifier.value++; //score counting deaths
-            world.resetWorldAfterPacmanDeath(this);
-          } else {
-            assert(multipleSpawningPacmans);
-            world.remove(this);
-          }
+        //Note reset might have happened while waiting for delayed
+        if (world.pacmanPlayersList.length == 1 ||
+            world.numberAlivePacman() == 0) {
+          world.numberOfDeathsNotifier.value++; //score counting deaths
+          world.resetWorldAfterPacmanDeath(this);
+        } else {
+          assert(multipleSpawningPacmans);
+          world.remove(this);
         }
       });
     }

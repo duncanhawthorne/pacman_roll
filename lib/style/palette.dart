@@ -1,4 +1,5 @@
 import 'package:flame/palette.dart';
+import 'package:flutter/material.dart';
 
 /// A palette of colors to be used in the game.
 ///
@@ -16,32 +17,56 @@ import 'package:flame/palette.dart';
 /// we could allow players to customize colors, for example,
 /// or even get the colors from the network.
 class Palette {
-  PaletteEntry get seed =>
-      const PaletteEntry(blueMaze); //Color(0xFF000000) //0xFF0050bc
-  PaletteEntry get text =>
-      const PaletteEntry(white); //const PaletteEntry(Color(0xee352b42));
-  PaletteEntry get mainBackground => const PaletteEntry(black); //0xffa2fff3
-  PaletteEntry get mainContrast => const PaletteEntry(white);
-  PaletteEntry get backgroundLevelSelection =>
-      const PaletteEntry(Color(0xffffcd75));
+  static const seed = PaletteEntry(blueMaze); //Color(0xFF000000) //0xFF0050bc
+  static const text =
+      PaletteEntry(white); //const PaletteEntry(Color(0xee352b42));
+  static const mainBackground = PaletteEntry(black); //0xffa2fff3
+  static const mainContrast = PaletteEntry(white);
+  static const backgroundLevelSelection = PaletteEntry(Color(0xffffcd75));
 
-  PaletteEntry get playSessionBackground =>
-      const PaletteEntry(black); //0xffa2fff3
-  PaletteEntry get playSessionContrast =>
-      const PaletteEntry(white); //0xffa2fff3
-  PaletteEntry get borderColor => const PaletteEntry(blueMaze); //0xffa2fff3
-  PaletteEntry get backgroundSettings => const PaletteEntry(Color(0xffbfc8e3));
+  static const playSessionBackground = PaletteEntry(black); //0xffa2fff3
 
-  PaletteEntry get pageTransition => const PaletteEntry(black); //0xffa2fff3
+  static const borderColor = PaletteEntry(blueMaze); //0xffa2fff3
+  static const backgroundSettings = PaletteEntry(Color(0xffbfc8e3));
 
-  PaletteEntry get flameGameBackground => const PaletteEntry(black);
+  static const pageTransition = PaletteEntry(black); //0xffa2fff3
+
+  static const flameGameBackground = PaletteEntry(black);
 
   static const black = Color(0xff000000);
   static const darkGrey = Color(0xff222222);
   static const lightBluePMR = Color(0xffa2fff3);
   static const blueMaze = Color(0xFF3B32D4);
+  static const redWarning = Colors.red;
   static const transp = Color(0x00000000);
   static const white = Color(0xffffffff);
+  static const playSessionContrast = white; //0xffa2fff3
 
-  PaletteEntry get transpPalette => const PaletteEntry(transp);
+  static const transpPalette = PaletteEntry(transp);
 }
+
+TextStyle headingTextStyle =
+    const TextStyle(fontFamily: 'Press Start 2P', fontSize: 28);
+
+TextStyle bodyTextStyle = const TextStyle(
+    fontFamily: 'Press Start 2P', color: Palette.playSessionContrast);
+
+ButtonStyle buttonStyle = TextButton.styleFrom(
+  shape: const RoundedRectangleBorder(
+    borderRadius: BorderRadius.all(Radius.circular(8)),
+    side: BorderSide(
+      color: Palette.blueMaze,
+      width: 3,
+    ),
+  ),
+);
+
+ButtonStyle buttonStyleWarning = TextButton.styleFrom(
+  shape: const RoundedRectangleBorder(
+    borderRadius: BorderRadius.all(Radius.circular(8)),
+    side: BorderSide(
+      color: Palette.redWarning,
+      width: 3,
+    ),
+  ),
+);

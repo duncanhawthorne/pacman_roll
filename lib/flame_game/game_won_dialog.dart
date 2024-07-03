@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 
 import '../firebase/firebase_saves.dart';
 import '../level_selection/levels.dart';
@@ -32,84 +31,78 @@ class GameWonDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final palette = context.read<Palette>();
+    //context.read<Palette>();
     return Center(
-      child: Container(
-        //width: 480,
-        //height: 300,
-        decoration: BoxDecoration(
-            border: Border.all(color: palette.borderColor.color, width: 3),
-            borderRadius: BorderRadius.circular(10),
-            color: palette.playSessionBackground.color),
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(40.0, 20, 40, 20),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('Complete',
-                  style: Theme.of(context).textTheme.headlineMedium,
-                  textAlign: TextAlign.center),
-              const SizedBox(height: 16),
-              const SizedBox(height: 16),
-              Text(
-                _levelCompleteText(levelCompletedIn),
-                style: const TextStyle(fontFamily: 'Press Start 2P'),
-              ),
-              !Save.firebaseOn
-                  ? const SizedBox.shrink()
-                  : FutureBuilder(
-                      future: _scoreboardRankText(levelCompletedIn),
-                      initialData: _scoreboardLoadingText(),
-                      builder:
-                          (BuildContext context, AsyncSnapshot<String> text) {
-                        return Text(
-                          text.data!,
-                          style: const TextStyle(fontFamily: 'Press Start 2P'),
-                        );
-                      }),
-              const SizedBox(height: 16),
-              const SizedBox(height: 16),
-              if (true) ...[
-                TextButton(
-                    style: TextButton.styleFrom(
-                      shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(8)),
-                        side: BorderSide(
-                          color: Palette.blueMaze,
-                          width: 3,
-                        ),
-                      ),
-                    ),
-                    onPressed: () {
-                      if (overlayMainMenu) {
-                        game.overlays.remove(GameScreen.wonDialogKey);
-                        game.start();
-                      } else {
+          padding: const EdgeInsets.all(75.0),
+          child: Container(
+            //width: 480,
+            //height: 300,
+            decoration: BoxDecoration(
+                border: Border.all(color: Palette.borderColor.color, width: 3),
+                borderRadius: BorderRadius.circular(10),
+                color: Palette.playSessionBackground.color),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(40.0, 20, 40, 20),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('Complete',
+                      style: headingTextStyle, textAlign: TextAlign.center),
+                  const SizedBox(height: 16),
+                  const SizedBox(height: 16),
+                  Text(
+                    _levelCompleteText(levelCompletedIn),
+                    style: bodyTextStyle,
+                  ),
+                  !Save.firebaseOn
+                      ? const SizedBox.shrink()
+                      : FutureBuilder(
+                          future: _scoreboardRankText(levelCompletedIn),
+                          initialData: _scoreboardLoadingText(),
+                          builder: (BuildContext context,
+                              AsyncSnapshot<String> text) {
+                            return Text(
+                              text.data!,
+                              style: bodyTextStyle,
+                            );
+                          }),
+                  const SizedBox(height: 16),
+                  const SizedBox(height: 16),
+                  if (true) ...[
+                    TextButton(
+                        style: buttonStyle,
+                        onPressed: () {
+                          if (overlayMainMenu) {
+                            game.overlays.remove(GameScreen.wonDialogKey);
+                            game.start();
+                          } else {
+                            context.go('/');
+                          }
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Text('Retry', style: bodyTextStyle),
+                        )),
+                    /*
+                    NesButton(
+                      onPressed: () {
                         context.go('/');
-                      }
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Text('Retry',
-                          style: TextStyle(
-                              fontFamily: 'Press Start 2P',
-                              color: palette.playSessionContrast.color)),
-                    )),
-                /*
-                NesButton(
-                  onPressed: () {
-                    context.go('/');
-                  },
-                  type: NesButtonType.primary,
-                  child: const Text('Retry',
-                      style: TextStyle(fontFamily: 'Press Start 2P')),
-                ),
+                      },
+                      type: NesButtonType.primary,
+                      child: const Text('Retry',
+                          style: TextStyle(fontFamily: 'Press Start 2P')),
+                    ),
 
-                 */
-                //const SizedBox(height: 16),
-              ],
-            ],
+                     */
+                    //const SizedBox(height: 16),
+                  ],
+                ],
+              ),
+            ),
           ),
         ),
       ),

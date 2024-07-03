@@ -4,8 +4,8 @@ import 'dart:core';
 import 'package:flame/camera.dart';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
-import 'package:flame/palette.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
+import 'package:flutter/animation.dart';
 
 import '../audio/audio_controller.dart';
 import '../firebase/firebase_saves.dart';
@@ -37,7 +37,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
     required this.level,
     required PlayerProgress playerProgress,
     required this.audioController,
-    required this.palette,
+    //required this.palette,
   }) : super(
           world: PacmanWorld(level: level, playerProgress: playerProgress),
           camera: CameraComponent.withFixedResolution(
@@ -51,7 +51,8 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
 
   /// A helper for playing sound effects and background audio.
   final AudioController audioController;
-  final Palette palette;
+
+  //final Palette palette;
 
   String userString = "";
   final stopwatch = Stopwatch();
@@ -61,10 +62,10 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
       !paused &&
       isLoaded &&
       isMounted &&
-      !overlays.isActive(GameScreen.startDialogKey);
+      !(overlays.isActive(GameScreen.startDialogKey) && stopwatchSeconds == 0);
 
   @override
-  Color backgroundColor() => palette.flameGameBackground.color;
+  Color backgroundColor() => Palette.flameGameBackground.color;
 
   String getEncodeCurrentGameState() {
     Map<String, dynamic> gameTmp = {};
@@ -99,7 +100,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
         if (stopwatchSeconds > 10) {
           save.firebasePushSingleScore(userString, getEncodeCurrentGameState());
         }
-        cleanOverlays();
+        cleanOverlaysAndDialogs();
         overlays.add(GameScreen.wonDialogKey);
       }
     }
@@ -108,7 +109,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
   void handleLoseGame() {
     //pauseEngine();
     audioController.stopAllSfx();
-    cleanOverlays();
+    cleanOverlaysAndDialogs();
     overlays.add(GameScreen.loseDialogKey);
   }
 
@@ -117,12 +118,10 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
     overlays.add(GameScreen.statusOverlayKey);
   }
 
-  void cleanOverlays() {
+  void cleanOverlaysAndDialogs() {
     overlays.remove(GameScreen.backButtonKey);
     overlays.remove(GameScreen.statusOverlayKey);
-  }
-
-  void cleanDialogues() {
+    overlays.remove(GameScreen.startDialogKey);
     overlays.remove(GameScreen.loseDialogKey);
     overlays.remove(GameScreen.wonDialogKey);
   }
@@ -136,8 +135,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
   }
 
   void reset() {
-    cleanDialogues();
-    cleanOverlays();
+    cleanOverlaysAndDialogs();
     addOverlays();
     stopwatch.stop();
     stopwatch.reset();
@@ -155,32 +153,34 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
   @override
   Future<void> onLoad() async {
     super.onLoad();
-    if (overlayMainMenu) {
-      overlays.add(GameScreen.startDialogKey);
-    }
     userString = _getRandomString(world.random, 15);
     reset();
-    setStatusBarColor(palette.flameGameBackground.color);
+    setStatusBarColor(Palette.flameGameBackground.color);
     fixTitle(Palette.black);
     Future.delayed(const Duration(seconds: 1), () {
       fixTitle(Palette.black);
     });
     if (overlayMainMenu) {
-      Future.delayed(const Duration(milliseconds: 1), () {
-        pauseEngine();
+      overlays.add(GameScreen.startDialogKey);
+      Future.delayed(const Duration(milliseconds: 1000), () {
+        if (!isGameLive) {
+          //i.e. dialog still showing
+          pauseEngine();
+          //camera.viewfinder.add(RotateEffect.by(2 * pi,
+          //    EffectController(duration: 20000 / 1000, curve: Curves.linear)));
+        }
       });
     }
   }
 
   void end() {
-    world.end();
     audioController.stopAllSfx();
   }
 
   @override
   Future<void> onRemove() async {
-    cleanOverlays();
-    setStatusBarColor(palette.mainBackground.color);
+    cleanOverlaysAndDialogs();
+    setStatusBarColor(Palette.mainBackground.color);
     fixTitle(Palette.lightBluePMR);
     end();
     super.onRemove();

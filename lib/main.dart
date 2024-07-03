@@ -22,6 +22,7 @@ void main() async {
   save.fbStart();
 
   fixTitle(Palette.lightBluePMR);
+  GoogleFonts.config.allowRuntimeFetching = false;
 
   FlutterNativeSplash.remove();
   await Flame.device.fullScreen();
@@ -53,18 +54,18 @@ class MyGame extends StatelessWidget {
           ),
         ],
         child: Builder(builder: (context) {
-          final palette = context.watch<Palette>();
+          //context.watch<Palette>();
 
           return MaterialApp.router(
             title: appTitle,
             theme: flutterNesTheme().copyWith(
               colorScheme: ColorScheme.fromSeed(
-                seedColor: palette.seed.color,
-                surface: palette.mainBackground.color,
+                seedColor: Palette.seed.color,
+                surface: Palette.mainBackground.color,
               ),
               textTheme: GoogleFonts.pressStart2pTextTheme().apply(
-                bodyColor: palette.text.color,
-                displayColor: palette.text.color,
+                bodyColor: Palette.text.color,
+                displayColor: Palette.text.color,
               ),
             ),
             routeInformationProvider: router.routeInformationProvider,

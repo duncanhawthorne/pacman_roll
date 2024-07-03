@@ -14,13 +14,13 @@ class LevelSelectionScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final palette = context.watch<Palette>();
+    //context.watch<Palette>();
     final playerProgress = context.watch<PlayerProgress>();
     final levelTextStyle =
         Theme.of(context).textTheme.bodyMedium?.copyWith(height: 1.4);
 
     return Scaffold(
-      backgroundColor: palette.backgroundLevelSelection.color,
+      backgroundColor: Palette.backgroundLevelSelection.color,
       body: Column(
         children: [
           Padding(

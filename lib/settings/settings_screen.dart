@@ -16,10 +16,10 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final settings = context.watch<SettingsController>();
-    final palette = context.watch<Palette>();
+    //context.watch<Palette>();
 
     return Scaffold(
-      backgroundColor: palette.backgroundSettings.color,
+      backgroundColor: Palette.backgroundSettings.color,
       body: Center(
         child: Column(
           children: [
