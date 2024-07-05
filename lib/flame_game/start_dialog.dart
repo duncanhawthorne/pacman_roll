@@ -12,7 +12,6 @@ class StartDialog extends StatelessWidget {
   const StartDialog({
     super.key,
     required this.level,
-    required this.levelCompletedIn,
     required this.game,
   });
 
@@ -20,9 +19,6 @@ class StartDialog extends StatelessWidget {
   final GameLevel level;
 
   final PacmanGame game;
-
-  /// How many seconds that the level was completed in.
-  final double levelCompletedIn;
 
   @override
   Widget build(BuildContext context) {

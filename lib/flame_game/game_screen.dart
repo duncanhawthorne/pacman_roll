@@ -70,14 +70,11 @@ class GameScreen extends StatelessWidget {
             wonDialogKey: (BuildContext context, PacmanGame game) {
               return GameWonDialog(
                   level: level,
-                  levelCompletedIn: game.stopwatchSeconds,
+                  levelCompletedInMillis: game.stopwatchMilliSeconds,
                   game: game);
             },
             startDialogKey: (BuildContext context, PacmanGame game) {
-              return StartDialog(
-                  level: level,
-                  levelCompletedIn: game.stopwatchSeconds,
-                  game: game);
+              return StartDialog(level: level, game: game);
             }
           },
         ),
@@ -197,7 +194,9 @@ Widget statusOverlayWidget(BuildContext context, PacmanGame game) {
                   color: Colors.white,
                   fontFamily: 'Press Start 2P'),
               formatter: (elapsedTime) {
-                return game.stopwatchSeconds.toStringAsFixed(1).padLeft(4, " ");
+                return (game.stopwatchMilliSeconds / 1000)
+                    .toStringAsFixed(1)
+                    .padLeft(4, " ");
               },
             ),
           ),

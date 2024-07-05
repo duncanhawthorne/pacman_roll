@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:core';
 
 import 'package:flame/camera.dart';
@@ -57,11 +56,11 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
   String userString = "";
   final stopwatch = Stopwatch();
 
-  double get stopwatchSeconds =>
-      stopwatch.elapsed.inMilliseconds / 1000 +
-      world.numberOfDeathsNotifier.value * 5;
+  int get stopwatchMilliSeconds =>
+      stopwatch.elapsed.inMilliseconds +
+      world.numberOfDeathsNotifier.value * 5000;
 
-  bool get levelStarted => stopwatchSeconds > 0;
+  bool get levelStarted => stopwatchMilliSeconds > 0;
   bool mazeEverRotated = false;
 
   bool get isGameLive =>
@@ -73,12 +72,12 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
   @override
   Color backgroundColor() => Palette.flameGameBackground.color;
 
-  String getEncodeCurrentGameState() {
+  Map<String, dynamic> getEncodeCurrentGameState() {
     Map<String, dynamic> gameTmp = {};
     gameTmp = {};
     gameTmp["userString"] = userString;
-    gameTmp["levelCompleteTime"] = stopwatchSeconds;
-    return json.encode(gameTmp);
+    gameTmp["levelCompleteTime"] = stopwatchMilliSeconds;
+    return gameTmp;
   }
 
   void winOrLoseGameListener() {
@@ -93,9 +92,6 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
       if (world.pelletsRemainingNotifier.value == 0 && levelStarted) {
         handleWinGame();
       }
-      if (world.pelletsRemainingNotifier.value == 5 && levelStarted) {
-        save.cacheLeaderboardNow(); //close to the end but not at the end
-      }
     });
   }
 
@@ -104,7 +100,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
       if (world.pelletsRemainingNotifier.value == 0) {
         world.winGameWorldTidy();
         stopwatch.stop();
-        if (stopwatchSeconds > 10) {
+        if (stopwatchMilliSeconds > 10 * 1000) {
           save.firebasePushSingleScore(userString, getEncodeCurrentGameState());
         }
         cleanOverlaysAndDialogs();
@@ -142,6 +138,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
   }
 
   void reset() {
+    userString = _getRandomString(world.random, 15);
     cleanOverlaysAndDialogs();
     addOverlays();
     stopwatch.stop();
@@ -160,7 +157,6 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
   @override
   Future<void> onLoad() async {
     super.onLoad();
-    userString = _getRandomString(world.random, 15);
     reset();
     setStatusBarColor(Palette.flameGameBackground.color);
     fixTitle(Palette.black);

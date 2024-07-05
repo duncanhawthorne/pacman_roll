@@ -17,7 +17,7 @@ class GameWonDialog extends StatelessWidget {
   const GameWonDialog({
     super.key,
     required this.level,
-    required this.levelCompletedIn,
+    required this.levelCompletedInMillis,
     required this.game,
   });
 
@@ -27,7 +27,7 @@ class GameWonDialog extends StatelessWidget {
   final PacmanGame game;
 
   /// How many seconds that the level was completed in.
-  final double levelCompletedIn;
+  final int levelCompletedInMillis;
 
   @override
   Widget build(BuildContext context) {
@@ -55,13 +55,13 @@ class GameWonDialog extends StatelessWidget {
                   const SizedBox(height: 16),
                   const SizedBox(height: 16),
                   Text(
-                    _levelCompleteText(levelCompletedIn),
+                    _levelCompleteText(levelCompletedInMillis),
                     style: bodyTextStyle,
                   ),
                   !Save.firebaseOn
                       ? const SizedBox.shrink()
                       : FutureBuilder(
-                          future: _scoreboardRankText(levelCompletedIn),
+                          future: _scoreboardRankText(levelCompletedInMillis),
                           initialData: _scoreboardLoadingText(),
                           builder: (BuildContext context,
                               AsyncSnapshot<String> text) {
@@ -110,8 +110,9 @@ class GameWonDialog extends StatelessWidget {
   }
 }
 
-String _levelCompleteText(double levelCompletedIn) {
-  String y = "Time: ${levelCompletedIn.toStringAsFixed(1)} seconds";
+String _levelCompleteText(int levelCompletedInMillis) {
+  String y =
+      "Time: ${(levelCompletedInMillis / 1000).toStringAsFixed(1)} seconds";
   return y;
 }
 
@@ -120,21 +121,12 @@ String _scoreboardLoadingText() {
   return y;
 }
 
-Future<String> _scoreboardRankText(double levelCompletedIn) async {
-  save.cacheLeaderboardNow(); //belts and braces. should have been called earlier in prep
+Future<String> _scoreboardRankText(int levelCompletedInMillis) async {
   double x = Save.firebaseOn
-      ? _percentileOf(await save.leaderboardWinTimesCache!, levelCompletedIn) *
-          100
-      : 0.0;
-  String y = !Save.firebaseOn || (await save.leaderboardWinTimesCache)!.isEmpty
+      ? (await save.firebasePercentile(levelCompletedInMillis)) * 100.0
+      : 100.0;
+  String y = !Save.firebaseOn
       ? ""
       : "\nRank: ${x == 0 ? "World Record" : "Top ${x.toStringAsFixed(0)}%"}";
   return y;
-}
-
-double _percentileOf(List<double> list, double value) {
-  List<double> tmpList = List<double>.from(list);
-  tmpList.add(value);
-  tmpList.sort();
-  return tmpList.indexOf(value) / (tmpList.length - 1);
 }
