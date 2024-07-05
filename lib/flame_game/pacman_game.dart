@@ -56,13 +56,19 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
 
   String userString = "";
   final stopwatch = Stopwatch();
-  double get stopwatchSeconds => stopwatch.elapsed.inMilliseconds / 1000;
+
+  double get stopwatchSeconds =>
+      stopwatch.elapsed.inMilliseconds / 1000 +
+      world.numberOfDeathsNotifier.value * 5;
+
+  bool get levelStarted => stopwatchSeconds > 0;
+  bool mazeEverRotated = false;
 
   bool get isGameLive =>
       !paused &&
       isLoaded &&
       isMounted &&
-      !(overlays.isActive(GameScreen.startDialogKey) && stopwatchSeconds == 0);
+      !(overlays.isActive(GameScreen.startDialogKey) && !levelStarted);
 
   @override
   Color backgroundColor() => Palette.flameGameBackground.color;
@@ -78,15 +84,16 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
   void winOrLoseGameListener() {
     assert(world.pelletsRemainingNotifier.value > 0);
     world.numberOfDeathsNotifier.addListener(() {
-      if (world.numberOfDeathsNotifier.value >= level.maxAllowedDeaths) {
+      if (world.numberOfDeathsNotifier.value >= level.maxAllowedDeaths &&
+          levelStarted) {
         handleLoseGame();
       }
     });
     world.pelletsRemainingNotifier.addListener(() {
-      if (world.pelletsRemainingNotifier.value == 0) {
+      if (world.pelletsRemainingNotifier.value == 0 && levelStarted) {
         handleWinGame();
       }
-      if (world.pelletsRemainingNotifier.value == 5) {
+      if (world.pelletsRemainingNotifier.value == 5 && levelStarted) {
         save.cacheLeaderboardNow(); //close to the end but not at the end
       }
     });

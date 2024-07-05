@@ -66,7 +66,7 @@ class StartDialog extends StatelessWidget {
                    */
                   const SizedBox(height: 16),
                   if (true) ...[
-                    game.stopwatchSeconds > 0
+                    game.levelStarted
                         ? Row(
                             children: [
                               TextButton(

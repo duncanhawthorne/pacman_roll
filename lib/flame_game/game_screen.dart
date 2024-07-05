@@ -14,7 +14,6 @@ import '../settings/settings.dart';
 import 'game_lose_dialog.dart';
 import 'game_won_dialog.dart';
 import 'icons/pacman_icons.dart';
-import 'icons/pacman_sprites.dart';
 import 'pacman_game.dart';
 import 'pacman_world.dart';
 import 'start_dialog.dart';
@@ -156,13 +155,26 @@ Widget statusOverlayWidget(BuildContext context, PacmanGame game) {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          //FIXME first ElapsedTimeDisplay shouldn't be necessary
+          //but without it the pacman icon doesn't animate
+          ElapsedTimeDisplay(
+            startTime: DateTime.now(), //actually ignored
+            interval: const Duration(milliseconds: 100),
+            style: const TextStyle(
+                fontSize: 1 * statusWidgetHeightFactor,
+                color: Colors.transparent,
+                fontFamily: 'Press Start 2P'),
+            formatter: (elapsedTime) {
+              return elapsedTime.milliseconds.toString().padLeft(4, " ");
+            },
+          ),
           ValueListenableBuilder<int>(
             valueListenable: game.world.numberOfDeathsNotifier,
             builder: (BuildContext context, int value, Widget? child) {
               return Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: List.generate(
-                      3 - game.world.numberOfDeathsNotifier.value,
+                      3,
                       (index) => Padding(
                           padding: const EdgeInsets.fromLTRB(
                               4 * statusWidgetHeightFactor,
@@ -171,12 +183,7 @@ Widget statusOverlayWidget(BuildContext context, PacmanGame game) {
                               0),
                           child: Transform.rotate(
                               angle: 2 * pi / 2,
-                              child: index == 0
-                                  ? animatedPacmanIcon(game,
-                                      game.world.pacmanDyingNotifier.value)
-                                  : pacmanIconCache[
-                                      pacmanRenderFracIncrementsNumber ~/
-                                          4]))));
+                              child: animatedPacmanIcon(game, index)))));
             },
           ),
           const SizedBox(width: 20 * statusWidgetHeightFactor, height: 1),

@@ -266,7 +266,6 @@ class PacmanWorld extends Forge2DWorld
       }
     }
 
-    pelletsRemainingNotifier.value += 1; //to avoid hitting zero in reset
     for (var child in children) {
       if (child is MiniPelletSprite ||
           child is MiniPelletCircle ||
@@ -276,9 +275,9 @@ class PacmanWorld extends Forge2DWorld
       }
     }
     addAll(maze.pellets(pelletsRemainingNotifier, level.superPelletsEnabled));
-    pelletsRemainingNotifier.value -= 1; //to avoid hitting zero in reset
 
     numberOfDeathsNotifier.value = 0;
+    pacmanDyingNotifier.value = 0;
     setMazeAngle(0);
 
     //addAll(screenEdgeBoundaries(game.camera));
@@ -289,6 +288,12 @@ class PacmanWorld extends Forge2DWorld
     startSiren();
     multiGhostAdderTimer();
     cameraRotateableOnPacmanDeathFlourish = true;
+    Future.delayed(const Duration(milliseconds: 5000), () {
+      if (!game.levelStarted && !game.mazeEverRotated) {
+        //if user hasn't worked out how to start by now, give a prompt
+        moveMazeAngleByDelta(2 * pi / 64);
+      }
+    });
   }
 
   @override
@@ -310,9 +315,6 @@ class PacmanWorld extends Forge2DWorld
   @override
   void onDragStart(DragStartEvent event) {
     super.onDragStart(event);
-    if (game.isGameLive) {
-      game.stopwatch.start();
-    }
     Vector2 eventVector = event.canvasPosition - game.canvasSize / 2;
     if (iOS) {
       _fingersLastDragAngle[event.pointerId] = null;
@@ -352,6 +354,10 @@ class PacmanWorld extends Forge2DWorld
   void moveMazeAngleByDelta(double angleDelta) {
     if (cameraRotateableOnPacmanDeathFlourish && game.isGameLive) {
       setMazeAngle(_lastMazeAngle + angleDelta);
+      game.mazeEverRotated = true;
+      if (!doingLevelResetFlourish) {
+        game.stopwatch.start();
+      }
     }
   }
 

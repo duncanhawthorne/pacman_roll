@@ -7,11 +7,10 @@ import '../game_screen.dart';
 import '../pacman_game.dart';
 import 'pacman_sprites.dart';
 
-Widget animatedPacmanIcon(PacmanGame game, int startValue) {
+Widget animatedPacmanIcon(PacmanGame game, int index) {
   return ValueListenableBuilder<int>(
       valueListenable: game.world.pacmanDyingNotifier,
       builder: (BuildContext context, int value, Widget? child) {
-        int currentValue = game.world.pacmanDyingNotifier.value;
         return TweenAnimationBuilder(
             tween: IntTween(
                 begin: pacmanRenderFracIncrementsNumber ~/ 4,
@@ -19,10 +18,13 @@ Widget animatedPacmanIcon(PacmanGame game, int startValue) {
                     pacmanRenderFracIncrementsNumber *
                         3 ~/
                         4 *
-                        (currentValue - startValue)),
+                        min(
+                            1,
+                            max(0,
+                                game.world.pacmanDyingNotifier.value - index))),
             duration: Duration(
-                milliseconds: currentValue == startValue
-                    ? 0
+                milliseconds: game.world.pacmanDyingNotifier.value <= index
+                    ? 0 //when reset game
                     : kPacmanDeadResetTimeAnimationMillis),
             builder: (BuildContext context, int val, __) {
               return pacmanIconCache[val];
