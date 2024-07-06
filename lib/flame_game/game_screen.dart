@@ -171,7 +171,7 @@ Widget statusOverlayWidget(BuildContext context, PacmanGame game) {
               return Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: List.generate(
-                      3,
+                      game.level.maxAllowedDeaths,
                       (index) => Padding(
                           padding: const EdgeInsets.fromLTRB(
                               4 * statusWidgetHeightFactor,

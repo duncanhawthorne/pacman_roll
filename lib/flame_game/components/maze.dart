@@ -147,7 +147,7 @@ class Maze {
   static const pelletScaleFactor = _largeSprites ? 0.4 : 0.46;
 
   Vector2 ghostStartForId(int idNum) {
-    return ghostStart +
+    return (idNum == 100 ? cage : ghostStart) +
         Vector2(maze.spriteWidth() * (idNum <= 2 ? (idNum - 1) : 0), 0);
   }
 

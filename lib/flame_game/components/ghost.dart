@@ -10,7 +10,7 @@ import 'maze.dart';
 
 const int kGhostChaseTimeMillis = 6000;
 const int kGhostResetTimeMillis = 1000;
-const multipleSpawningGhosts = false;
+//const multipleSpawningGhosts = false;
 
 class Ghost extends GameCharacter {
   Ghost({
@@ -67,11 +67,11 @@ class Ghost extends GameCharacter {
     }
   }
 
-  void setDead() {
+  void setDead({spawningDeath = false}) {
     if (!world.gameWonOrLost) {
       current = CharacterState.deadGhost; //stops further interactions
       _ghostDeadTimeLatest = world.now;
-      if (multipleSpawningGhosts) {
+      if (game.level.multipleSpawningGhosts && !spawningDeath) {
         world.remove(this);
       } else {
         disconnectSpriteFromBall();
@@ -80,6 +80,14 @@ class Ghost extends GameCharacter {
         //will get moved to right position later by code in sequence checker
       }
     }
+  }
+
+  void startDead() {
+    current = CharacterState.deadGhost;
+    _ghostDeadTimeLatest = world.now;
+    Future.delayed(const Duration(milliseconds: 10), () {
+      setDead(spawningDeath: true);
+    });
   }
 
   void setStartPositionAfterPacmanDeath() {
@@ -132,12 +140,11 @@ class Ghost extends GameCharacter {
     super.onLoad();
     world.ghostPlayersList.add(this);
     animations = await _getAnimations();
-    current = CharacterState.scared;
+    current = CharacterState.deadGhost;
   }
 
   @override
   Future<void> onRemove() async {
-    //XghostScaredTimeLatest = 0;
     world.ghostPlayersList.remove(this);
     super.onRemove();
   }

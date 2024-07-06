@@ -61,7 +61,8 @@ class GameWonDialog extends StatelessWidget {
                   !Save.firebaseOn
                       ? const SizedBox.shrink()
                       : FutureBuilder(
-                          future: _scoreboardRankText(levelCompletedInMillis),
+                          future: _scoreboardRankText(
+                              level.number, levelCompletedInMillis),
                           initialData: _scoreboardLoadingText(),
                           builder: (BuildContext context,
                               AsyncSnapshot<String> text) {
@@ -121,9 +122,11 @@ String _scoreboardLoadingText() {
   return y;
 }
 
-Future<String> _scoreboardRankText(int levelCompletedInMillis) async {
+Future<String> _scoreboardRankText(
+    int levelNum, int levelCompletedInMillis) async {
   double x = Save.firebaseOn
-      ? (await save.firebasePercentile(levelCompletedInMillis)) * 100.0
+      ? (await save.firebasePercentile(levelNum, levelCompletedInMillis)) *
+          100.0
       : 100.0;
   String y = !Save.firebaseOn
       ? ""

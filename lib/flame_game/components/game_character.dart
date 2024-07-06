@@ -99,7 +99,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   }
 
   void _moveUnderlyingBallThroughPipePortal() {
-    assert(current != CharacterState.deadGhost); //as physics doesn't apply
+    assert(connectedToBall);
     if (position.x.abs() > maze.mazeWidth() / 2 * _portalMargin ||
         position.y.abs() > maze.mazeHeight() / 2 * _portalMargin) {
       _setUnderlyingBallPositionMoving(Vector2(
@@ -131,14 +131,11 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     }
   }
 
-  void oneFrameOfPhysics() {
-    assert(current != CharacterState.deadGhost);
-    if (current != CharacterState.deadGhost) {
-      //if statement shouldn't be necessary, but asserts aren't enforced in production
-      _moveUnderlyingBallThroughPipePortal(); //note never called for deadGhost
-      position = _getUnderlyingBallPosition();
-      angle = _getUpdatedAngle();
-    }
+  void _oneFrameOfPhysics() {
+    assert(connectedToBall);
+    _moveUnderlyingBallThroughPipePortal(); //note never called for deadGhost
+    position = _getUnderlyingBallPosition();
+    angle = _getUpdatedAngle();
   }
 
   @override
@@ -159,7 +156,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   @override
   void update(double dt) {
     if (connectedToBall) {
-      oneFrameOfPhysics();
+      _oneFrameOfPhysics();
     }
     super.update(dt);
     _lastVelocity.setFrom((position - _lastPosition) / dt);

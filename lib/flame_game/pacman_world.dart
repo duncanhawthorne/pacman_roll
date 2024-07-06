@@ -82,6 +82,9 @@ class PacmanWorld extends Forge2DWorld
   List<Ghost> ghostPlayersList = [];
   List<Pacman> pacmanPlayersList = [];
 
+  async.Timer? ghostTimer;
+  async.Timer? sirenTimer;
+
   void play(SfxType type) {
     const soundOn = true; //!(windows && !kIsWeb);
     if (soundOn) {
@@ -114,14 +117,18 @@ class PacmanWorld extends Forge2DWorld
 
   void sirenVolumeUpdatedTimer() async {
     //NOTE disabled on iOS due to bug
-    async.Timer.periodic(const Duration(milliseconds: 250), (timer) {
-      if (game.isGameLive && !gameWonOrLost) {
-        game.audioController.setSirenVolume(averageGhostSpeed());
-      } else {
-        game.audioController.setSirenVolume(0);
-        timer.cancel();
-      }
-    });
+    // ignore: prefer_conditional_assignment
+    if (sirenTimer == null) {
+      sirenTimer =
+          async.Timer.periodic(const Duration(milliseconds: 250), (timer) {
+        if (game.isGameLive && !gameWonOrLost) {
+          game.audioController.setSirenVolume(averageGhostSpeed());
+        } else {
+          game.audioController.setSirenVolume(0);
+          timer.cancel();
+        }
+      });
+    }
   }
 
   void addGhost(int idNum) {
@@ -129,6 +136,9 @@ class PacmanWorld extends Forge2DWorld
     Ghost ghost = Ghost(position: target);
     ghost.idNum = idNum;
     add(ghost);
+    if (idNum == 100) {
+      ghost.startDead();
+    }
   }
 
   void addThreeGhosts() {
@@ -146,9 +156,10 @@ class PacmanWorld extends Forge2DWorld
     }
   }
 
-  void multiGhostAdderTimer() {
-    if (multipleSpawningGhosts) {
-      async.Timer.periodic(const Duration(milliseconds: 5000), (timer) {
+  void startMultiGhostAdderTimer() {
+    if (game.level.multipleSpawningGhosts && ghostTimer == null) {
+      ghostTimer =
+          async.Timer.periodic(const Duration(milliseconds: 5000), (timer) {
         if (game.isGameLive && !gameWonOrLost) {
           addGhost(100);
         } else {
@@ -158,11 +169,18 @@ class PacmanWorld extends Forge2DWorld
     }
   }
 
+  void cancelMultiGhostAdderTimer() {
+    if (game.level.multipleSpawningGhosts && ghostTimer != null) {
+      ghostTimer!.cancel();
+      ghostTimer = null;
+    }
+  }
+
   void trimAllGhosts() {
     for (int i = 0; i < ghostPlayersList.length; i++) {
       int j = ghostPlayersList.length - 1 - i;
       if (j >= 0) {
-        //assert(multipleSpawningGhosts);
+        //assert(game.level.multipleSpawningGhosts);
         remove(ghostPlayersList[j]);
       }
     }
@@ -217,7 +235,7 @@ class PacmanWorld extends Forge2DWorld
   void _resetWorldAfterPacmanDeathReal(Pacman dyingPacman) {
     //_fingersLastDragAngle.clear(); //so you have to re-press
     dyingPacman.setStartPositionAfterDeath();
-    if (multipleSpawningGhosts) {
+    if (game.level.multipleSpawningGhosts) {
       trimAllGhosts();
       addThreeGhosts();
     } else {
@@ -239,6 +257,13 @@ class PacmanWorld extends Forge2DWorld
   }
 
   void reset() {
+    cancelMultiGhostAdderTimer();
+    if (sirenTimer != null) {
+      game.audioController.setSirenVolume(0);
+      sirenTimer!.cancel();
+      sirenTimer = null;
+    }
+
     if (multipleSpawningPacmans) {
       for (Pacman pacman in pacmanPlayersList) {
         remove(pacman);
@@ -251,7 +276,7 @@ class PacmanWorld extends Forge2DWorld
         pacmanPlayersList[0].setStartPositionAfterDeath();
       }
     }
-    if (multipleSpawningGhosts) {
+    if (game.level.multipleSpawningGhosts) {
       for (Ghost ghost in ghostPlayersList) {
         remove(ghost);
       }
@@ -279,14 +304,13 @@ class PacmanWorld extends Forge2DWorld
     numberOfDeathsNotifier.value = 0;
     pacmanDyingNotifier.value = 0;
     setMazeAngle(0);
-
     //addAll(screenEdgeBoundaries(game.camera));
   }
 
   void start() {
     play(SfxType.startMusic);
     startSiren();
-    multiGhostAdderTimer();
+    //multiGhostAdderTimer();
     cameraRotateableOnPacmanDeathFlourish = true;
     Future.delayed(const Duration(milliseconds: 5000), () {
       if (!game.levelStarted && !game.mazeEverRotated) {
@@ -357,6 +381,7 @@ class PacmanWorld extends Forge2DWorld
       game.mazeEverRotated = true;
       if (!doingLevelResetFlourish) {
         game.stopwatch.start();
+        startMultiGhostAdderTimer();
       }
     }
   }

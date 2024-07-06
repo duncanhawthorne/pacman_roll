@@ -47,19 +47,24 @@ class Save {
     }
   }
 
-  Future<double> firebasePercentile(int vsMillis) async {
+  Future<double> firebasePercentile(int levelNum, int vsMillis) async {
     if (firebaseOn) {
       try {
         if (firebaseOn) {
           final collectionRef = db!.collection(mainDB);
-          Query fasterQuery =
-              collectionRef.where("levelCompleteTime", isLessThan: vsMillis);
-          AggregateQuerySnapshot fasterSnapshot =
-              await fasterQuery.count().get();
+          AggregateQuerySnapshot fasterSnapshot = await collectionRef
+              .where("levelCompleteTime", isLessThan: vsMillis)
+              .where("levelNum", isEqualTo: levelNum)
+              .count()
+              .get();
           int fasterCount = fasterSnapshot.count ?? 0;
-          Query allQuery = collectionRef;
-          AggregateQuerySnapshot allSnapshot = await allQuery.count().get();
-          int allCount = allSnapshot.count ?? 100;
+          AggregateQuerySnapshot slowerSnapshot = await collectionRef
+              .where("levelCompleteTime", isGreaterThan: vsMillis)
+              .where("levelNum", isEqualTo: levelNum)
+              .count()
+              .get();
+          int slowerCount = slowerSnapshot.count ?? 100;
+          int allCount = fasterCount + slowerCount + 1; //ignore equal times
           return (fasterCount + 1 - 1) / (allCount == 1 ? 100 : allCount - 1);
         }
       } catch (e) {

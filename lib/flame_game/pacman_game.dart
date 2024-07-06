@@ -76,6 +76,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
     Map<String, dynamic> gameTmp = {};
     gameTmp = {};
     gameTmp["userString"] = userString;
+    gameTmp["levelNum"] = level.number;
     gameTmp["levelCompleteTime"] = stopwatchMilliSeconds;
     return gameTmp;
   }
