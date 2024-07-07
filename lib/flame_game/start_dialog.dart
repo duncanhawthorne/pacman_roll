@@ -36,60 +36,63 @@ class StartDialog extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10),
                 color: Palette.playSessionBackground.color),
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(40, 20, 40, 20),
+              padding: const EdgeInsets.fromLTRB(40, 4, 40, 4),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const SizedBox(height: 16),
-                  Transform.rotate(
-                    angle: -0.1,
-                    child: Text(appTitle,
-                        style: headingTextStyle, textAlign: TextAlign.center),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(0, 16 + 16, 0, 16),
+                    child: Transform.rotate(
+                      angle: -0.1,
+                      child: Text(appTitle,
+                          style: headingTextStyle, textAlign: TextAlign.center),
+                    ),
                   ),
-                  const SizedBox(height: 16),
                   levelSelector(context, game),
-                  const SizedBox(height: 16),
-                  game.levelStarted
-                      ? Row(
-                          children: [
-                            TextButton(
-                                style: buttonStyleWarning,
-                                onPressed: () {
-                                  if (!game.world.doingLevelResetFlourish) {
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(0, 16, 0, 16),
+                    child: game.levelStarted
+                        ? Row(
+                            children: [
+                              TextButton(
+                                  style: buttonStyleWarning,
+                                  onPressed: () {
+                                    if (!game.world.doingLevelResetFlourish) {
+                                      game.overlays
+                                          .remove(GameScreen.startDialogKey);
+                                      game.start();
+                                    }
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(16.0),
+                                    child: Text('Reset', style: bodyTextStyle),
+                                  )),
+                              const SizedBox(width: 10),
+                              TextButton(
+                                  style: buttonStyle,
+                                  onPressed: () {
                                     game.overlays
                                         .remove(GameScreen.startDialogKey);
-                                    game.start();
-                                  }
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.all(16.0),
-                                  child: Text('Reset', style: bodyTextStyle),
-                                )),
-                            const SizedBox(width: 10),
-                            TextButton(
-                                style: buttonStyle,
-                                onPressed: () {
-                                  game.overlays
-                                      .remove(GameScreen.startDialogKey);
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.all(16.0),
-                                  child: Text('Resume', style: bodyTextStyle),
-                                ))
-                          ],
-                        )
-                      : TextButton(
-                          style: buttonStyle,
-                          onPressed: () {
-                            game.overlays.remove(GameScreen.startDialogKey);
-                            game.start();
-                            //context.go('/');
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Text('Play', style: bodyTextStyle),
-                          )),
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(16.0),
+                                    child: Text('Resume', style: bodyTextStyle),
+                                  ))
+                            ],
+                          )
+                        : TextButton(
+                            style: buttonStyle,
+                            onPressed: () {
+                              game.overlays.remove(GameScreen.startDialogKey);
+                              game.start();
+                              //context.go('/');
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Text('Play', style: bodyTextStyle),
+                            )),
+                  ),
                 ],
               ),
             ),
@@ -107,7 +110,7 @@ Widget levelSelector(BuildContext context, PacmanGame game) {
           padding: const EdgeInsets.fromLTRB(0, 16, 0, 16),
           child: Row(
             children: [
-              Text('Level', style: bodyTextStyle),
+              Text('Level:', style: bodyTextStyle),
               const SizedBox(width: 10),
               ...List.generate(
                   min(

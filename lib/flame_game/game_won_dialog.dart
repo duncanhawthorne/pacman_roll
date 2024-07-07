@@ -43,49 +43,57 @@ class GameWonDialog extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10),
                 color: Palette.playSessionBackground.color),
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(40.0, 20, 40, 20),
+              padding: const EdgeInsets.fromLTRB(40.0, 4, 40, 4),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('Complete',
-                      style: headingTextStyle, textAlign: TextAlign.center),
-                  const SizedBox(height: 16),
-                  const SizedBox(height: 16),
-                  Text(
-                    _levelCompleteText(levelCompletedInMillis),
-                    style: bodyTextStyle,
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(0, 16, 0, 16),
+                    child: Text('Complete',
+                        style: headingTextStyle, textAlign: TextAlign.center),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
+                    child: Text(
+                      _levelCompleteText(levelCompletedInMillis),
+                      style: bodyTextStyle,
+                    ),
                   ),
                   !Save.firebaseOn
                       ? const SizedBox.shrink()
-                      : FutureBuilder(
-                          future: _scoreboardRankText(
-                              level.number, levelCompletedInMillis),
-                          initialData: _scoreboardLoadingText(),
-                          builder: (BuildContext context,
-                              AsyncSnapshot<String> text) {
-                            return Text(
-                              text.data!,
-                              style: bodyTextStyle,
-                            );
-                          }),
-                  const SizedBox(height: 16),
+                      : Padding(
+                          padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
+                          child: FutureBuilder(
+                              future: _scoreboardRankText(
+                                  level.number, levelCompletedInMillis),
+                              initialData: _scoreboardLoadingText(),
+                              builder: (BuildContext context,
+                                  AsyncSnapshot<String> text) {
+                                return Text(
+                                  text.data!,
+                                  style: bodyTextStyle,
+                                );
+                              }),
+                        ),
                   levelSelector(context, game),
-                  const SizedBox(height: 16),
-                  TextButton(
-                      style: buttonStyle,
-                      onPressed: () {
-                        if (overlayMainMenu) {
-                          game.overlays.remove(GameScreen.wonDialogKey);
-                          game.start();
-                        } else {
-                          context.go('/');
-                        }
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Text('Retry', style: bodyTextStyle),
-                      )),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(0, 16, 0, 16),
+                    child: TextButton(
+                        style: buttonStyle,
+                        onPressed: () {
+                          if (overlayMainMenu) {
+                            game.overlays.remove(GameScreen.wonDialogKey);
+                            game.start();
+                          } else {
+                            context.go('/');
+                          }
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Text('Retry', style: bodyTextStyle),
+                        )),
+                  ),
                 ],
               ),
             ),
@@ -97,14 +105,11 @@ class GameWonDialog extends StatelessWidget {
 }
 
 String _levelCompleteText(int levelCompletedInMillis) {
-  String y =
-      "Time: ${(levelCompletedInMillis / 1000).toStringAsFixed(1)} seconds";
-  return y;
+  return "Time: ${(levelCompletedInMillis / 1000).toStringAsFixed(1)} seconds";
 }
 
 String _scoreboardLoadingText() {
-  String y = !Save.firebaseOn ? "" : "\nRank: Loading...";
-  return y;
+  return !Save.firebaseOn ? "" : "Rank: Loading...";
 }
 
 Future<String> _scoreboardRankText(
@@ -115,6 +120,6 @@ Future<String> _scoreboardRankText(
       : 100.0;
   String y = !Save.firebaseOn
       ? ""
-      : "\nRank: ${x == 0 ? "World Record" : "Top ${x.toStringAsFixed(0)}%"}";
+      : "Rank: ${x == 0 ? "World Record" : "Top ${x.toStringAsFixed(0)}%"}";
   return y;
 }

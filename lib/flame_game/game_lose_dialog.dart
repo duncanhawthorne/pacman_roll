@@ -34,39 +34,44 @@ class GameLoseDialog extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10),
                 color: Palette.playSessionBackground.color),
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(40.0, 20, 40, 20),
+              padding: const EdgeInsets.fromLTRB(40.0, 4, 40, 4),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    'Game Over',
-                    style: headingTextStyle,
-                    textAlign: TextAlign.center,
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(0, 16, 0, 16),
+                    child: Text(
+                      'Game Over',
+                      style: headingTextStyle,
+                      textAlign: TextAlign.center,
+                    ),
                   ),
-                  const SizedBox(height: 16),
-                  const SizedBox(height: 16),
-                  Text(
-                    "Dots left: ${game.world.pelletsRemainingNotifier.value}",
-                    style: bodyTextStyle,
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
+                    child: Text(
+                      "Dots left: ${game.world.pelletsRemainingNotifier.value}",
+                      style: bodyTextStyle,
+                    ),
                   ),
-                  const SizedBox(height: 16),
                   levelSelector(context, game),
-                  const SizedBox(height: 16),
-                  TextButton(
-                      style: buttonStyle,
-                      onPressed: () {
-                        if (overlayMainMenu) {
-                          game.overlays.remove(GameScreen.loseDialogKey);
-                          game.start();
-                        } else {
-                          context.go('/');
-                        }
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Text('Retry', style: bodyTextStyle),
-                      )),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(0, 16, 0, 16),
+                    child: TextButton(
+                        style: buttonStyle,
+                        onPressed: () {
+                          if (overlayMainMenu) {
+                            game.overlays.remove(GameScreen.loseDialogKey);
+                            game.start();
+                          } else {
+                            context.go('/');
+                          }
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Text('Retry', style: bodyTextStyle),
+                        )),
+                  ),
                 ],
               ),
             ),
