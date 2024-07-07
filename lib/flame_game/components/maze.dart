@@ -133,7 +133,7 @@ class Maze {
   static const _mazeInnerWallWidthFactor = 0.7;
   static const double _pixelationBuffer = 1.03;
   static const bool _largeSprites = chosenMaze != _smallSpritesMazeXLayout;
-  static const _mazeScaleFactor = _largeSprites ? 1.0 : 0.95;
+  static const _mazeScaleFactor = _largeSprites ? 0.95 : 0.95;
   final _mazeLayout = _decodeMazeLayout(chosenMaze);
 
   late final ghostStart = _vectorOfMazeListTargetNumber(7);

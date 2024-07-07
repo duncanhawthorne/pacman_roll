@@ -104,6 +104,8 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
         if (stopwatchMilliSeconds > 10 * 1000) {
           save.firebasePushSingleScore(userString, getEncodeCurrentGameState());
         }
+        world.playerProgress
+            .setLevelFinished(level.number, stopwatchMilliSeconds);
         cleanOverlaysAndDialogs();
         overlays.add(GameScreen.wonDialogKey);
       }

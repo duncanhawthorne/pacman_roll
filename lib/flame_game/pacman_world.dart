@@ -6,10 +6,12 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 
 import '../../audio/sounds.dart';
 import '../level_selection/levels.dart';
 import '../player_progress/player_progress.dart';
+import '../style/palette.dart';
 import '../utils/helper.dart';
 import 'components/game_character.dart';
 import 'components/ghost.dart';
@@ -312,10 +314,25 @@ class PacmanWorld extends Forge2DWorld
     startSiren();
     //multiGhostAdderTimer();
     cameraRotateableOnPacmanDeathFlourish = true;
-    Future.delayed(const Duration(milliseconds: 5000), () {
+    Future.delayed(const Duration(milliseconds: 3000), () {
       if (!game.levelStarted && !game.mazeEverRotated) {
         //if user hasn't worked out how to start by now, give a prompt
-        moveMazeAngleByDelta(2 * pi / 64);
+        add(
+          TextComponent(
+              text: '←←←←←←←←\n↓      ↑\n↓ Drag ↑\n↓      ↑\n→→→→→→→→',
+              position: maze.cage,
+              anchor: Anchor.center,
+              textRenderer: TextPaint(
+                style: const TextStyle(
+                  backgroundColor: Palette.blueMaze,
+                  fontSize: 3,
+                  color: Palette.playSessionContrast,
+                  fontFamily: 'Press Start 2P',
+                ),
+              ),
+              key: ComponentKey.named('tutorial'),
+              priority: 100),
+        );
       }
     });
   }
@@ -361,6 +378,12 @@ class PacmanWorld extends Forge2DWorld
         double angleDelta = smallAngle(
             currentAngleTmp - _fingersLastDragAngle[event.pointerId]!);
         double spinMultiplier = 4 * min(1, eventVectorLengthProportion / 0.75);
+
+        if (game.findByKey(ComponentKey.named('tutorial')) != null) {
+          remove(game.findByKey(ComponentKey.named('tutorial'))!);
+        }
+        game.mazeEverRotated = true;
+
         moveMazeAngleByDelta(angleDelta * spinMultiplier);
       }
       _fingersLastDragAngle[event.pointerId] = currentAngleTmp;
@@ -378,7 +401,7 @@ class PacmanWorld extends Forge2DWorld
   void moveMazeAngleByDelta(double angleDelta) {
     if (cameraRotateableOnPacmanDeathFlourish && game.isGameLive) {
       setMazeAngle(_lastMazeAngle + angleDelta);
-      game.mazeEverRotated = true;
+
       if (!doingLevelResetFlourish) {
         game.stopwatch.start();
         startMultiGhostAdderTimer();

@@ -1,4 +1,7 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../level_selection/levels.dart';
 import '../style/palette.dart';
@@ -22,16 +25,12 @@ class StartDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //context.read<Palette>();
-    //final settingsController = context.watch<SettingsController>();
     return Center(
       child: FittedBox(
         fit: BoxFit.scaleDown,
         child: Padding(
           padding: const EdgeInsets.all(75.0),
           child: Container(
-            //width: 480,
-            //height: 300,
             decoration: BoxDecoration(
                 border: Border.all(color: Palette.borderColor.color, width: 3),
                 borderRadius: BorderRadius.circular(10),
@@ -46,79 +45,51 @@ class StartDialog extends StatelessWidget {
                   Transform.rotate(
                     angle: -0.1,
                     child: Text(appTitle,
-                        style: headingTextStyle,
-                        //Theme.of(context).textTheme.headlineMedium,
-                        textAlign: TextAlign.center),
+                        style: headingTextStyle, textAlign: TextAlign.center),
                   ),
                   const SizedBox(height: 16),
-                  /*
+                  levelSelector(context, game),
                   const SizedBox(height: 16),
-                  Image.asset('assets/images/dash/ghost1.png',
-                      filterQuality: FilterQuality.none, height: 92, width: 92),
-                  const SizedBox(height: 16),
-                  audioOnOffButton(settingsController,
-                      color: Palette.mainContrast.color),
-
-                   */
-                  const SizedBox(height: 16),
-                  if (true) ...[
-                    game.levelStarted
-                        ? Row(
-                            children: [
-                              TextButton(
-                                  style: buttonStyleWarning,
-                                  onPressed: () {
-                                    if (!game.world.doingLevelResetFlourish) {
-                                      game.overlays
-                                          .remove(GameScreen.startDialogKey);
-                                      game.start();
-                                    }
-                                    //context.go('/');
-                                  },
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(16.0),
-                                    child: Text('Reset', style: bodyTextStyle),
-                                  )),
-                              const SizedBox(width: 10),
-                              TextButton(
-                                  style: buttonStyle,
-                                  onPressed: () {
+                  game.levelStarted
+                      ? Row(
+                          children: [
+                            TextButton(
+                                style: buttonStyleWarning,
+                                onPressed: () {
+                                  if (!game.world.doingLevelResetFlourish) {
                                     game.overlays
                                         .remove(GameScreen.startDialogKey);
-                                    //game.resumeEngine();
-                                    //game.stopwatch.start();
-                                    //context.go('/');
-                                  },
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(16.0),
-                                    child: Text('Resume', style: bodyTextStyle),
-                                  ))
-                            ],
-                          )
-                        : TextButton(
-                            style: buttonStyle,
-                            onPressed: () {
-                              game.overlays.remove(GameScreen.startDialogKey);
-                              game.start();
-                              //context.go('/');
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Text('Play', style: bodyTextStyle),
-                            )),
-                    /*
-                    NesButton(
-                      onPressed: () {
-                        context.go('/');
-                      },
-                      type: NesButtonType.primary,
-                      child: const Text('Retry',
-                          style: TextStyle(fontFamily: 'Press Start 2P')),
-                    ),
-
-                     */
-                    //const SizedBox(height: 16),
-                  ],
+                                    game.start();
+                                  }
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Text('Reset', style: bodyTextStyle),
+                                )),
+                            const SizedBox(width: 10),
+                            TextButton(
+                                style: buttonStyle,
+                                onPressed: () {
+                                  game.overlays
+                                      .remove(GameScreen.startDialogKey);
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Text('Resume', style: bodyTextStyle),
+                                ))
+                          ],
+                        )
+                      : TextButton(
+                          style: buttonStyle,
+                          onPressed: () {
+                            game.overlays.remove(GameScreen.startDialogKey);
+                            game.start();
+                            //context.go('/');
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Text('Play', style: bodyTextStyle),
+                          )),
                 ],
               ),
             ),
@@ -127,4 +98,37 @@ class StartDialog extends StatelessWidget {
       ),
     );
   }
+}
+
+Widget levelSelector(BuildContext context, PacmanGame game) {
+  return game.world.playerProgress.levels.isEmpty && game.level.number == 1
+      ? const SizedBox.shrink()
+      : Padding(
+          padding: const EdgeInsets.fromLTRB(0, 16, 0, 16),
+          child: Row(
+            children: [
+              Text('Level', style: bodyTextStyle),
+              const SizedBox(width: 10),
+              ...List.generate(
+                  min(
+                      gameLevels.length,
+                      max(game.level.number,
+                          game.world.playerProgress.levels.length + 1)),
+                  (index) => Padding(
+                        padding: const EdgeInsets.fromLTRB(2, 0, 2, 0),
+                        child: TextButton(
+                            style: game.level.number == index + 1
+                                ? buttonStyle
+                                : buttonStylePassive,
+                            onPressed: () {
+                              context.go('/session/${index + 1}');
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text('${index + 1}', style: bodyTextStyle),
+                            )),
+                      )),
+            ],
+          ),
+        );
 }

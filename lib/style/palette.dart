@@ -70,3 +70,13 @@ ButtonStyle buttonStyleWarning = TextButton.styleFrom(
     ),
   ),
 );
+
+ButtonStyle buttonStylePassive = TextButton.styleFrom(
+  shape: const RoundedRectangleBorder(
+    borderRadius: BorderRadius.all(Radius.circular(8)),
+    side: BorderSide(
+      color: Palette.transp,
+      width: 3,
+    ),
+  ),
+);
