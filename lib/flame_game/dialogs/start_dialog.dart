@@ -3,11 +3,11 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../level_selection/levels.dart';
-import '../style/palette.dart';
-import '../utils/constants.dart';
-import 'game_screen.dart';
-import 'pacman_game.dart';
+import '../../level_selection/levels.dart';
+import '../../style/palette.dart';
+import '../../utils/constants.dart';
+import '../game_screen.dart';
+import '../pacman_game.dart';
 
 /// This dialog is shown before starting the game.
 

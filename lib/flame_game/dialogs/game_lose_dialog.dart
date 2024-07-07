@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:pacman_roll/flame_game/start_dialog.dart';
 
-import '../level_selection/levels.dart';
-import '../style/palette.dart';
-import 'game_screen.dart';
-import 'pacman_game.dart';
-import 'pacman_world.dart';
+import '../../level_selection/levels.dart';
+import '../../style/palette.dart';
+import '../game_screen.dart';
+import '../pacman_game.dart';
+import '../pacman_world.dart';
+import 'start_dialog.dart';
 
 /// This dialog is shown when a level is lost.
 
