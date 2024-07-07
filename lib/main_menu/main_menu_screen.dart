@@ -48,13 +48,13 @@ class MainMenuScreen extends StatelessWidget {
               _gap,
               _gap,
               TextButton(
-                  style: buttonStyle,
+                  style: buttonStyleNormal,
                   onPressed: () {
                     GoRouter.of(context).go('/session/1');
                   },
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
-                    child: Text('Play', style: bodyTextStyle),
+                    child: Text('Play', style: textStyleBody),
                   )),
               /*
               WobblyButton(

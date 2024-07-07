@@ -45,13 +45,17 @@ class Palette {
   static const transpPalette = PaletteEntry(transp);
 }
 
-TextStyle headingTextStyle =
+TextStyle textStyleHeading =
     const TextStyle(fontFamily: 'Press Start 2P', fontSize: 28);
 
-TextStyle bodyTextStyle = const TextStyle(
+TextStyle textStyleBody = const TextStyle(
     fontFamily: 'Press Start 2P', color: Palette.playSessionContrast);
 
-ButtonStyle buttonStyle = TextButton.styleFrom(
+ButtonStyle buttonStyleNormal = TextButton.styleFrom(
+  minimumSize: Size.zero,
+  padding: const EdgeInsets.all(24.0),
+  //padding: EdgeInsets.zero,
+  //tapTargetSize: MaterialTapTargetSize.shrinkWrap,
   shape: const RoundedRectangleBorder(
     borderRadius: BorderRadius.all(Radius.circular(8)),
     side: BorderSide(
@@ -62,6 +66,9 @@ ButtonStyle buttonStyle = TextButton.styleFrom(
 );
 
 ButtonStyle buttonStyleWarning = TextButton.styleFrom(
+  minimumSize: Size.zero,
+  padding: const EdgeInsets.all(24.0),
+  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
   shape: const RoundedRectangleBorder(
     borderRadius: BorderRadius.all(Radius.circular(8)),
     side: BorderSide(
@@ -71,7 +78,21 @@ ButtonStyle buttonStyleWarning = TextButton.styleFrom(
   ),
 );
 
-ButtonStyle buttonStylePassive = TextButton.styleFrom(
+ButtonStyle buttonStyleSmallActive = TextButton.styleFrom(
+  minimumSize: Size.zero,
+  padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+  shape: const RoundedRectangleBorder(
+    borderRadius: BorderRadius.all(Radius.circular(8)),
+    side: BorderSide(
+      color: Palette.blueMaze,
+      width: 3,
+    ),
+  ),
+);
+
+ButtonStyle buttonStyleSmallPassive = TextButton.styleFrom(
+  minimumSize: Size.zero,
+  padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
   shape: const RoundedRectangleBorder(
     borderRadius: BorderRadius.all(Radius.circular(8)),
     side: BorderSide(

@@ -160,8 +160,8 @@ class PacmanWorld extends Forge2DWorld
 
   void startMultiGhostAdderTimer() {
     if (game.level.multipleSpawningGhosts && ghostTimer == null) {
-      ghostTimer =
-          async.Timer.periodic(const Duration(milliseconds: 5000), (timer) {
+      ghostTimer = async.Timer.periodic(
+          Duration(milliseconds: level.ghostSpwanTimerLength * 1000), (timer) {
         if (game.isGameLive && !gameWonOrLost) {
           addGhost(100);
         } else {
@@ -315,7 +315,7 @@ class PacmanWorld extends Forge2DWorld
     //multiGhostAdderTimer();
     cameraRotateableOnPacmanDeathFlourish = true;
     Future.delayed(const Duration(milliseconds: 3000), () {
-      if (!game.levelStarted && !game.mazeEverRotated) {
+      if (!game.levelStarted && !game.mazeEverRotated && level.number == 1) {
         //if user hasn't worked out how to start by now, give a prompt
         add(
           TextComponent(

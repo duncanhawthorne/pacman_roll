@@ -120,13 +120,13 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
   }
 
   void addOverlays() {
-    overlays.add(GameScreen.backButtonKey);
-    overlays.add(GameScreen.statusOverlayKey);
+    overlays.add(GameScreen.topLeftOverlayKey);
+    overlays.add(GameScreen.topRightOverlayKey);
   }
 
   void cleanOverlaysAndDialogs() {
-    overlays.remove(GameScreen.backButtonKey);
-    overlays.remove(GameScreen.statusOverlayKey);
+    overlays.remove(GameScreen.topLeftOverlayKey);
+    overlays.remove(GameScreen.topRightOverlayKey);
     overlays.remove(GameScreen.startDialogKey);
     overlays.remove(GameScreen.loseDialogKey);
     overlays.remove(GameScreen.wonDialogKey);

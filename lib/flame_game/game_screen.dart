@@ -12,8 +12,8 @@ import '../main_menu/main_menu_screen.dart';
 import '../player_progress/player_progress.dart';
 import '../settings/settings.dart';
 import 'dialogs/game_lose_dialog.dart';
+import 'dialogs/game_start_dialog.dart';
 import 'dialogs/game_won_dialog.dart';
-import 'dialogs/start_dialog.dart';
 import 'icons/pacman_icons.dart';
 import 'pacman_game.dart';
 import 'pacman_world.dart';
@@ -35,14 +35,12 @@ class GameScreen extends StatelessWidget {
   static const String loseDialogKey = 'lose_dialog';
   static const String wonDialogKey = 'won_dialog';
   static const String startDialogKey = 'start_dialog';
-  static const String backButtonKey = 'back_button';
-  static const String statusOverlayKey = 'status_overlay';
+  static const String topLeftOverlayKey = 'top_left_overlay';
+  static const String topRightOverlayKey = 'top_right_overlay';
 
   @override
   Widget build(BuildContext context) {
-    //context.watch<Palette>();
     final audioController = context.read<AudioController>();
-    //final palette = context.read<Palette>();
     return PopScope(
       canPop: false,
       child: Scaffold(
@@ -55,10 +53,10 @@ class GameScreen extends StatelessWidget {
             //palette: palette,
           ),
           overlayBuilderMap: {
-            backButtonKey: (BuildContext context, PacmanGame game) {
+            topLeftOverlayKey: (BuildContext context, PacmanGame game) {
               return backButtonWidget(context, game);
             },
-            statusOverlayKey: (BuildContext context, PacmanGame game) {
+            topRightOverlayKey: (BuildContext context, PacmanGame game) {
               return statusOverlayWidget(context, game);
             },
             loseDialogKey: (BuildContext context, PacmanGame game) {
@@ -93,41 +91,10 @@ Widget backButtonWidget(BuildContext context, PacmanGame game) {
       mainAxisAlignment: MainAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        /*
-        NesButton(
-          type: NesButtonType.normal,
-          onPressed: () {
-            GoRouter.of(context).go("/");
-          },
-          child: NesIcon(
-              iconData: NesIcons.leftArrowIndicator, size: const Size(15, 15)),
-        ),
-         */
-        /*
-        const SizedBox(width: 20 * statusWidgetHeightFactor, height: 1),
-        NesButton(
-            type: NesButtonType.normal,
-            onPressed: () {
-              settingsController.toggleAudioOn();
-            },
-            child: ValueListenableBuilder<bool>(
-              valueListenable: settingsController.audioOn,
-              builder: (context, audioOn, child) {
-                return NesIcon(
-                    iconData: audioOn ? NesIcons.musicNote : NesIcons.radio,
-                    size: const Size(15, 15));
-              },
-            )),
-
-         */
-
-        //const SizedBox(width: 20 * statusWidgetHeightFactor, height: 1),
         IconButton(
           onPressed: () {
             if (overlayMainMenu) {
               game.overlays.add(GameScreen.startDialogKey);
-              //game.pauseEngine();
-              //game.stopwatch.stop();
             } else {
               GoRouter.of(context).go("/");
             }
