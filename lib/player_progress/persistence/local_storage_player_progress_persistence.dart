@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'player_progress_persistence.dart';
@@ -8,32 +10,47 @@ class LocalStoragePlayerProgressPersistence extends PlayerProgressPersistence {
   final Future<SharedPreferences> instanceFuture =
       SharedPreferences.getInstance();
 
-  @override
-  Future<List<int>> getFinishedLevels() async {
-    final prefs = await instanceFuture;
-    final serialized = prefs.getStringList('levelsFinished') ?? [];
+  Map<int, int> decode(String gameEncoded) {
+    Map<int, int> gameTmp = {};
+    if (gameEncoded == "") {
+      gameTmp = {};
+    } else {
+      gameTmp = json.decode(gameEncoded);
+    }
+    return gameTmp;
+  }
 
-    return serialized.map(int.parse).toList();
+  String encode(Map<int, int> gameEncoded) {
+    return json.encode(gameEncoded);
+  }
+
+  @override
+  Future<Map<int, int>> getFinishedLevels() async {
+    final prefs = await instanceFuture;
+    final gameEncoded = prefs.getString('levelsFinishedMap') ?? "";
+    return decode(gameEncoded);
   }
 
   @override
   Future<void> saveLevelFinished(int level, int time) async {
     final prefs = await instanceFuture;
-    final serialized = prefs.getStringList('levelsFinished') ?? [];
-    if (level <= serialized.length) {
-      final currentTime = int.parse(serialized[level - 1]);
+    final gameEncoded = prefs.getString('levelsFinishedMap') ?? "";
+    Map<int, int> decoded = decode(gameEncoded);
+    if (decoded.containsKey(level)) {
+      final int currentTime = decoded[level]!;
       if (time < currentTime) {
-        serialized[level - 1] = time.toString();
+        decoded[level] = time;
       }
     } else {
-      serialized.add(time.toString());
+      decoded[level] = time;
     }
-    await prefs.setStringList('levelsFinished', serialized);
+
+    await prefs.setString('levelsFinishedMap', encode(decoded));
   }
 
   @override
   Future<void> reset() async {
     final prefs = await instanceFuture;
-    await prefs.remove('levelsFinished');
+    await prefs.remove('levelsFinishedMap');
   }
 }

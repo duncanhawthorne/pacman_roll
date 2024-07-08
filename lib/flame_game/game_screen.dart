@@ -54,10 +54,10 @@ class GameScreen extends StatelessWidget {
           ),
           overlayBuilderMap: {
             topLeftOverlayKey: (BuildContext context, PacmanGame game) {
-              return backButtonWidget(context, game);
+              return topLeftOverlayWidget(context, game);
             },
             topRightOverlayKey: (BuildContext context, PacmanGame game) {
-              return statusOverlayWidget(context, game);
+              return topRightOverlayWidget(context, game);
             },
             loseDialogKey: (BuildContext context, PacmanGame game) {
               return GameLoseDialog(
@@ -81,7 +81,7 @@ class GameScreen extends StatelessWidget {
   }
 }
 
-Widget backButtonWidget(BuildContext context, PacmanGame game) {
+Widget topLeftOverlayWidget(BuildContext context, PacmanGame game) {
   final settingsController = context.watch<SettingsController>();
   return Positioned(
     top: 20,
@@ -109,7 +109,7 @@ Widget backButtonWidget(BuildContext context, PacmanGame game) {
   );
 }
 
-Widget statusOverlayWidget(BuildContext context, PacmanGame game) {
+Widget topRightOverlayWidget(BuildContext context, PacmanGame game) {
   return Positioned(
     top: 27,
     right: 30,

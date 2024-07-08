@@ -5,10 +5,10 @@ import 'player_progress_persistence.dart';
 /// An in-memory implementation of [PlayerProgressPersistence].
 /// Useful for testing.
 class MemoryOnlyPlayerProgressPersistence implements PlayerProgressPersistence {
-  final levels = <int>[];
+  final Map<int, int> levels = {};
 
   @override
-  Future<List<int>> getFinishedLevels() async {
+  Future<Map<int, int>> getFinishedLevels() async {
     await Future<void>.delayed(const Duration(milliseconds: 500));
     return levels;
   }
@@ -16,8 +16,8 @@ class MemoryOnlyPlayerProgressPersistence implements PlayerProgressPersistence {
   @override
   Future<void> saveLevelFinished(int level, int time) async {
     await Future<void>.delayed(const Duration(milliseconds: 500));
-    if (level < levels.length - 1 && levels[level - 1] > time) {
-      levels[level - 1] = time;
+    if (levels.containsKey(level) && levels[level]! > time) {
+      levels[level] = time;
     }
   }
 

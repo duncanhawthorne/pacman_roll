@@ -5,6 +5,7 @@ const gameLevels = <GameLevel>[
     superPelletsEnabled: true,
     multipleSpawningGhosts: false,
     ghostSpwanTimerLength: -1,
+    homingGhosts: false,
   ),
   (
     number: 2,
@@ -12,6 +13,7 @@ const gameLevels = <GameLevel>[
     superPelletsEnabled: false,
     multipleSpawningGhosts: false,
     ghostSpwanTimerLength: -1,
+    homingGhosts: false,
   ),
   (
     number: 3,
@@ -19,6 +21,7 @@ const gameLevels = <GameLevel>[
     superPelletsEnabled: false,
     multipleSpawningGhosts: true,
     ghostSpwanTimerLength: 5,
+    homingGhosts: false,
   ),
   (
     number: 4,
@@ -26,6 +29,7 @@ const gameLevels = <GameLevel>[
     superPelletsEnabled: false,
     multipleSpawningGhosts: true,
     ghostSpwanTimerLength: 3,
+    homingGhosts: false,
   ),
   (
     number: 5,
@@ -33,6 +37,7 @@ const gameLevels = <GameLevel>[
     superPelletsEnabled: false,
     multipleSpawningGhosts: true,
     ghostSpwanTimerLength: 2,
+    homingGhosts: false,
   ),
   (
     number: 6,
@@ -40,6 +45,39 @@ const gameLevels = <GameLevel>[
     superPelletsEnabled: false,
     multipleSpawningGhosts: true,
     ghostSpwanTimerLength: 1,
+    homingGhosts: false,
+  ),
+  (
+    number: 7,
+    maxAllowedDeaths: 3,
+    superPelletsEnabled: false,
+    multipleSpawningGhosts: true,
+    ghostSpwanTimerLength: 5,
+    homingGhosts: true,
+  ),
+  (
+    number: 8,
+    maxAllowedDeaths: 3,
+    superPelletsEnabled: false,
+    multipleSpawningGhosts: true,
+    ghostSpwanTimerLength: 3,
+    homingGhosts: true,
+  ),
+  (
+    number: 9,
+    maxAllowedDeaths: 3,
+    superPelletsEnabled: false,
+    multipleSpawningGhosts: true,
+    ghostSpwanTimerLength: 2,
+    homingGhosts: true,
+  ),
+  (
+    number: 10,
+    maxAllowedDeaths: 3,
+    superPelletsEnabled: false,
+    multipleSpawningGhosts: true,
+    ghostSpwanTimerLength: 1,
+    homingGhosts: true,
   ),
 ];
 
@@ -49,4 +87,5 @@ typedef GameLevel = ({
   bool superPelletsEnabled,
   bool multipleSpawningGhosts,
   int ghostSpwanTimerLength,
+  bool homingGhosts,
 });

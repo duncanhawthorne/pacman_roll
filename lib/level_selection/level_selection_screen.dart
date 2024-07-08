@@ -56,7 +56,8 @@ class LevelSelectionScreen extends StatelessWidget {
                 children: [
                   for (final level in gameLevels)
                     ListTile(
-                      enabled: playerProgress.levels.length >= level.number - 1,
+                      enabled:
+                          playerProgress.maxLevelCompleted >= level.number - 1,
                       onTap: () {
                         GoRouter.of(context)
                             .go('/play/session/${level.number}');
@@ -71,15 +72,15 @@ class LevelSelectionScreen extends StatelessWidget {
                             'Level #${level.number}',
                             style: levelTextStyle,
                           ),
-                          if (playerProgress.levels.length <
+                          if (playerProgress.maxLevelCompleted <
                               level.number - 1) ...[
                             const SizedBox(width: 10),
                             const Icon(Icons.lock, size: 20),
-                          ] else if (playerProgress.levels.length >=
+                          ] else if (playerProgress.maxLevelCompleted >=
                               level.number) ...[
                             const SizedBox(width: 50),
                             Text(
-                              '${playerProgress.levels[level.number - 1]}s',
+                              '${playerProgress.levels[level.number]}s',
                               style: levelTextStyle,
                             ),
                           ],

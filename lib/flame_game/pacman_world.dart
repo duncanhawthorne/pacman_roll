@@ -260,6 +260,9 @@ class PacmanWorld extends Forge2DWorld
 
   void reset() {
     cancelMultiGhostAdderTimer();
+    try {
+      remove(game.findByKey(ComponentKey.named('tutorial'))!);
+    } catch (e) {}
     if (sirenTimer != null) {
       game.audioController.setSirenVolume(0);
       sirenTimer!.cancel();

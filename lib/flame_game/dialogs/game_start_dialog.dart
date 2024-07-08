@@ -79,7 +79,8 @@ class StartDialog extends StatelessWidget {
 
 Widget levelSelector(BuildContext context, PacmanGame game) {
   bool showText = game.level.number <= 2;
-  return game.world.playerProgress.levels.isEmpty && game.level.number == 1
+  return game.world.playerProgress.maxLevelCompleted == 0 &&
+          game.level.number == 1
       ? const SizedBox.shrink()
       : Padding(
           padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
@@ -93,7 +94,7 @@ Widget levelSelector(BuildContext context, PacmanGame game) {
                   min(
                       gameLevels.length,
                       max(game.level.number,
-                          game.world.playerProgress.levels.length + 1)),
+                          game.world.playerProgress.maxLevelCompleted + 1)),
                   (index) => Padding(
                         padding: const EdgeInsets.fromLTRB(2, 0, 2, 0),
                         child: TextButton(
@@ -103,7 +104,11 @@ Widget levelSelector(BuildContext context, PacmanGame game) {
                             onPressed: () {
                               context.go('/session/${index + 1}');
                             },
-                            child: Text('${index + 1}', style: textStyleBody)),
+                            child: Text('${index + 1}',
+                                style: game.world.playerProgress.levels
+                                        .containsKey(index + 1)
+                                    ? textStyleBody
+                                    : textStyleBodyDull)),
                       )),
             ],
           ),

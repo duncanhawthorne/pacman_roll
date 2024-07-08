@@ -41,6 +41,7 @@ class Palette {
   static const transp = Color(0x00000000);
   static const white = Color(0xffffffff);
   static const playSessionContrast = white; //0xffa2fff3
+  static const playSessionDull = Colors.grey; //0xffa2fff3
 
   static const transpPalette = PaletteEntry(transp);
 }
@@ -50,6 +51,9 @@ TextStyle textStyleHeading =
 
 TextStyle textStyleBody = const TextStyle(
     fontFamily: 'Press Start 2P', color: Palette.playSessionContrast);
+
+TextStyle textStyleBodyDull = const TextStyle(
+    fontFamily: 'Press Start 2P', color: Palette.playSessionDull);
 
 ButtonStyle buttonStyleNormal = TextButton.styleFrom(
   minimumSize: Size.zero,

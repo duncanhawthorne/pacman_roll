@@ -20,6 +20,7 @@ class Ghost extends GameCharacter {
   //int ghostScaredTimeLatest = 0; //a long time ago
   int _ghostDeadTimeLatest = 0; //a long time ago
   int idNum = 100;
+  Vector2? specialSpawnLocation;
 
   Future<Map<CharacterState, SpriteAnimation>?> _getAnimations() async {
     return {
@@ -75,7 +76,13 @@ class Ghost extends GameCharacter {
         world.remove(this);
       } else {
         disconnectSpriteFromBall();
-        add(ReturnHomeEffect(maze.ghostStart));
+        if (spawningDeath && world.level.homingGhosts) {
+          specialSpawnLocation = Vector2.all(0);
+          specialSpawnLocation!.setFrom(world.pacmanPlayersList[0].position);
+          add(ReturnHomeEffect(specialSpawnLocation!));
+        } else {
+          add(ReturnHomeEffect(maze.ghostStart));
+        }
         add(RotateHomeEffect(smallAngle(-angle)));
         //will get moved to right position later by code in sequence checker
       }
@@ -115,7 +122,12 @@ class Ghost extends GameCharacter {
       if (world.now - _ghostDeadTimeLatest > kGhostResetTimeMillis) {
         if (!world.gameWonOrLost && _ghostDeadTimeLatest != 0) {
           //dont set on game over or after pacman death
-          setPositionStill(maze.ghostStart + Vector2.random() / 100);
+          if (specialSpawnLocation != null) {
+            setPositionStill(specialSpawnLocation!);
+            specialSpawnLocation = null;
+          } else {
+            setPositionStill(maze.ghostStart + Vector2.random() / 100);
+          }
         }
         current = CharacterState.scared;
       }
