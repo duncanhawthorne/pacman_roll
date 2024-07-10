@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../firebase/firebase_saves.dart';
 import '../../level_selection/levels.dart';
-import '../../style/palette.dart';
+import '../../style/dialog.dart';
 import '../game_screen.dart';
 import '../pacman_game.dart';
 import '../pacman_world.dart';
@@ -38,8 +38,7 @@ class GameWonDialog extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           titleText(text: 'Complete'),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
+          bodyWidget(
             child: Text(
               _levelCompleteText(levelCompletedInMillis),
               style: textStyleBody,
@@ -47,8 +46,7 @@ class GameWonDialog extends StatelessWidget {
           ),
           !Save.firebaseOn
               ? const SizedBox.shrink()
-              : Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
+              : bodyWidget(
                   child: FutureBuilder(
                       future: _scoreboardRankText(
                           level.number, levelCompletedInMillis),
@@ -62,19 +60,20 @@ class GameWonDialog extends StatelessWidget {
                       }),
                 ),
           levelSelector(context, game),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(0, 16, 0, 16),
-            child: TextButton(
-                style: buttonStyleNormal,
-                onPressed: () {
-                  if (overlayMainMenu) {
-                    game.overlays.remove(GameScreen.wonDialogKey);
-                    game.start();
-                  } else {
-                    context.go('/');
-                  }
-                },
-                child: Text('Retry', style: textStyleBody)),
+          bottomRowWidget(
+            children: [
+              TextButton(
+                  style: buttonStyleNormal,
+                  onPressed: () {
+                    if (overlayMainMenu) {
+                      game.overlays.remove(GameScreen.wonDialogKey);
+                      game.start();
+                    } else {
+                      context.go('/');
+                    }
+                  },
+                  child: Text('Retry', style: textStyleBody)),
+            ],
           ),
         ],
       ),

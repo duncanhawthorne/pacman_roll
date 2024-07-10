@@ -120,7 +120,7 @@ class PacmanWorld extends Forge2DWorld
   void sirenVolumeUpdatedTimer() async {
     //NOTE disabled on iOS due to bug
     // ignore: prefer_conditional_assignment
-    if (sirenTimer == null) {
+    if (sirenTimer == null && game.isGameLive && !gameWonOrLost) {
       sirenTimer =
           async.Timer.periodic(const Duration(milliseconds: 250), (timer) {
         if (game.isGameLive && !gameWonOrLost) {
@@ -128,6 +128,7 @@ class PacmanWorld extends Forge2DWorld
         } else {
           game.audioController.setSirenVolume(0);
           timer.cancel();
+          sirenTimer = null;
         }
       });
     }
@@ -159,13 +160,17 @@ class PacmanWorld extends Forge2DWorld
   }
 
   void startMultiGhostAdderTimer() {
-    if (game.level.multipleSpawningGhosts && ghostTimer == null) {
+    if (game.level.multipleSpawningGhosts &&
+        ghostTimer == null &&
+        game.isGameLive &&
+        !gameWonOrLost) {
       ghostTimer = async.Timer.periodic(
           Duration(milliseconds: level.ghostSpwanTimerLength * 1000), (timer) {
-        if (game.isGameLive && !gameWonOrLost) {
+        if (game.isGameLive && !gameWonOrLost && !doingLevelResetFlourish) {
           addGhost(100);
         } else {
           timer.cancel();
+          ghostTimer = null;
         }
       });
     }
@@ -260,9 +265,9 @@ class PacmanWorld extends Forge2DWorld
 
   void reset() {
     cancelMultiGhostAdderTimer();
-    try {
+    if (game.findByKey(ComponentKey.named('tutorial')) != null) {
       remove(game.findByKey(ComponentKey.named('tutorial'))!);
-    } catch (e) {}
+    }
     if (sirenTimer != null) {
       game.audioController.setSirenVolume(0);
       sirenTimer!.cancel();
@@ -408,6 +413,7 @@ class PacmanWorld extends Forge2DWorld
       if (!doingLevelResetFlourish) {
         game.stopwatch.start();
         startMultiGhostAdderTimer();
+        sirenVolumeUpdatedTimer();
       }
     }
   }

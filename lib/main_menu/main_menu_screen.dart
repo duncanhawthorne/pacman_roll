@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../settings/settings.dart';
+import '../style/dialog.dart';
 import '../style/palette.dart';
 import '../utils/constants.dart';
 import '../utils/helper.dart';

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../level_selection/levels.dart';
-import '../../style/palette.dart';
+import '../../style/dialog.dart';
 import '../game_screen.dart';
 import '../pacman_game.dart';
 import '../pacman_world.dart';
@@ -29,27 +29,27 @@ class GameLoseDialog extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           titleText(text: 'Game Over'),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
+          bodyWidget(
             child: Text(
               "Dots left: ${game.world.pelletsRemainingNotifier.value}",
               style: textStyleBody,
             ),
           ),
           levelSelector(context, game),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(0, 16, 0, 16),
-            child: TextButton(
-                style: buttonStyleNormal,
-                onPressed: () {
-                  if (overlayMainMenu) {
-                    game.overlays.remove(GameScreen.loseDialogKey);
-                    game.start();
-                  } else {
-                    context.go('/');
-                  }
-                },
-                child: Text('Retry', style: textStyleBody)),
+          bottomRowWidget(
+            children: [
+              TextButton(
+                  style: buttonStyleNormal,
+                  onPressed: () {
+                    if (overlayMainMenu) {
+                      game.overlays.remove(GameScreen.loseDialogKey);
+                      game.start();
+                    } else {
+                      context.go('/');
+                    }
+                  },
+                  child: Text('Retry', style: textStyleBody)),
+            ],
           ),
         ],
       ),

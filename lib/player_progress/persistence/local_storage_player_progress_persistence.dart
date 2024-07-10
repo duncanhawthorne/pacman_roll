@@ -11,17 +11,24 @@ class LocalStoragePlayerProgressPersistence extends PlayerProgressPersistence {
       SharedPreferences.getInstance();
 
   Map<int, int> decode(String gameEncoded) {
-    Map<int, int> gameTmp = {};
+    Map<String, int> gameTmp = {};
     if (gameEncoded == "") {
       gameTmp = {};
     } else {
-      gameTmp = json.decode(gameEncoded);
+      var jsonDecoded = json.decode(gameEncoded);
+      for (String item in jsonDecoded.keys) {
+        gameTmp[item] = jsonDecoded[item];
+      }
     }
-    return gameTmp;
+    return gameTmp.map<int, int>(
+      (k, v) => MapEntry(int.parse(k), v), // parse String back to int
+    );
   }
 
-  String encode(Map<int, int> gameEncoded) {
-    return json.encode(gameEncoded);
+  String encode(Map<int, int> gameDecoded) {
+    return json.encode(gameDecoded.map<String, int>(
+      (k, v) => MapEntry(k.toString(), v), // convert int to String
+    ));
   }
 
   @override
@@ -44,7 +51,6 @@ class LocalStoragePlayerProgressPersistence extends PlayerProgressPersistence {
     } else {
       decoded[level] = time;
     }
-
     await prefs.setString('levelsFinishedMap', encode(decoded));
   }
 
