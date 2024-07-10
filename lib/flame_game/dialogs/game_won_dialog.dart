@@ -32,51 +32,47 @@ class GameWonDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return pacmanDialog(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          titleText(text: 'Complete'),
-          bodyWidget(
-            child: Text(
-              _levelCompleteText(levelCompletedInMillis),
-              style: textStyleBody,
-            ),
+    return popupDialog(
+      children: [
+        titleText(text: 'Complete'),
+        bodyWidget(
+          child: Text(
+            _levelCompleteText(levelCompletedInMillis),
+            style: textStyleBody,
           ),
-          !Save.firebaseOn
-              ? const SizedBox.shrink()
-              : bodyWidget(
-                  child: FutureBuilder(
-                      future: _scoreboardRankText(
-                          level.number, levelCompletedInMillis),
-                      initialData: _scoreboardLoadingText(),
-                      builder:
-                          (BuildContext context, AsyncSnapshot<String> text) {
-                        return Text(
-                          text.data!,
-                          style: textStyleBody,
-                        );
-                      }),
-                ),
-          levelSelector(context, game),
-          bottomRowWidget(
-            children: [
-              TextButton(
-                  style: buttonStyleNormal,
-                  onPressed: () {
-                    if (overlayMainMenu) {
-                      game.overlays.remove(GameScreen.wonDialogKey);
-                      game.start();
-                    } else {
-                      context.go('/');
-                    }
-                  },
-                  child: Text('Retry', style: textStyleBody)),
-            ],
-          ),
-        ],
-      ),
+        ),
+        !Save.firebaseOn
+            ? const SizedBox.shrink()
+            : bodyWidget(
+                child: FutureBuilder(
+                    future: _scoreboardRankText(
+                        level.number, levelCompletedInMillis),
+                    initialData: _scoreboardLoadingText(),
+                    builder:
+                        (BuildContext context, AsyncSnapshot<String> text) {
+                      return Text(
+                        text.data!,
+                        style: textStyleBody,
+                      );
+                    }),
+              ),
+        levelSelector(context, game),
+        bottomRowWidget(
+          children: [
+            TextButton(
+                style: buttonStyle(),
+                onPressed: () {
+                  if (overlayMainMenu) {
+                    game.overlays.remove(GameScreen.wonDialogKey);
+                    game.start();
+                  } else {
+                    context.go('/');
+                  }
+                },
+                child: Text('Retry', style: textStyleBody)),
+          ],
+        ),
+      ],
     );
   }
 }

@@ -23,36 +23,32 @@ class GameLoseDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return pacmanDialog(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          titleText(text: 'Game Over'),
-          bodyWidget(
-            child: Text(
-              "Dots left: ${game.world.pelletsRemainingNotifier.value}",
-              style: textStyleBody,
-            ),
+    return popupDialog(
+      children: [
+        titleText(text: 'Game Over'),
+        bodyWidget(
+          child: Text(
+            "Dots left: ${game.world.pelletsRemainingNotifier.value}",
+            style: textStyleBody,
           ),
-          levelSelector(context, game),
-          bottomRowWidget(
-            children: [
-              TextButton(
-                  style: buttonStyleNormal,
-                  onPressed: () {
-                    if (overlayMainMenu) {
-                      game.overlays.remove(GameScreen.loseDialogKey);
-                      game.start();
-                    } else {
-                      context.go('/');
-                    }
-                  },
-                  child: Text('Retry', style: textStyleBody)),
-            ],
-          ),
-        ],
-      ),
+        ),
+        levelSelector(context, game),
+        bottomRowWidget(
+          children: [
+            TextButton(
+                style: buttonStyle(),
+                onPressed: () {
+                  if (overlayMainMenu) {
+                    game.overlays.remove(GameScreen.loseDialogKey);
+                    game.start();
+                  } else {
+                    context.go('/');
+                  }
+                },
+                child: Text('Retry', style: textStyleBody)),
+          ],
+        ),
+      ],
     );
   }
 }

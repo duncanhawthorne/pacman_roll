@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../level_selection/levels.dart';
 import '../../style/dialog.dart';
+import '../../style/palette.dart';
 import '../../utils/constants.dart';
 import '../game_screen.dart';
 import '../pacman_game.dart';
@@ -25,54 +26,50 @@ class StartDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return pacmanDialog(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          titleWidget(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(0, 16, 0, 8),
-              child: Transform.rotate(
-                angle: -0.1,
-                child: Text(appTitle,
-                    style: textStyleHeading, textAlign: TextAlign.center),
-              ),
+    return popupDialog(
+      children: [
+        titleWidget(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(0, 16, 0, 8),
+            child: Transform.rotate(
+              angle: -0.1,
+              child: Text(appTitle,
+                  style: textStyleHeading, textAlign: TextAlign.center),
             ),
           ),
-          levelSelector(context, game),
-          bottomRowWidget(
-            children: game.levelStarted
-                ? [
-                    TextButton(
-                        style: buttonStyleWarning,
-                        onPressed: () {
-                          if (!game.world.doingLevelResetFlourish) {
-                            game.overlays.remove(GameScreen.startDialogKey);
-                            game.start();
-                          }
-                        },
-                        child: Text('Reset', style: textStyleBody)),
-                    TextButton(
-                        style: buttonStyleNormal,
-                        onPressed: () {
-                          game.overlays.remove(GameScreen.startDialogKey);
-                        },
-                        child: Text('Resume', style: textStyleBody))
-                  ]
-                : [
-                    TextButton(
-                        style: buttonStyleNormal,
-                        onPressed: () {
+        ),
+        levelSelector(context, game),
+        bottomRowWidget(
+          children: game.levelStarted
+              ? [
+                  TextButton(
+                      style: buttonStyle(color: Palette.redWarning),
+                      onPressed: () {
+                        if (!game.world.doingLevelResetFlourish) {
                           game.overlays.remove(GameScreen.startDialogKey);
                           game.start();
-                          //context.go('/');
-                        },
-                        child: Text('Play', style: textStyleBody)),
-                  ],
-          )
-        ],
-      ),
+                        }
+                      },
+                      child: Text('Reset', style: textStyleBody)),
+                  TextButton(
+                      style: buttonStyle(),
+                      onPressed: () {
+                        game.overlays.remove(GameScreen.startDialogKey);
+                      },
+                      child: Text('Resume', style: textStyleBody))
+                ]
+              : [
+                  TextButton(
+                      style: buttonStyle(),
+                      onPressed: () {
+                        game.overlays.remove(GameScreen.startDialogKey);
+                        game.start();
+                        //context.go('/');
+                      },
+                      child: Text('Play', style: textStyleBody)),
+                ],
+        )
+      ],
     );
   }
 }
@@ -101,8 +98,9 @@ Widget levelSelector(BuildContext context, PacmanGame game) {
                             padding: const EdgeInsets.fromLTRB(2, 0, 2, 0),
                             child: TextButton(
                                 style: game.level.number == index + 1
-                                    ? buttonStyleSmallActive
-                                    : buttonStyleSmallPassive,
+                                    ? buttonStyle(small: true)
+                                    : buttonStyle(
+                                        small: true, color: Palette.transp),
                                 onPressed: () {
                                   if (!game.world.doingLevelResetFlourish) {
                                     context.go('/session/${index + 1}');
@@ -127,8 +125,10 @@ Widget levelSelector(BuildContext context, PacmanGame game) {
                                       const EdgeInsets.fromLTRB(2, 0, 2, 0),
                                   child: TextButton(
                                       style: game.level.number == index + 5 + 1
-                                          ? buttonStyleSmallActive
-                                          : buttonStyleSmallPassive,
+                                          ? buttonStyle(small: true)
+                                          : buttonStyle(
+                                              small: true,
+                                              color: Palette.transp),
                                       onPressed: () {
                                         if (!game
                                             .world.doingLevelResetFlourish) {

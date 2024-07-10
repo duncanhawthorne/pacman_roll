@@ -49,7 +49,7 @@ class MainMenuScreen extends StatelessWidget {
               _gap,
               _gap,
               TextButton(
-                  style: buttonStyleNormal,
+                  style: buttonStyle(),
                   onPressed: () {
                     GoRouter.of(context).go('/session/1');
                   },

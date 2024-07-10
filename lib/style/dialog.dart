@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'palette.dart';
 
-Widget pacmanDialog({required Widget child}) {
+Widget popupDialog({required List<Widget> children}) {
   return Center(
     child: FittedBox(
       fit: BoxFit.scaleDown,
@@ -14,7 +14,11 @@ Widget pacmanDialog({required Widget child}) {
               borderRadius: BorderRadius.circular(10),
               color: Palette.playSessionBackground.color),
           child: Padding(
-              padding: const EdgeInsets.fromLTRB(40.0, 4, 40, 4), child: child),
+              padding: const EdgeInsets.fromLTRB(40.0, 4, 40, 4),
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: children)),
         ),
       ),
     ),
@@ -63,53 +67,18 @@ TextStyle textStyleBody = const TextStyle(
 TextStyle textStyleBodyDull = const TextStyle(
     fontFamily: 'Press Start 2P', color: Palette.playSessionDull);
 
-ButtonStyle buttonStyleNormal = TextButton.styleFrom(
-  minimumSize: Size.zero,
-  padding: const EdgeInsets.all(24.0),
-  //padding: EdgeInsets.zero,
-  //tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-  shape: const RoundedRectangleBorder(
-    borderRadius: BorderRadius.all(Radius.circular(8)),
-    side: BorderSide(
-      color: Palette.blueMaze,
-      width: 3,
+ButtonStyle buttonStyle({Color color = Palette.blueMaze, bool small = false}) {
+  return TextButton.styleFrom(
+    minimumSize: Size.zero,
+    padding: EdgeInsets.all(small ? 16 : 24),
+    //padding: EdgeInsets.zero,
+    //tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+    shape: RoundedRectangleBorder(
+      borderRadius: const BorderRadius.all(Radius.circular(8)),
+      side: BorderSide(
+        color: color,
+        width: 3,
+      ),
     ),
-  ),
-);
-
-ButtonStyle buttonStyleWarning = TextButton.styleFrom(
-  minimumSize: Size.zero,
-  padding: const EdgeInsets.all(24.0),
-  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-  shape: const RoundedRectangleBorder(
-    borderRadius: BorderRadius.all(Radius.circular(8)),
-    side: BorderSide(
-      color: Palette.redWarning,
-      width: 3,
-    ),
-  ),
-);
-
-ButtonStyle buttonStyleSmallActive = TextButton.styleFrom(
-  minimumSize: Size.zero,
-  padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-  shape: const RoundedRectangleBorder(
-    borderRadius: BorderRadius.all(Radius.circular(8)),
-    side: BorderSide(
-      color: Palette.blueMaze,
-      width: 3,
-    ),
-  ),
-);
-
-ButtonStyle buttonStyleSmallPassive = TextButton.styleFrom(
-  minimumSize: Size.zero,
-  padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-  shape: const RoundedRectangleBorder(
-    borderRadius: BorderRadius.all(Radius.circular(8)),
-    side: BorderSide(
-      color: Palette.transp,
-      width: 3,
-    ),
-  ),
-);
+  );
+}
