@@ -15,11 +15,12 @@ const int kGhostResetTimeMillis = 1000;
 class Ghost extends GameCharacter {
   Ghost({
     required super.position,
+    required this.idNum,
   }) : super();
 
   //int ghostScaredTimeLatest = 0; //a long time ago
   int _ghostDeadTimeLatest = 0; //a long time ago
-  int idNum = 100;
+  int idNum;
   Vector2? specialSpawnLocation;
 
   Future<Map<CharacterState, SpriteAnimation>?> _getAnimations() async {
@@ -153,6 +154,9 @@ class Ghost extends GameCharacter {
     world.ghostPlayersList.add(this);
     animations = await _getAnimations();
     current = CharacterState.deadGhost;
+    if (idNum == 100) {
+      startDead();
+    }
   }
 
   @override

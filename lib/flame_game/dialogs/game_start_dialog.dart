@@ -42,15 +42,24 @@ class StartDialog extends StatelessWidget {
         bottomRowWidget(
           children: game.levelStarted
               ? [
-                  TextButton(
-                      style: buttonStyle(color: Palette.redWarning),
-                      onPressed: () {
-                        if (!game.world.doingLevelResetFlourish) {
-                          game.overlays.remove(GameScreen.startDialogKey);
-                          game.start();
-                        }
-                      },
-                      child: Text('Reset', style: textStyleBody)),
+                  ValueListenableBuilder<bool>(
+                      valueListenable: game.world.doingLevelResetFlourish,
+                      builder:
+                          (BuildContext context, bool value, Widget? child) {
+                        return TextButton(
+                            style: buttonStyle(
+                                borderColor:
+                                    game.world.doingLevelResetFlourish.value
+                                        ? Palette.darkGrey
+                                        : Palette.redWarning),
+                            onPressed: () {
+                              if (!game.world.doingLevelResetFlourish.value) {
+                                game.overlays.remove(GameScreen.startDialogKey);
+                                game.start();
+                              }
+                            },
+                            child: Text('Reset', style: textStyleBody));
+                      }),
                   TextButton(
                       style: buttonStyle(),
                       onPressed: () {
@@ -92,26 +101,8 @@ Widget levelSelector(BuildContext context, PacmanGame game) {
                   !showText
                       ? const SizedBox.shrink()
                       : const SizedBox(width: 10),
-                  ...List.generate(
-                      min(5, maxLevelToShow),
-                      (index) => Padding(
-                            padding: const EdgeInsets.fromLTRB(2, 0, 2, 0),
-                            child: TextButton(
-                                style: game.level.number == index + 1
-                                    ? buttonStyle(small: true)
-                                    : buttonStyle(
-                                        small: true, color: Palette.transp),
-                                onPressed: () {
-                                  if (!game.world.doingLevelResetFlourish) {
-                                    context.go('/session/${index + 1}');
-                                  }
-                                },
-                                child: Text('${index + 1}',
-                                    style: game.world.playerProgress.levels
-                                            .containsKey(index + 1)
-                                        ? textStyleBody
-                                        : textStyleBodyDull)),
-                          )),
+                  ...List.generate(min(5, maxLevelToShow),
+                      (index) => levelButtonSingle(context, game, index)),
                 ],
               ),
               maxLevelToShow <= 5
@@ -120,32 +111,36 @@ Widget levelSelector(BuildContext context, PacmanGame game) {
                       children: [
                         ...List.generate(
                             maxLevelToShow - 5,
-                            (index) => Padding(
-                                  padding:
-                                      const EdgeInsets.fromLTRB(2, 0, 2, 0),
-                                  child: TextButton(
-                                      style: game.level.number == index + 5 + 1
-                                          ? buttonStyle(small: true)
-                                          : buttonStyle(
-                                              small: true,
-                                              color: Palette.transp),
-                                      onPressed: () {
-                                        if (!game
-                                            .world.doingLevelResetFlourish) {
-                                          context
-                                              .go('/session/${index + 5 + 1}');
-                                        }
-                                      },
-                                      child: Text('${index + 5 + 1}',
-                                          style: game
-                                                  .world.playerProgress.levels
-                                                  .containsKey(index + 5 + 1)
-                                              ? textStyleBody
-                                              : textStyleBodyDull)),
-                                )),
+                            (index) =>
+                                levelButtonSingle(context, game, 5 + index)),
                       ],
                     )
             ],
           ),
         );
+}
+
+Widget levelButtonSingle(BuildContext context, PacmanGame game, int index) {
+  return Padding(
+      padding: const EdgeInsets.fromLTRB(2, 0, 2, 0),
+      child: ValueListenableBuilder<bool>(
+          valueListenable: game.world.doingLevelResetFlourish,
+          builder: (BuildContext context, bool value, Widget? child) {
+            return TextButton(
+                style: game.world.doingLevelResetFlourish.value
+                    ? buttonStyle(small: true, borderColor: Palette.darkGrey)
+                    : game.level.number == index + 1
+                        ? buttonStyle(small: true)
+                        : buttonStyle(small: true, borderColor: Palette.transp),
+                onPressed: () {
+                  if (!game.world.doingLevelResetFlourish.value) {
+                    context.go('/session/${index + 1}');
+                  }
+                },
+                child: Text('${index + 1}',
+                    style:
+                        game.world.playerProgress.levels.containsKey(index + 1)
+                            ? textStyleBody
+                            : textStyleBodyDull));
+          }));
 }

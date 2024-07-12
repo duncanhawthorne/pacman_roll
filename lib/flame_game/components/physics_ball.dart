@@ -11,7 +11,7 @@ class PhysicsBall extends BodyComponent {
   PhysicsBall(
       {Vector2? initialPosition,
       position,
-      required GameCharacter realCharacter,
+      required this.realCharacter,
       double? size,
       Color? color})
       : super(
@@ -43,7 +43,7 @@ class PhysicsBall extends BodyComponent {
   //  ..color = color ?? Colors.transparent
   //  ..style = PaintingStyle.fill);
 
-  GameCharacter? realCharacter;
+  GameCharacter realCharacter;
 
   @override
   // ignore: overridden_fields

@@ -156,7 +156,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
 
       if (world.pacmanPlayersList.length == 1 ||
           world.numberAlivePacman() == 0) {
-        world.doingLevelResetFlourish = true;
+        world.doingLevelResetFlourish.value = true;
         game.stopwatch.stop();
         world.cancelMultiGhostAdderTimer();
       }

@@ -7,6 +7,7 @@ import 'package:flame/events.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:pacman_roll/flame_game/components/physics_ball.dart';
 
 import '../../audio/sounds.dart';
 import '../level_selection/levels.dart';
@@ -66,7 +67,7 @@ class PacmanWorld extends Forge2DWorld
       numberOfDeathsNotifier.value >= level.maxAllowedDeaths;
 
   int allGhostScaredTimeLatest = 0;
-  bool doingLevelResetFlourish = false;
+  ValueNotifier<bool> doingLevelResetFlourish = ValueNotifier(false);
 
   int now = DateTime.now().millisecondsSinceEpoch;
   //Vector2 get size => (parent as FlameGame).size;
@@ -136,12 +137,8 @@ class PacmanWorld extends Forge2DWorld
 
   void addGhost(int idNum) {
     Vector2 target = maze.ghostStartForId(idNum);
-    Ghost ghost = Ghost(position: target);
-    ghost.idNum = idNum;
+    Ghost ghost = Ghost(position: target, idNum: idNum);
     add(ghost);
-    if (idNum == 100) {
-      ghost.startDead();
-    }
   }
 
   void addThreeGhosts() {
@@ -166,7 +163,9 @@ class PacmanWorld extends Forge2DWorld
         !gameWonOrLost) {
       ghostTimer = async.Timer.periodic(
           Duration(milliseconds: level.ghostSpwanTimerLength * 1000), (timer) {
-        if (game.isGameLive && !gameWonOrLost && !doingLevelResetFlourish) {
+        if (game.isGameLive &&
+            !gameWonOrLost &&
+            !doingLevelResetFlourish.value) {
           addGhost(100);
         } else {
           timer.cancel();
@@ -223,24 +222,21 @@ class PacmanWorld extends Forge2DWorld
         for (Ghost ghost in ghostPlayersList) {
           ghost.slideToStartPositionAfterPacmanDeath();
         }
-        game.camera.viewfinder
-            .add(RotateHomeEffect(smallAngle(-_lastMazeAngle)));
-
-        Future.delayed(const Duration(milliseconds: kGhostResetTimeMillis), () {
-          //Note reset might have happened while waiting for delayed
-          cameraRotateableOnPacmanDeathFlourish = true;
-          _resetWorldAfterPacmanDeathReal(dyingPacman);
-        });
+        game.camera.viewfinder.add(RotateHomeEffectAndReset(
+            smallAngle(-_lastMazeAngle),
+            onComplete: _resetWorldAfterPacmanDeathReal));
       } else {
-        _resetWorldAfterPacmanDeathReal(dyingPacman);
+        _resetWorldAfterPacmanDeathReal();
       }
     } else {
-      doingLevelResetFlourish = false;
+      doingLevelResetFlourish.value = false;
     }
   }
 
-  void _resetWorldAfterPacmanDeathReal(Pacman dyingPacman) {
-    //_fingersLastDragAngle.clear(); //so you have to re-press
+  void _resetWorldAfterPacmanDeathReal() {
+    assert(pacmanPlayersList.length == 1);
+    Pacman dyingPacman = pacmanPlayersList[0];
+    cameraRotateableOnPacmanDeathFlourish = true;
     dyingPacman.setStartPositionAfterDeath();
     if (game.level.multipleSpawningGhosts) {
       trimAllGhosts();
@@ -251,7 +247,7 @@ class PacmanWorld extends Forge2DWorld
       }
     }
     setMazeAngle(0);
-    doingLevelResetFlourish = false;
+    doingLevelResetFlourish.value = false;
   }
 
   void startSiren() {
@@ -307,6 +303,14 @@ class PacmanWorld extends Forge2DWorld
           child is SuperPelletSprite ||
           child is SuperPelletCircle) {
         remove(child);
+      }
+      if (child is PhysicsBall) {
+        Future.delayed(const Duration(milliseconds: 100), () {
+          if (!child.realCharacter.isMounted || !child.realCharacter.isLoaded) {
+            // clean up any stray balls. Shouldn't be necessary
+            remove(child);
+          }
+        });
       }
     }
     addAll(maze.pellets(pelletsRemainingNotifier, level.superPelletsEnabled));
@@ -410,7 +414,7 @@ class PacmanWorld extends Forge2DWorld
     if (cameraRotateableOnPacmanDeathFlourish && game.isGameLive) {
       setMazeAngle(_lastMazeAngle + angleDelta);
 
-      if (!doingLevelResetFlourish) {
+      if (!doingLevelResetFlourish.value) {
         game.stopwatch.start();
         startMultiGhostAdderTimer();
         sirenVolumeUpdatedTimer();

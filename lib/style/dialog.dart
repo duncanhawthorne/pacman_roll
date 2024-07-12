@@ -67,7 +67,8 @@ TextStyle textStyleBody = const TextStyle(
 TextStyle textStyleBodyDull = const TextStyle(
     fontFamily: 'Press Start 2P', color: Palette.playSessionDull);
 
-ButtonStyle buttonStyle({Color color = Palette.blueMaze, bool small = false}) {
+ButtonStyle buttonStyle(
+    {Color borderColor = Palette.blueMaze, bool small = false}) {
   return TextButton.styleFrom(
     minimumSize: Size.zero,
     padding: EdgeInsets.all(small ? 16 : 24),
@@ -76,7 +77,7 @@ ButtonStyle buttonStyle({Color color = Palette.blueMaze, bool small = false}) {
     shape: RoundedRectangleBorder(
       borderRadius: const BorderRadius.all(Radius.circular(8)),
       side: BorderSide(
-        color: color,
+        color: borderColor,
         width: 3,
       ),
     ),

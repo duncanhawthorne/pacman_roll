@@ -21,3 +21,12 @@ class RotateHomeEffect extends RotateEffect {
             EffectController(
                 duration: kGhostResetTimeMillis / 1000, curve: Curves.linear));
 }
+
+class RotateHomeEffectAndReset extends RotateEffect {
+  RotateHomeEffectAndReset(double destination, {required onComplete})
+      : super.by(
+            destination,
+            EffectController(
+                duration: kGhostResetTimeMillis / 1000, curve: Curves.linear),
+            onComplete: onComplete);
+}
