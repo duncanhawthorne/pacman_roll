@@ -272,7 +272,8 @@ class PacmanWorld extends Forge2DWorld
 
     if (multipleSpawningPacmans) {
       for (Pacman pacman in pacmanPlayersList) {
-        remove(pacman);
+        pacman.disconnectSpriteFromBall(); //sync
+        remove(pacman); //async
       }
       add(Pacman(position: maze.pacmanStart));
     } else {
@@ -284,7 +285,8 @@ class PacmanWorld extends Forge2DWorld
     }
     if (game.level.multipleSpawningGhosts) {
       for (Ghost ghost in ghostPlayersList) {
-        remove(ghost);
+        ghost.disconnectSpriteFromBall(); //sync
+        remove(ghost); //async
       }
       addThreeGhosts();
     } else {
@@ -305,12 +307,13 @@ class PacmanWorld extends Forge2DWorld
         remove(child);
       }
       if (child is PhysicsBall) {
-        Future.delayed(const Duration(milliseconds: 100), () {
-          if (!child.realCharacter.isMounted || !child.realCharacter.isLoaded) {
-            // clean up any stray balls. Shouldn't be necessary
-            remove(child);
-          }
-        });
+        //Future.delayed(const Duration(milliseconds: 100), () {
+        if (!pacmanPlayersList.contains(child.realCharacter) &&
+            !ghostPlayersList.contains(child.realCharacter)) {
+          // clean up any stray balls. Shouldn't be necessary
+          debug("stray physics ball"); //FIXME
+        }
+        //});
       }
     }
     addAll(maze.pellets(pelletsRemainingNotifier, level.superPelletsEnabled));

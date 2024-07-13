@@ -149,6 +149,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
 
   @override
   Future<void> onRemove() async {
+    disconnectSpriteFromBall();
     world.remove(_underlyingBall);
     super.onRemove();
   }
