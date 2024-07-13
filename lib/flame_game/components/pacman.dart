@@ -24,10 +24,8 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     required super.position,
   }) : super(priority: 2);
 
-  int _pacmanSpecialStartEatingTimeLatest = 0; //a long time ago
-  int _targetRoundedMouthOpenTime = 0; //a long time ago
-  int _pacmanEatingTimeLatest = 0; //a long time ago
-  int _pacmanEatingSoundTimeLatest = 0; //a long time ago
+  int _pacmanStartEatingTimeLatest = 0; //a long time ago
+  int _pacmanDeadTimeLatest = 0; //a long time ago
   final Vector2 _screenSizeLast = Vector2(0, 0);
 
   Future<Map<CharacterState, SpriteAnimation>?> _getAnimations(int size) async {
@@ -53,32 +51,16 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     };
   }
 
-  void _eatAnimation() {
+  void _eat({required isPellet}) {
     if (current != CharacterState.deadPacman) {
-      if (current != CharacterState.eating) {
-        //first time
-        _pacmanSpecialStartEatingTimeLatest = world.now;
-      }
-      current = CharacterState.eating;
-      _pacmanEatingTimeLatest = world.now;
-
-      int unroundedMouthOpenTime =
-          2 * _kPacmanHalfEatingResetTimeMillis + _pacmanEatingTimeLatest;
-
-      //ensure animation end synced up with turned off eating state, so move forward time by a few milliseconds
-      _targetRoundedMouthOpenTime = roundUpToMult(
-              unroundedMouthOpenTime - _pacmanSpecialStartEatingTimeLatest,
-              2 * _kPacmanHalfEatingResetTimeMillis) +
-          _pacmanSpecialStartEatingTimeLatest;
-    }
-  }
-
-  void _eatPelletSound() {
-    if (!world.gameWonOrLost) {
-      if (_pacmanEatingSoundTimeLatest <
-          world.now - _kPacmanHalfEatingResetTimeMillis * 2) {
-        _pacmanEatingSoundTimeLatest = world.now;
-        world.play(SfxType.waka);
+      if (current == CharacterState.normal) {
+        current = CharacterState.eating;
+        _pacmanStartEatingTimeLatest = world.now;
+        if (isPellet) {
+          world.play(SfxType.waka);
+        } else {
+          world.play(SfxType.eatGhost);
+        }
       }
     }
   }
@@ -101,13 +83,10 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     if (current != CharacterState.deadPacman) {
       // can simultaneously eat pellet and die to ghost so don't want to do this if just died
       world.remove(pellet); //do this first so checks based on game over apply
-      if (pellet is MiniPelletSprite || pellet is MiniPelletCircle) {
-        _eatPelletSound();
-      } else {
-        //superPellet
+      if (pellet is SuperPelletSprite || pellet is SuperPelletCircle) {
         world.scareGhosts();
       }
-      _eatAnimation();
+      _eat(isPellet: true);
     }
   }
 
@@ -128,8 +107,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   void _eatGhost(Ghost ghost) {
     if (current != CharacterState.deadPacman) {
       //pacman visuals
-      world.play(SfxType.eatGhost);
-      _eatAnimation();
+      _eat(isPellet: false);
 
       //ghost impact
       ghost.setDead();
@@ -156,22 +134,21 @@ class Pacman extends GameCharacter with CollisionCallbacks {
 
       if (world.pacmanPlayersList.length == 1 ||
           world.numberAlivePacman() == 0) {
+        _pacmanDeadTimeLatest = world.now;
         world.doingLevelResetFlourish.value = true;
         game.stopwatch.stop();
         world.cancelMultiGhostAdderTimer();
       }
-      Future.delayed(
-          const Duration(milliseconds: _kPacmanDeadResetTimeMillis + 100), () {
-        //Note reset might have happened while waiting for delayed
-        if (world.pacmanPlayersList.length == 1 ||
-            world.numberAlivePacman() == 0) {
-          world.numberOfDeathsNotifier.value++; //score counting deaths
-          world.resetWorldAfterPacmanDeath(this);
-        } else {
-          assert(multipleSpawningPacmans);
-          world.remove(this);
-        }
-      });
+    }
+  }
+
+  void _dieFromGhostActionAfterDeathAnimation() {
+    if (world.pacmanPlayersList.length == 1 || world.numberAlivePacman() == 0) {
+      world.numberOfDeathsNotifier.value++; //score counting deaths
+      world.resetWorldAfterPacmanDeath(this);
+    } else {
+      assert(multipleSpawningPacmans);
+      world.remove(this);
     }
   }
 
@@ -189,8 +166,15 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   }
 
   void _pacmanEatingNormalSequence() {
+    if (current == CharacterState.deadPacman) {
+      if (world.now - _pacmanDeadTimeLatest > _kPacmanDeadResetTimeMillis) {
+        _dieFromGhostActionAfterDeathAnimation();
+        assert(current != CharacterState.deadPacman || world.gameWonOrLost);
+      }
+    }
     if (current == CharacterState.eating) {
-      if (world.now > _targetRoundedMouthOpenTime) {
+      if (world.now - _pacmanStartEatingTimeLatest >
+          _kPacmanHalfEatingResetTimeMillis * 2) {
         current = CharacterState.normal;
       }
     }
@@ -233,8 +217,4 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     _pacmanEatingNormalSequence();
     super.update(dt);
   }
-}
-
-int roundUpToMult(int x, int roundUpMult) {
-  return (x / roundUpMult).ceil() * roundUpMult;
 }

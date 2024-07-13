@@ -14,9 +14,8 @@ const int kGhostResetTimeMillis = 1000;
 
 class Ghost extends GameCharacter {
   Ghost({
-    required super.position,
     required this.idNum,
-  }) : super();
+  }) : super(position: maze.ghostStartForId(idNum));
 
   //int ghostScaredTimeLatest = 0; //a long time ago
   int _ghostDeadTimeLatest = 0; //a long time ago
@@ -76,12 +75,14 @@ class Ghost extends GameCharacter {
       if (game.level.multipleSpawningGhosts && !spawningDeath) {
         world.remove(this);
       } else {
-        disconnectSpriteFromBall();
         if (spawningDeath && world.level.homingGhosts) {
+          /// can't call [disconnectSpriteFromBall] as body not yet initialised
+          connectedToBall = false;
           specialSpawnLocation = Vector2.all(0);
           specialSpawnLocation!.setFrom(world.pacmanPlayersList[0].position);
           add(ReturnHomeEffect(specialSpawnLocation!));
         } else {
+          disconnectSpriteFromBall();
           add(ReturnHomeEffect(maze.ghostStart));
         }
         add(RotateHomeEffect(smallAngle(-angle)));
@@ -93,9 +94,7 @@ class Ghost extends GameCharacter {
   void startDead() {
     current = CharacterState.deadGhost;
     _ghostDeadTimeLatest = world.now;
-    Future.delayed(const Duration(milliseconds: 10), () {
-      setDead(spawningDeath: true);
-    });
+    setDead(spawningDeath: true);
   }
 
   void setStartPositionAfterPacmanDeath() {

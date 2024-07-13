@@ -72,7 +72,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
   @override
   Color backgroundColor() => Palette.flameGameBackground.color;
 
-  Map<String, dynamic> getEncodeCurrentGameState() {
+  Map<String, dynamic> _getEncodeCurrentGameState() {
     Map<String, dynamic> gameTmp = {};
     gameTmp = {};
     gameTmp["userString"] = userString;
@@ -87,45 +87,46 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
     world.numberOfDeathsNotifier.addListener(() {
       if (world.numberOfDeathsNotifier.value >= level.maxAllowedDeaths &&
           levelStarted) {
-        handleLoseGame();
+        _handleLoseGame();
       }
     });
     world.pelletsRemainingNotifier.addListener(() {
       if (world.pelletsRemainingNotifier.value == 0 && levelStarted) {
-        handleWinGame();
+        _handleWinGame();
       }
     });
   }
 
-  void handleWinGame() {
+  void _handleWinGame() {
     if (isGameLive) {
       if (world.pelletsRemainingNotifier.value == 0) {
         world.winGameWorldTidy();
         stopwatch.stop();
         if (stopwatchMilliSeconds > 10 * 1000) {
-          save.firebasePushSingleScore(userString, getEncodeCurrentGameState());
+          save.firebasePushSingleScore(
+              userString, _getEncodeCurrentGameState());
         }
         world.playerProgress
             .setLevelFinished(level.number, stopwatchMilliSeconds);
-        cleanOverlaysAndDialogs();
+        _cleanOverlaysAndDialogs();
         overlays.add(GameScreen.wonDialogKey);
       }
     }
   }
 
-  void handleLoseGame() {
+  void _handleLoseGame() {
     //pauseEngine();
     audioController.stopAllSfx();
-    cleanOverlaysAndDialogs();
+    _cleanOverlaysAndDialogs();
     overlays.add(GameScreen.loseDialogKey);
   }
 
-  void addOverlays() {
+  void _addOverlays() {
     overlays.add(GameScreen.topLeftOverlayKey);
     overlays.add(GameScreen.topRightOverlayKey);
   }
 
-  void cleanOverlaysAndDialogs() {
+  void _cleanOverlaysAndDialogs() {
     overlays.remove(GameScreen.topLeftOverlayKey);
     overlays.remove(GameScreen.topRightOverlayKey);
     overlays.remove(GameScreen.startDialogKey);
@@ -141,10 +142,10 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
     super.onGameResize(size);
   }
 
-  void reset() {
+  void _reset() {
     userString = _getRandomString(world.random, 15);
-    cleanOverlaysAndDialogs();
-    addOverlays();
+    _cleanOverlaysAndDialogs();
+    _addOverlays();
     stopwatch.stop();
     stopwatch.reset();
     world.reset();
@@ -152,7 +153,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
 
   void start() {
     resumeEngine();
-    reset();
+    _reset();
     world.start();
   }
 
@@ -161,7 +162,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
   @override
   Future<void> onLoad() async {
     super.onLoad();
-    reset();
+    _reset();
     setStatusBarColor(Palette.flameGameBackground.color);
     fixTitle(Palette.black);
     Future.delayed(const Duration(seconds: 1), () {
@@ -180,16 +181,16 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
     }
   }
 
-  void end() {
+  void _end() {
     audioController.stopAllSfx();
   }
 
   @override
   Future<void> onRemove() async {
-    cleanOverlaysAndDialogs();
+    _cleanOverlaysAndDialogs();
     setStatusBarColor(Palette.mainBackground.color);
     fixTitle(Palette.lightBluePMR);
-    end();
+    _end();
     super.onRemove();
   }
 }
