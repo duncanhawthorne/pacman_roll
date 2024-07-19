@@ -5,7 +5,7 @@ import '../pacman_world.dart';
 import 'maze.dart';
 
 class MiniPelletCircle extends CircleComponent
-    with HasWorldReference<PacmanWorld> {
+    with HasWorldReference<PacmanWorld>, IgnoreEvents {
   MiniPelletCircle({required super.position})
       : super(
             radius: maze.spriteWidth() / 2 * Maze.pelletScaleFactor / 3,
@@ -36,7 +36,7 @@ class MiniPelletCircle extends CircleComponent
 /// The [MiniPelletSprite] components are the components that the [Player] should collect
 /// to finish a level. The points are represented by Flame's mascot; Ember.
 class MiniPelletSprite extends SpriteAnimationComponent
-    with HasGameReference, HasWorldReference<PacmanWorld> {
+    with HasGameReference, HasWorldReference<PacmanWorld>, IgnoreEvents {
   MiniPelletSprite() : super(size: spriteSize, anchor: Anchor.center);
 
   static final Vector2 spriteSize =

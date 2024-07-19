@@ -97,6 +97,9 @@ class PacmanWorld extends Forge2DWorld
   }
 
   int numberAlivePacman() {
+    if (pacmanPlayersList.isEmpty) {
+      return 0;
+    }
     return pacmanPlayersList
         .map((Pacman pacman) =>
             pacman.current != CharacterState.deadPacman ? 1 : 0)
@@ -295,12 +298,12 @@ class PacmanWorld extends Forge2DWorld
       }
     }
 
-    for (var child in children) {
+    for (Component child in children) {
       if (child is MiniPelletSprite ||
           child is MiniPelletCircle ||
           child is SuperPelletSprite ||
           child is SuperPelletCircle) {
-        remove(child);
+        child.removeFromParent();
       }
       if (child is PhysicsBall) {
         if (!pacmanPlayersList.contains(child.realCharacter) &&
@@ -315,7 +318,6 @@ class PacmanWorld extends Forge2DWorld
     numberOfDeathsNotifier.value = 0;
     pacmanDyingNotifier.value = 0;
     _setMazeAngle(0);
-    //addAll(screenEdgeBoundaries(game.camera));
   }
 
   void start() {
@@ -350,6 +352,7 @@ class PacmanWorld extends Forge2DWorld
   Future<void> onLoad() async {
     super.onLoad();
     addAll(maze.mazeWalls());
+    //addAll(screenEdgeBoundaries(game.camera));
     if (!overlayMainMenu) {
       start();
     }

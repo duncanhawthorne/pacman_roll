@@ -3,6 +3,7 @@ import 'dart:core';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
+import 'package:pacman_roll/flame_game/components/pacman.dart';
 
 import '../../utils/helper.dart';
 import '../pacman_game.dart';
@@ -14,14 +15,20 @@ import 'physics_ball.dart';
 class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     with
         //CollisionCallbacks,
+        IgnoreEvents,
         HasWorldReference<PacmanWorld>,
         HasGameReference<PacmanGame> {
   GameCharacter({
     super.position,
     super.priority = 1,
-  }) : super(size: Vector2.all(maze.spriteWidth()), anchor: Anchor.center);
+  }) : super(
+            size: Vector2.all(maze.spriteWidth()),
+            //paint: Paint()
+            //  ..filterQuality = FilterQuality.none
+            //  //..color = const Color.fromARGB(255, 255, 255, 255)
+            //  ..isAntiAlias = false),
+            anchor: Anchor.center);
 
-  //final Vector2 startingPosition;
   late final PhysicsBall _underlyingBall = PhysicsBall(
       realCharacter: this,
       initialPosition: position,
@@ -144,6 +151,8 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     _lastPosition.setFrom(position);
     add(CircleHitbox(
       isSolid: true,
+      collisionType:
+          this is Pacman ? CollisionType.active : CollisionType.passive,
     )); //hitbox as large as possble
   }
 

@@ -1,3 +1,4 @@
+import 'package:flame/components.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flutter/material.dart';
 
@@ -6,7 +7,7 @@ import 'maze.dart';
 
 const useForgePhysicsBallRotation = false;
 
-class PhysicsBall extends BodyComponent {
+class PhysicsBall extends BodyComponent with IgnoreEvents {
   PhysicsBall(
       {Vector2? initialPosition,
       position,

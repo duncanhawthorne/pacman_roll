@@ -48,7 +48,7 @@ class AudioController {
       : assert(polyphony >= 1),
         _musicPlayer = AudioPlayer(playerId: 'musicPlayer'),
         _sfxPlayersNew = {
-          for (var item in List<int>.generate(SfxType.values.length, (i) => i))
+          for (int item in List<int>.generate(SfxType.values.length, (i) => i))
             SfxType.values[item]: AudioPlayer(playerId: 'sfxPlayer#$item')
         },
         _playlist = Queue.of(List<Song>.of(songs)..shuffle()) {

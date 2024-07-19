@@ -60,7 +60,7 @@ class PacmanSprites {
 
   Future<List<Sprite>> _lf2fl(List<Future> lf) async {
     List<Sprite> finalItems = [];
-    for (var item in lf) {
+    for (Future item in lf) {
       Sprite finalItem = await item;
       finalItems.add(finalItem);
     }

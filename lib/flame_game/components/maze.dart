@@ -10,8 +10,16 @@ import '../pacman_game.dart';
 import 'mini_pellet.dart';
 import 'super_pellet.dart';
 
-final Paint _blackBackgroundPaint = Paint()..color = Palette.black;
-final Paint _blueMazePaint = Paint()..color = Palette.blueMaze;
+final Paint _blackBackgroundPaint = Paint()
+//..filterQuality = FilterQuality.none
+////..color = Color.fromARGB(50, 100, 100, 100)
+//..isAntiAlias = false
+  ..color = Palette.black;
+final Paint _blueMazePaint = Paint()
+//..filterQuality = FilterQuality.none
+////..color = Color.fromARGB(50, 100, 100, 100)
+//..isAntiAlias = false
+  ..color = Palette.blueMaze;
 
 class GameSize {}
 
@@ -302,7 +310,7 @@ class Maze {
   }
 }
 
-class MazeWallSquareVisual extends RectangleComponent {
+class MazeWallSquareVisual extends RectangleComponent with IgnoreEvents {
   MazeWallSquareVisual(
       {required super.position, required width, required height})
       : super(
@@ -311,18 +319,22 @@ class MazeWallSquareVisual extends RectangleComponent {
             paint: _blackBackgroundPaint);
 }
 
-class MazeWallCircleVisual extends CircleComponent {
+class MazeWallCircleVisual extends CircleComponent with IgnoreEvents {
   MazeWallCircleVisual({required super.radius, required super.position})
       : super(anchor: Anchor.center, paint: _blackBackgroundPaint); //NOTE BLACK
 }
 
-class MazeWallRectangleGround extends BodyComponent {
+class MazeWallRectangleGround extends BodyComponent with IgnoreEvents {
   @override
   final Vector2 position;
   final double width;
   final double height;
 
   MazeWallRectangleGround(this.position, this.width, this.height);
+
+  @override
+  // ignore: overridden_fields
+  final renderBody = true;
 
   @override
   Body createBody() {
@@ -346,12 +358,16 @@ class MazeWallRectangleGround extends BodyComponent {
   }
 }
 
-class MazeWallCircleGround extends BodyComponent {
+class MazeWallCircleGround extends BodyComponent with IgnoreEvents {
   @override
   final Vector2 position;
   final double radius;
 
   MazeWallCircleGround(this.position, this.radius);
+
+  @override
+  // ignore: overridden_fields
+  final renderBody = true;
 
   @override
   Body createBody() {

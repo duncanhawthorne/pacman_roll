@@ -15,7 +15,7 @@ class LocalStoragePlayerProgressPersistence extends PlayerProgressPersistence {
     if (gameEncoded == "") {
       gameTmp = {};
     } else {
-      var jsonDecoded = json.decode(gameEncoded);
+      Map<String, dynamic> jsonDecoded = json.decode(gameEncoded);
       for (String item in jsonDecoded.keys) {
         gameTmp[item] = jsonDecoded[item];
       }
