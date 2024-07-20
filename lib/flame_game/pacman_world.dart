@@ -7,7 +7,6 @@ import 'package:flame/events.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:pacman_roll/flame_game/components/physics_ball.dart';
 
 import '../../audio/sounds.dart';
 import '../level_selection/levels.dart';
@@ -19,7 +18,9 @@ import 'components/ghost.dart';
 import 'components/maze.dart';
 import 'components/mini_pellet.dart';
 import 'components/pacman.dart';
+import 'components/physics_ball.dart';
 import 'components/super_pellet.dart';
+import 'components/wrapper_no_events.dart';
 import 'effects/return_home_effect.dart';
 import 'pacman_game.dart';
 
@@ -187,7 +188,7 @@ class PacmanWorld extends Forge2DWorld
       int j = ghostPlayersList.length - 1 - i;
       if (j >= 0) {
         //assert(game.level.multipleSpawningGhosts);
-        remove(ghostPlayersList[j]);
+        ghostPlayersList[j].removeFromParent();
       }
     }
   }
@@ -261,7 +262,7 @@ class PacmanWorld extends Forge2DWorld
   void reset() {
     cancelMultiGhostAdderTimer();
     if (game.findByKey(ComponentKey.named('tutorial')) != null) {
-      remove(game.findByKey(ComponentKey.named('tutorial'))!);
+      game.findByKey(ComponentKey.named('tutorial'))!.removeFromParent();
     }
     if (sirenTimer != null) {
       game.audioController.setSirenVolume(0);
@@ -272,7 +273,7 @@ class PacmanWorld extends Forge2DWorld
     if (multipleSpawningPacmans) {
       for (Pacman pacman in pacmanPlayersList) {
         pacman.disconnectSpriteFromBall(); //sync
-        remove(pacman); //async
+        pacman.removeFromParent(); //async
       }
       add(Pacman(position: maze.pacmanStart));
     } else {
@@ -285,7 +286,7 @@ class PacmanWorld extends Forge2DWorld
     if (game.level.multipleSpawningGhosts) {
       for (Ghost ghost in ghostPlayersList) {
         ghost.disconnectSpriteFromBall(); //sync
-        remove(ghost); //async
+        ghost.removeFromParent(); //async
       }
       _addThreeGhosts();
     } else {
@@ -305,6 +306,21 @@ class PacmanWorld extends Forge2DWorld
           child is SuperPelletCircle) {
         child.removeFromParent();
       }
+      if (child is WrapperNoEvents) {
+        bool containerOfPellets = false;
+        for (Component xchild in child.children) {
+          if (xchild is MiniPelletSprite ||
+              xchild is MiniPelletCircle ||
+              xchild is SuperPelletSprite ||
+              xchild is SuperPelletCircle) {
+            containerOfPellets = true;
+            xchild.removeFromParent();
+          }
+        }
+        if (containerOfPellets) {
+          child.removeFromParent();
+        }
+      }
       if (child is PhysicsBall) {
         if (!pacmanPlayersList.contains(child.realCharacter) &&
             !ghostPlayersList.contains(child.realCharacter)) {
@@ -313,7 +329,7 @@ class PacmanWorld extends Forge2DWorld
         }
       }
     }
-    addAll(maze.pellets(pelletsRemainingNotifier, level.superPelletsEnabled));
+    add(maze.pellets(pelletsRemainingNotifier, level.superPelletsEnabled));
 
     numberOfDeathsNotifier.value = 0;
     pacmanDyingNotifier.value = 0;
@@ -351,7 +367,7 @@ class PacmanWorld extends Forge2DWorld
   @override
   Future<void> onLoad() async {
     super.onLoad();
-    addAll(maze.mazeWalls());
+    add(maze.mazeWalls());
     //addAll(screenEdgeBoundaries(game.camera));
     if (!overlayMainMenu) {
       start();
@@ -392,7 +408,7 @@ class PacmanWorld extends Forge2DWorld
         double spinMultiplier = 4 * min(1, eventVectorLengthProportion / 0.75);
 
         if (game.findByKey(ComponentKey.named('tutorial')) != null) {
-          remove(game.findByKey(ComponentKey.named('tutorial'))!);
+          game.findByKey(ComponentKey.named('tutorial'))!.removeFromParent();
         }
         game.mazeEverRotated = true;
 

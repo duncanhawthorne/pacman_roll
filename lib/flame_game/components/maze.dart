@@ -9,6 +9,7 @@ import '../../style/palette.dart';
 import '../pacman_game.dart';
 import 'mini_pellet.dart';
 import 'super_pellet.dart';
+import 'wrapper_no_events.dart';
 
 final Paint _blackBackgroundPaint = Paint()
 //..filterQuality = FilterQuality.none
@@ -230,9 +231,9 @@ class Maze {
     return Vector2(0, 0);
   }
 
-  List<Component> pellets(
+  WrapperNoEvents pellets(
       ValueNotifier pelletsRemainingNotifier, bool superPelletsEnabled) {
-    List<Component> result = [];
+    WrapperNoEvents result = WrapperNoEvents();
     //pelletsRemainingNotifier.value = 0;
     for (int i = 0; i < _mazeLayout.length; i++) {
       for (int j = 0; j < _mazeLayout[i].length; j++) {
@@ -254,8 +255,8 @@ class Maze {
     return result;
   }
 
-  List<Component> mazeWalls() {
-    List<Component> result = [];
+  WrapperNoEvents mazeWalls() {
+    WrapperNoEvents result = WrapperNoEvents();
     double scale = blockWidth();
     for (int i = 0; i < _mazeLayout.length; i++) {
       for (int j = 0; j < _mazeLayout[i].length; j++) {

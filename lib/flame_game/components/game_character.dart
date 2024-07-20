@@ -3,12 +3,12 @@ import 'dart:core';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
-import 'package:pacman_roll/flame_game/components/pacman.dart';
 
 import '../../utils/helper.dart';
 import '../pacman_game.dart';
 import '../pacman_world.dart';
 import 'maze.dart';
+import 'pacman.dart';
 import 'physics_ball.dart';
 
 /// The [GameCharacter] is the generic object that is linked to a [PhysicsBall]
@@ -147,7 +147,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
 
   @override
   Future<void> onLoad() async {
-    world.add(_underlyingBall);
+    add(_underlyingBall);
     _lastPosition.setFrom(position);
     add(CircleHitbox(
       isSolid: true,
@@ -159,7 +159,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   @override
   Future<void> onRemove() async {
     disconnectSpriteFromBall();
-    world.remove(_underlyingBall);
+    _underlyingBall.removeFromParent();
     super.onRemove();
   }
 

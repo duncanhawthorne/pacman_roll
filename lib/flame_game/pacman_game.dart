@@ -83,7 +83,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
   }
 
   void winOrLoseGameListener() {
-    assert(world.pelletsRemainingNotifier.value > 0);
+    assert(world.pelletsRemainingNotifier.value > 0 || !levelStarted);
     world.numberOfDeathsNotifier.addListener(() {
       if (world.numberOfDeathsNotifier.value >= level.maxAllowedDeaths &&
           levelStarted) {

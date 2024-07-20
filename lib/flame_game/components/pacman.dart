@@ -149,7 +149,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
       world.resetWorldAfterPacmanDeath(this);
     } else {
       assert(multipleSpawningPacmans);
-      world.remove(this);
+      this.removeFromParent();
     }
   }
 
