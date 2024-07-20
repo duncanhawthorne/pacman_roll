@@ -4,7 +4,7 @@ import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 
 import '../pacman_world.dart';
-import 'maze.dart';
+import '../maze.dart';
 
 class SuperPelletCircle extends CircleComponent
     with HasWorldReference<PacmanWorld>, IgnoreEvents {

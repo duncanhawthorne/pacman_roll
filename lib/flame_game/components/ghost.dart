@@ -6,7 +6,7 @@ import '../../audio/sounds.dart';
 import '../../utils/helper.dart';
 import '../effects/return_home_effect.dart';
 import 'game_character.dart';
-import 'maze.dart';
+import '../maze.dart';
 
 const int kGhostChaseTimeMillis = 6000;
 const int kGhostResetTimeMillis = 1000;

@@ -3,7 +3,7 @@ import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flutter/material.dart';
 
 import 'game_character.dart';
-import 'maze.dart';
+import '../maze.dart';
 
 const useForgePhysicsBallRotation = false;
 

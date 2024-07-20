@@ -7,7 +7,7 @@ import 'package:flame_forge2d/flame_forge2d.dart';
 import '../../utils/helper.dart';
 import '../pacman_game.dart';
 import '../pacman_world.dart';
-import 'maze.dart';
+import '../maze.dart';
 import 'pacman.dart';
 import 'physics_ball.dart';
 

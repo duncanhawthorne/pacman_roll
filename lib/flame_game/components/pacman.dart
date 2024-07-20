@@ -8,7 +8,7 @@ import '../../audio/sounds.dart';
 import '../icons/pacman_sprites.dart';
 import 'game_character.dart';
 import 'ghost.dart';
-import 'maze.dart';
+import '../maze.dart';
 import 'mini_pellet.dart';
 import 'super_pellet.dart';
 

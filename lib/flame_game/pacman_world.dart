@@ -15,7 +15,7 @@ import '../style/palette.dart';
 import '../utils/helper.dart';
 import 'components/game_character.dart';
 import 'components/ghost.dart';
-import 'components/maze.dart';
+import 'maze.dart';
 import 'components/mini_pellet.dart';
 import 'components/pacman.dart';
 import 'components/physics_ball.dart';
