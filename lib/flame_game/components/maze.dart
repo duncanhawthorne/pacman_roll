@@ -231,9 +231,9 @@ class Maze {
     return Vector2(0, 0);
   }
 
-  PelletWrapperNoEvents pellets(
+  PelletWrapper pellets(
       ValueNotifier pelletsRemainingNotifier, bool superPelletsEnabled) {
-    final result = PelletWrapperNoEvents();
+    final result = PelletWrapper();
     //pelletsRemainingNotifier.value = 0;
     for (int i = 0; i < _mazeLayout.length; i++) {
       for (int j = 0; j < _mazeLayout[i].length; j++) {
@@ -255,8 +255,8 @@ class Maze {
     return result;
   }
 
-  WallWrapperNoEvents mazeWalls() {
-    final result = WallWrapperNoEvents();
+  WallWrapper mazeWalls() {
+    final result = WallWrapper();
     double scale = blockWidth();
     for (int i = 0; i < _mazeLayout.length; i++) {
       for (int j = 0; j < _mazeLayout[i].length; j++) {

@@ -61,6 +61,7 @@ class PacmanWorld extends Forge2DWorld
 
   final numberOfDeathsNotifier = ValueNotifier(0);
   final pelletsRemainingNotifier = ValueNotifier(0);
+  final characterWrapper = CharacterWrapper();
 
   final pacmanDyingNotifier = ValueNotifier(0);
 
@@ -144,7 +145,7 @@ class PacmanWorld extends Forge2DWorld
 
   void _addThreeGhosts() {
     for (int i = 0; i < 3; i++) {
-      add(Ghost(idNum: i));
+      characterWrapper.add(Ghost(idNum: i));
     }
   }
 
@@ -167,7 +168,7 @@ class PacmanWorld extends Forge2DWorld
         if (game.isGameLive &&
             !gameWonOrLost &&
             !doingLevelResetFlourish.value) {
-          add(Ghost(idNum: 100));
+          characterWrapper.add(Ghost(idNum: 100));
         } else {
           timer.cancel();
           ghostTimer = null;
@@ -275,10 +276,10 @@ class PacmanWorld extends Forge2DWorld
         pacman.disconnectSpriteFromBall(); //sync
         pacman.removeFromParent(); //async
       }
-      add(Pacman(position: maze.pacmanStart));
+      characterWrapper.add(Pacman(position: maze.pacmanStart));
     } else {
       if (pacmanPlayersList.isEmpty) {
-        add(Pacman(position: maze.pacmanStart));
+        characterWrapper.add(Pacman(position: maze.pacmanStart));
       } else {
         pacmanPlayersList[0].setStartPositionAfterDeath();
       }
@@ -300,13 +301,14 @@ class PacmanWorld extends Forge2DWorld
     }
 
     for (Component child in children) {
-      if (child is PelletWrapperNoEvents) {
+      if (child is PelletWrapper) {
         child.removeFromParent();
-      } else if (child is WallWrapperNoEvents) {
+      } else if (child is WallWrapper) {
       } else if (child is MiniPelletSprite ||
           child is MiniPelletCircle ||
           child is SuperPelletSprite ||
           child is SuperPelletCircle) {
+        //defunct
         child.removeFromParent();
       } else if (child is PhysicsBall) {
         if (!pacmanPlayersList.contains(child.realCharacter) &&
@@ -355,6 +357,7 @@ class PacmanWorld extends Forge2DWorld
   Future<void> onLoad() async {
     super.onLoad();
     add(maze.mazeWalls());
+    add(characterWrapper);
     //addAll(screenEdgeBoundaries(game.camera));
     if (!overlayMainMenu) {
       start();

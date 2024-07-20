@@ -115,8 +115,8 @@ class Pacman extends GameCharacter with CollisionCallbacks {
 
       //other impact
       if (multipleSpawningPacmans) {
-        //world.addPacman(getUnderlyingBallPosition() + Vector2.random() / 100);
-        world.add(Pacman(position: position + Vector2.random() / 100));
+        world.characterWrapper
+            .add(Pacman(position: position + Vector2.random() / 100));
       }
     }
   }

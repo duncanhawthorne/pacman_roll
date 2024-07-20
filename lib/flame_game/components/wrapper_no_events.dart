@@ -2,6 +2,8 @@ import 'package:flame/components.dart';
 
 class WrapperNoEvents extends PositionComponent with IgnoreEvents {}
 
-class PelletWrapperNoEvents extends PositionComponent with IgnoreEvents {}
+class PelletWrapper extends WrapperNoEvents {}
 
-class WallWrapperNoEvents extends PositionComponent with IgnoreEvents {}
+class WallWrapper extends WrapperNoEvents {}
+
+class CharacterWrapper extends WrapperNoEvents {}
