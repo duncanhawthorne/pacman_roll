@@ -15,13 +15,10 @@ import '../style/palette.dart';
 import '../utils/helper.dart';
 import 'components/game_character.dart';
 import 'components/ghost.dart';
-import 'maze.dart';
-import 'components/mini_pellet.dart';
 import 'components/pacman.dart';
-import 'components/physics_ball.dart';
-import 'components/super_pellet.dart';
 import 'components/wrapper_no_events.dart';
 import 'effects/return_home_effect.dart';
+import 'maze.dart';
 import 'pacman_game.dart';
 
 final bool iOS = defaultTargetPlatform == TargetPlatform.iOS;
@@ -61,7 +58,10 @@ class PacmanWorld extends Forge2DWorld
 
   final numberOfDeathsNotifier = ValueNotifier(0);
   final pelletsRemainingNotifier = ValueNotifier(0);
-  final characterWrapper = CharacterWrapper();
+
+  final noEventsWrapper = WrapperNoEvents();
+  final pacmanWrapper = PacmanWrapper();
+  final ghostWrapper = GhostWrapper();
 
   final pacmanDyingNotifier = ValueNotifier(0);
 
@@ -85,8 +85,8 @@ class PacmanWorld extends Forge2DWorld
   /// The gravity is defined in virtual pixels per second squared.
   /// These pixels are in relation to how big the [FixedResolutionViewport] is.
 
-  List<Ghost> ghostPlayersList = [];
-  List<Pacman> pacmanPlayersList = [];
+  final List<Ghost> ghostPlayersList = [];
+  final List<Pacman> pacmanPlayersList = [];
 
   async.Timer? ghostTimer;
   async.Timer? sirenTimer;
@@ -145,7 +145,7 @@ class PacmanWorld extends Forge2DWorld
 
   void _addThreeGhosts() {
     for (int i = 0; i < 3; i++) {
-      characterWrapper.add(Ghost(idNum: i));
+      ghostWrapper.add(Ghost(idNum: i));
     }
   }
 
@@ -168,7 +168,7 @@ class PacmanWorld extends Forge2DWorld
         if (game.isGameLive &&
             !gameWonOrLost &&
             !doingLevelResetFlourish.value) {
-          characterWrapper.add(Ghost(idNum: 100));
+          ghostWrapper.add(Ghost(idNum: 100));
         } else {
           timer.cancel();
           ghostTimer = null;
@@ -276,10 +276,10 @@ class PacmanWorld extends Forge2DWorld
         pacman.disconnectSpriteFromBall(); //sync
         pacman.removeFromParent(); //async
       }
-      characterWrapper.add(Pacman(position: maze.pacmanStart));
+      pacmanWrapper.add(Pacman(position: maze.pacmanStart));
     } else {
       if (pacmanPlayersList.isEmpty) {
-        characterWrapper.add(Pacman(position: maze.pacmanStart));
+        pacmanWrapper.add(Pacman(position: maze.pacmanStart));
       } else {
         pacmanPlayersList[0].setStartPositionAfterDeath();
       }
@@ -300,25 +300,13 @@ class PacmanWorld extends Forge2DWorld
       }
     }
 
-    for (Component child in children) {
+    for (Component child in noEventsWrapper.children) {
       if (child is PelletWrapper) {
         child.removeFromParent();
-      } else if (child is WallWrapper) {
-      } else if (child is MiniPelletSprite ||
-          child is MiniPelletCircle ||
-          child is SuperPelletSprite ||
-          child is SuperPelletCircle) {
-        //defunct
-        child.removeFromParent();
-      } else if (child is PhysicsBall) {
-        if (!pacmanPlayersList.contains(child.realCharacter) &&
-            !ghostPlayersList.contains(child.realCharacter)) {
-          // clean up any stray balls. Shouldn't be necessary
-          debug("stray physics ball"); //FIXME
-        }
-      }
+      } else if (child is WallWrapper) {}
     }
-    add(maze.pellets(pelletsRemainingNotifier, level.superPelletsEnabled));
+    noEventsWrapper
+        .add(maze.pellets(pelletsRemainingNotifier, level.superPelletsEnabled));
 
     numberOfDeathsNotifier.value = 0;
     pacmanDyingNotifier.value = 0;
@@ -356,8 +344,10 @@ class PacmanWorld extends Forge2DWorld
   @override
   Future<void> onLoad() async {
     super.onLoad();
-    add(maze.mazeWalls());
-    add(characterWrapper);
+    add(noEventsWrapper);
+    noEventsWrapper.add(maze.mazeWalls());
+    noEventsWrapper.add(pacmanWrapper);
+    noEventsWrapper.add(ghostWrapper);
     //addAll(screenEdgeBoundaries(game.camera));
     if (!overlayMainMenu) {
       start();

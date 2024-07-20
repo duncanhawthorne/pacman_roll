@@ -6,9 +6,9 @@ import 'package:flame/components.dart';
 
 import '../../audio/sounds.dart';
 import '../icons/pacman_sprites.dart';
+import '../maze.dart';
 import 'game_character.dart';
 import 'ghost.dart';
-import '../maze.dart';
 import 'mini_pellet.dart';
 import 'super_pellet.dart';
 
@@ -115,7 +115,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
 
       //other impact
       if (multipleSpawningPacmans) {
-        world.characterWrapper
+        world.pacmanWrapper
             .add(Pacman(position: position + Vector2.random() / 100));
       }
     }
