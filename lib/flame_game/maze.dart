@@ -264,11 +264,11 @@ class Maze {
             if (k > 0) {
               result.add(MazeWallRectangleGround(
                   center + Vector2(scale * k / 2, 0),
-                  scale * k + _pixelationBuffer,
+                  scale * (k + _pixelationBuffer),
                   scale));
               result.add(MazeWallSquareVisual(
                   position: center + Vector2(scale * k / 2, 0),
-                  width: scale * k + _pixelationBuffer,
+                  width: scale * (k + _pixelationBuffer),
                   height: scale * _mazeInnerWallWidthFactor));
             }
           }
@@ -282,18 +282,31 @@ class Maze {
               result.add(MazeWallRectangleGround(
                   center + Vector2(0, scale * k / 2),
                   scale,
-                  scale * k + _pixelationBuffer));
+                  scale * (k + _pixelationBuffer)));
               result.add(MazeWallSquareVisual(
                   position: center + Vector2(0, scale * k / 2),
                   width: scale * _mazeInnerWallWidthFactor,
-                  height: scale * k + _pixelationBuffer));
+                  height: scale * (k + _pixelationBuffer)));
             }
           }
-          if (_wallAt(i + 1, j) && _wallAt(i, j + 1) && _wallAt(i + 1, j + 1)) {
-            result.add(MazeWallSquareVisual(
-                position: center + Vector2(scale / 2, scale / 2),
-                width: scale,
-                height: scale));
+          if (!_wallAt(i - 1, j) &&
+              !_wallAt(i, j - 1) &&
+              !_wallAt(i - 1, j - 1) &&
+              _wallAt(i + 1, j) &&
+              _wallAt(i, j + 1) &&
+              _wallAt(i + 1, j + 1)) {
+            int k = 0;
+            while (j + k < _mazeLayout[i].length &&
+                _wallAt(i + 1, j + k + 1) &&
+                _wallAt(i, j + k + 1)) {
+              k++;
+            }
+            if (k > 0) {
+              result.add(MazeWallSquareVisual(
+                  position: center + Vector2(scale * k / 2, scale / 2),
+                  width: scale * k,
+                  height: scale));
+            }
           }
         }
       }
