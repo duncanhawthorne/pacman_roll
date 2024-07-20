@@ -387,10 +387,12 @@ class PacmanWorld extends Forge2DWorld
             currentAngleTmp - _fingersLastDragAngle[event.pointerId]!);
         double spinMultiplier = 4 * min(1, eventVectorLengthProportion / 0.75);
 
-        if (game.findByKey(ComponentKey.named('tutorial')) != null) {
-          game.findByKey(ComponentKey.named('tutorial'))!.removeFromParent();
+        if (!game.mazeEverRotated) {
+          if (game.findByKey(ComponentKey.named('tutorial')) != null) {
+            game.findByKey(ComponentKey.named('tutorial'))!.removeFromParent();
+          }
+          game.mazeEverRotated = true;
         }
-        game.mazeEverRotated = true;
 
         _moveMazeAngleByDelta(angleDelta * spinMultiplier);
       }
