@@ -73,7 +73,7 @@ class Ghost extends GameCharacter {
       current = CharacterState.deadGhost; //stops further interactions
       _ghostDeadTimeLatest = world.now;
       if (game.level.multipleSpawningGhosts && !spawningDeath) {
-        this.removeFromParent();
+        removeFromParent();
       } else {
         if (spawningDeath && world.level.homingGhosts) {
           /// can't call [disconnectSpriteFromBall] as body not yet initialised
