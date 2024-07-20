@@ -300,28 +300,15 @@ class PacmanWorld extends Forge2DWorld
     }
 
     for (Component child in children) {
-      if (child is MiniPelletSprite ||
+      if (child is PelletWrapperNoEvents) {
+        child.removeFromParent();
+      } else if (child is WallWrapperNoEvents) {
+      } else if (child is MiniPelletSprite ||
           child is MiniPelletCircle ||
           child is SuperPelletSprite ||
           child is SuperPelletCircle) {
         child.removeFromParent();
-      }
-      if (child is WrapperNoEvents) {
-        bool containerOfPellets = false;
-        for (Component xchild in child.children) {
-          if (xchild is MiniPelletSprite ||
-              xchild is MiniPelletCircle ||
-              xchild is SuperPelletSprite ||
-              xchild is SuperPelletCircle) {
-            containerOfPellets = true;
-            xchild.removeFromParent();
-          }
-        }
-        if (containerOfPellets) {
-          child.removeFromParent();
-        }
-      }
-      if (child is PhysicsBall) {
+      } else if (child is PhysicsBall) {
         if (!pacmanPlayersList.contains(child.realCharacter) &&
             !ghostPlayersList.contains(child.realCharacter)) {
           // clean up any stray balls. Shouldn't be necessary

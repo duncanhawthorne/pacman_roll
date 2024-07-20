@@ -231,9 +231,9 @@ class Maze {
     return Vector2(0, 0);
   }
 
-  WrapperNoEvents pellets(
+  PelletWrapperNoEvents pellets(
       ValueNotifier pelletsRemainingNotifier, bool superPelletsEnabled) {
-    WrapperNoEvents result = WrapperNoEvents();
+    final result = PelletWrapperNoEvents();
     //pelletsRemainingNotifier.value = 0;
     for (int i = 0; i < _mazeLayout.length; i++) {
       for (int j = 0; j < _mazeLayout[i].length; j++) {
@@ -255,8 +255,8 @@ class Maze {
     return result;
   }
 
-  WrapperNoEvents mazeWalls() {
-    WrapperNoEvents result = WrapperNoEvents();
+  WallWrapperNoEvents mazeWalls() {
+    final result = WallWrapperNoEvents();
     double scale = blockWidth();
     for (int i = 0; i < _mazeLayout.length; i++) {
       for (int j = 0; j < _mazeLayout[i].length; j++) {
@@ -264,6 +264,9 @@ class Maze {
         if (_wallAt(i, j)) {
           if (_circleAt(i, j)) {
             result.add(MazeWallCircleGround(center, scale / 2));
+            result.add(MazeWallCircleVisual(
+                position: center,
+                radius: scale / 2 * _mazeInnerWallWidthFactor));
           }
           if (!_wallAt(i, j - 1)) {
             int k = 0;
@@ -275,41 +278,6 @@ class Maze {
                   center + Vector2(scale * k / 2, 0),
                   scale * k + _pixelationBuffer,
                   scale));
-            }
-          }
-
-          if (!_wallAt(i - 1, j)) {
-            int k = 0;
-            while (i + k < _mazeLayout.length && _wallAt(i + k + 1, j)) {
-              k++;
-            }
-            if (k > 0) {
-              result.add(MazeWallRectangleGround(
-                  center + Vector2(0, scale * k / 2),
-                  scale,
-                  scale * k + _pixelationBuffer));
-            }
-          }
-        }
-      }
-    }
-
-    for (int i = 0; i < _mazeLayout.length; i++) {
-      for (int j = 0; j < _mazeLayout[i].length; j++) {
-        Vector2 center = _vectorOfMazeListIndex(i, j);
-        if (_wallAt(i, j)) {
-          if (_circleAt(i, j)) {
-            result.add(MazeWallCircleVisual(
-                position: center,
-                radius: scale / 2 * _mazeInnerWallWidthFactor));
-          }
-
-          if (!_wallAt(i, j - 1)) {
-            int k = 0;
-            while (j + k < _mazeLayout[i].length && _wallAt(i, j + k + 1)) {
-              k++;
-            }
-            if (k > 0) {
               result.add(MazeWallSquareVisual(
                   position: center + Vector2(scale * k / 2, 0),
                   width: scale * k + _pixelationBuffer,
@@ -323,6 +291,10 @@ class Maze {
               k++;
             }
             if (k > 0) {
+              result.add(MazeWallRectangleGround(
+                  center + Vector2(0, scale * k / 2),
+                  scale,
+                  scale * k + _pixelationBuffer));
               result.add(MazeWallSquareVisual(
                   position: center + Vector2(0, scale * k / 2),
                   width: scale * _mazeInnerWallWidthFactor,
@@ -332,8 +304,8 @@ class Maze {
           if (_wallAt(i + 1, j) && _wallAt(i, j + 1) && _wallAt(i + 1, j + 1)) {
             result.add(MazeWallSquareVisual(
                 position: center + Vector2(scale / 2, scale / 2),
-                width: scale * _mazeInnerWallWidthFactor,
-                height: scale + _pixelationBuffer));
+                width: scale,
+                height: scale));
           }
         }
       }
@@ -369,6 +341,9 @@ class MazeWallRectangleGround extends BodyComponent with IgnoreEvents {
   final renderBody = true;
 
   @override
+  final priority = -2;
+
+  @override
   Body createBody() {
     final shape = PolygonShape();
     paint = _blueMazePaint;
@@ -400,6 +375,9 @@ class MazeWallCircleGround extends BodyComponent with IgnoreEvents {
   @override
   // ignore: overridden_fields
   final renderBody = true;
+
+  @override
+  final priority = -2;
 
   @override
   Body createBody() {
