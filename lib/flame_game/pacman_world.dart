@@ -260,7 +260,19 @@ class PacmanWorld extends Forge2DWorld
     }
   }
 
-  void reset() {
+  void reset({bool levelResize = false}) {
+    for (Component child in noEventsWrapper.children) {
+      if (child is PelletWrapper) {
+        child.removeFromParent();
+      } else if (child is WallWrapper) {
+        child.removeFromParent();
+      }
+    }
+
+    noEventsWrapper
+        .add(maze.pellets(pelletsRemainingNotifier, level.superPelletsEnabled));
+    noEventsWrapper.add(maze.mazeWalls());
+
     cancelMultiGhostAdderTimer();
     if (game.findByKey(ComponentKey.named('tutorial')) != null) {
       game.findByKey(ComponentKey.named('tutorial'))!.removeFromParent();
@@ -271,7 +283,7 @@ class PacmanWorld extends Forge2DWorld
       sirenTimer = null;
     }
 
-    if (multipleSpawningPacmans) {
+    if (multipleSpawningPacmans || levelResize) {
       for (Pacman pacman in pacmanPlayersList) {
         pacman.disconnectSpriteFromBall(); //sync
         pacman.removeFromParent(); //async
@@ -284,7 +296,7 @@ class PacmanWorld extends Forge2DWorld
         pacmanPlayersList[0].setStartPositionAfterDeath();
       }
     }
-    if (game.level.multipleSpawningGhosts) {
+    if (game.level.multipleSpawningGhosts || levelResize) {
       for (Ghost ghost in ghostPlayersList) {
         ghost.disconnectSpriteFromBall(); //sync
         ghost.removeFromParent(); //async
@@ -299,14 +311,6 @@ class PacmanWorld extends Forge2DWorld
         }
       }
     }
-
-    for (Component child in noEventsWrapper.children) {
-      if (child is PelletWrapper) {
-        child.removeFromParent();
-      } else if (child is WallWrapper) {}
-    }
-    noEventsWrapper
-        .add(maze.pellets(pelletsRemainingNotifier, level.superPelletsEnabled));
 
     numberOfDeathsNotifier.value = 0;
     pacmanDyingNotifier.value = 0;
@@ -345,7 +349,7 @@ class PacmanWorld extends Forge2DWorld
   Future<void> onLoad() async {
     super.onLoad();
     add(noEventsWrapper);
-    noEventsWrapper.add(maze.mazeWalls());
+    //noEventsWrapper.add(maze.mazeWalls());
     noEventsWrapper.add(pacmanWrapper);
     noEventsWrapper.add(ghostWrapper);
     //addAll(screenEdgeBoundaries(game.camera));

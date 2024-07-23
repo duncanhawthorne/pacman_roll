@@ -19,4 +19,7 @@ class PacmanWrapper extends WrapperNoEvents {
   final priority = 2;
 }
 
-class GhostWrapper extends WrapperNoEvents {}
+class GhostWrapper extends WrapperNoEvents {
+  @override
+  final priority = 1;
+}

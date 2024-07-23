@@ -99,8 +99,9 @@ class AudioController {
 
     final AudioPlayer currentPlayer = _sfxPlayersNew[type] ?? AudioPlayer();
 
-    //exta code
-    if (type == SfxType.ghostsScared || type == SfxType.ghostsRoamingSiren) {
+    //extra code
+    if (type == SfxType.ghostsRoamingSiren) {
+      // || type == SfxType.ghostsScared
       currentPlayer.setReleaseMode(ReleaseMode.loop);
     } else {
       currentPlayer.setReleaseMode(ReleaseMode.stop);
@@ -130,14 +131,16 @@ class AudioController {
       _sfxPlayersNew[SfxType.ghostsRoamingSiren]!.setVolume(0);
     }
     double calcedVolume = getTargetSirenVolume(averageGhostSpeed);
-    double currentVolume = _sfxPlayersNew[SfxType.ghostsRoamingSiren]!.volume;
+    double currentVolume =
+        _sfxPlayersNew[SfxType.ghostsRoamingSiren]!.volume / volumeScalar;
     double targetVolume = 0;
     if (gradual) {
       targetVolume = (calcedVolume + currentVolume) / 2;
     } else {
       targetVolume = calcedVolume;
     }
-    _sfxPlayersNew[SfxType.ghostsRoamingSiren]!.setVolume(targetVolume);
+    _sfxPlayersNew[SfxType.ghostsRoamingSiren]!
+        .setVolume(targetVolume * volumeScalar);
   }
 
   void stopAllSfx() {

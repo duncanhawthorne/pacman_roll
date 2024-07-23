@@ -29,6 +29,7 @@ import 'pacman_world.dart';
 /// could also be set inside of `onLoad` for example.
 
 const flameGameZoom = 30.0; //determines speed of game
+const visualZoomMultiplier = 0.95;
 const double kSquareNotionalSize = 1700; //determines speed of game
 
 class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
@@ -42,7 +43,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
           camera: CameraComponent.withFixedResolution(
               width: kSquareNotionalSize,
               height: kSquareNotionalSize), //2800, 1700 //CameraComponent(),//
-          zoom: flameGameZoom,
+          zoom: flameGameZoom * visualZoomMultiplier,
         );
 
   /// What the properties of the level that is played has.
@@ -142,18 +143,18 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
     super.onGameResize(size);
   }
 
-  void _reset() {
+  void _reset({bool levelResize = false}) {
     userString = _getRandomString(world.random, 15);
     _cleanOverlaysAndDialogs();
     _addOverlays();
     stopwatch.stop();
     stopwatch.reset();
-    world.reset();
+    world.reset(levelResize: levelResize);
   }
 
-  void start() {
+  void start({bool levelResize = false}) {
     resumeEngine();
-    _reset();
+    _reset(levelResize: levelResize);
     world.start();
   }
 

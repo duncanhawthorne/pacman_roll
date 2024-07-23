@@ -27,6 +27,8 @@ List<String> soundTypeToFilename(SfxType type) {
   }
 }
 
+const double volumeScalar = 0.5;
+
 /// Allows control over loudness of different SFX types.
 double soundTypeToVolume(SfxType type) {
   switch (type) {
@@ -35,9 +37,10 @@ double soundTypeToVolume(SfxType type) {
     case SfxType.ghostsScared:
     case SfxType.endMusic:
     case SfxType.pacmanDeath:
-    case SfxType.ghostsRoamingSiren:
     case SfxType.eatGhost:
-      return 1;
+      return 1 * volumeScalar;
+    case SfxType.ghostsRoamingSiren:
+      return 0;
   }
 }
 

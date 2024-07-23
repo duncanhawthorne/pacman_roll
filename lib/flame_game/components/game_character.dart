@@ -5,9 +5,9 @@ import 'package:flame/components.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 
 import '../../utils/helper.dart';
+import '../maze.dart';
 import '../pacman_game.dart';
 import '../pacman_world.dart';
-import '../maze.dart';
 import 'pacman.dart';
 import 'physics_ball.dart';
 
@@ -153,7 +153,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
       isSolid: true,
       collisionType:
           this is Pacman ? CollisionType.active : CollisionType.passive,
-    )); //hitbox as large as possble
+    )); //hitbox as large as possible
   }
 
   @override
