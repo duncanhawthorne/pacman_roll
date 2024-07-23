@@ -33,6 +33,7 @@ class GameLoseDialog extends StatelessWidget {
           ),
         ),
         levelSelector(context, game),
+        mazeSelector(context, game),
         bottomRowWidget(
           children: [
             TextButton(

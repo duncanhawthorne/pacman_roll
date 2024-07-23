@@ -260,7 +260,7 @@ class PacmanWorld extends Forge2DWorld
     }
   }
 
-  void reset({bool levelResize = false}) {
+  void reset({bool mazeResize = false}) {
     for (Component child in noEventsWrapper.children) {
       if (child is PelletWrapper) {
         child.removeFromParent();
@@ -283,7 +283,7 @@ class PacmanWorld extends Forge2DWorld
       sirenTimer = null;
     }
 
-    if (multipleSpawningPacmans || levelResize) {
+    if (multipleSpawningPacmans || mazeResize) {
       for (Pacman pacman in pacmanPlayersList) {
         pacman.disconnectSpriteFromBall(); //sync
         pacman.removeFromParent(); //async
@@ -296,7 +296,7 @@ class PacmanWorld extends Forge2DWorld
         pacmanPlayersList[0].setStartPositionAfterDeath();
       }
     }
-    if (game.level.multipleSpawningGhosts || levelResize) {
+    if (game.level.multipleSpawningGhosts || mazeResize) {
       for (Ghost ghost in ghostPlayersList) {
         ghost.disconnectSpriteFromBall(); //sync
         ghost.removeFromParent(); //async

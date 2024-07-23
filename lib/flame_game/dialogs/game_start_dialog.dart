@@ -40,7 +40,7 @@ class StartDialog extends StatelessWidget {
           ),
         ),
         levelSelector(context, game),
-        //mazeSelector(context, game),
+        mazeSelector(context, game),
         bottomRowWidget(
           children: game.levelStarted
               ? [
@@ -181,7 +181,7 @@ Widget mazeButtonSingle(BuildContext context, PacmanGame game, int index) {
                   if (!game.world.doingLevelResetFlourish.value) {
                     maze.mazeId = index;
                     game.overlays.remove(GameScreen.startDialogKey);
-                    game.start(levelResize: true);
+                    game.start(mazeResize: true);
                   }
                 },
                 child: Text(["A", "B", "C"][index], style: textStyleBody));

@@ -143,18 +143,18 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
     super.onGameResize(size);
   }
 
-  void _reset({bool levelResize = false}) {
+  void _reset({bool mazeResize = false}) {
     userString = _getRandomString(world.random, 15);
     _cleanOverlaysAndDialogs();
     _addOverlays();
     stopwatch.stop();
     stopwatch.reset();
-    world.reset(levelResize: levelResize);
+    world.reset(mazeResize: mazeResize);
   }
 
-  void start({bool levelResize = false}) {
+  void start({bool mazeResize = false}) {
     resumeEngine();
-    _reset(levelResize: levelResize);
+    _reset(mazeResize: mazeResize);
     world.start();
   }
 

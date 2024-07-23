@@ -57,6 +57,7 @@ class GameWonDialog extends StatelessWidget {
                     }),
               ),
         levelSelector(context, game),
+        mazeSelector(context, game),
         bottomRowWidget(
           children: [
             TextButton(
