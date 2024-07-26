@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../flame_game/dialogs/game_overlays.dart';
 import '../settings/settings.dart';
 import '../style/dialog.dart';
 import '../style/palette.dart';
@@ -78,16 +79,4 @@ class MainMenuScreen extends StatelessWidget {
   }
 
   static const _gap = SizedBox(height: 40);
-}
-
-Widget audioOnOffButton(settingsController, {Color? color}) {
-  return ValueListenableBuilder<bool>(
-    valueListenable: settingsController.audioOn,
-    builder: (context, audioOn, child) {
-      return IconButton(
-        onPressed: () => settingsController.toggleAudioOn(),
-        icon: Icon(audioOn ? Icons.volume_up : Icons.volume_off, color: color),
-      );
-    },
-  );
 }

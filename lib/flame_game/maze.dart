@@ -26,13 +26,13 @@ class Maze {
     }
   }
 
-  final List decodedMazeList = [
+  final List _decodedMazeList = [
     _decodeMazeLayout(_maze1Layout),
     _decodeMazeLayout(_mazeMP4Layout),
     _decodeMazeLayout(_mazeMP1Layout)
   ];
 
-  get _mazeLayout => decodedMazeList[_mazeId];
+  get _mazeLayout => _decodedMazeList[_mazeId];
   late Vector2 ghostStart = _vectorOfMazeListTargetNumber(7);
   late Vector2 pacmanStart = _vectorOfMazeListTargetNumber(8);
   late Vector2 cage = _vectorOfMazeListTargetNumber(9);
