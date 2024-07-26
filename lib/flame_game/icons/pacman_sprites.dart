@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 
 import '../../utils/helper.dart';
 
-const int pacmanRenderFracIncrementsNumber = 32;
+const int pacmanRenderFracIncrementsNumber = 64;
 const int pacmanMouthWidthDefault =
     pacmanRenderFracIncrementsNumber ~/ 4; //8 / 32; //5/32
 const int pacmanDeadFrames = (pacmanRenderFracIncrementsNumber * 3) ~/
@@ -40,7 +40,7 @@ class PacmanSprites {
         center: Offset(size / 2, size / 2),
         width: size.toDouble(),
         height: size.toDouble());
-    canvas.drawArc(pacmanRect, 2 * pi * ((mouthWidth / 2) + 0.5),
+    canvas.drawArc(pacmanRect, 2 * pi / 2 + 2 * pi * ((mouthWidth / 2) + 0.5),
         2 * pi * (1 - mouthWidth), true, yellowPacmanPaint);
     Picture picture = recorder.endRecording();
     return picture;

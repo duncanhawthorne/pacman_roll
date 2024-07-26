@@ -1,5 +1,4 @@
 import 'dart:core';
-import 'dart:math';
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
@@ -155,14 +154,14 @@ class Pacman extends GameCharacter with CollisionCallbacks {
 
   void setStartPositionAfterDeath() {
     setPositionStill(maze.pacmanStart);
-    angle = 2 * pi / 2;
+    angle = 0;
     current = CharacterState.normal;
   }
 
   void slideToStartPositionAfterDeath() {
     setPositionStill(maze.pacmanStart);
     disconnectFromPhysics();
-    angle = 2 * pi / 2;
+    angle = 0;
     current = CharacterState.birthing;
   }
 
@@ -186,7 +185,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     super.onLoad();
     world.pacmanPlayersList.add(this);
     current = CharacterState.normal;
-    angle = 2 * pi / 2;
+    angle = 0;
   }
 
   @override

@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:elapsed_time_display/elapsed_time_display.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
@@ -145,9 +143,7 @@ Widget topRightOverlayWidget(BuildContext context, PacmanGame game) {
                               0,
                               4 * statusWidgetHeightFactor,
                               0),
-                          child: Transform.rotate(
-                              angle: 2 * pi / 2,
-                              child: animatedPacmanIcon(game, index)))));
+                          child: animatedPacmanIcon(game, index))));
             },
           ),
           const SizedBox(width: 20 * statusWidgetHeightFactor, height: 1),

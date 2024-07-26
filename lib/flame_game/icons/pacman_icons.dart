@@ -68,8 +68,12 @@ class MyPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     double mouthWidth = mouthInt / pacmanRenderFracIncrementsNumber;
     mouthWidth = max(0, min(1, mouthWidth));
-    canvas.drawArc(_pacmanRectStatusBar, 2 * pi * ((mouthWidth / 2) + 0.5),
-        2 * pi * (1 - mouthWidth), true, yellowPacmanPaint);
+    canvas.drawArc(
+        _pacmanRectStatusBar,
+        2 * pi / 2 + 2 * pi * ((mouthWidth / 2) + 0.5),
+        2 * pi * (1 - mouthWidth),
+        true,
+        yellowPacmanPaint);
   }
 
   @override

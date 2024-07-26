@@ -11,13 +11,20 @@ import 'components/wrapper_no_events.dart';
 import 'pacman_game.dart';
 
 class Maze {
-  int mazeId = 0;
+  int _mazeId = 0;
 
-  get ghostStart => _vectorOfMazeListTargetNumber(7);
+  int get mazeId => _mazeId;
 
-  get pacmanStart => _vectorOfMazeListTargetNumber(8);
+  set mazeId(int i) => setMazeIdReal(i);
 
-  get cage => _vectorOfMazeListTargetNumber(9);
+  void setMazeIdReal(int i) {
+    {
+      _mazeId = i;
+      ghostStart = _vectorOfMazeListTargetNumber(7);
+      pacmanStart = _vectorOfMazeListTargetNumber(8);
+      cage = _vectorOfMazeListTargetNumber(9);
+    }
+  }
 
   final List decodedMazeList = [
     _decodeMazeLayout(_maze1Layout),
@@ -25,7 +32,11 @@ class Maze {
     _decodeMazeLayout(_mazeMP1Layout)
   ];
 
-  get _mazeLayout => decodedMazeList[mazeId];
+  get _mazeLayout => decodedMazeList[_mazeId];
+  late Vector2 ghostStart = _vectorOfMazeListTargetNumber(7);
+  late Vector2 pacmanStart = _vectorOfMazeListTargetNumber(8);
+  late Vector2 cage = _vectorOfMazeListTargetNumber(9);
+
   static const bool _largeSprites =
       true; //_chosenMaze != _smallSpritesMazeXLayout;
   static const pelletScaleFactor = _largeSprites ? 0.4 : 0.46;

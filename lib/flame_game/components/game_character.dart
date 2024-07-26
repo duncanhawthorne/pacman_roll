@@ -1,4 +1,5 @@
 import 'dart:core';
+import 'dart:ui';
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
@@ -23,10 +24,10 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     super.priority = 1,
   }) : super(
             size: Vector2.all(maze.spriteWidth()),
-            //paint: Paint()
-            //  ..filterQuality = FilterQuality.none
-            //  //..color = const Color.fromARGB(255, 255, 255, 255)
-            //  ..isAntiAlias = false),
+            paint: Paint()
+              ..filterQuality = FilterQuality.high
+              //..color = const Color.fromARGB(255, 255, 255, 255)
+              ..isAntiAlias = true,
             anchor: Anchor.center);
 
   late final PhysicsBall _underlyingBall = PhysicsBall(
