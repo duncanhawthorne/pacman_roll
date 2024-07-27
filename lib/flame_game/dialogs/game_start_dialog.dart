@@ -86,11 +86,9 @@ class StartDialog extends StatelessWidget {
 }
 
 Widget levelSelector(BuildContext context, PacmanGame game) {
-  int maxLevelToShow = min(gameLevels.length,
-      max(game.level.number, game.world.playerProgress.maxLevelCompleted + 1));
-  bool showText = maxLevelToShow <= 2;
-  return game.world.playerProgress.maxLevelCompleted == 0 &&
-          game.level.number == 1
+  int maxLevelToShowCache = maxLevelToShow(game);
+  bool showText = maxLevelToShowCache <= 2;
+  return maxLevelToShowCache == 1
       ? const SizedBox.shrink()
       : bodyWidget(
           child: Column(
@@ -103,16 +101,16 @@ Widget levelSelector(BuildContext context, PacmanGame game) {
                   !showText
                       ? const SizedBox.shrink()
                       : const SizedBox(width: 10),
-                  ...List.generate(min(5, maxLevelToShow),
+                  ...List.generate(min(5, maxLevelToShowCache),
                       (index) => levelButtonSingle(context, game, index)),
                 ],
               ),
-              maxLevelToShow <= 5
+              maxLevelToShowCache <= 5
                   ? const SizedBox.shrink()
                   : Row(
                       children: [
                         ...List.generate(
-                            maxLevelToShow - 5,
+                            maxLevelToShowCache - 5,
                             (index) =>
                                 levelButtonSingle(context, game, 5 + index)),
                       ],
@@ -148,8 +146,7 @@ Widget levelButtonSingle(BuildContext context, PacmanGame game, int index) {
 }
 
 Widget mazeSelector(BuildContext context, PacmanGame game) {
-  return game.world.playerProgress.maxLevelCompleted == 0 &&
-          game.level.number == 1
+  return maxLevelToShow(game) == 1
       ? const SizedBox.shrink()
       : bodyWidget(
           child: Column(
@@ -168,9 +165,10 @@ Widget mazeSelector(BuildContext context, PacmanGame game) {
 Widget mazeButtonSingle(BuildContext context, PacmanGame game, int index) {
   return Padding(
       padding: const EdgeInsets.fromLTRB(2, 0, 2, 0),
-      child: ValueListenableBuilder<bool>(
-          valueListenable: game.world.doingLevelResetFlourish,
-          builder: (BuildContext context, bool value, Widget? child) {
+      child: ListenableBuilder(
+          listenable: Listenable.merge(
+              [game.world.doingLevelResetFlourish, maze.mazeIdNotifier]),
+          builder: (BuildContext context, Widget? child) {
             return TextButton(
                 style: game.world.doingLevelResetFlourish.value
                     ? buttonStyle(small: true, borderColor: Palette.darkGrey)
@@ -178,12 +176,21 @@ Widget mazeButtonSingle(BuildContext context, PacmanGame game, int index) {
                         ? buttonStyle(small: true)
                         : buttonStyle(small: true, borderColor: Palette.transp),
                 onPressed: () {
-                  if (!game.world.doingLevelResetFlourish.value) {
+                  if (!game.world.doingLevelResetFlourish.value &&
+                      index != maze.mazeId) {
                     maze.mazeId = index;
-                    game.overlays.remove(GameScreen.startDialogKey);
-                    game.start(mazeResize: true);
+                    game.reset(mazeResize: true);
+                    game.resumeEngine(); //for map to redraw, if engine paused
+                    game.showMainMenu(); //to pause engine again after delay
                   }
                 },
                 child: Text(["A", "B", "C"][index], style: textStyleBody));
           }));
+}
+
+int maxLevelToShow(PacmanGame game) {
+  return min(
+      gameLevels.length,
+      max(max(game.level.number, maze.mazeId == 0 ? 1 : 2),
+          game.world.playerProgress.maxLevelCompleted + 1));
 }

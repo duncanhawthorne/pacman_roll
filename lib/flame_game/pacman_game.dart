@@ -143,7 +143,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
     super.onGameResize(size);
   }
 
-  void _reset({bool mazeResize = false}) {
+  void reset({bool mazeResize = false}) {
     userString = _getRandomString(world.random, 15);
     _cleanOverlaysAndDialogs();
     _addOverlays();
@@ -154,8 +154,26 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
 
   void start({bool mazeResize = false}) {
     resumeEngine();
-    _reset(mazeResize: mazeResize);
+    reset(mazeResize: mazeResize);
     world.start();
+  }
+
+  int _showMainMenuLastRunTime = 0;
+
+  void showMainMenu() {
+    if (overlayMainMenu) {
+      _showMainMenuLastRunTime = world.now;
+      int showMainMenuLastRunTimeLast = world.now;
+      overlays.add(GameScreen.startDialogKey);
+      Future.delayed(const Duration(milliseconds: 1000), () {
+        if (!isGameLive &&
+            showMainMenuLastRunTimeLast == _showMainMenuLastRunTime) {
+          //i.e. dialog still showing and haven't started playing yet
+          //and haven't restarted the dialog in the meantime
+          pauseEngine();
+        }
+      });
+    }
   }
 
   /// In the [onLoad] method you load different type of assets and set things
@@ -163,23 +181,13 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
   @override
   Future<void> onLoad() async {
     super.onLoad();
-    _reset();
+    reset();
     setStatusBarColor(Palette.flameGameBackground.color);
     fixTitle(Palette.black);
     Future.delayed(const Duration(seconds: 1), () {
       fixTitle(Palette.black);
     });
-    if (overlayMainMenu) {
-      overlays.add(GameScreen.startDialogKey);
-      Future.delayed(const Duration(milliseconds: 1000), () {
-        if (!isGameLive) {
-          //i.e. dialog still showing
-          pauseEngine();
-          //camera.viewfinder.add(RotateEffect.by(2 * pi,
-          //    EffectController(duration: 20000 / 1000, curve: Curves.linear)));
-        }
-      });
-    }
+    showMainMenu();
   }
 
   void _end() {

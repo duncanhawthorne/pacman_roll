@@ -26,7 +26,7 @@ Widget topLeftOverlayWidget(BuildContext context, PacmanGame game) {
         IconButton(
           onPressed: () {
             if (overlayMainMenu) {
-              game.overlays.add(GameScreen.startDialogKey);
+              game.showMainMenu();
             } else {
               GoRouter.of(context).go("/");
             }
