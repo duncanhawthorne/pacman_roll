@@ -29,7 +29,7 @@ import 'pacman_world.dart';
 /// could also be set inside of `onLoad` for example.
 
 const flameGameZoom = 30.0; //determines speed of game
-const visualZoomMultiplier = 0.95;
+const visualZoomMultiplier = 0.92;
 const double kSquareNotionalSize = 1700; //determines speed of game
 
 class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
