@@ -20,9 +20,9 @@ class Maze {
   void setMazeIdReal(int i) {
     {
       mazeIdNotifier.value = i;
-      ghostStart = _vectorOfMazeListTargetNumber(7);
-      pacmanStart = _vectorOfMazeListTargetNumber(8);
-      cage = _vectorOfMazeListTargetNumber(9);
+      ghostStart = _vectorOfMazeListCode(_kGhostStart);
+      pacmanStart = _vectorOfMazeListCode(_kPacmanStart);
+      cage = _vectorOfMazeListCode(_kCage);
     }
   }
 
@@ -33,12 +33,11 @@ class Maze {
   ];
 
   get _mazeLayout => _decodedMazeList[mazeId];
-  late Vector2 ghostStart = _vectorOfMazeListTargetNumber(7);
-  late Vector2 pacmanStart = _vectorOfMazeListTargetNumber(8);
-  late Vector2 cage = _vectorOfMazeListTargetNumber(9);
+  late Vector2 ghostStart = _vectorOfMazeListCode(_kGhostStart);
+  late Vector2 pacmanStart = _vectorOfMazeListCode(_kPacmanStart);
+  late Vector2 cage = _vectorOfMazeListCode(_kCage);
 
-  static const bool _largeSprites =
-      true; //_chosenMaze != _smallSpritesMazeXLayout;
+  static const bool _largeSprites = true;
   static const pelletScaleFactor = _largeSprites ? 0.4 : 0.46;
 
   Vector2 ghostStartForId(int idNum) {
@@ -86,7 +85,7 @@ class Maze {
         j < 0) {
       return false;
     } else {
-      return _mazeLayout[i][j] == 1;
+      return _mazeLayout[i][j] == _kWall;
     }
   }
 
@@ -105,10 +104,10 @@ class Maze {
         blockWidth();
   }
 
-  Vector2 _vectorOfMazeListTargetNumber(int targetNumber) {
+  Vector2 _vectorOfMazeListCode(String code) {
     for (int i = 0; i < _mazeLayout.length; i++) {
       for (int j = 0; j < _mazeLayout[i].length; j++) {
-        if (_mazeLayout[i][j] == targetNumber) {
+        if (_mazeLayout[i][j] == code) {
           return _vectorOfMazeListIndex(i, j, ioffset: _largeSprites ? 0.5 : 0);
         }
       }
@@ -117,7 +116,8 @@ class Maze {
   }
 
   bool _pelletCodeAtCell(int i, int j) {
-    return _mazeLayout[i][j] == 0 || _mazeLayout[i][j] == 3;
+    return _mazeLayout[i][j] == _kMiniPellet ||
+        _mazeLayout[i][j] == _kSuperPellet;
   }
 
   bool _pelletAt(int i, int j) {
@@ -141,10 +141,10 @@ class Maze {
             ioffset: _largeSprites ? 1 / 2 : 0,
             joffset: _largeSprites ? 1 / 2 : 0);
         if (_pelletAt(i, j)) {
-          if (_mazeLayout[i][j] == 0) {
+          if (_mazeLayout[i][j] == _kMiniPellet) {
             result.add(MiniPelletCircle(position: center));
           }
-          if (_mazeLayout[i][j] == 3) {
+          if (_mazeLayout[i][j] == _kSuperPellet) {
             if (superPelletsEnabled) {
               result.add(SuperPelletCircle(position: center));
             } else {
@@ -237,14 +237,17 @@ class Maze {
     return result;
   }
 
-// 0 - pac-dots quad
-// 1 - wall
-// 2 - ghost-lair
-// 3 - power-pellet quad top
-// 4 - empty
-// 7 - ghostStart
-// 8 - pacmanStart
-// 9 - cage
+  static const _kMiniPellet = "0"; //quad of dots
+  static const _kWall = "1";
+
+  // ignore: unused_field
+  static const _kLair = "2";
+  static const _kSuperPellet = "3"; //quad top
+  // ignore: unused_field
+  static const _kEmpty = "4";
+  static const _kGhostStart = "7";
+  static const _kPacmanStart = "8";
+  static const _kCage = "9";
 
   static const _mazeP1Layout = [
     '11111111111111111111111111111',
@@ -297,10 +300,10 @@ class Maze {
     '11100000144444444444100000111',
     '00000100144111111144100100000',
     '00000100444122922144400100000',
-    '11100100446122222164400100111',
-    '00000100146111111164100100000',
-    '00000100146444444464100100000',
-    '11100000166444444466100000111',
+    '11100100444122222144400100111',
+    '00000100144111111144100100000',
+    '00000100144444444444100100000',
+    '11100000144444444444100000111',
     '44100000111144144111100000144',
     '44100100000000100000000100144',
     '44100100000000100000000100144',
@@ -319,8 +322,8 @@ class Maze {
   static const _mazeMP1Layout = [
     '11111111111111111111111111111',
     '10000000100000000000100000001',
-    '10000000100000000000100000001',
-    '13311100100111111100100111331',
+    '13300000100000000000100000331',
+    '10011100100111111100100111001',
     '10000000000000000000000000001',
     '10000000000000000000000000001',
     '11100100111100100111100100111',
@@ -352,13 +355,14 @@ class Maze {
   ];
 }
 
-List<List<int>> _decodeMazeLayout(encodedMazeLayout) {
-  List<List<int>> result = [];
+List<List<String>> _decodeMazeLayout(encodedMazeLayout) {
+  List<List<String>> result = [];
   for (String row in encodedMazeLayout) {
     List rowListString = row.split("");
-    List<int> rowListInt = [];
+    List<String> rowListInt = [];
     for (String letter in rowListString) {
-      rowListInt.add(int.parse(letter));
+      //rowListInt.add(int.parse(letter));
+      rowListInt.add(letter);
     }
     result.add(rowListInt);
   }
