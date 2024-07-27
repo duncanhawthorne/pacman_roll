@@ -18,8 +18,7 @@ class MiniPelletCircle extends CircleComponent
       isSolid: true,
       collisionType: CollisionType.passive,
       radius: 0,
-      position:
-          Vector2.all(maze.spriteWidth() / 2 * Maze.pelletScaleFactor / 3),
+      position: Vector2.all(radius),
       anchor: Anchor.center,
     ));
     //debugMode = true;

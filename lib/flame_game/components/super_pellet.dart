@@ -3,8 +3,8 @@ import 'dart:math';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 
-import '../pacman_world.dart';
 import '../maze.dart';
+import '../pacman_world.dart';
 
 class SuperPelletCircle extends CircleComponent
     with HasWorldReference<PacmanWorld>, IgnoreEvents {
@@ -19,9 +19,9 @@ class SuperPelletCircle extends CircleComponent
     add(CircleHitbox(
       isSolid: true,
       collisionType: CollisionType.passive,
-      radius: maze.spriteWidth() / 2 * Maze.pelletScaleFactor / 2,
-      //generous
-      position: Vector2.all(maze.spriteWidth() / 2 * Maze.pelletScaleFactor),
+      radius: radius / 2,
+      //generous vs mini_pellet
+      position: Vector2.all(radius),
       anchor: Anchor.center,
     ));
     //debugMode = true;
