@@ -29,7 +29,10 @@ import 'pacman_world.dart';
 /// Note that both of the last are passed in to the super constructor, they
 /// could also be set inside of `onLoad` for example.
 
-const flameGameZoom = 30.0; //determines speed of game
+// flame_forge2d has a maximum allowed speed for physical objects.
+// Reducing map size 30x, scaling up gravity 30x, & zooming 30x changes nothing,
+// but reduces chance of hitting maximum allowed speed
+const flameGameZoom = 30.0;
 const visualZoomMultiplier = 0.92;
 const double kSquareNotionalSize = 1700; //determines speed of game
 

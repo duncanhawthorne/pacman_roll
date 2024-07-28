@@ -322,7 +322,10 @@ class PacmanWorld extends Forge2DWorld
     //multiGhostAdderTimer();
     cameraRotateableOnPacmanDeathFlourish = true;
     Future.delayed(const Duration(milliseconds: 3000), () {
-      if (!game.levelStarted && !game.mazeEverRotated && level.number == 1) {
+      if (!game.levelStarted &&
+          !game.mazeEverRotated &&
+          game.findByKey(ComponentKey.named('tutorial')) == null &&
+          level.number == 1) {
         //if user hasn't worked out how to start by now, give a prompt
         add(
           TextComponent(
@@ -352,7 +355,7 @@ class PacmanWorld extends Forge2DWorld
     noEventsWrapper.add(pacmanWrapper);
     noEventsWrapper.add(ghostWrapper);
     //addAll(screenEdgeBoundaries(game.camera));
-    start();
+    //start();
     game.winOrLoseGameListener(); //after have created pellets //isn't disposed so don't call on start
   }
 
@@ -425,7 +428,8 @@ class PacmanWorld extends Forge2DWorld
     _lastMazeAngle = angle;
     gravity = Vector2(cos(_lastMazeAngle + 2 * pi / 4),
             sin(_lastMazeAngle + 2 * pi / 4)) *
-        50;
+        50 *
+        (30 / flameGameZoom);
     game.camera.viewfinder.angle = angle;
   }
 }
