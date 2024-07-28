@@ -13,6 +13,7 @@ import '../player_progress/player_progress.dart';
 import '../style/palette.dart';
 import '../utils/helper.dart';
 import 'game_screen.dart';
+import 'maze.dart';
 import 'pacman_world.dart';
 
 /// This is the base of the game which is added to the [GameWidget].
@@ -35,6 +36,7 @@ const double kSquareNotionalSize = 1700; //determines speed of game
 class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
   PacmanGame({
     required this.level,
+    required mazeId,
     required PlayerProgress playerProgress,
     required this.audioController,
     //required this.palette,
@@ -44,7 +46,9 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
               width: kSquareNotionalSize,
               height: kSquareNotionalSize), //2800, 1700 //CameraComponent(),//
           zoom: flameGameZoom * visualZoomMultiplier,
-        );
+        ) {
+    setMazeId(mazeId);
+  }
 
   /// What the properties of the level that is played has.
   final GameLevel level;
@@ -52,7 +56,9 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
   /// A helper for playing sound effects and background audio.
   final AudioController audioController;
 
-  //final Palette palette;
+  void setMazeId(id) {
+    maze.mazeId = id;
+  }
 
   String userString = "";
   final stopwatch = Stopwatch();

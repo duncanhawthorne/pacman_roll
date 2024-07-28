@@ -10,8 +10,16 @@ import 'components/super_pellet.dart';
 import 'components/wrapper_no_events.dart';
 import 'pacman_game.dart';
 
+final List<String> mazeNames = ["A", "B", "C"];
+
 class Maze {
-  final ValueNotifier<int> mazeIdNotifier = ValueNotifier(0);
+  Maze({
+    required mazeIdInitial,
+  }) {
+    setMazeIdReal(mazeIdInitial);
+  }
+
+  late final ValueNotifier<int> mazeIdNotifier = ValueNotifier(0);
 
   int get mazeId => mazeIdNotifier.value;
 
@@ -369,4 +377,4 @@ List<List<String>> _decodeMazeLayout(encodedMazeLayout) {
   return result;
 }
 
-Maze maze = Maze();
+Maze maze = Maze(mazeIdInitial: 0);

@@ -21,9 +21,10 @@ const double statusWidgetHeightFactor = 0.75;
 const statusWidgetHeight = 30;
 
 class GameScreen extends StatelessWidget {
-  const GameScreen({required this.level, super.key});
+  const GameScreen({required this.level, required this.mazeId, super.key});
 
   final GameLevel level;
+  final int mazeId;
 
   static const String loseDialogKey = 'lose_dialog';
   static const String wonDialogKey = 'won_dialog';
@@ -41,6 +42,7 @@ class GameScreen extends StatelessWidget {
           key: const Key('play session'),
           game: PacmanGame(
             level: level,
+            mazeId: mazeId,
             playerProgress: context.read<PlayerProgress>(),
             audioController: audioController,
             //palette: palette,

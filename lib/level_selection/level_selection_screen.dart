@@ -4,6 +4,7 @@ import 'package:nes_ui/nes_ui.dart';
 import 'package:provider/provider.dart';
 
 import '../player_progress/player_progress.dart';
+import '../router.dart';
 import '../style/palette.dart';
 import '../style/wobbly_button.dart';
 import 'instructions_dialog.dart';
@@ -59,8 +60,7 @@ class LevelSelectionScreen extends StatelessWidget {
                       enabled:
                           playerProgress.maxLevelCompleted >= level.number - 1,
                       onTap: () {
-                        GoRouter.of(context)
-                            .go('/play/session/${level.number}');
+                        GoRouter.of(context).go('/$levelUrl/${level.number}');
                       },
                       leading: Text(
                         level.number.toString(),

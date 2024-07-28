@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../flame_game/dialogs/game_overlays.dart';
+import '../router.dart';
 import '../settings/settings.dart';
 import '../style/dialog.dart';
 import '../style/palette.dart';
@@ -52,7 +53,7 @@ class MainMenuScreen extends StatelessWidget {
               TextButton(
                   style: buttonStyle(),
                   onPressed: () {
-                    GoRouter.of(context).go('/session/1');
+                    GoRouter.of(context).go('/$levelUrl/1');
                   },
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../level_selection/levels.dart';
+import '../../router.dart';
 import '../../style/dialog.dart';
 import '../../style/palette.dart';
 import '../../utils/constants.dart';
@@ -134,7 +135,8 @@ Widget levelButtonSingle(BuildContext context, PacmanGame game, int index) {
                         : buttonStyle(small: true, borderColor: Palette.transp),
                 onPressed: () {
                   if (!game.world.doingLevelResetFlourish.value) {
-                    context.go('/session/${index + 1}');
+                    context.go(
+                        '/$levelUrl/${index + 1}/$mapUrl/${mazeNames[maze.mazeId]}');
                   }
                 },
                 child: Text('${index + 1}',
@@ -166,8 +168,10 @@ Widget mazeButtonSingle(BuildContext context, PacmanGame game, int index) {
   return Padding(
       padding: const EdgeInsets.fromLTRB(2, 0, 2, 0),
       child: ListenableBuilder(
-          listenable: Listenable.merge(
-              [game.world.doingLevelResetFlourish, maze.mazeIdNotifier]),
+          listenable: Listenable.merge([
+            game.world.doingLevelResetFlourish,
+            //maze.mazeIdNotifier,
+          ]),
           builder: (BuildContext context, Widget? child) {
             return TextButton(
                 style: game.world.doingLevelResetFlourish.value
@@ -178,13 +182,18 @@ Widget mazeButtonSingle(BuildContext context, PacmanGame game, int index) {
                 onPressed: () {
                   if (!game.world.doingLevelResetFlourish.value &&
                       index != maze.mazeId) {
+                    context.go(
+                        '/$levelUrl/${game.level.number}/$mapUrl/${mazeNames[index]}');
+                    /*
                     maze.mazeId = index;
                     game.reset(mazeResize: true);
                     game.resumeEngine(); //for map to redraw, if engine paused
                     game.showMainMenu(); //to pause engine again after delay
+
+                     */
                   }
                 },
-                child: Text(["A", "B", "C"][index], style: textStyleBody));
+                child: Text(mazeNames[index], style: textStyleBody));
           }));
 }
 
