@@ -136,7 +136,7 @@ Widget levelButtonSingle(BuildContext context, PacmanGame game, int index) {
                 onPressed: () {
                   if (!game.world.doingLevelResetFlourish.value) {
                     context.go(
-                        '/$levelUrl/${index + 1}/$mapUrl/${mazeNames[maze.mazeId]}');
+                        '/?$levelUrl=${index + 1}&$mapUrl=${mazeNames[maze.mazeId]}');
                   }
                 },
                 child: Text('${index + 1}',
@@ -148,13 +148,21 @@ Widget levelButtonSingle(BuildContext context, PacmanGame game, int index) {
 }
 
 Widget mazeSelector(BuildContext context, PacmanGame game) {
-  return maxLevelToShow(game) == 1
+  int maxLevelToShowCache = maxLevelToShow(game);
+  bool showText = maxLevelToShowCache <= 2;
+  return maxLevelToShowCache == 1
       ? const SizedBox.shrink()
       : bodyWidget(
           child: Column(
             children: [
               Row(
                 children: [
+                  !showText
+                      ? const SizedBox.shrink()
+                      : Text('Maze:', style: textStyleBody),
+                  !showText
+                      ? const SizedBox.shrink()
+                      : const SizedBox(width: 10),
                   ...List.generate(
                       3, (index) => mazeButtonSingle(context, game, index)),
                 ],
@@ -183,14 +191,7 @@ Widget mazeButtonSingle(BuildContext context, PacmanGame game, int index) {
                   if (!game.world.doingLevelResetFlourish.value &&
                       index != maze.mazeId) {
                     context.go(
-                        '/$levelUrl/${game.level.number}/$mapUrl/${mazeNames[index]}');
-                    /*
-                    maze.mazeId = index;
-                    game.reset(mazeResize: true);
-                    game.resumeEngine(); //for map to redraw, if engine paused
-                    game.showMainMenu(); //to pause engine again after delay
-
-                     */
+                        '/?$levelUrl=${game.level.number}&$mapUrl=${mazeNames[index]}');
                   }
                 },
                 child: Text(mazeNames[index], style: textStyleBody));

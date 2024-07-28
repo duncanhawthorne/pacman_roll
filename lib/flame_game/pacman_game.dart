@@ -86,6 +86,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
     gameTmp["levelNum"] = level.number;
     gameTmp["levelCompleteTime"] = stopwatchMilliSeconds;
     gameTmp["dateTime"] = world.now;
+    gameTmp["mazeId"] = maze.mazeId;
     return gameTmp;
   }
 
@@ -167,19 +168,17 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
   int _showMainMenuLastRunTime = 0;
 
   void showMainMenu() {
-    if (overlayMainMenu) {
-      _showMainMenuLastRunTime = world.now;
-      int showMainMenuLastRunTimeLast = world.now;
-      overlays.add(GameScreen.startDialogKey);
-      Future.delayed(const Duration(milliseconds: 1000), () {
-        if (!isGameLive &&
-            showMainMenuLastRunTimeLast == _showMainMenuLastRunTime) {
-          //i.e. dialog still showing and haven't started playing yet
-          //and haven't restarted the dialog in the meantime
-          pauseEngine();
-        }
-      });
-    }
+    _showMainMenuLastRunTime = world.now;
+    int showMainMenuLastRunTimeLast = world.now;
+    overlays.add(GameScreen.startDialogKey);
+    Future.delayed(const Duration(milliseconds: 1000), () {
+      if (!isGameLive &&
+          showMainMenuLastRunTimeLast == _showMainMenuLastRunTime) {
+        //i.e. dialog still showing and haven't started playing yet
+        //and haven't restarted the dialog in the meantime
+        pauseEngine();
+      }
+    });
   }
 
   /// In the [onLoad] method you load different type of assets and set things

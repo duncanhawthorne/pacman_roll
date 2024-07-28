@@ -22,7 +22,6 @@ import 'maze.dart';
 import 'pacman_game.dart';
 
 final bool iOS = defaultTargetPlatform == TargetPlatform.iOS;
-const bool overlayMainMenu = true;
 final bool _sirenEnabled = !iOS;
 
 /// The world is where you place all the components that should live inside of
@@ -353,9 +352,7 @@ class PacmanWorld extends Forge2DWorld
     noEventsWrapper.add(pacmanWrapper);
     noEventsWrapper.add(ghostWrapper);
     //addAll(screenEdgeBoundaries(game.camera));
-    if (!overlayMainMenu) {
-      start();
-    }
+    start();
     game.winOrLoseGameListener(); //after have created pellets //isn't disposed so don't call on start
   }
 

@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../firebase/firebase_saves.dart';
 import '../../level_selection/levels.dart';
 import '../../style/dialog.dart';
 import '../game_screen.dart';
 import '../pacman_game.dart';
-import '../pacman_world.dart';
 import 'game_start_dialog.dart';
 
 /// This dialog is shown when a level is won.
@@ -63,12 +61,8 @@ class GameWonDialog extends StatelessWidget {
             TextButton(
                 style: buttonStyle(),
                 onPressed: () {
-                  if (overlayMainMenu) {
-                    game.overlays.remove(GameScreen.wonDialogKey);
-                    game.start();
-                  } else {
-                    context.go('/');
-                  }
+                  game.overlays.remove(GameScreen.wonDialogKey);
+                  game.start();
                 },
                 child: Text('Retry', style: textStyleBody)),
           ],

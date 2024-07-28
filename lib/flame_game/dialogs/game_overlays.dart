@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-import '../../main_menu/main_menu_screen.dart';
 import '../../settings/settings.dart';
 import '../game_screen.dart';
 import '../icons/pacman_icons.dart';
@@ -25,14 +24,9 @@ Widget topLeftOverlayWidget(BuildContext context, PacmanGame game) {
       children: [
         IconButton(
           onPressed: () {
-            if (overlayMainMenu) {
-              game.showMainMenu();
-            } else {
-              GoRouter.of(context).go("/");
-            }
+            game.showMainMenu();
           },
-          icon: const Icon(overlayMainMenu ? Icons.menu : Icons.arrow_back,
-              color: Colors.white),
+          icon: const Icon(Icons.menu, color: Colors.white),
         ),
         const SizedBox(width: 20 * statusWidgetHeightFactor, height: 1),
         audioOnOffButton(settingsController, color: Colors.white),
