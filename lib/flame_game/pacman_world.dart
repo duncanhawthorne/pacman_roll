@@ -142,6 +142,14 @@ class PacmanWorld extends Forge2DWorld
     }
   }
 
+  void _cancelSirenVolumeUpdatedTimer() {
+    if (sirenTimer != null) {
+      game.audioController.setSirenVolume(0);
+      sirenTimer!.cancel();
+      sirenTimer = null;
+    }
+  }
+
   void _addThreeGhosts() {
     for (int i = 0; i < 3; i++) {
       ghostWrapper.add(Ghost(idNum: i));
@@ -251,76 +259,7 @@ class PacmanWorld extends Forge2DWorld
     doingLevelResetFlourish.value = false;
   }
 
-  void _startSiren() {
-    if (_sirenEnabled) {
-      play(SfxType.ghostsRoamingSiren);
-      game.audioController.setSirenVolume(0);
-      _sirenVolumeUpdatedTimer();
-    }
-  }
-
-  void reset({bool mazeResize = false}) {
-    for (Component child in noEventsWrapper.children) {
-      if (child is PelletWrapper) {
-        child.removeFromParent();
-      } else if (child is WallWrapper) {
-        child.removeFromParent();
-      }
-    }
-
-    noEventsWrapper
-        .add(maze.pellets(pelletsRemainingNotifier, level.superPelletsEnabled));
-    noEventsWrapper.add(maze.mazeWalls());
-
-    cancelMultiGhostAdderTimer();
-    if (game.findByKey(ComponentKey.named('tutorial')) != null) {
-      game.findByKey(ComponentKey.named('tutorial'))!.removeFromParent();
-    }
-    if (sirenTimer != null) {
-      game.audioController.setSirenVolume(0);
-      sirenTimer!.cancel();
-      sirenTimer = null;
-    }
-
-    if (multipleSpawningPacmans || mazeResize) {
-      for (Pacman pacman in pacmanPlayersList) {
-        pacman.disconnectSpriteFromBall(); //sync
-        pacman.removeFromParent(); //async
-      }
-      pacmanWrapper.add(Pacman(position: maze.pacmanStart));
-    } else {
-      if (pacmanPlayersList.isEmpty) {
-        pacmanWrapper.add(Pacman(position: maze.pacmanStart));
-      } else {
-        pacmanPlayersList[0].setStartPositionAfterDeath();
-      }
-    }
-    if (game.level.multipleSpawningGhosts || mazeResize) {
-      for (Ghost ghost in ghostPlayersList) {
-        ghost.disconnectSpriteFromBall(); //sync
-        ghost.removeFromParent(); //async
-      }
-      _addThreeGhosts();
-    } else {
-      if (ghostPlayersList.isEmpty) {
-        _addThreeGhosts();
-      } else {
-        for (Ghost ghost in ghostPlayersList) {
-          ghost.setStartPositionAfterPacmanDeath();
-        }
-      }
-    }
-
-    numberOfDeathsNotifier.value = 0;
-    pacmanDyingNotifier.value = 0;
-    _setMazeAngle(0);
-  }
-
-  void start() {
-    play(SfxType.startMusic);
-    _startSiren();
-    //multiGhostAdderTimer();
-    cameraRotateableOnPacmanDeathFlourish = true;
+  void _showTutorial() {
     Future.delayed(const Duration(milliseconds: 3000), () {
       if (!game.levelStarted &&
           !game.mazeEverRotated &&
@@ -347,16 +286,84 @@ class PacmanWorld extends Forge2DWorld
     });
   }
 
+  void removeTutorial() {
+    if (game.findByKey(ComponentKey.named('tutorial')) != null) {
+      game.findByKey(ComponentKey.named('tutorial'))!.removeFromParent();
+    }
+  }
+
+  void resetMaze() {
+    for (Component child in noEventsWrapper.children) {
+      if (child is PelletWrapper) {
+        child.removeFromParent();
+      } else if (child is WallWrapper) {
+        child.removeFromParent();
+      }
+    }
+    noEventsWrapper
+        .add(maze.pellets(pelletsRemainingNotifier, level.superPelletsEnabled));
+    noEventsWrapper.add(maze.mazeWalls());
+  }
+
+  void resetPacmanLayer({bool mazeResize = false}) {
+    if (multipleSpawningPacmans || mazeResize) {
+      for (Pacman pacman in pacmanPlayersList) {
+        pacman.disconnectSpriteFromBall(); //sync
+        pacman.removeFromParent(); //async
+      }
+      pacmanWrapper.add(Pacman(position: maze.pacmanStart));
+    } else {
+      if (pacmanPlayersList.isEmpty) {
+        pacmanWrapper.add(Pacman(position: maze.pacmanStart));
+      } else {
+        pacmanPlayersList[0].setStartPositionAfterDeath();
+      }
+    }
+    numberOfDeathsNotifier.value = 0;
+    pacmanDyingNotifier.value = 0;
+  }
+
+  void resetGhostLayer({bool mazeResize = false}) {
+    if (game.level.multipleSpawningGhosts || mazeResize) {
+      for (Ghost ghost in ghostPlayersList) {
+        ghost.disconnectSpriteFromBall(); //sync
+        ghost.removeFromParent(); //async
+      }
+      _addThreeGhosts();
+    } else {
+      if (ghostPlayersList.isEmpty) {
+        _addThreeGhosts();
+      } else {
+        for (Ghost ghost in ghostPlayersList) {
+          ghost.setStartPositionAfterPacmanDeath();
+        }
+      }
+    }
+  }
+
+  void reset({bool mazeResize = false}) {
+    cancelMultiGhostAdderTimer();
+    _cancelSirenVolumeUpdatedTimer;
+    removeTutorial();
+    resetMaze();
+    resetPacmanLayer(mazeResize: mazeResize);
+    resetGhostLayer(mazeResize: mazeResize);
+    _setMazeAngle(0);
+    //cameraRotateableOnPacmanDeathFlourish = true; //perhaps not necessary
+  }
+
+  void start() {
+    play(SfxType.startMusic);
+    _showTutorial();
+  }
+
   @override
   Future<void> onLoad() async {
     super.onLoad();
     add(noEventsWrapper);
-    //noEventsWrapper.add(maze.mazeWalls());
     noEventsWrapper.add(pacmanWrapper);
     noEventsWrapper.add(ghostWrapper);
-    //addAll(screenEdgeBoundaries(game.camera));
-    //start();
-    game.winOrLoseGameListener(); //after have created pellets //isn't disposed so don't call on start
+    game.winOrLoseGameListener(); //isn't disposed so run once, not on start()
   }
 
   @override
@@ -392,9 +399,7 @@ class PacmanWorld extends Forge2DWorld
         double spinMultiplier = 4 * min(1, eventVectorLengthProportion / 0.75);
 
         if (!game.mazeEverRotated) {
-          if (game.findByKey(ComponentKey.named('tutorial')) != null) {
-            game.findByKey(ComponentKey.named('tutorial'))!.removeFromParent();
-          }
+          removeTutorial();
           game.mazeEverRotated = true;
         }
 

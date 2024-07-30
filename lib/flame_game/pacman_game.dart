@@ -184,17 +184,21 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
     });
   }
 
-  /// In the [onLoad] method you load different type of assets and set things
-  /// that only needs to be set once when the level starts up.
-  @override
-  Future<void> onLoad() async {
-    super.onLoad();
-    reset();
+  void _bugFixes() {
     setStatusBarColor(Palette.flameGameBackground.color);
     fixTitle(Palette.black);
     Future.delayed(const Duration(seconds: 1), () {
       fixTitle(Palette.black);
     });
+  }
+
+  /// In the [onLoad] method you load different type of assets and set things
+  /// that only needs to be set once when the level starts up.
+  @override
+  Future<void> onLoad() async {
+    super.onLoad();
+    _bugFixes();
+    reset();
     showMainMenu();
   }
 

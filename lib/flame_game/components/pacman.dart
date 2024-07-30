@@ -165,7 +165,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     current = CharacterState.birthing;
   }
 
-  void _pacmanEatingNormalSequence() {
+  void _pacmanDeadEatingNormalSequence() {
     if (current == CharacterState.deadPacman) {
       if (world.now - _pacmanDeadTimeLatest > _kPacmanDeadResetTimeMillis) {
         _dieFromGhostActionAfterDeathAnimation();
@@ -214,7 +214,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
 
   @override
   void update(double dt) {
-    _pacmanEatingNormalSequence();
+    _pacmanDeadEatingNormalSequence();
     super.update(dt);
   }
 }
