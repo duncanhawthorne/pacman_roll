@@ -25,12 +25,17 @@ class Maze {
 
   set mazeId(int i) => setMazeIdReal(i);
 
+  double mazeWidth = 0;
+  double mazeHeight = 0;
+
   void setMazeIdReal(int i) {
     {
       mazeIdNotifier.value = i;
       ghostStart = _vectorOfMazeListCode(_kGhostStart);
       pacmanStart = _vectorOfMazeListCode(_kPacmanStart);
       cage = _vectorOfMazeListCode(_kCage);
+      mazeWidth = blockWidth() * _mazeLayout[0].length;
+      mazeHeight = blockWidth() * _mazeLayout.length;
     }
   }
 
@@ -68,14 +73,6 @@ class Maze {
 
   double spriteWidth() {
     return blockWidth() * (_largeSprites ? 2 : 1);
-  }
-
-  double mazeWidth() {
-    return blockWidth() * _mazeLayout[0].length;
-  }
-
-  double mazeHeight() {
-    return blockWidth() * _mazeLayout.length;
   }
 
   int _mazeLayoutHorizontalLength() {

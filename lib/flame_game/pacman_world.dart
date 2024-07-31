@@ -116,7 +116,7 @@ class PacmanWorld extends Forge2DWorld
     } else {
       return ghostPlayersList
               .map((Ghost ghost) => ghost.current == CharacterState.normal
-                  ? ghost.getVelocity().length
+                  ? ghost.getSpeed()
                   : 0.0)
               .reduce((value, element) => value + element) /
           ghostPlayersList.length;

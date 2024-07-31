@@ -5,7 +5,6 @@ import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 
-import '../../utils/helper.dart';
 import '../maze.dart';
 import '../pacman_game.dart';
 import '../pacman_world.dart';
@@ -35,14 +34,10 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
       initialPosition: position,
       position: position); //to avoid null safety issues
 
-  // Used to store the last position of the player, so that we later can
-  // determine which direction that the player is moving.
-  final Vector2 _lastPosition = Vector2.zero();
-  final Vector2 _lastVelocity = Vector2.zero();
   bool connectedToBall = true;
 
-  Vector2 getVelocity() {
-    return _getUnderlyingBallVelocity();
+  double getSpeed() {
+    return _underlyingBall.body.linearVelocity.length;
   }
 
   void setPositionStill(Vector2 targetLoc) {
@@ -71,15 +66,6 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     _underlyingBall.body.setActive(false);
   }
 
-  Vector2 _getUnderlyingBallPosition() {
-    try {
-      return _underlyingBall.position;
-    } catch (e) {
-      debug(["getUnderlyingBallPosition", e, _lastPosition]);
-      return _lastPosition; //Vector2(10, 0);
-    }
-  }
-
   void _setUnderlyingBallPositionStill(Vector2 targetLoc) {
     _setUnderlyingBallPositionMoving(targetLoc);
     _setUnderlyingVelocity(Vector2(0, 0));
@@ -87,69 +73,42 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
 
   void _setUnderlyingBallPositionMoving(Vector2 targetLoc) {
     _underlyingBall.body.setTransform(targetLoc, angle);
-    _lastPosition
-        .setFrom(targetLoc); //else _lastVelocity calc produces nonsense
-  }
-
-  Vector2 _getUnderlyingBallVelocity() {
-    try {
-      return Vector2(_underlyingBall.body.linearVelocity.x,
-          _underlyingBall.body.linearVelocity.y);
-    } catch (e) {
-      debug(["getUnderlyingBallVelocity", e, _lastVelocity]);
-      return _lastVelocity;
-    }
   }
 
   void _setUnderlyingVelocity(Vector2 vel) {
     _underlyingBall.body.linearVelocity.setFrom(vel);
-    _lastVelocity.setFrom(vel);
   }
 
   void _moveUnderlyingBallThroughPipePortal() {
     assert(connectedToBall);
-    if (position.x.abs() > maze.mazeWidth() / 2 * _portalMargin ||
-        position.y.abs() > maze.mazeHeight() / 2 * _portalMargin) {
+    if (position.x.abs() > maze.mazeWidth / 2 * _portalMargin ||
+        position.y.abs() > maze.mazeHeight / 2 * _portalMargin) {
       _setUnderlyingBallPositionMoving(Vector2(
-          _mod(position.x, maze.mazeWidth() * _portalMargin),
-          _mod(position.y, maze.mazeHeight() * _portalMargin)));
+          _mod(position.x, maze.mazeWidth * _portalMargin),
+          _mod(position.y, maze.mazeHeight * _portalMargin)));
     }
   }
 
   int _spinParity() {
-    Vector2 vel = _getUnderlyingBallVelocity();
-    if (vel.x.abs() > vel.y.abs()) {
-      return (world.gravity.y > 0 ? 1 : -1) * (vel.x > 0 ? 1 : -1);
-    } else {
-      return (world.gravity.x > 0 ? -1 : 1) * (vel.y > 0 ? 1 : -1);
-    }
+    return _underlyingBall.body.linearVelocity.x.abs() >
+            _underlyingBall.body.linearVelocity.y.abs()
+        ? (world.gravity.y > 0 ? 1 : -1) *
+            (_underlyingBall.body.linearVelocity.x > 0 ? 1 : -1)
+        : (world.gravity.x > 0 ? -1 : 1) *
+            (_underlyingBall.body.linearVelocity.y > 0 ? 1 : -1);
   }
 
-  double _getUpdatedAngle() {
-    if (useForgePhysicsBallRotation) {
-      try {
-        return _underlyingBall.angle;
-      } catch (e) {
-        debug(["_getUpdatedAngle", e]);
-        return angle;
-      }
-    } else {
-      return angle +
-          (position - _lastPosition).length / (size.x / 2) * _spinParity();
+  void _oneFrameOfPhysics(double dt) {
+    if (connectedToBall) {
+      _moveUnderlyingBallThroughPipePortal(); //note never called for deadGhost
+      position.setFrom(_underlyingBall.position);
+      angle += getSpeed() * dt / (size.x / 2) * _spinParity();
     }
-  }
-
-  void _oneFrameOfPhysics() {
-    assert(connectedToBall);
-    _moveUnderlyingBallThroughPipePortal(); //note never called for deadGhost
-    position = _getUnderlyingBallPosition();
-    angle = _getUpdatedAngle();
   }
 
   @override
   Future<void> onLoad() async {
     add(_underlyingBall);
-    _lastPosition.setFrom(position);
     add(CircleHitbox(
       isSolid: true,
       collisionType:
@@ -166,12 +125,8 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
 
   @override
   void update(double dt) {
-    if (connectedToBall) {
-      _oneFrameOfPhysics();
-    }
+    _oneFrameOfPhysics(dt);
     super.update(dt);
-    _lastVelocity.setFrom((position - _lastPosition) / dt);
-    _lastPosition.setFrom(position);
   }
 }
 
