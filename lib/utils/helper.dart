@@ -11,13 +11,7 @@ import 'title_fix_stub.dart' if (dart.library.js_interop) 'title_fix_web.dart';
 double smallAngle(double angleDelta) {
   //avoid +2*pi-delta jump when go around the circle, instead give -delta
   angleDelta = angleDelta % (2 * pi);
-  if (angleDelta > 2 * pi / 2) {
-    return angleDelta - 2 * pi;
-  } else if (angleDelta < -2 * pi / 2) {
-    return angleDelta + 2 * pi;
-  } else {
-    return angleDelta;
-  }
+  return angleDelta > 2 * pi / 2 ? angleDelta - 2 * pi : angleDelta;
 }
 
 void debug(x) {

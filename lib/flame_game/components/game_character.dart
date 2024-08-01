@@ -11,6 +11,11 @@ import '../pacman_world.dart';
 import 'pacman.dart';
 import 'physics_ball.dart';
 
+final Paint highQualityPaint = Paint()
+  ..filterQuality = FilterQuality.high
+//..color = const Color.fromARGB(255, 255, 255, 255)
+  ..isAntiAlias = true;
+
 /// The [GameCharacter] is the generic object that is linked to a [PhysicsBall]
 class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     with
@@ -23,10 +28,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     super.priority = 1,
   }) : super(
             size: Vector2.all(maze.spriteWidth()),
-            paint: Paint()
-              ..filterQuality = FilterQuality.high
-              //..color = const Color.fromARGB(255, 255, 255, 255)
-              ..isAntiAlias = true,
+            paint: highQualityPaint,
             anchor: Anchor.center);
 
   late final PhysicsBall _underlyingBall = PhysicsBall(
@@ -81,11 +83,12 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
 
   void _moveUnderlyingBallThroughPipePortal() {
     assert(connectedToBall);
-    if (position.x.abs() > maze.mazeWidth / 2 * _portalMargin ||
-        position.y.abs() > maze.mazeHeight / 2 * _portalMargin) {
+    if (_underlyingBall.position.x.abs() > maze.mazeWidth / 2 * _portalMargin ||
+        _underlyingBall.position.y.abs() >
+            maze.mazeHeight / 2 * _portalMargin) {
       _setUnderlyingBallPositionMoving(Vector2(
-          _mod(position.x, maze.mazeWidth * _portalMargin),
-          _mod(position.y, maze.mazeHeight * _portalMargin)));
+          _mod(_underlyingBall.position.x, maze.mazeWidth * _portalMargin),
+          _mod(_underlyingBall.position.y, maze.mazeHeight * _portalMargin)));
     }
   }
 
@@ -143,11 +146,6 @@ enum CharacterState {
 const _portalMargin = 0.97;
 
 double _mod(double position, double mod) {
-  if (position > mod / 2) {
-    return position - mod;
-  } else if (position < -mod / 2) {
-    return position + mod;
-  } else {
-    return position;
-  }
+  position = position % mod;
+  return position > mod / 2 ? position - mod : position;
 }

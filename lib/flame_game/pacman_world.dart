@@ -76,7 +76,6 @@ class PacmanWorld extends Forge2DWorld
 
   final Map<int, double?> _fingersLastDragAngle = {};
 
-  double _lastMazeAngle = 0;
   bool cameraRotateableOnPacmanDeathFlourish = true;
 
   final Random random;
@@ -232,7 +231,7 @@ class PacmanWorld extends Forge2DWorld
           ghost.slideToStartPositionAfterPacmanDeath();
         }
         game.camera.viewfinder.add(RotateHomeEffectAndReset(
-            smallAngle(-_lastMazeAngle),
+            smallAngle(-game.camera.viewfinder.angle),
             onComplete: _resetWorldAfterPacmanDeathReal));
       } else {
         _resetWorldAfterPacmanDeathReal();
@@ -375,27 +374,28 @@ class PacmanWorld extends Forge2DWorld
   @override
   void onDragStart(DragStartEvent event) {
     super.onDragStart(event);
-    Vector2 eventVector = event.canvasPosition - game.canvasSize / 2;
     if (iOS) {
       _fingersLastDragAngle[event.pointerId] = null;
     } else {
-      _fingersLastDragAngle[event.pointerId] =
-          atan2(eventVector.x, eventVector.y);
+      _fingersLastDragAngle[event.pointerId] = atan2(
+          event.canvasPosition.x - game.canvasSize.x / 2,
+          event.canvasPosition.y - game.canvasSize.y / 2);
     }
   }
 
   @override
   void onDragUpdate(DragUpdateEvent event) {
     super.onDragUpdate(event);
-    Vector2 eventVector = event.canvasStartPosition - game.canvasSize / 2;
     double eventVectorLengthProportion =
         (event.canvasStartPosition - game.canvasSize / 2).length /
             (min(game.canvasSize.x, game.canvasSize.y) / 2);
-    double currentAngleTmp = atan2(eventVector.x, eventVector.y);
+    double fingerCurrentDragAngle = atan2(
+        event.canvasStartPosition.x - game.canvasSize.x / 2,
+        event.canvasStartPosition.y - game.canvasSize.y / 2);
     if (_fingersLastDragAngle.containsKey(event.pointerId)) {
       if (_fingersLastDragAngle[event.pointerId] != null) {
         double angleDelta = smallAngle(
-            currentAngleTmp - _fingersLastDragAngle[event.pointerId]!);
+            fingerCurrentDragAngle - _fingersLastDragAngle[event.pointerId]!);
         double spinMultiplier = 4 * min(1, eventVectorLengthProportion / 0.75);
 
         if (!game.mazeEverRotated) {
@@ -405,7 +405,7 @@ class PacmanWorld extends Forge2DWorld
 
         _moveMazeAngleByDelta(angleDelta * spinMultiplier);
       }
-      _fingersLastDragAngle[event.pointerId] = currentAngleTmp;
+      _fingersLastDragAngle[event.pointerId] = fingerCurrentDragAngle;
     }
   }
 
@@ -419,7 +419,7 @@ class PacmanWorld extends Forge2DWorld
 
   void _moveMazeAngleByDelta(double angleDelta) {
     if (cameraRotateableOnPacmanDeathFlourish && game.isGameLive) {
-      _setMazeAngle(_lastMazeAngle + angleDelta);
+      _setMazeAngle(game.camera.viewfinder.angle + angleDelta);
 
       if (!doingLevelResetFlourish.value) {
         game.stopwatch.start();
@@ -430,9 +430,7 @@ class PacmanWorld extends Forge2DWorld
   }
 
   void _setMazeAngle(double angle) {
-    _lastMazeAngle = angle;
-    gravity = Vector2(cos(_lastMazeAngle + 2 * pi / 4),
-            sin(_lastMazeAngle + 2 * pi / 4)) *
+    gravity = Vector2(cos(angle + 2 * pi / 4), sin(angle + 2 * pi / 4)) *
         50 *
         (30 / flameGameZoom);
     game.camera.viewfinder.angle = angle;
