@@ -111,7 +111,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
 
   @override
   Future<void> onLoad() async {
-    add(_underlyingBall);
+    parent!.add(_underlyingBall);
     add(CircleHitbox(
       isSolid: true,
       collisionType:

@@ -4,28 +4,18 @@ import 'package:flutter/animation.dart';
 
 import '../components/ghost.dart';
 
-/// The [JumpEffect] is simply a [MoveByEffect] which has the properties of the
-/// effect pre-defined.
-class ReturnHomeEffect extends MoveToEffect {
-  ReturnHomeEffect(Vector2 destination)
+class MoveToPositionEffect extends MoveToEffect {
+  MoveToPositionEffect(Vector2 destination)
       : super(
             destination,
             EffectController(
                 duration: kGhostResetTimeMillis / 1000, curve: Curves.linear));
 }
 
-class RotateHomeEffect extends RotateEffect {
-  RotateHomeEffect(double destination)
+class RotateByAngleEffect extends RotateEffect {
+  RotateByAngleEffect(double angle, {onComplete})
       : super.by(
-            destination,
-            EffectController(
-                duration: kGhostResetTimeMillis / 1000, curve: Curves.linear));
-}
-
-class RotateHomeEffectAndReset extends RotateEffect {
-  RotateHomeEffectAndReset(double destination, {required onComplete})
-      : super.by(
-            destination,
+            angle,
             EffectController(
                 duration: kGhostResetTimeMillis / 1000, curve: Curves.linear),
             onComplete: onComplete);

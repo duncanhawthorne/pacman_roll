@@ -230,7 +230,7 @@ class PacmanWorld extends Forge2DWorld
         for (Ghost ghost in ghostPlayersList) {
           ghost.slideToStartPositionAfterPacmanDeath();
         }
-        game.camera.viewfinder.add(RotateHomeEffectAndReset(
+        game.camera.viewfinder.add(RotateByAngleEffect(
             smallAngle(-game.camera.viewfinder.angle),
             onComplete: _resetWorldAfterPacmanDeathReal));
       } else {

@@ -5,8 +5,8 @@ import 'package:flame/components.dart';
 import '../../audio/sounds.dart';
 import '../../utils/helper.dart';
 import '../effects/return_home_effect.dart';
-import 'game_character.dart';
 import '../maze.dart';
+import 'game_character.dart';
 
 const int kGhostChaseTimeMillis = 6000;
 const int kGhostResetTimeMillis = 1000;
@@ -80,12 +80,12 @@ class Ghost extends GameCharacter {
           connectedToBall = false;
           specialSpawnLocation = Vector2.all(0);
           specialSpawnLocation!.setFrom(world.pacmanPlayersList[0].position);
-          add(ReturnHomeEffect(specialSpawnLocation!));
+          add(MoveToPositionEffect(specialSpawnLocation!));
         } else {
           disconnectSpriteFromBall();
-          add(ReturnHomeEffect(maze.ghostStart));
+          add(MoveToPositionEffect(maze.ghostStart));
         }
-        add(RotateHomeEffect(smallAngle(-angle)));
+        add(RotateByAngleEffect(smallAngle(-angle)));
         //will get moved to right position later by code in sequence checker
       }
     }
@@ -106,8 +106,8 @@ class Ghost extends GameCharacter {
 
   void slideToStartPositionAfterPacmanDeath() {
     disconnectSpriteFromBall();
-    add(ReturnHomeEffect(maze.ghostStartForId(idNum)));
-    add(RotateHomeEffect(smallAngle(-angle)));
+    add(MoveToPositionEffect(maze.ghostStartForId(idNum)));
+    add(RotateByAngleEffect(smallAngle(-angle)));
     disconnectFromPhysics();
   }
 
