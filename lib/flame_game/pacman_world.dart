@@ -17,7 +17,7 @@ import 'components/game_character.dart';
 import 'components/ghost.dart';
 import 'components/pacman.dart';
 import 'components/wrapper_no_events.dart';
-import 'effects/return_home_effect.dart';
+import 'effects/rotate_by_effect.dart';
 import 'maze.dart';
 import 'pacman_game.dart';
 

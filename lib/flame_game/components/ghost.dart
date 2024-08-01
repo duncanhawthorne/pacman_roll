@@ -4,7 +4,8 @@ import 'package:flame/components.dart';
 
 import '../../audio/sounds.dart';
 import '../../utils/helper.dart';
-import '../effects/return_home_effect.dart';
+import '../effects/move_to_effect.dart';
+import '../effects/rotate_by_effect.dart';
 import '../maze.dart';
 import 'game_character.dart';
 
