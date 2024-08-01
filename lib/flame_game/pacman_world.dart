@@ -270,14 +270,7 @@ class PacmanWorld extends Forge2DWorld
               text: '←←←←←←←←\n↓      ↑\n↓ Drag ↑\n↓      ↑\n→→→→→→→→',
               position: maze.cage,
               anchor: Anchor.center,
-              textRenderer: TextPaint(
-                style: const TextStyle(
-                  backgroundColor: Palette.blueMaze,
-                  fontSize: 3,
-                  color: Palette.playSessionContrast,
-                  fontFamily: 'Press Start 2P',
-                ),
-              ),
+              textRenderer: _tutorialTextRenderer,
               key: ComponentKey.named('tutorial'),
               priority: 100),
         );
@@ -436,3 +429,12 @@ class PacmanWorld extends Forge2DWorld
     game.camera.viewfinder.angle = angle;
   }
 }
+
+final TextPaint _tutorialTextRenderer = TextPaint(
+  style: const TextStyle(
+    backgroundColor: Palette.blueMaze,
+    fontSize: 3,
+    color: Palette.playSessionContrast,
+    fontFamily: 'Press Start 2P',
+  ),
+);
