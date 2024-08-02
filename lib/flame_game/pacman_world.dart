@@ -114,9 +114,8 @@ class PacmanWorld extends Forge2DWorld
       return 0;
     } else {
       return ghostPlayersList
-              .map((Ghost ghost) => ghost.current == CharacterState.normal
-                  ? ghost.getSpeed()
-                  : 0.0)
+              .map((Ghost ghost) =>
+                  ghost.current == CharacterState.normal ? ghost.speed : 0.0)
               .reduce((value, element) => value + element) /
           ghostPlayersList.length;
     }
@@ -194,15 +193,14 @@ class PacmanWorld extends Forge2DWorld
     for (int i = 0; i < ghostPlayersList.length; i++) {
       int j = ghostPlayersList.length - 1 - i;
       if (j >= 0) {
-        //assert(game.level.multipleSpawningGhosts);
         ghostPlayersList[j].removeFromParent();
       }
     }
   }
 
-  void disconnectGhostsFromPhysics() {
+  void disconnectGhostsFromBalls() {
     for (int i = 0; i < ghostPlayersList.length; i++) {
-      ghostPlayersList[i].disconnectFromPhysics();
+      ghostPlayersList[i].disconnectFromBall();
     }
   }
 
@@ -300,7 +298,7 @@ class PacmanWorld extends Forge2DWorld
   void resetPacmanLayer({bool mazeResize = false}) {
     if (multipleSpawningPacmans || mazeResize) {
       for (Pacman pacman in pacmanPlayersList) {
-        pacman.disconnectSpriteFromBall(); //sync
+        pacman.disconnectFromBall(); //sync
         pacman.removeFromParent(); //async
       }
       pacmanWrapper.add(Pacman(position: maze.pacmanStart));
@@ -318,7 +316,7 @@ class PacmanWorld extends Forge2DWorld
   void resetGhostLayer({bool mazeResize = false}) {
     if (game.level.multipleSpawningGhosts || mazeResize) {
       for (Ghost ghost in ghostPlayersList) {
-        ghost.disconnectSpriteFromBall(); //sync
+        ghost.disconnectFromBall(); //sync
         ghost.removeFromParent(); //async
       }
       _addThreeGhosts();

@@ -3,7 +3,6 @@ import 'dart:ui';
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
-import 'package:flame_forge2d/flame_forge2d.dart';
 
 import '../maze.dart';
 import '../pacman_game.dart';
@@ -31,87 +30,49 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
             paint: highQualityPaint,
             anchor: Anchor.center);
 
-  late final PhysicsBall _underlyingBall = PhysicsBall(
+  late final PhysicsBall _ball = PhysicsBall(
       realCharacter: this,
       initialPosition: position,
       position: position); //to avoid null safety issues
 
   bool connectedToBall = true;
 
-  double getSpeed() {
-    return _underlyingBall.body.linearVelocity.length;
-  }
+  double get speed => _ball.speed;
+
+  int get _spinParity =>
+      _ball.body.linearVelocity.x.abs() > _ball.body.linearVelocity.y.abs()
+          ? (world.gravity.y > 0 ? 1 : -1) *
+              (_ball.body.linearVelocity.x > 0 ? 1 : -1)
+          : (world.gravity.x > 0 ? -1 : 1) *
+              (_ball.body.linearVelocity.y > 0 ? 1 : -1);
 
   void setPositionStill(Vector2 targetLoc) {
-    _setUnderlyingBallPositionStill(targetLoc);
+    _ball.position = targetLoc;
+    _ball.velocity = Vector2(0, 0);
     position.setFrom(targetLoc);
-    _setUnderlyingBallDynamic();
+    _connectToBall();
   }
 
-  void disconnectSpriteFromBall() {
-    _setUnderlyingBallStatic();
+  void disconnectFromBall() {
+    _ball.setStatic();
     connectedToBall = false;
   }
 
-  void disconnectFromPhysics() {
-    _setUnderlyingBallStatic();
-  }
-
-  void _setUnderlyingBallDynamic() {
-    _underlyingBall.body.setType(BodyType.dynamic);
-    _underlyingBall.body.setActive(true);
+  void _connectToBall() {
     connectedToBall = true;
-  }
-
-  void _setUnderlyingBallStatic() {
-    _underlyingBall.body.setType(BodyType.static);
-    _underlyingBall.body.setActive(false);
-  }
-
-  void _setUnderlyingBallPositionStill(Vector2 targetLoc) {
-    _setUnderlyingBallPositionMoving(targetLoc);
-    _setUnderlyingVelocity(Vector2(0, 0));
-  }
-
-  void _setUnderlyingBallPositionMoving(Vector2 targetLoc) {
-    _underlyingBall.body.setTransform(targetLoc, angle);
-  }
-
-  void _setUnderlyingVelocity(Vector2 vel) {
-    _underlyingBall.body.linearVelocity.setFrom(vel);
-  }
-
-  void _moveUnderlyingBallThroughPipePortal() {
-    assert(connectedToBall);
-    if (_underlyingBall.position.x.abs() > maze.mazeWidth / 2 * _portalMargin ||
-        _underlyingBall.position.y.abs() >
-            maze.mazeHeight / 2 * _portalMargin) {
-      _setUnderlyingBallPositionMoving(Vector2(
-          _mod(_underlyingBall.position.x, maze.mazeWidth * _portalMargin),
-          _mod(_underlyingBall.position.y, maze.mazeHeight * _portalMargin)));
-    }
-  }
-
-  int _spinParity() {
-    return _underlyingBall.body.linearVelocity.x.abs() >
-            _underlyingBall.body.linearVelocity.y.abs()
-        ? (world.gravity.y > 0 ? 1 : -1) *
-            (_underlyingBall.body.linearVelocity.x > 0 ? 1 : -1)
-        : (world.gravity.x > 0 ? -1 : 1) *
-            (_underlyingBall.body.linearVelocity.y > 0 ? 1 : -1);
+    _ball.setDynamic();
   }
 
   void _oneFrameOfPhysics(double dt) {
     if (connectedToBall) {
-      _moveUnderlyingBallThroughPipePortal(); //note never called for deadGhost
-      position.setFrom(_underlyingBall.position);
-      angle += getSpeed() * dt / (size.x / 2) * _spinParity();
+      position.setFrom(_ball.position);
+      angle += speed * dt / (size.x / 2) * _spinParity;
     }
   }
 
   @override
   Future<void> onLoad() async {
-    parent!.add(_underlyingBall);
+    add(_ball); //should be added to static parent, but risks going stray
     add(CircleHitbox(
       isSolid: true,
       collisionType:
@@ -121,8 +82,8 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
 
   @override
   Future<void> onRemove() async {
-    disconnectSpriteFromBall();
-    _underlyingBall.removeFromParent();
+    disconnectFromBall();
+    _ball.removeFromParent();
     super.onRemove();
   }
 
@@ -141,11 +102,4 @@ enum CharacterState {
   deadGhost,
   deadPacman,
   birthing
-}
-
-const _portalMargin = 0.97;
-
-double _mod(double position, double mod) {
-  position = position % mod;
-  return position > mod / 2 ? position - mod : position;
 }

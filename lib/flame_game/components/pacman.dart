@@ -126,9 +126,9 @@ class Pacman extends GameCharacter with CollisionCallbacks {
         world.pelletsRemainingNotifier.value != 0) {
       world.play(SfxType.pacmanDeath);
       current = CharacterState.deadPacman;
-      disconnectFromPhysics();
+      disconnectFromBall();
       if (_freezeGhostsOnKillPacman) {
-        world.disconnectGhostsFromPhysics();
+        world.disconnectGhostsFromBalls();
       }
       world.pacmanDyingNotifier.value++;
 
@@ -160,7 +160,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
 
   void slideToStartPositionAfterDeath() {
     setPositionStill(maze.pacmanStart);
-    disconnectFromPhysics();
+    disconnectFromBall();
     angle = 0;
     current = CharacterState.birthing;
   }

@@ -36,4 +36,47 @@ class PhysicsBall extends BodyComponent with IgnoreEvents {
   @override
   // ignore: overridden_fields
   final renderBody = false;
+
+  double get speed => body.linearVelocity.length;
+
+  set velocity(Vector2 vel) => body.linearVelocity.setFrom(vel);
+
+  set position(Vector2 pos) => body.setTransform(pos, 0); //realCharacter.angle
+
+  bool subConnectedBall = true;
+
+  void setDynamic() {
+    body.setType(BodyType.dynamic);
+    body.setActive(true);
+    subConnectedBall = true;
+  }
+
+  void setStatic() {
+    body.setType(BodyType.static);
+    body.setActive(false);
+    subConnectedBall = false;
+  }
+
+  void moveThroughPipePortal() {
+    if (subConnectedBall) {
+      if (position.x.abs() > maze.mazeWidth / 2 * _portalMargin ||
+          position.y.abs() > maze.mazeHeight / 2 * _portalMargin) {
+        position = Vector2(_mod(position.x, maze.mazeWidth * _portalMargin),
+            _mod(position.y, maze.mazeHeight * _portalMargin));
+      }
+    }
+  }
+
+  @override
+  void update(double dt) {
+    super.update(dt);
+    moveThroughPipePortal();
+  }
+}
+
+const _portalMargin = 0.97;
+
+double _mod(double position, double mod) {
+  position = position % mod;
+  return position > mod / 2 ? position - mod : position;
 }

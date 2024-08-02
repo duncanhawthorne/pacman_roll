@@ -83,7 +83,7 @@ class Ghost extends GameCharacter {
           specialSpawnLocation!.setFrom(world.pacmanPlayersList[0].position);
           add(MoveToPositionEffect(specialSpawnLocation!));
         } else {
-          disconnectSpriteFromBall();
+          disconnectFromBall();
           add(MoveToPositionEffect(maze.ghostStart));
         }
         add(RotateByAngleEffect(smallAngle(-angle)));
@@ -106,10 +106,9 @@ class Ghost extends GameCharacter {
   }
 
   void slideToStartPositionAfterPacmanDeath() {
-    disconnectSpriteFromBall();
+    disconnectFromBall();
     add(MoveToPositionEffect(maze.ghostStartForId(idNum)));
     add(RotateByAngleEffect(smallAngle(-angle)));
-    disconnectFromPhysics();
   }
 
   void setPositionForGameEnd() {
