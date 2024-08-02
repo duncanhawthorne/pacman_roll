@@ -30,10 +30,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
             paint: highQualityPaint,
             anchor: Anchor.center);
 
-  late final PhysicsBall _ball = PhysicsBall(
-      realCharacter: this,
-      initialPosition: position,
-      position: position); //to avoid null safety issues
+  late final PhysicsBall _ball = PhysicsBall(position: position);
 
   bool connectedToBall = true;
 
@@ -72,7 +69,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
 
   @override
   Future<void> onLoad() async {
-    add(_ball); //should be added to static parent, but risks going stray
+    parent!.add(_ball); //should be added to static parent but risks going stray
     add(CircleHitbox(
       isSolid: true,
       collisionType:
