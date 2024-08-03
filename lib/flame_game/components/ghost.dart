@@ -70,15 +70,18 @@ class Ghost extends GameCharacter {
       if (game.level.multipleSpawningGhosts && !spawningDeath) {
         removeFromParent();
       } else {
-        if (spawningDeath && world.level.homingGhosts) {
+        if (spawningDeath) {
           /// can't call [disconnectSpriteFromBall] as body not yet initialised
           connectedToBall = false;
-          specialSpawnLocation = Vector2.all(0);
-          specialSpawnLocation!.setFrom(world.pacmanPlayersList[0].position);
-          add(MoveToPositionEffect(specialSpawnLocation!));
+          if (world.level.homingGhosts) {
+            specialSpawnLocation = Vector2.all(0);
+            specialSpawnLocation!.setFrom(world.pacmanPlayersList[0].position);
+            add(MoveToPositionEffect(specialSpawnLocation!));
+          } else {
+            add(MoveToPositionEffect(maze.ghostStart));
+          }
         } else {
-          /// can't call [disconnectSpriteFromBall] as body not yet initialised
-          connectedToBall = false;
+          disconnectFromBall();
           add(MoveToPositionEffect(maze.ghostStart));
         }
         add(RotateByAngleEffect(smallAngle(-angle)));
