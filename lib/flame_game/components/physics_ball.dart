@@ -36,22 +36,22 @@ class PhysicsBall extends BodyComponent with IgnoreEvents {
 
   set position(Vector2 pos) => body.setTransform(pos, 0); //realCharacter.angle
 
-  bool subConnectedBall = true;
+  bool _subConnectedBall = true;
 
   void setDynamic() {
     body.setType(BodyType.dynamic);
     body.setActive(true);
-    subConnectedBall = true;
+    _subConnectedBall = true;
   }
 
   void setStatic() {
     body.setType(BodyType.static);
     body.setActive(false);
-    subConnectedBall = false;
+    _subConnectedBall = false;
   }
 
-  void moveThroughPipePortal() {
-    if (subConnectedBall) {
+  void _moveThroughPipePortal() {
+    if (_subConnectedBall) {
       if (position.x.abs() > maze.mazeWidth / 2 * _portalMargin ||
           position.y.abs() > maze.mazeHeight / 2 * _portalMargin) {
         position = Vector2(_mod(position.x, maze.mazeWidth * _portalMargin),
@@ -63,7 +63,7 @@ class PhysicsBall extends BodyComponent with IgnoreEvents {
   @override
   void update(double dt) {
     super.update(dt);
-    moveThroughPipePortal();
+    _moveThroughPipePortal();
   }
 }
 

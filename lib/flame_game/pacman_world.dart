@@ -21,8 +21,8 @@ import 'effects/rotate_by_effect.dart';
 import 'maze.dart';
 import 'pacman_game.dart';
 
-final bool iOS = defaultTargetPlatform == TargetPlatform.iOS;
-final bool _sirenEnabled = !iOS;
+final bool _iOS = defaultTargetPlatform == TargetPlatform.iOS;
+final bool _sirenEnabled = !_iOS;
 
 /// The world is where you place all the components that should live inside of
 /// the game, like the player, enemies, obstacles and points for example.
@@ -276,13 +276,13 @@ class PacmanWorld extends Forge2DWorld
     });
   }
 
-  void removeTutorial() {
+  void _removeTutorial() {
     if (game.findByKey(ComponentKey.named('tutorial')) != null) {
       game.findByKey(ComponentKey.named('tutorial'))!.removeFromParent();
     }
   }
 
-  void resetMaze() {
+  void _resetMaze() {
     for (Component child in noEventsWrapper.children) {
       if (child is PelletWrapper) {
         child.removeFromParent();
@@ -295,7 +295,7 @@ class PacmanWorld extends Forge2DWorld
     noEventsWrapper.add(maze.mazeWalls());
   }
 
-  void resetPacmanLayer({bool mazeResize = false}) {
+  void _resetPacmanLayer({bool mazeResize = false}) {
     if (multipleSpawningPacmans || mazeResize) {
       for (Pacman pacman in pacmanPlayersList) {
         pacman.disconnectFromBall(); //sync
@@ -313,7 +313,7 @@ class PacmanWorld extends Forge2DWorld
     pacmanDyingNotifier.value = 0;
   }
 
-  void resetGhostLayer({bool mazeResize = false}) {
+  void _resetGhostLayer({bool mazeResize = false}) {
     if (game.level.multipleSpawningGhosts || mazeResize) {
       for (Ghost ghost in ghostPlayersList) {
         ghost.disconnectFromBall(); //sync
@@ -334,10 +334,10 @@ class PacmanWorld extends Forge2DWorld
   void reset({bool mazeResize = false}) {
     cancelMultiGhostAdderTimer();
     _cancelSirenVolumeUpdatedTimer;
-    removeTutorial();
-    resetMaze();
-    resetPacmanLayer(mazeResize: mazeResize);
-    resetGhostLayer(mazeResize: mazeResize);
+    _removeTutorial();
+    _resetMaze();
+    _resetPacmanLayer(mazeResize: mazeResize);
+    _resetGhostLayer(mazeResize: mazeResize);
     _setMazeAngle(0);
     //cameraRotateableOnPacmanDeathFlourish = true; //perhaps not necessary
   }
@@ -365,7 +365,7 @@ class PacmanWorld extends Forge2DWorld
   @override
   void onDragStart(DragStartEvent event) {
     super.onDragStart(event);
-    if (iOS) {
+    if (_iOS) {
       _fingersLastDragAngle[event.pointerId] = null;
     } else {
       _fingersLastDragAngle[event.pointerId] = atan2(
@@ -390,7 +390,7 @@ class PacmanWorld extends Forge2DWorld
         double spinMultiplier = 4 * min(1, eventVectorLengthProportion / 0.75);
 
         if (!game.mazeEverRotated) {
-          removeTutorial();
+          _removeTutorial();
           game.mazeEverRotated = true;
         }
 
