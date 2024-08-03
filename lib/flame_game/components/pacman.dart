@@ -8,7 +8,7 @@ import '../icons/pacman_sprites.dart';
 import '../maze.dart';
 import 'game_character.dart';
 import 'ghost.dart';
-import 'mini_pellet.dart';
+import 'pellet.dart';
 import 'super_pellet.dart';
 
 const int _kPacmanDeadResetTimeMillis = 1700;
@@ -66,10 +66,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
 
   void _onCollideWith(PositionComponent other) {
     if (current != CharacterState.deadPacman) {
-      if (other is MiniPelletSprite ||
-          other is SuperPelletSprite ||
-          other is MiniPelletCircle ||
-          other is SuperPelletCircle) {
+      if (other is Pellet) {
         _onCollideWithPellet(other);
       } else if (other is Ghost) {
         //If turn on collision callbacks in physicsBall this would be belt and braces. Right now not
@@ -81,9 +78,8 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   void _onCollideWithPellet(PositionComponent pellet) {
     if (current != CharacterState.deadPacman) {
       // can simultaneously eat pellet and die to ghost so don't want to do this if just died
-      pellet
-          .removeFromParent(); //do this first so checks based on game over apply
-      if (pellet is SuperPelletSprite || pellet is SuperPelletCircle) {
+      pellet.removeFromParent(); //do this first, for checks based on game over
+      if (pellet is SuperPellet) {
         world.scareGhosts();
       }
       _eat(isPellet: true);

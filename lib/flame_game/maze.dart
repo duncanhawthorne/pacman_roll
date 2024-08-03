@@ -147,13 +147,13 @@ class Maze {
             joffset: _largeSprites ? 1 / 2 : 0);
         if (_pelletAt(i, j)) {
           if (_mazeLayout[i][j] == _kMiniPellet) {
-            result.add(MiniPelletCircle(position: center));
+            result.add(MiniPellet(position: center));
           }
           if (_mazeLayout[i][j] == _kSuperPellet) {
             if (superPelletsEnabled) {
-              result.add(SuperPelletCircle(position: center));
+              result.add(SuperPellet(position: center));
             } else {
-              result.add(MiniPelletCircle(position: center));
+              result.add(MiniPellet(position: center));
             }
           }
         }
