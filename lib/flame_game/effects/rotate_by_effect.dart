@@ -8,6 +8,6 @@ class RotateByAngleEffect extends RotateEffect {
       : super.by(
             angle,
             EffectController(
-                duration: kGhostResetTimeMillis / 1000, curve: Curves.linear),
+                duration: kGhostResetTimeMillis / 1000, curve: Curves.easeOut),
             onComplete: onComplete);
 }

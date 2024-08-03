@@ -3,7 +3,7 @@ import 'package:flame_forge2d/flame_forge2d.dart';
 
 import '../maze.dart';
 
-const useForgePhysicsBallRotation = false;
+const _useForgePhysicsBallRotation = false;
 
 class PhysicsBall extends BodyComponent with IgnoreEvents {
   PhysicsBall({
@@ -15,12 +15,12 @@ class PhysicsBall extends BodyComponent with IgnoreEvents {
                 CircleShape()
                   ..radius = radius ?? maze.spriteWidth() / 2 * 0.99, //0.95
                 restitution: 0.0,
-                friction: useForgePhysicsBallRotation ? 1 : 0,
+                friction: _useForgePhysicsBallRotation ? 1 : 0,
                 userData: PhysicsBall,
               ),
             ],
             bodyDef: BodyDef(
-              angularDamping: useForgePhysicsBallRotation ? 0.1 : 0.1,
+              angularDamping: _useForgePhysicsBallRotation ? 0.1 : 0.1,
               position: position,
               type: BodyType.dynamic,
               userData: PhysicsBall,

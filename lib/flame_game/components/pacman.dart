@@ -75,7 +75,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     }
   }
 
-  void _onCollideWithPellet(PositionComponent pellet) {
+  void _onCollideWithPellet(Pellet pellet) {
     if (current != CharacterState.deadPacman) {
       // can simultaneously eat pellet and die to ghost so don't want to do this if just died
       pellet.removeFromParent(); //do this first, for checks based on game over

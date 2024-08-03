@@ -9,5 +9,5 @@ class MoveToPositionEffect extends MoveToEffect {
       : super(
             destination,
             EffectController(
-                duration: kGhostResetTimeMillis / 1000, curve: Curves.linear));
+                duration: kGhostResetTimeMillis / 1000, curve: Curves.easeOut));
 }

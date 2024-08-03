@@ -13,10 +13,16 @@ const int kGhostChaseTimeMillis = 6000;
 const int kGhostResetTimeMillis = 1000;
 //const multipleSpawningGhosts = false;
 
+final _ghostSpriteMap = {
+  0: 'dash/ghost1.png',
+  1: 'dash/ghost3.png',
+  2: 'dash/ghost2.png'
+};
+
 class Ghost extends GameCharacter {
   Ghost({
     required this.idNum,
-  }) : super(position: maze.ghostStartForId(idNum));
+  }) : super(position: maze.ghostSpawnForId(idNum));
 
   //int ghostScaredTimeLatest = 0; //a long time ago
   int _ghostDeadTimeLatest = 0; //a long time ago
@@ -26,19 +32,7 @@ class Ghost extends GameCharacter {
   Future<Map<CharacterState, SpriteAnimation>?> _getAnimations() async {
     return {
       CharacterState.normal: SpriteAnimation.spriteList(
-        [
-          await game.loadSprite(idNum == 0
-              ? 'dash/ghost1.png'
-              : idNum == 1
-                  ? 'dash/ghost3.png'
-                  : idNum == 2
-                      ? 'dash/ghost2.png'
-                      : [
-                          'dash/ghost1.png',
-                          'dash/ghost2.png',
-                          'dash/ghost3.png'
-                        ][world.random.nextInt(3)])
-        ],
+        [await game.loadSprite(_ghostSpriteMap[idNum % 3]!)],
         stepTime: double.infinity,
       ),
       CharacterState.scared: SpriteAnimation.spriteList(
@@ -83,7 +77,8 @@ class Ghost extends GameCharacter {
           specialSpawnLocation!.setFrom(world.pacmanPlayersList[0].position);
           add(MoveToPositionEffect(specialSpawnLocation!));
         } else {
-          disconnectFromBall();
+          /// can't call [disconnectSpriteFromBall] as body not yet initialised
+          connectedToBall = false;
           add(MoveToPositionEffect(maze.ghostStart));
         }
         add(RotateByAngleEffect(smallAngle(-angle)));
@@ -153,7 +148,7 @@ class Ghost extends GameCharacter {
     world.ghostPlayersList.add(this);
     animations = await _getAnimations();
     current = CharacterState.deadGhost;
-    if (idNum == 100) {
+    if (idNum >= 3) {
       startDead();
     }
   }

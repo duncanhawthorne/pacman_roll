@@ -173,7 +173,7 @@ class PacmanWorld extends Forge2DWorld
         if (game.isGameLive &&
             !gameWonOrLost &&
             !doingLevelResetFlourish.value) {
-          ghostWrapper.add(Ghost(idNum: 100));
+          ghostWrapper.add(Ghost(idNum: [3, 4, 5][random.nextInt(3)]));
         } else {
           timer.cancel();
           ghostTimer = null;
