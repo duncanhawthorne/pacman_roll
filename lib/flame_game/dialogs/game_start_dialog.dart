@@ -76,7 +76,6 @@ class StartDialog extends StatelessWidget {
                       onPressed: () {
                         game.overlays.remove(GameScreen.startDialogKey);
                         game.start();
-                        //context.go('/');
                       },
                       child: Text('Play', style: textStyleBody)),
                 ],

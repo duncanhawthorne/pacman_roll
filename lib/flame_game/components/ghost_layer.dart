@@ -1,0 +1,173 @@
+import 'dart:async' as async;
+
+import 'package:flame/components.dart';
+import 'package:flutter/foundation.dart';
+
+import '../../audio/sounds.dart';
+import '../pacman_game.dart';
+import '../pacman_world.dart';
+import 'game_character.dart';
+import 'ghost.dart';
+import 'wrapper_no_events.dart';
+
+final bool _iOS = defaultTargetPlatform == TargetPlatform.iOS;
+final bool _sirenEnabled = !_iOS;
+
+class Ghosts extends WrapperNoEvents
+    with HasWorldReference<PacmanWorld>, HasGameReference<PacmanGame> {
+  @override
+  final priority = 1;
+
+  async.Timer? _ghostTimer;
+  async.Timer? _sirenTimer;
+
+  final List<Ghost> ghostList = [];
+
+  int scaredTimeLatest = 0;
+
+  double _averageGhostSpeed() {
+    if (!game.isGameLive ||
+        world.pacmans.numberAlivePacman() == 0 ||
+        world.gameWonOrLost ||
+        ghostList.isEmpty) {
+      return 0;
+    } else {
+      return ghostList
+              .map((Ghost ghost) =>
+                  ghost.current == CharacterState.normal ? ghost.speed : 0.0)
+              .reduce((value, element) => value + element) /
+          ghostList.length;
+    }
+  }
+
+  void sirenVolumeUpdatedTimer() async {
+    // ignore: prefer_conditional_assignment
+    if (_sirenEnabled) {
+      if (_sirenTimer == null && game.isGameLive && !world.gameWonOrLost) {
+        _sirenTimer =
+            async.Timer.periodic(const Duration(milliseconds: 250), (timer) {
+          if (game.isGameLive && !world.gameWonOrLost) {
+            game.audioController
+                .setSirenVolume(_averageGhostSpeed(), gradual: true);
+          } else {
+            game.audioController.setSirenVolume(0);
+            timer.cancel();
+            _sirenTimer = null;
+          }
+        });
+      }
+    }
+  }
+
+  void _cancelSirenVolumeUpdatedTimer() {
+    if (_sirenTimer != null) {
+      game.audioController.setSirenVolume(0);
+      _sirenTimer!.cancel();
+      _sirenTimer = null;
+    }
+  }
+
+  void _addThreeGhosts() {
+    for (int i = 0; i < 3; i++) {
+      add(Ghost(idNum: i));
+    }
+  }
+
+  void scareGhosts() {
+    if (world.pellets.pelletsRemainingNotifier.value != 0) {
+      world.play(SfxType.ghostsScared);
+      for (Ghost ghost in ghostList) {
+        ghost.setScared();
+      }
+    }
+  }
+
+  void startMultiGhostAdderTimer() {
+    if (game.level.multipleSpawningGhosts &&
+        _ghostTimer == null &&
+        game.isGameLive &&
+        !world.gameWonOrLost) {
+      _ghostTimer = async.Timer.periodic(
+          Duration(milliseconds: world.level.ghostSpwanTimerLength * 1000),
+          (timer) {
+        if (game.isGameLive &&
+            !world.gameWonOrLost &&
+            !world.doingLevelResetFlourish.value) {
+          add(Ghost(idNum: [3, 4, 5][game.random.nextInt(3)]));
+        } else {
+          timer.cancel();
+          _ghostTimer = null;
+        }
+      });
+    }
+  }
+
+  void cancelMultiGhostAdderTimer() {
+    if (world.level.multipleSpawningGhosts && _ghostTimer != null) {
+      _ghostTimer!.cancel();
+      _ghostTimer = null;
+    }
+  }
+
+  void _trimAllGhosts() {
+    for (int i = 0; i < ghostList.length; i++) {
+      int j = ghostList.length - 1 - i;
+      if (j >= 0) {
+        ghostList[j].removeFromParent();
+      }
+    }
+  }
+
+  void disconnectGhostsFromBalls() {
+    for (int i = 0; i < ghostList.length; i++) {
+      ghostList[i].disconnectFromBall();
+    }
+  }
+
+  void resetAfterGameWin() {
+    scaredTimeLatest = 0;
+    _trimAllGhosts();
+    for (Ghost ghost in ghostList) {
+      /// now defunct as [trimAllGhosts]
+      ghost.setPositionForGameEnd();
+    }
+  }
+
+  void resetAfterPacmanDeath() {
+    for (Ghost ghost in ghostList) {
+      ghost.slideToStartPositionAfterPacmanDeath();
+    }
+  }
+
+  void resetAfterPacmanDeathReal() {
+    if (game.level.multipleSpawningGhosts) {
+      _trimAllGhosts();
+      _addThreeGhosts();
+    } else {
+      for (Ghost ghost in ghostList) {
+        ghost.setStartPositionAfterPacmanDeath();
+      }
+    }
+  }
+
+  @override
+  void reset({bool mazeResize = false}) {
+    cancelMultiGhostAdderTimer();
+    _cancelSirenVolumeUpdatedTimer;
+    if (world.level.multipleSpawningGhosts || mazeResize) {
+      for (Ghost ghost in ghostList) {
+        ghost.disconnectFromBall(); //sync
+        ghost.removeFromParent(); //async
+      }
+      _addThreeGhosts();
+    } else {
+      if (ghostList.isEmpty) {
+        _addThreeGhosts();
+      } else {
+        for (Ghost ghost in ghostList) {
+          ghost.setStartPositionAfterPacmanDeath();
+        }
+      }
+    }
+  }
+}

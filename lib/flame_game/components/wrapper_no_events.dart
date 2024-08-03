@@ -5,21 +5,8 @@ import 'package:flame/components.dart';
 /// Especially on drag events deliverAtPoint
 /// Also set IgnoreEvents to speed up deliverAtPoint for all components queried
 
-class WrapperNoEvents extends PositionComponent with IgnoreEvents {}
+class WrapperNoEvents extends PositionComponent with IgnoreEvents {
+  void reset() {}
 
-class PelletWrapper extends WrapperNoEvents {
-  @override
-  final priority = -2;
-}
-
-class WallWrapper extends WrapperNoEvents {}
-
-class PacmanWrapper extends WrapperNoEvents {
-  @override
-  final priority = 2;
-}
-
-class GhostWrapper extends WrapperNoEvents {
-  @override
-  final priority = 1;
+  void start() {}
 }

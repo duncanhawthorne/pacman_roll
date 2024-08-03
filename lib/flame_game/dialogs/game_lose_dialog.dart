@@ -26,7 +26,7 @@ class GameLoseDialog extends StatelessWidget {
         titleText(text: 'Game Over'),
         bodyWidget(
           child: Text(
-            "Dots left: ${game.world.pelletsRemainingNotifier.value}",
+            "Dots left: ${game.world.pellets.pelletsRemainingNotifier.value}",
             style: textStyleBody,
           ),
         ),

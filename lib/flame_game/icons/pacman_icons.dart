@@ -9,7 +9,7 @@ import 'pacman_sprites.dart';
 
 Widget animatedPacmanIcon(PacmanGame game, int index) {
   return ValueListenableBuilder<int>(
-      valueListenable: game.world.pacmanDyingNotifier,
+      valueListenable: game.world.pacmans.pacmanDyingNotifier,
       builder: (BuildContext context, int value, Widget? child) {
         return TweenAnimationBuilder(
             tween: IntTween(
@@ -20,12 +20,15 @@ Widget animatedPacmanIcon(PacmanGame game, int index) {
                         4 *
                         min(
                             1,
-                            max(0,
-                                game.world.pacmanDyingNotifier.value - index))),
+                            max(
+                                0,
+                                game.world.pacmans.pacmanDyingNotifier.value -
+                                    index))),
             duration: Duration(
-                milliseconds: game.world.pacmanDyingNotifier.value <= index
-                    ? 0 //when reset game
-                    : kPacmanDeadResetTimeAnimationMillis),
+                milliseconds:
+                    game.world.pacmans.pacmanDyingNotifier.value <= index
+                        ? 0 //when reset game
+                        : kPacmanDeadResetTimeAnimationMillis),
             builder: (BuildContext context, int val, __) {
               return pacmanIconCache[val];
             });
@@ -85,9 +88,9 @@ class MyPainter extends CustomPainter {
 // ignore: unused_element
 Widget _animatedPacmanIconDirect(PacmanGame game, int startValue) {
   return ValueListenableBuilder<int>(
-      valueListenable: game.world.pacmanDyingNotifier,
+      valueListenable: game.world.pacmans.pacmanDyingNotifier,
       builder: (BuildContext context, int value, Widget? child) {
-        if (game.world.pacmanDyingNotifier.value != startValue) {
+        if (game.world.pacmans.pacmanDyingNotifier.value != startValue) {
           return _pacmanIconFromPainterDirect();
         } else {
           return pacmanIconCache[pacmanRenderFracIncrementsNumber ~/ 4];

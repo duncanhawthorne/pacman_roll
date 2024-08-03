@@ -59,7 +59,7 @@ Widget topRightOverlayWidget(BuildContext context, PacmanGame game) {
             },
           ),
           ValueListenableBuilder<int>(
-            valueListenable: game.world.numberOfDeathsNotifier,
+            valueListenable: game.world.pacmans.numberOfDeathsNotifier,
             builder: (BuildContext context, int value, Widget? child) {
               return Row(
                   crossAxisAlignment: CrossAxisAlignment.center,

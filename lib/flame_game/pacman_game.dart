@@ -1,4 +1,5 @@
 import 'dart:core';
+import 'dart:math';
 
 import 'package:flame/camera.dart';
 import 'package:flame/components.dart';
@@ -64,20 +65,21 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
   }
 
   String userString = "";
-  final stopwatch = Stopwatch();
 
+  final stopwatch = Stopwatch();
   int get stopwatchMilliSeconds =>
       stopwatch.elapsed.inMilliseconds +
-      world.numberOfDeathsNotifier.value * 5000;
-
+      world.pacmans.numberOfDeathsNotifier.value * 5000;
   bool get levelStarted => stopwatchMilliSeconds > 0;
-  bool mazeEverRotated = false;
+  int now = DateTime.now().millisecondsSinceEpoch;
 
   bool get isGameLive =>
       !paused &&
       isLoaded &&
       isMounted &&
       !(overlays.isActive(GameScreen.startDialogKey) && !levelStarted);
+
+  final Random random = Random();
 
   @override
   Color backgroundColor() => Palette.flameGameBackground.color;
@@ -88,21 +90,22 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
     gameTmp["userString"] = userString;
     gameTmp["levelNum"] = level.number;
     gameTmp["levelCompleteTime"] = stopwatchMilliSeconds;
-    gameTmp["dateTime"] = world.now;
+    gameTmp["dateTime"] = now;
     gameTmp["mazeId"] = maze.mazeId;
     return gameTmp;
   }
 
-  void winOrLoseGameListener() {
-    assert(world.pelletsRemainingNotifier.value > 0 || !levelStarted);
-    world.numberOfDeathsNotifier.addListener(() {
-      if (world.numberOfDeathsNotifier.value >= level.maxAllowedDeaths &&
+  void _winOrLoseGameListener() {
+    assert(world.pellets.pelletsRemainingNotifier.value > 0 || !levelStarted);
+    world.pacmans.numberOfDeathsNotifier.addListener(() {
+      if (world.pacmans.numberOfDeathsNotifier.value >=
+              level.maxAllowedDeaths &&
           levelStarted) {
         _handleLoseGame();
       }
     });
-    world.pelletsRemainingNotifier.addListener(() {
-      if (world.pelletsRemainingNotifier.value == 0 && levelStarted) {
+    world.pellets.pelletsRemainingNotifier.addListener(() {
+      if (world.pellets.pelletsRemainingNotifier.value == 0 && levelStarted) {
         _handleWinGame();
       }
     });
@@ -110,8 +113,8 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
 
   void _handleWinGame() {
     if (isGameLive) {
-      if (world.pelletsRemainingNotifier.value == 0) {
-        world.winGameWorldTidy();
+      if (world.pellets.pelletsRemainingNotifier.value == 0) {
+        world.resetAfterGameWin();
         stopwatch.stop();
         if (stopwatchMilliSeconds > 10 * 1000) {
           save.firebasePushSingleScore(
@@ -153,26 +156,29 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
     super.onGameResize(size);
   }
 
-  void reset({bool mazeResize = false}) {
-    userString = _getRandomString(world.random, 15);
+  void reset({firstRun = false}) {
+    userString = _getRandomString(random, 15);
     _cleanOverlaysAndDialogs();
     _addOverlays();
     stopwatch.stop();
     stopwatch.reset();
-    world.reset(mazeResize: mazeResize);
+    if (!firstRun) {
+      assert(world.isLoaded);
+      world.reset();
+    }
   }
 
-  void start({bool mazeResize = false}) {
+  void start() {
     resumeEngine();
-    reset(mazeResize: mazeResize);
+    reset();
     world.start();
   }
 
   int _showMainMenuLastRunTime = 0;
 
   void showMainMenu() {
-    _showMainMenuLastRunTime = world.now;
-    int showMainMenuLastRunTimeLast = world.now;
+    _showMainMenuLastRunTime = now;
+    int showMainMenuLastRunTimeLast = now;
     overlays.add(GameScreen.startDialogKey);
     Future.delayed(const Duration(milliseconds: 1000), () {
       if (!isGameLive &&
@@ -198,8 +204,15 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
   Future<void> onLoad() async {
     super.onLoad();
     _bugFixes();
-    reset();
+    reset(firstRun: true);
     showMainMenu();
+    _winOrLoseGameListener(); //isn't disposed so run once, not on start()
+  }
+
+  @override
+  void update(double dt) {
+    super.update(dt);
+    now = DateTime.now().millisecondsSinceEpoch;
   }
 
   void _end() {

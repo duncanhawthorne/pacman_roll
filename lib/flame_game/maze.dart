@@ -1,13 +1,12 @@
 import 'dart:math';
 
 import 'package:flame/components.dart';
-import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flutter/foundation.dart';
 
-import 'components/maze_wall.dart';
 import 'components/mini_pellet.dart';
+import 'components/pellet.dart';
 import 'components/super_pellet.dart';
-import 'components/wrapper_no_events.dart';
+import 'components/wall.dart';
 import 'pacman_game.dart';
 
 final List<String> mazeNames = ["A", "B", "C"];
@@ -139,9 +138,9 @@ class Maze {
         _pelletCodeAtCell(i + 1, j + 1);
   }
 
-  PelletWrapper pellets(
+  List<Pellet> pellets(
       ValueNotifier pelletsRemainingNotifier, bool superPelletsEnabled) {
-    final result = PelletWrapper();
+    final List<Pellet> result = [];
     //pelletsRemainingNotifier.value = 0;
     for (int i = 0; i < _mazeLayout.length; i++) {
       for (int j = 0; j < _mazeLayout[i].length; j++) {
@@ -167,8 +166,9 @@ class Maze {
 
   static const _mazeInnerWallWidthFactor = 0.7;
   static const double _pixelationBuffer = 0.03;
-  WallWrapper mazeWalls() {
-    final result = WallWrapper();
+
+  List<Component> mazeWalls() {
+    final List<Component> result = [];
     double scale = blockWidth();
     for (int i = 0; i < _mazeLayout.length; i++) {
       for (int j = 0; j < _mazeLayout[i].length; j++) {

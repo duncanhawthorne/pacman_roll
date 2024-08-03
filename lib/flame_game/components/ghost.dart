@@ -27,7 +27,9 @@ class Ghost extends GameCharacter {
   //int ghostScaredTimeLatest = 0; //a long time ago
   int _ghostDeadTimeLatest = 0; //a long time ago
   int idNum;
-  Vector2? specialSpawnLocation;
+  Vector2? _specialSpawnLocation;
+
+  get ghosts => world.ghosts;
 
   Future<Map<CharacterState, SpriteAnimation>?> _getAnimations() async {
     return {
@@ -59,14 +61,14 @@ class Ghost extends GameCharacter {
         // if dead, need to continue dead animation without physics applying, then get sequenced to scared via standard sequence code
         current = CharacterState.scared;
       }
-      world.allGhostScaredTimeLatest = world.now;
+      ghosts.scaredTimeLatest = game.now;
     }
   }
 
   void setDead({spawningDeath = false}) {
     if (!world.gameWonOrLost) {
       current = CharacterState.deadGhost; //stops further interactions
-      _ghostDeadTimeLatest = world.now;
+      _ghostDeadTimeLatest = game.now;
       if (game.level.multipleSpawningGhosts && !spawningDeath) {
         removeFromParent();
       } else {
@@ -74,9 +76,10 @@ class Ghost extends GameCharacter {
           /// can't call [disconnectSpriteFromBall] as body not yet initialised
           connectedToBall = false;
           if (world.level.homingGhosts) {
-            specialSpawnLocation = Vector2.all(0);
-            specialSpawnLocation!.setFrom(world.pacmanPlayersList[0].position);
-            add(MoveToPositionEffect(specialSpawnLocation!));
+            _specialSpawnLocation = Vector2.all(0);
+            _specialSpawnLocation!
+                .setFrom(world.pacmans.pacmanList[0].position);
+            add(MoveToPositionEffect(_specialSpawnLocation!));
           } else {
             add(MoveToPositionEffect(maze.ghostStart));
           }
@@ -92,7 +95,7 @@ class Ghost extends GameCharacter {
 
   void startDead() {
     current = CharacterState.deadGhost;
-    _ghostDeadTimeLatest = world.now;
+    _ghostDeadTimeLatest = game.now;
     setDead(spawningDeath: true);
   }
 
@@ -100,7 +103,7 @@ class Ghost extends GameCharacter {
     setPositionStill(maze.ghostStartForId(idNum));
     angle = 0;
     _ghostDeadTimeLatest = 0;
-    world.allGhostScaredTimeLatest = 0;
+    ghosts.scaredTimeLatest = 0;
   }
 
   void slideToStartPositionAfterPacmanDeath() {
@@ -112,17 +115,17 @@ class Ghost extends GameCharacter {
   void setPositionForGameEnd() {
     setPositionStill(maze.cage + Vector2.random() / 100);
     _ghostDeadTimeLatest = 0;
-    world.allGhostScaredTimeLatest = 0;
+    ghosts.scaredTimeLatest = 0;
   }
 
   void _ghostDeadScaredScaredIshNormalSequence() {
     if (current == CharacterState.deadGhost) {
-      if (world.now - _ghostDeadTimeLatest > kGhostResetTimeMillis) {
+      if (game.now - _ghostDeadTimeLatest > kGhostResetTimeMillis) {
         if (!world.gameWonOrLost && _ghostDeadTimeLatest != 0) {
           //dont set on game over or after pacman death
-          if (specialSpawnLocation != null) {
-            setPositionStill(specialSpawnLocation!);
-            specialSpawnLocation = null;
+          if (_specialSpawnLocation != null) {
+            setPositionStill(_specialSpawnLocation!);
+            _specialSpawnLocation = null;
           } else {
             setPositionStill(maze.ghostStart + Vector2.random() / 100);
           }
@@ -131,14 +134,13 @@ class Ghost extends GameCharacter {
       }
     }
     if (current == CharacterState.scared) {
-      if (world.now - world.allGhostScaredTimeLatest >
-          kGhostChaseTimeMillis * 2 / 3) {
+      if (game.now - ghosts.scaredTimeLatest > kGhostChaseTimeMillis * 2 / 3) {
         current = CharacterState.scaredIsh;
       }
     }
 
     if (current == CharacterState.scaredIsh) {
-      if (world.now - world.allGhostScaredTimeLatest > kGhostChaseTimeMillis) {
+      if (game.now - ghosts.scaredTimeLatest > kGhostChaseTimeMillis) {
         current = CharacterState.normal;
         game.audioController.stopSfx(SfxType.ghostsScared);
       }
@@ -148,7 +150,7 @@ class Ghost extends GameCharacter {
   @override
   Future<void> onLoad() async {
     super.onLoad();
-    world.ghostPlayersList.add(this);
+    ghosts.ghostList.add(this);
     animations = await _getAnimations();
     current = CharacterState.deadGhost;
     if (idNum >= 3) {
@@ -158,7 +160,7 @@ class Ghost extends GameCharacter {
 
   @override
   Future<void> onRemove() async {
-    world.ghostPlayersList.remove(this);
+    ghosts.ghostList.remove(this);
     super.onRemove();
   }
 
