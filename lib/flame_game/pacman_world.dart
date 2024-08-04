@@ -90,29 +90,31 @@ class PacmanWorld extends Forge2DWorld
   static const bool _slideCharactersAfterPacmanDeath = true;
 
   void resetAfterPacmanDeath(Pacman dyingPacman) {
+    resetSlideAfterPacmanDeath(dyingPacman);
+  }
+
+  void resetSlideAfterPacmanDeath(Pacman dyingPacman) {
     //reset ghost scared status. Shouldn't be relevant as just died
     game.audioController.stopSfx(SfxType.ghostsScared);
-    //ghosts.scaredTimeLatest = 0;
-
     if (!gameWonOrLost) {
       if (_slideCharactersAfterPacmanDeath) {
-        dyingPacman.slideToStartPositionAfterDeath();
-        ghosts.resetAfterPacmanDeath();
+        dyingPacman.resetSlideAfterDeath();
+        ghosts.resetSlideAfterPacmanDeath();
         _cameraRotatableOnPacmanDeathFlourish = false;
         game.camera.viewfinder.add(RotateByAngleEffect(
             smallAngle(-game.camera.viewfinder.angle),
-            onComplete: _resetAfterPacmanDeathReal));
+            onComplete: _resetInstantAfterPacmanDeath));
       } else {
-        _resetAfterPacmanDeathReal();
+        _resetInstantAfterPacmanDeath();
       }
     } else {
       doingLevelResetFlourish.value = false;
     }
   }
 
-  void _resetAfterPacmanDeathReal() {
-    pacmans.resetAfterPacmanDeathReal();
-    ghosts.resetAfterPacmanDeathReal();
+  void _resetInstantAfterPacmanDeath() {
+    pacmans.resetInstantAfterPacmanDeath();
+    ghosts.resetInstantAfterPacmanDeath();
     _cameraRotatableOnPacmanDeathFlourish = true;
     _setMazeAngle(0);
     doingLevelResetFlourish.value = false;
@@ -120,7 +122,6 @@ class PacmanWorld extends Forge2DWorld
 
   void reset({firstRun = false}) {
     _setMazeAngle(0);
-    //cameraRotateableOnPacmanDeathFlourish = true; //perhaps not necessary
     if (!firstRun) {
       for (WrapperNoEvents wrapper in wrappers) {
         assert(wrapper.isLoaded);

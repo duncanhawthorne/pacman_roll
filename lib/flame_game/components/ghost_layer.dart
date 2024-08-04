@@ -128,20 +128,21 @@ class Ghosts extends WrapperNoEvents
     _trimAllGhosts();
   }
 
-  void resetAfterPacmanDeath() {
+  void resetSlideAfterPacmanDeath() {
     for (Ghost ghost in ghostList) {
-      ghost.slideToStartPositionAfterPacmanDeath();
+      ghost.resetSlideAfterPacmanDeath();
     }
   }
 
-  void resetAfterPacmanDeathReal() {
+  void resetInstantAfterPacmanDeath() {
     if (game.level.multipleSpawningGhosts) {
       _trimAllGhosts();
       _addThreeGhosts();
     } else {
       for (Ghost ghost in ghostList) {
-        ghost.setStartPositionAfterPacmanDeath();
+        ghost.resetInstantAfterPacmanDeath();
       }
+      scaredTimeLatest = 0;
     }
   }
 
@@ -157,7 +158,7 @@ class Ghosts extends WrapperNoEvents
         _addThreeGhosts();
       } else {
         for (Ghost ghost in ghostList) {
-          ghost.setStartPositionAfterPacmanDeath();
+          ghost.resetInstantAfterPacmanDeath();
         }
       }
     }

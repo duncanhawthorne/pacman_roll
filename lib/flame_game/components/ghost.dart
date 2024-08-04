@@ -23,7 +23,6 @@ class Ghost extends GameCharacter {
     required this.idNum,
   }) : super(position: maze.ghostSpawnForId(idNum));
 
-  //int ghostScaredTimeLatest = 0; //a long time ago
   int _ghostDeadTimeLatest = 0; //a long time ago
   int idNum;
   Vector2? _specialSpawnLocation;
@@ -89,32 +88,17 @@ class Ghost extends GameCharacter {
     }
   }
 
-  void startDead() {
-    current = CharacterState.deadGhost;
-    _ghostDeadTimeLatest = game.now;
-    setDead(spawningDeath: true);
-  }
-
-  void setStartPositionAfterPacmanDeath() {
-    setPositionStill(maze.ghostStartForId(idNum));
-    angle = 0;
-    _ghostDeadTimeLatest = 0;
-    world.ghosts.scaredTimeLatest = 0;
-  }
-
-  void slideToStartPositionAfterPacmanDeath() {
+  void resetSlideAfterPacmanDeath() {
     disconnectFromBall();
     add(MoveToPositionEffect(maze.ghostStartForId(idNum)));
     add(RotateByAngleEffect(smallAngle(-angle)));
   }
 
-  /*
-  void setPositionForGameEnd() {
-    setPositionStill(maze.cage + Vector2.random() / 100);
+  void resetInstantAfterPacmanDeath() {
+    setPositionStill(maze.ghostStartForId(idNum));
+    angle = 0;
     _ghostDeadTimeLatest = 0;
-    world.ghosts.scaredTimeLatest = 0;
   }
-   */
 
   void _ghostDeadScaredScaredIshNormalSequence() {
     if (current == CharacterState.deadGhost) {
@@ -153,7 +137,7 @@ class Ghost extends GameCharacter {
     animations = await _getAnimations();
     current = CharacterState.deadGhost;
     if (idNum >= 3) {
-      startDead();
+      setDead(spawningDeath: true);
     }
   }
 

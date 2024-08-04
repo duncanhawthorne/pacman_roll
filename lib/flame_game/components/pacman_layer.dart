@@ -27,7 +27,7 @@ class Pacmans extends WrapperNoEvents {
         .reduce((value, element) => value + element);
   }
 
-  void resetAfterPacmanDeathReal() {
+  void resetInstantAfterPacmanDeath() {
     assert(pacmanList.length == 1);
     Pacman dyingPacman = pacmanList[0];
     dyingPacman.setStartPositionAfterDeath();
