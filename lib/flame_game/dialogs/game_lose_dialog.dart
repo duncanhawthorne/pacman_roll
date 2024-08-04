@@ -38,7 +38,7 @@ class GameLoseDialog extends StatelessWidget {
                 style: buttonStyle(),
                 onPressed: () {
                   game.overlays.remove(GameScreen.loseDialogKey);
-                  game.start();
+                  game.resetAndStart();
                 },
                 child: Text('Retry', style: textStyleBody)),
           ],

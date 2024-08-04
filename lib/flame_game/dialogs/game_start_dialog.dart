@@ -49,7 +49,7 @@ class StartDialog extends StatelessWidget {
                       style: buttonStyle(borderColor: Palette.redWarning),
                       onPressed: () {
                         game.overlays.remove(GameScreen.startDialogKey);
-                        game.start();
+                        game.resetAndStart();
                       },
                       child: Text('Reset', style: textStyleBody)),
                   TextButton(

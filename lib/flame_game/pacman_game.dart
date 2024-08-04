@@ -129,7 +129,6 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
   }
 
   void _handleLoseGame() {
-    //pauseEngine();
     audioController.stopAllSfx();
     _cleanOverlaysAndDialogs();
     overlays.add(GameScreen.loseDialogKey);
@@ -168,9 +167,13 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
     }
   }
 
+  void resetAndStart() {
+    reset();
+    start();
+  }
+
   void start() {
     resumeEngine();
-    reset();
     world.start();
   }
 

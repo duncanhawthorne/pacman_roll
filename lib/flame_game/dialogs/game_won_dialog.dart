@@ -62,7 +62,7 @@ class GameWonDialog extends StatelessWidget {
                 style: buttonStyle(),
                 onPressed: () {
                   game.overlays.remove(GameScreen.wonDialogKey);
-                  game.start();
+                  game.resetAndStart();
                 },
                 child: Text('Retry', style: textStyleBody)),
           ],
