@@ -22,8 +22,7 @@ class Pacmans extends WrapperNoEvents {
       return 0;
     }
     return pacmanList
-        .map((Pacman pacman) =>
-            pacman.current != CharacterState.deadPacman ? 1 : 0)
+        .map((Pacman pacman) => pacman.current != CharacterState.dead ? 1 : 0)
         .reduce((value, element) => value + element);
   }
 

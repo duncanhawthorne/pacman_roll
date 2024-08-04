@@ -50,8 +50,11 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     _connectToBall();
   }
 
-  void disconnectFromBall() {
-    _ball.setStatic();
+  void disconnectFromBall({spawning = false}) {
+    if (!spawning) {
+      /// if body not yet initialised, this will crash
+      _ball.setStatic();
+    }
     connectedToBall = false;
   }
 
@@ -91,12 +94,4 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   }
 }
 
-enum CharacterState {
-  normal,
-  scared,
-  scaredIsh,
-  eating,
-  deadGhost,
-  deadPacman,
-  birthing
-}
+enum CharacterState { normal, scared, scaredIsh, eating, dead, birthing }

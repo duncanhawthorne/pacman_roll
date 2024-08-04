@@ -44,7 +44,7 @@ class Ghost extends GameCharacter {
         ],
         stepTime: 0.1,
       ),
-      CharacterState.deadGhost: SpriteAnimation.spriteList(
+      CharacterState.dead: SpriteAnimation.spriteList(
         [await game.loadSprite('dash/eyes.png')],
         stepTime: double.infinity,
       ),
@@ -53,23 +53,22 @@ class Ghost extends GameCharacter {
 
   void setScared() {
     if (!world.gameWonOrLost) {
-      if (current != CharacterState.deadGhost) {
+      if (current != CharacterState.dead) {
         // if dead, need to continue dead animation without physics applying, then get sequenced to scared via standard sequence code
         current = CharacterState.scared;
       }
     }
   }
 
-  void setDead({spawningDeath = false}) {
+  void setDead({spawning = false}) {
     if (!world.gameWonOrLost) {
-      current = CharacterState.deadGhost; //stops further interactions
+      current = CharacterState.dead; //stops further interactions
       _ghostDeadTimeLatest = game.now;
-      if (game.level.multipleSpawningGhosts && !spawningDeath) {
+      if (game.level.multipleSpawningGhosts && !spawning) {
         removeFromParent();
       } else {
-        if (spawningDeath) {
-          /// can't call [disconnectSpriteFromBall] as body not yet initialised
-          connectedToBall = false;
+        if (spawning) {
+          disconnectFromBall(spawning: true);
           if (world.level.homingGhosts) {
             _specialSpawnLocation = Vector2.all(0);
             _specialSpawnLocation!
@@ -101,7 +100,7 @@ class Ghost extends GameCharacter {
   }
 
   void _ghostDeadScaredScaredIshNormalSequence() {
-    if (current == CharacterState.deadGhost) {
+    if (current == CharacterState.dead) {
       if (game.now - _ghostDeadTimeLatest > kGhostResetTimeMillis) {
         if (!world.gameWonOrLost && _ghostDeadTimeLatest != 0) {
           //dont set on game over or after pacman death
@@ -135,9 +134,9 @@ class Ghost extends GameCharacter {
     super.onLoad();
     world.ghosts.ghostList.add(this);
     animations = await _getAnimations();
-    current = CharacterState.deadGhost;
+    current = CharacterState.dead;
     if (idNum >= 3) {
-      setDead(spawningDeath: true);
+      setDead(spawning: true);
     }
   }
 

@@ -38,7 +38,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
         stepTime:
             _kPacmanHalfEatingResetTimeMillis / 1000 / pacmanEatingHalfFrames,
       ),
-      CharacterState.deadPacman: SpriteAnimation.spriteList(
+      CharacterState.dead: SpriteAnimation.spriteList(
           await pacmanSprites.pacmanDyingSprites(size),
           stepTime:
               kPacmanDeadResetTimeAnimationMillis / 1000 / pacmanDeadFrames,
@@ -51,7 +51,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   }
 
   void _eat({required isPellet}) {
-    if (current != CharacterState.deadPacman) {
+    if (current != CharacterState.dead) {
       if (current == CharacterState.normal) {
         current = CharacterState.eating;
         _pacmanStartEatingTimeLatest = game.now;
@@ -65,7 +65,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   }
 
   void _onCollideWith(PositionComponent other) {
-    if (current != CharacterState.deadPacman) {
+    if (current != CharacterState.dead) {
       if (other is Pellet) {
         _onCollideWithPellet(other);
       } else if (other is Ghost) {
@@ -76,7 +76,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   }
 
   void _onCollideWithPellet(Pellet pellet) {
-    if (current != CharacterState.deadPacman) {
+    if (current != CharacterState.dead) {
       // can simultaneously eat pellet and die to ghost so don't want to do this if just died
       pellet.removeFromParent(); //do this first, for checks based on game over
       if (pellet is SuperPellet) {
@@ -87,8 +87,8 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   }
 
   void _onCollideWithGhost(Ghost ghost) {
-    if (ghost.current == CharacterState.deadGhost ||
-        current == CharacterState.deadPacman ||
+    if (ghost.current == CharacterState.dead ||
+        current == CharacterState.dead ||
         !connectedToBall ||
         !ghost.connectedToBall) {
       //nothing, but need to keep if condition
@@ -101,7 +101,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   }
 
   void _eatGhost(Ghost ghost) {
-    if (current != CharacterState.deadPacman) {
+    if (current != CharacterState.dead) {
       //pacman visuals
       _eat(isPellet: false);
 
@@ -117,10 +117,10 @@ class Pacman extends GameCharacter with CollisionCallbacks {
 
   static const bool _freezeGhostsOnKillPacman = false;
   void _dieFromGhost() {
-    if (current != CharacterState.deadPacman &&
+    if (current != CharacterState.dead &&
         world.pellets.pelletsRemainingNotifier.value != 0) {
       world.play(SfxType.pacmanDeath);
-      current = CharacterState.deadPacman;
+      current = CharacterState.dead;
       disconnectFromBall();
       if (_freezeGhostsOnKillPacman) {
         world.ghosts.disconnectGhostsFromBalls();
@@ -162,10 +162,10 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   }
 
   void _pacmanDeadEatingNormalSequence() {
-    if (current == CharacterState.deadPacman && !world.gameWonOrLost) {
+    if (current == CharacterState.dead && !world.gameWonOrLost) {
       if (game.now - _pacmanDeadTimeLatest > _kPacmanDeadResetTimeMillis) {
         _dieFromGhostActionAfterDeathAnimation();
-        assert(current != CharacterState.deadPacman || world.gameWonOrLost);
+        assert(current != CharacterState.dead || world.gameWonOrLost);
       }
     }
     if (current == CharacterState.eating) {
