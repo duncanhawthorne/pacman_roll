@@ -30,7 +30,7 @@ class Pacmans extends WrapperNoEvents {
   void resetInstantAfterPacmanDeath() {
     assert(pacmanList.length == 1);
     Pacman dyingPacman = pacmanList[0];
-    dyingPacman.setStartPositionAfterDeath();
+    dyingPacman.resetInstantAfterDeath();
   }
 
   @override
@@ -45,7 +45,7 @@ class Pacmans extends WrapperNoEvents {
       if (pacmanList.isEmpty) {
         add(Pacman(position: maze.pacmanStart));
       } else {
-        pacmanList[0].setStartPositionAfterDeath();
+        pacmanList[0].resetInstantAfterDeath();
       }
     }
     numberOfDeathsNotifier.value = 0;

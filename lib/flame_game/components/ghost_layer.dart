@@ -129,12 +129,14 @@ class Ghosts extends WrapperNoEvents
   }
 
   void resetSlideAfterPacmanDeath() {
+    scaredTimeLatest = 0;
     for (Ghost ghost in ghostList) {
       ghost.resetSlideAfterPacmanDeath();
     }
   }
 
   void resetInstantAfterPacmanDeath() {
+    scaredTimeLatest = 0;
     if (game.level.multipleSpawningGhosts) {
       _trimAllGhosts();
       _addThreeGhosts();
@@ -142,7 +144,6 @@ class Ghosts extends WrapperNoEvents
       for (Ghost ghost in ghostList) {
         ghost.resetInstantAfterPacmanDeath();
       }
-      scaredTimeLatest = 0;
     }
   }
 
