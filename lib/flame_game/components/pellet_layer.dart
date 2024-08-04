@@ -16,12 +16,20 @@ class PelletWrapper extends WrapperNoEvents
   @override
   final priority = -2;
 
-  final pelletsRemainingNotifier = ValueNotifier(0);
+  final ValueNotifier<int> pelletsRemainingNotifier = ValueNotifier(0);
 
   @override
   void reset() {
-    removeAll(children);
+    if (children.isNotEmpty) {
+      removeAll(children);
+    }
     addAll(maze.pellets(
         pelletsRemainingNotifier, world.level.superPelletsEnabled));
+  }
+
+  @override
+  Future<void> onLoad() async {
+    super.onLoad();
+    reset();
   }
 }

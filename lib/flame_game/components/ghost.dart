@@ -11,7 +11,6 @@ import 'game_character.dart';
 
 const int kGhostChaseTimeMillis = 6000;
 const int kGhostResetTimeMillis = 1000;
-//const multipleSpawningGhosts = false;
 
 final _ghostSpriteMap = {
   0: 'dash/ghost1.png',
@@ -28,8 +27,6 @@ class Ghost extends GameCharacter {
   int _ghostDeadTimeLatest = 0; //a long time ago
   int idNum;
   Vector2? _specialSpawnLocation;
-
-  get ghosts => world.ghosts;
 
   Future<Map<CharacterState, SpriteAnimation>?> _getAnimations() async {
     return {
@@ -61,7 +58,6 @@ class Ghost extends GameCharacter {
         // if dead, need to continue dead animation without physics applying, then get sequenced to scared via standard sequence code
         current = CharacterState.scared;
       }
-      ghosts.scaredTimeLatest = game.now;
     }
   }
 
@@ -103,7 +99,7 @@ class Ghost extends GameCharacter {
     setPositionStill(maze.ghostStartForId(idNum));
     angle = 0;
     _ghostDeadTimeLatest = 0;
-    ghosts.scaredTimeLatest = 0;
+    world.ghosts.scaredTimeLatest = 0;
   }
 
   void slideToStartPositionAfterPacmanDeath() {
@@ -112,11 +108,13 @@ class Ghost extends GameCharacter {
     add(RotateByAngleEffect(smallAngle(-angle)));
   }
 
+  /*
   void setPositionForGameEnd() {
     setPositionStill(maze.cage + Vector2.random() / 100);
     _ghostDeadTimeLatest = 0;
-    ghosts.scaredTimeLatest = 0;
+    world.ghosts.scaredTimeLatest = 0;
   }
+   */
 
   void _ghostDeadScaredScaredIshNormalSequence() {
     if (current == CharacterState.deadGhost) {
@@ -134,13 +132,14 @@ class Ghost extends GameCharacter {
       }
     }
     if (current == CharacterState.scared) {
-      if (game.now - ghosts.scaredTimeLatest > kGhostChaseTimeMillis * 2 / 3) {
+      if (game.now - world.ghosts.scaredTimeLatest >
+          kGhostChaseTimeMillis * 2 / 3) {
         current = CharacterState.scaredIsh;
       }
     }
 
     if (current == CharacterState.scaredIsh) {
-      if (game.now - ghosts.scaredTimeLatest > kGhostChaseTimeMillis) {
+      if (game.now - world.ghosts.scaredTimeLatest > kGhostChaseTimeMillis) {
         current = CharacterState.normal;
         game.audioController.stopSfx(SfxType.ghostsScared);
       }
@@ -150,7 +149,7 @@ class Ghost extends GameCharacter {
   @override
   Future<void> onLoad() async {
     super.onLoad();
-    ghosts.ghostList.add(this);
+    world.ghosts.ghostList.add(this);
     animations = await _getAnimations();
     current = CharacterState.deadGhost;
     if (idNum >= 3) {
@@ -160,7 +159,7 @@ class Ghost extends GameCharacter {
 
   @override
   Future<void> onRemove() async {
-    ghosts.ghostList.remove(this);
+    world.ghosts.ghostList.remove(this);
     super.onRemove();
   }
 

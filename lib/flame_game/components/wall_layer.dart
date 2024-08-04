@@ -9,7 +9,15 @@ class WallWrapper extends WrapperNoEvents
     with HasWorldReference<PacmanWorld>, HasGameReference<PacmanGame> {
   @override
   void reset() {
-    removeAll(children);
+    if (children.isNotEmpty) {
+      removeAll(children);
+    }
     addAll(maze.mazeWalls());
+  }
+
+  @override
+  Future<void> onLoad() async {
+    super.onLoad();
+    reset();
   }
 }

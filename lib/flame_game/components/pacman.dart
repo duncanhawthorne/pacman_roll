@@ -27,8 +27,6 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   int _pacmanDeadTimeLatest = 0; //a long time ago
   final Vector2 _screenSizeLast = Vector2(0, 0);
 
-  get pacmans => world.pacmans;
-
   Future<Map<CharacterState, SpriteAnimation>?> _getAnimations(int size) async {
     return {
       CharacterState.normal: SpriteAnimation.spriteList(
@@ -112,7 +110,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
 
       //other impact
       if (multipleSpawningPacmans) {
-        pacmans.add(Pacman(position: position + Vector2.random() / 100));
+        world.pacmans.add(Pacman(position: position + Vector2.random() / 100));
       }
     }
   }
@@ -127,9 +125,10 @@ class Pacman extends GameCharacter with CollisionCallbacks {
       if (_freezeGhostsOnKillPacman) {
         world.ghosts.disconnectGhostsFromBalls();
       }
-      pacmans.pacmanDyingNotifier.value++;
+      world.pacmans.pacmanDyingNotifier.value++;
 
-      if (pacmans.pacmanList.length == 1 || pacmans.numberAlivePacman() == 0) {
+      if (world.pacmans.pacmanList.length == 1 ||
+          world.pacmans.numberAlivePacman() == 0) {
         _pacmanDeadTimeLatest = game.now;
         world.doingLevelResetFlourish.value = true;
         game.stopwatch.stop();
@@ -139,8 +138,9 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   }
 
   void _dieFromGhostActionAfterDeathAnimation() {
-    if (pacmans.pacmanList.length == 1 || pacmans.numberAlivePacman() == 0) {
-      pacmans.numberOfDeathsNotifier.value++; //score counting deaths
+    if (world.pacmans.pacmanList.length == 1 ||
+        world.pacmans.numberAlivePacman() == 0) {
+      world.pacmans.numberOfDeathsNotifier.value++; //score counting deaths
       world.resetAfterPacmanDeath(this);
     } else {
       assert(multipleSpawningPacmans);
@@ -162,7 +162,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   }
 
   void _pacmanDeadEatingNormalSequence() {
-    if (current == CharacterState.deadPacman) {
+    if (current == CharacterState.deadPacman && !world.gameWonOrLost) {
       if (game.now - _pacmanDeadTimeLatest > _kPacmanDeadResetTimeMillis) {
         _dieFromGhostActionAfterDeathAnimation();
         assert(current != CharacterState.deadPacman || world.gameWonOrLost);
@@ -179,7 +179,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   @override
   Future<void> onLoad() async {
     super.onLoad();
-    pacmans.pacmanList.add(this);
+    world.pacmans.pacmanList.add(this);
     current = CharacterState.normal;
     angle = 0;
   }
@@ -195,7 +195,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
 
   @override
   Future<void> onRemove() async {
-    pacmans.pacmanList.remove(this);
+    world.pacmans.pacmanList.remove(this);
     super.onRemove();
   }
 

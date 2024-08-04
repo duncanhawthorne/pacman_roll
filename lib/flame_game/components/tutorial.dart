@@ -46,6 +46,12 @@ class TutorialWrapper extends WrapperNoEvents
       _mazeEverRotated = true;
     }
   }
+
+  @override
+  Future<void> onLoad() async {
+    super.onLoad();
+    reset();
+  }
 }
 
 final TextPaint _tutorialTextRenderer = TextPaint(

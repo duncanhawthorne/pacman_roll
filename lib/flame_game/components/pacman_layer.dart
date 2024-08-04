@@ -14,8 +14,8 @@ class Pacmans extends WrapperNoEvents {
 
   final List<Pacman> pacmanList = [];
 
-  final numberOfDeathsNotifier = ValueNotifier(0);
-  final pacmanDyingNotifier = ValueNotifier(0);
+  final ValueNotifier<int> numberOfDeathsNotifier = ValueNotifier(0);
+  final ValueNotifier<int> pacmanDyingNotifier = ValueNotifier(0);
 
   int numberAlivePacman() {
     if (pacmanList.isEmpty) {
@@ -50,5 +50,11 @@ class Pacmans extends WrapperNoEvents {
     }
     numberOfDeathsNotifier.value = 0;
     pacmanDyingNotifier.value = 0;
+  }
+
+  @override
+  Future<void> onLoad() async {
+    super.onLoad();
+    reset();
   }
 }

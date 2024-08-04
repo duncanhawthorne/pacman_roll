@@ -118,12 +118,15 @@ class PacmanWorld extends Forge2DWorld
     doingLevelResetFlourish.value = false;
   }
 
-  void reset() {
-    for (WrapperNoEvents wrapper in wrappers) {
-      wrapper.reset();
-    }
+  void reset({firstRun = false}) {
     _setMazeAngle(0);
     //cameraRotateableOnPacmanDeathFlourish = true; //perhaps not necessary
+    if (!firstRun) {
+      for (WrapperNoEvents wrapper in wrappers) {
+        assert(wrapper.isLoaded);
+        wrapper.reset();
+      }
+    }
   }
 
   void start() {
@@ -140,7 +143,7 @@ class PacmanWorld extends Forge2DWorld
     for (WrapperNoEvents wrapper in wrappers) {
       noEventsWrapper.add(wrapper);
     }
-    reset();
+    reset(firstRun: true);
     super.onLoad();
   }
 

@@ -79,6 +79,7 @@ class Ghosts extends WrapperNoEvents
       for (Ghost ghost in ghostList) {
         ghost.setScared();
       }
+      scaredTimeLatest = game.now;
     }
   }
 
@@ -110,27 +111,21 @@ class Ghosts extends WrapperNoEvents
   }
 
   void _trimAllGhosts() {
-    for (int i = 0; i < ghostList.length; i++) {
-      int j = ghostList.length - 1 - i;
-      if (j >= 0) {
-        ghostList[j].removeFromParent();
-      }
+    for (Ghost ghost in ghostList) {
+      ghost.disconnectFromBall(); //sync
+      ghost.removeFromParent(); //async
     }
   }
 
   void disconnectGhostsFromBalls() {
-    for (int i = 0; i < ghostList.length; i++) {
-      ghostList[i].disconnectFromBall();
+    for (Ghost ghost in ghostList) {
+      ghost.disconnectFromBall(); //sync
     }
   }
 
   void resetAfterGameWin() {
     scaredTimeLatest = 0;
     _trimAllGhosts();
-    for (Ghost ghost in ghostList) {
-      /// now defunct as [trimAllGhosts]
-      ghost.setPositionForGameEnd();
-    }
   }
 
   void resetAfterPacmanDeath() {
@@ -155,10 +150,7 @@ class Ghosts extends WrapperNoEvents
     cancelMultiGhostAdderTimer();
     _cancelSirenVolumeUpdatedTimer;
     if (world.level.multipleSpawningGhosts || mazeResize) {
-      for (Ghost ghost in ghostList) {
-        ghost.disconnectFromBall(); //sync
-        ghost.removeFromParent(); //async
-      }
+      _trimAllGhosts();
       _addThreeGhosts();
     } else {
       if (ghostList.isEmpty) {
@@ -169,5 +161,11 @@ class Ghosts extends WrapperNoEvents
         }
       }
     }
+  }
+
+  @override
+  Future<void> onLoad() async {
+    super.onLoad();
+    reset();
   }
 }
