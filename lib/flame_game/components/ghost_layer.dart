@@ -46,7 +46,9 @@ class Ghosts extends WrapperNoEvents
       if (_sirenTimer == null && game.isGameLive && !world.gameWonOrLost) {
         _sirenTimer =
             async.Timer.periodic(const Duration(milliseconds: 250), (timer) {
-          if (game.isGameLive && !world.gameWonOrLost) {
+          if (game.isGameLive &&
+              !world.gameWonOrLost &&
+              !world.doingLevelResetFlourish.value) {
             game.audioController
                 .setSirenVolume(_averageGhostSpeed(), gradual: true);
           } else {
@@ -151,18 +153,9 @@ class Ghosts extends WrapperNoEvents
   void reset({bool mazeResize = false}) {
     cancelMultiGhostAdderTimer();
     _cancelSirenVolumeUpdatedTimer;
-    if (world.level.multipleSpawningGhosts || mazeResize) {
-      _trimAllGhosts();
-      _addThreeGhosts();
-    } else {
-      if (ghostList.isEmpty) {
-        _addThreeGhosts();
-      } else {
-        for (Ghost ghost in ghostList) {
-          ghost.resetInstantAfterPacmanDeath();
-        }
-      }
-    }
+    scaredTimeLatest = 0;
+    _trimAllGhosts();
+    _addThreeGhosts();
   }
 
   @override

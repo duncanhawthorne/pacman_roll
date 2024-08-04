@@ -1,14 +1,16 @@
+import 'package:flame/components.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../maze.dart';
+import '../pacman_world.dart';
 import 'game_character.dart';
 import 'pacman.dart';
 import 'wrapper_no_events.dart';
 
 const multipleSpawningPacmans = false;
 
-class Pacmans extends WrapperNoEvents {
+class Pacmans extends WrapperNoEvents with HasWorldReference<PacmanWorld> {
   @override
   final priority = 2;
 
@@ -34,19 +36,11 @@ class Pacmans extends WrapperNoEvents {
 
   @override
   void reset({bool mazeResize = false}) {
-    if (multipleSpawningPacmans || mazeResize) {
-      for (Pacman pacman in pacmanList) {
-        pacman.disconnectFromBall(); //sync
-        pacman.removeFromParent(); //async
-      }
-      add(Pacman(position: maze.pacmanStart));
-    } else {
-      if (pacmanList.isEmpty) {
-        add(Pacman(position: maze.pacmanStart));
-      } else {
-        pacmanList[0].resetInstantAfterDeath();
-      }
+    for (Pacman pacman in pacmanList) {
+      pacman.disconnectFromBall(); //sync
+      pacman.removeFromParent(); //async
     }
+    add(Pacman(position: maze.pacmanStart));
     numberOfDeathsNotifier.value = 0;
     pacmanDyingNotifier.value = 0;
   }

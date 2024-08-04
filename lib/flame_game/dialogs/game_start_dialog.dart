@@ -45,24 +45,13 @@ class StartDialog extends StatelessWidget {
         bottomRowWidget(
           children: game.levelStarted
               ? [
-                  ValueListenableBuilder<bool>(
-                      valueListenable: game.world.doingLevelResetFlourish,
-                      builder:
-                          (BuildContext context, bool value, Widget? child) {
-                        return TextButton(
-                            style: buttonStyle(
-                                borderColor:
-                                    game.world.doingLevelResetFlourish.value
-                                        ? Palette.darkGrey
-                                        : Palette.redWarning),
-                            onPressed: () {
-                              if (!game.world.doingLevelResetFlourish.value) {
-                                game.overlays.remove(GameScreen.startDialogKey);
-                                game.start();
-                              }
-                            },
-                            child: Text('Reset', style: textStyleBody));
-                      }),
+                  TextButton(
+                      style: buttonStyle(borderColor: Palette.redWarning),
+                      onPressed: () {
+                        game.overlays.remove(GameScreen.startDialogKey);
+                        game.start();
+                      },
+                      child: Text('Reset', style: textStyleBody)),
                   TextButton(
                       style: buttonStyle(),
                       onPressed: () {
@@ -123,27 +112,18 @@ Widget levelSelector(BuildContext context, PacmanGame game) {
 Widget levelButtonSingle(BuildContext context, PacmanGame game, int index) {
   return Padding(
       padding: const EdgeInsets.fromLTRB(2, 0, 2, 0),
-      child: ValueListenableBuilder<bool>(
-          valueListenable: game.world.doingLevelResetFlourish,
-          builder: (BuildContext context, bool value, Widget? child) {
-            return TextButton(
-                style: game.world.doingLevelResetFlourish.value
-                    ? buttonStyle(small: true, borderColor: Palette.darkGrey)
-                    : game.level.number == index + 1
-                        ? buttonStyle(small: true)
-                        : buttonStyle(small: true, borderColor: Palette.transp),
-                onPressed: () {
-                  if (!game.world.doingLevelResetFlourish.value) {
-                    context.go(
-                        '/?$levelUrl=${index + 1}&$mapUrl=${mazeNames[maze.mazeId]}');
-                  }
-                },
-                child: Text('${index + 1}',
-                    style:
-                        game.world.playerProgress.levels.containsKey(index + 1)
-                            ? textStyleBody
-                            : textStyleBodyDull));
-          }));
+      child: TextButton(
+          style: game.level.number == index + 1
+              ? buttonStyle(small: true)
+              : buttonStyle(small: true, borderColor: Palette.transp),
+          onPressed: () {
+            context.go(
+                '/?$levelUrl=${index + 1}&$mapUrl=${mazeNames[maze.mazeId]}');
+          },
+          child: Text('${index + 1}',
+              style: game.world.playerProgress.levels.containsKey(index + 1)
+                  ? textStyleBody
+                  : textStyleBodyDull)));
 }
 
 Widget mazeSelector(BuildContext context, PacmanGame game) {
@@ -174,27 +154,17 @@ Widget mazeSelector(BuildContext context, PacmanGame game) {
 Widget mazeButtonSingle(BuildContext context, PacmanGame game, int index) {
   return Padding(
       padding: const EdgeInsets.fromLTRB(2, 0, 2, 0),
-      child: ListenableBuilder(
-          listenable: Listenable.merge([
-            game.world.doingLevelResetFlourish,
-            //maze.mazeIdNotifier,
-          ]),
-          builder: (BuildContext context, Widget? child) {
-            return TextButton(
-                style: game.world.doingLevelResetFlourish.value
-                    ? buttonStyle(small: true, borderColor: Palette.darkGrey)
-                    : maze.mazeId == index
-                        ? buttonStyle(small: true)
-                        : buttonStyle(small: true, borderColor: Palette.transp),
-                onPressed: () {
-                  if (!game.world.doingLevelResetFlourish.value &&
-                      index != maze.mazeId) {
-                    context.go(
-                        '/?$levelUrl=${game.level.number}&$mapUrl=${mazeNames[index]}');
-                  }
-                },
-                child: Text(mazeNames[index], style: textStyleBody));
-          }));
+      child: TextButton(
+          style: maze.mazeId == index
+              ? buttonStyle(small: true)
+              : buttonStyle(small: true, borderColor: Palette.transp),
+          onPressed: () {
+            if (index != maze.mazeId) {
+              context.go(
+                  '/?$levelUrl=${game.level.number}&$mapUrl=${mazeNames[index]}');
+            }
+          },
+          child: Text(mazeNames[index], style: textStyleBody)));
 }
 
 int maxLevelToShow(PacmanGame game) {

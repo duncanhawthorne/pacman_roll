@@ -37,13 +37,19 @@ class TutorialWrapper extends WrapperNoEvents
     });
   }
 
-  @override
-  void reset() {
+  void hide() {
     if (!_mazeEverRotated) {
       if (game.findByKey(ComponentKey.named('tutorial')) != null) {
         game.findByKey(ComponentKey.named('tutorial'))!.removeFromParent();
       }
       _mazeEverRotated = true;
+    }
+  }
+
+  @override
+  void reset() {
+    if (game.findByKey(ComponentKey.named('tutorial')) != null) {
+      game.findByKey(ComponentKey.named('tutorial'))!.removeFromParent();
     }
   }
 

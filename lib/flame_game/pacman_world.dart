@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flame/components.dart';
+import 'package:flame/effects.dart';
 import 'package:flame/events.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flutter/foundation.dart';
@@ -121,7 +122,13 @@ class PacmanWorld extends Forge2DWorld
   }
 
   void reset({firstRun = false}) {
+    //stop any rotation effect added to camera
+    //note, still leaves flourish variable hot, so fix below
+    game.camera.viewfinder.removeWhere((item) => item is Effect);
     _setMazeAngle(0);
+    _cameraRotatableOnPacmanDeathFlourish = true;
+    doingLevelResetFlourish.value = false;
+
     if (!firstRun) {
       for (WrapperNoEvents wrapper in wrappers) {
         assert(wrapper.isLoaded);
@@ -175,7 +182,7 @@ class PacmanWorld extends Forge2DWorld
             fingerCurrentDragAngle - _fingersLastDragAngle[event.pointerId]!);
         double spinMultiplier = 4 * min(1, eventVectorLengthProportion / 0.75);
 
-        tutorial.reset();
+        tutorial.hide();
 
         _moveMazeAngleByDelta(angleDelta * spinMultiplier);
       }
