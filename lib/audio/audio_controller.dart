@@ -124,13 +124,13 @@ class AudioController {
     return tmpSirenVolume;
   }
 
-  void setSirenVolume(double averageGhostSpeed, {gradual = false}) {
+  void setSirenVolume(double normalisedAverageGhostSpeed, {gradual = false}) {
     if (_sfxPlayersNew[SfxType.ghostsRoamingSiren]!.state !=
         PlayerState.playing) {
       playSfx(SfxType.ghostsRoamingSiren);
       _sfxPlayersNew[SfxType.ghostsRoamingSiren]!.setVolume(0);
     }
-    double calcedVolume = getTargetSirenVolume(averageGhostSpeed);
+    double calcedVolume = getTargetSirenVolume(normalisedAverageGhostSpeed);
     double currentVolume =
         _sfxPlayersNew[SfxType.ghostsRoamingSiren]!.volume / volumeScalar;
     double targetVolume = 0;

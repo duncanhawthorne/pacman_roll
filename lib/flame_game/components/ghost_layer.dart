@@ -49,8 +49,9 @@ class Ghosts extends WrapperNoEvents
           if (game.isGameLive &&
               !world.gameWonOrLost &&
               !world.doingLevelResetFlourish.value) {
-            game.audioController
-                .setSirenVolume(_averageGhostSpeed(), gradual: true);
+            game.audioController.setSirenVolume(
+                _averageGhostSpeed() * flameGameZoom / 30,
+                gradual: true);
           } else {
             game.audioController.setSirenVolume(0);
             timer.cancel();

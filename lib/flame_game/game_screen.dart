@@ -38,38 +38,40 @@ class GameScreen extends StatelessWidget {
     return PopScope(
       canPop: false,
       child: Scaffold(
-        body: GameWidget<PacmanGame>(
-          key: const Key('play session'),
-          game: PacmanGame(
-            level: level,
-            mazeId: mazeId,
-            playerProgress: context.read<PlayerProgress>(),
-            audioController: audioController,
-            //palette: palette,
-          ),
-          overlayBuilderMap: {
-            topLeftOverlayKey: (BuildContext context, PacmanGame game) {
-              return topLeftOverlayWidget(context, game);
-            },
-            topRightOverlayKey: (BuildContext context, PacmanGame game) {
-              return topRightOverlayWidget(context, game);
-            },
-            loseDialogKey: (BuildContext context, PacmanGame game) {
-              return GameLoseDialog(
-                level: level,
-                game: game,
-              );
-            },
-            wonDialogKey: (BuildContext context, PacmanGame game) {
-              return GameWonDialog(
+        body: SafeArea(
+          child: GameWidget<PacmanGame>(
+            key: const Key('play session'),
+            game: PacmanGame(
+              level: level,
+              mazeId: mazeId,
+              playerProgress: context.read<PlayerProgress>(),
+              audioController: audioController,
+              //palette: palette,
+            ),
+            overlayBuilderMap: {
+              topLeftOverlayKey: (BuildContext context, PacmanGame game) {
+                return topLeftOverlayWidget(context, game);
+              },
+              topRightOverlayKey: (BuildContext context, PacmanGame game) {
+                return topRightOverlayWidget(context, game);
+              },
+              loseDialogKey: (BuildContext context, PacmanGame game) {
+                return GameLoseDialog(
                   level: level,
-                  levelCompletedInMillis: game.stopwatchMilliSeconds,
-                  game: game);
+                  game: game,
+                );
+              },
+              wonDialogKey: (BuildContext context, PacmanGame game) {
+                return GameWonDialog(
+                    level: level,
+                    levelCompletedInMillis: game.stopwatchMilliSeconds,
+                    game: game);
+              },
+              startDialogKey: (BuildContext context, PacmanGame game) {
+                return StartDialog(level: level, game: game);
+              }
             },
-            startDialogKey: (BuildContext context, PacmanGame game) {
-              return StartDialog(level: level, game: game);
-            }
-          },
+          ),
         ),
       ),
     );
