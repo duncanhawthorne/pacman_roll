@@ -34,7 +34,7 @@ import 'pacman_game.dart';
 ///  `game`, which is a reference to the game class that the world is attached
 ///  to.
 
-final bool _iOS = defaultTargetPlatform == TargetPlatform.iOS;
+final bool _iOSWeb = defaultTargetPlatform == TargetPlatform.iOS && kIsWeb;
 
 class PacmanWorld extends Forge2DWorld
     with
@@ -69,7 +69,7 @@ class PacmanWorld extends Forge2DWorld
 
   final Map<int, double?> _fingersLastDragAngle = {};
 
-  ValueNotifier<bool> doingLevelResetFlourish = ValueNotifier(false);
+  bool doingLevelResetFlourish = false;
   bool _cameraRotatableOnPacmanDeathFlourish = true;
 
   /// The gravity is defined in virtual pixels per second squared.
@@ -109,7 +109,7 @@ class PacmanWorld extends Forge2DWorld
         _resetInstantAfterPacmanDeath();
       }
     } else {
-      doingLevelResetFlourish.value = false;
+      doingLevelResetFlourish = false;
     }
   }
 
@@ -118,7 +118,7 @@ class PacmanWorld extends Forge2DWorld
     ghosts.resetInstantAfterPacmanDeath();
     _cameraRotatableOnPacmanDeathFlourish = true;
     _setMazeAngle(0);
-    doingLevelResetFlourish.value = false;
+    doingLevelResetFlourish = false;
   }
 
   void reset({firstRun = false}) {
@@ -127,7 +127,7 @@ class PacmanWorld extends Forge2DWorld
     game.camera.viewfinder.removeWhere((item) => item is Effect);
     _setMazeAngle(0);
     _cameraRotatableOnPacmanDeathFlourish = true;
-    doingLevelResetFlourish.value = false;
+    doingLevelResetFlourish = false;
 
     if (!firstRun) {
       for (WrapperNoEvents wrapper in wrappers) {
@@ -158,7 +158,7 @@ class PacmanWorld extends Forge2DWorld
   @override
   void onDragStart(DragStartEvent event) {
     super.onDragStart(event);
-    if (_iOS) {
+    if (_iOSWeb) {
       _fingersLastDragAngle[event.pointerId] = null;
     } else {
       _fingersLastDragAngle[event.pointerId] = atan2(
@@ -183,7 +183,6 @@ class PacmanWorld extends Forge2DWorld
         double spinMultiplier = 4 * min(1, eventVectorLengthProportion / 0.75);
 
         tutorial.hide();
-
         _moveMazeAngleByDelta(angleDelta * spinMultiplier);
       }
       _fingersLastDragAngle[event.pointerId] = fingerCurrentDragAngle;
@@ -202,7 +201,7 @@ class PacmanWorld extends Forge2DWorld
     if (_cameraRotatableOnPacmanDeathFlourish && game.isGameLive) {
       _setMazeAngle(game.camera.viewfinder.angle + angleDelta);
 
-      if (!doingLevelResetFlourish.value) {
+      if (!doingLevelResetFlourish) {
         game.stopwatch.start();
         ghosts.startMultiGhostAdderTimer();
         ghosts.sirenVolumeUpdatedTimer();

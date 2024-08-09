@@ -130,7 +130,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
       if (world.pacmans.pacmanList.length == 1 ||
           world.pacmans.numberAlivePacman() == 0) {
         _pacmanDeadTimeLatest = game.now;
-        world.doingLevelResetFlourish.value = true;
+        world.doingLevelResetFlourish = true;
         game.stopwatch.stop();
         world.ghosts.cancelMultiGhostAdderTimer();
       }

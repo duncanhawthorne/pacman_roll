@@ -10,8 +10,8 @@ import 'game_character.dart';
 import 'ghost.dart';
 import 'wrapper_no_events.dart';
 
-final bool _iOS = defaultTargetPlatform == TargetPlatform.iOS;
-final bool _sirenEnabled = !_iOS;
+final bool _iOSWeb = defaultTargetPlatform == TargetPlatform.iOS && kIsWeb;
+final bool _sirenEnabled = !_iOSWeb;
 
 class Ghosts extends WrapperNoEvents
     with HasWorldReference<PacmanWorld>, HasGameReference<PacmanGame> {
@@ -48,7 +48,7 @@ class Ghosts extends WrapperNoEvents
             async.Timer.periodic(const Duration(milliseconds: 250), (timer) {
           if (game.isGameLive &&
               !world.gameWonOrLost &&
-              !world.doingLevelResetFlourish.value) {
+              !world.doingLevelResetFlourish) {
             game.audioController.setSirenVolume(
                 _averageGhostSpeed() * flameGameZoom / 30,
                 gradual: true);
@@ -96,7 +96,7 @@ class Ghosts extends WrapperNoEvents
           (timer) {
         if (game.isGameLive &&
             !world.gameWonOrLost &&
-            !world.doingLevelResetFlourish.value) {
+            !world.doingLevelResetFlourish) {
           add(Ghost(idNum: [3, 4, 5][game.random.nextInt(3)]));
         } else {
           timer.cancel();
