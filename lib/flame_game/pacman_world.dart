@@ -15,7 +15,7 @@ import 'components/ghost_layer.dart';
 import 'components/pacman.dart';
 import 'components/pacman_layer.dart';
 import 'components/pellet_layer.dart';
-import 'components/tutorial.dart';
+import 'components/tutorial_layer.dart';
 import 'components/wall_layer.dart';
 import 'components/wrapper_no_events.dart';
 import 'effects/rotate_by_effect.dart';

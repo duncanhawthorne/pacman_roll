@@ -2,8 +2,10 @@ import 'dart:core';
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
+import 'package:flame/effects.dart';
 
 import '../../audio/sounds.dart';
+import '../effects/null_effect.dart';
 import '../icons/pacman_sprites.dart';
 import '../maze.dart';
 import 'game_character.dart';
@@ -24,7 +26,6 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   }) : super(priority: 2);
 
   int _pacmanStartEatingTimeLatest = 0; //a long time ago
-  int _pacmanDeadTimeLatest = 0; //a long time ago
   final Vector2 _screenSizeLast = Vector2(0, 0);
 
   Future<Map<CharacterState, SpriteAnimation>?> _getAnimations(int size) async {
@@ -34,16 +35,16 @@ class Pacman extends GameCharacter with CollisionCallbacks {
         stepTime: double.infinity,
       ),
       CharacterState.eating: SpriteAnimation.spriteList(
-        await pacmanSprites.pacmanEatingSprites(size),
-        stepTime:
-            _kPacmanHalfEatingResetTimeMillis / 1000 / pacmanEatingHalfFrames,
-      ),
+          await pacmanSprites.pacmanEatingSprites(size),
+          stepTime:
+              _kPacmanHalfEatingResetTimeMillis / 1000 / pacmanEatingHalfFrames,
+          loop: false),
       CharacterState.dead: SpriteAnimation.spriteList(
           await pacmanSprites.pacmanDyingSprites(size),
           stepTime:
               kPacmanDeadResetTimeAnimationMillis / 1000 / pacmanDeadFrames,
           loop: false),
-      CharacterState.birthing: SpriteAnimation.spriteList(
+      CharacterState.spawning: SpriteAnimation.spriteList(
           await pacmanSprites.pacmanBirthingSprites(size),
           stepTime: kGhostResetTimeMillis / 1000 / pacmanDeadFrames,
           loop: false)
@@ -51,7 +52,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   }
 
   void _eat({required isPellet}) {
-    if (current != CharacterState.dead) {
+    if (typical) {
       if (current == CharacterState.normal) {
         current = CharacterState.eating;
         _pacmanStartEatingTimeLatest = game.now;
@@ -61,22 +62,22 @@ class Pacman extends GameCharacter with CollisionCallbacks {
           world.play(SfxType.eatGhost);
         }
       }
+      //if in eating state, just let that sequence complete normally
     }
   }
 
   void _onCollideWith(PositionComponent other) {
-    if (current != CharacterState.dead) {
+    if (typical) {
       if (other is Pellet) {
         _onCollideWithPellet(other);
       } else if (other is Ghost) {
-        //If turn on collision callbacks in physicsBall this would be belt and braces. Right now not
         _onCollideWithGhost(other);
       }
     }
   }
 
   void _onCollideWithPellet(Pellet pellet) {
-    if (current != CharacterState.dead) {
+    if (typical) {
       // can simultaneously eat pellet and die to ghost so don't want to do this if just died
       pellet.removeFromParent(); //do this first, for checks based on game over
       if (pellet is SuperPellet) {
@@ -87,28 +88,20 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   }
 
   void _onCollideWithGhost(Ghost ghost) {
-    if (ghost.current == CharacterState.dead ||
-        current == CharacterState.dead ||
-        !connectedToBall ||
-        !ghost.connectedToBall) {
-      //nothing, but need to keep if condition
-    } else if (ghost.current == CharacterState.scared ||
-        ghost.current == CharacterState.scaredIsh) {
-      _eatGhost(ghost);
-    } else {
-      _dieFromGhost();
+    if (typical && ghost.typical) {
+      if (ghost.current == CharacterState.scared ||
+          ghost.current == CharacterState.scaredIsh) {
+        _eatGhost(ghost);
+      } else {
+        _dieFromGhost();
+      }
     }
   }
 
   void _eatGhost(Ghost ghost) {
-    if (current != CharacterState.dead) {
-      //pacman visuals
+    if (typical && ghost.typical) {
       _eat(isPellet: false);
-
-      //ghost impact
       ghost.setDead();
-
-      //other impact
       if (multipleSpawningPacmans) {
         world.pacmans.add(Pacman(position: position + Vector2.random() / 100));
       }
@@ -117,57 +110,57 @@ class Pacman extends GameCharacter with CollisionCallbacks {
 
   static const bool _freezeGhostsOnKillPacman = false;
   void _dieFromGhost() {
-    if (current != CharacterState.dead &&
-        world.pellets.pelletsRemainingNotifier.value != 0) {
-      world.play(SfxType.pacmanDeath);
-      current = CharacterState.dead;
-      disconnectFromBall();
-      if (_freezeGhostsOnKillPacman) {
-        world.ghosts.disconnectGhostsFromBalls();
-      }
-      world.pacmans.pacmanDyingNotifier.value++;
-
-      if (world.pacmans.pacmanList.length == 1 ||
-          world.pacmans.numberAlivePacman() == 0) {
-        _pacmanDeadTimeLatest = game.now;
-        world.doingLevelResetFlourish = true;
-        game.stopwatch.stop();
-        world.ghosts.cancelMultiGhostAdderTimer();
+    if (typical) {
+      if (world.pellets.pelletsRemainingNotifier.value != 0) {
+        world.play(SfxType.pacmanDeath);
+        current = CharacterState.dead;
+        disconnectFromBall();
+        if (_freezeGhostsOnKillPacman) {
+          world.ghosts.disconnectGhostsFromBalls();
+        }
+        world.pacmans.pacmanDyingNotifier.value++;
+        if (world.pacmans.pacmanList.length == 1 ||
+            world.pacmans.numberAlivePacman() == 0) {
+          world.doingLevelResetFlourish = true;
+          game.stopwatch.stop();
+          world.ghosts.cancelMultiGhostAdderTimer();
+        }
+        add(NullEffect(_kPacmanDeadResetTimeMillis,
+            onComplete: _dieFromGhostActionAfterDeathAnimation));
       }
     }
   }
 
   void _dieFromGhostActionAfterDeathAnimation() {
-    if (world.pacmans.pacmanList.length == 1 ||
-        world.pacmans.numberAlivePacman() == 0) {
-      world.pacmans.numberOfDeathsNotifier.value++; //score counting deaths
-      world.resetAfterPacmanDeath(this);
-    } else {
-      assert(multipleSpawningPacmans);
-      removeFromParent();
+    if (current == CharacterState.dead && !world.gameWonOrLost) {
+      if (world.pacmans.pacmanList.length == 1 ||
+          world.pacmans.numberAlivePacman() == 0) {
+        world.pacmans.numberOfDeathsNotifier.value++; //score counting deaths
+        world.resetAfterPacmanDeath(this);
+      } else {
+        assert(multipleSpawningPacmans);
+        disconnectFromBall(); //sync //already done, but keep
+        removeFromParent(); //async
+      }
     }
   }
 
   void resetSlideAfterDeath() {
+    removeWhere((item) => item is Effect);
     setPositionStill(maze.pacmanStart);
     disconnectFromBall();
     angle = 0;
-    current = CharacterState.birthing;
+    current = CharacterState.spawning;
   }
 
   void resetInstantAfterDeath() {
+    removeWhere((item) => item is Effect);
     setPositionStill(maze.pacmanStart);
     angle = 0;
     current = CharacterState.normal;
   }
 
-  void _pacmanDeadEatingNormalSequence() {
-    if (current == CharacterState.dead && !world.gameWonOrLost) {
-      if (game.now - _pacmanDeadTimeLatest > _kPacmanDeadResetTimeMillis) {
-        _dieFromGhostActionAfterDeathAnimation();
-        assert(current != CharacterState.dead || world.gameWonOrLost);
-      }
-    }
+  void _stateSequence() {
     if (current == CharacterState.eating) {
       if (game.now - _pacmanStartEatingTimeLatest >
           _kPacmanHalfEatingResetTimeMillis * 2) {
@@ -210,7 +203,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
 
   @override
   void update(double dt) {
-    _pacmanDeadEatingNormalSequence();
+    _stateSequence();
     super.update(dt);
   }
 }

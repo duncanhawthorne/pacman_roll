@@ -1,6 +1,7 @@
 import 'dart:core';
 
 import 'package:flame/components.dart';
+import 'package:flame/effects.dart';
 
 import '../../audio/sounds.dart';
 import '../../utils/helper.dart';
@@ -9,7 +10,7 @@ import '../effects/rotate_by_effect.dart';
 import '../maze.dart';
 import 'game_character.dart';
 
-const int kGhostChaseTimeMillis = 6000;
+const int _kGhostChaseTimeMillis = 6000;
 const int kGhostResetTimeMillis = 1000;
 
 final _ghostSpriteMap = {
@@ -23,9 +24,7 @@ class Ghost extends GameCharacter {
     required this.idNum,
   }) : super(position: maze.ghostSpawnForId(idNum));
 
-  int _ghostDeadTimeLatest = 0; //a long time ago
   int idNum;
-  Vector2? _specialSpawnLocation;
 
   Future<Map<CharacterState, SpriteAnimation>?> _getAnimations() async {
     return {
@@ -48,81 +47,82 @@ class Ghost extends GameCharacter {
         [await game.loadSprite('dash/eyes.png')],
         stepTime: double.infinity,
       ),
+      CharacterState.spawning: SpriteAnimation.spriteList(
+        [await game.loadSprite('dash/eyes.png')],
+        stepTime: double.infinity,
+      ),
     };
   }
 
   void setScared() {
     if (!world.gameWonOrLost) {
-      if (current != CharacterState.dead) {
+      if (current != CharacterState.dead &&
+          current != CharacterState.spawning) {
         // if dead, need to continue dead animation without physics applying, then get sequenced to scared via standard sequence code
         current = CharacterState.scared;
       }
     }
   }
 
-  void setDead({spawning = false}) {
+  void setDead() {
     if (!world.gameWonOrLost) {
       current = CharacterState.dead; //stops further interactions
-      _ghostDeadTimeLatest = game.now;
-      if (game.level.multipleSpawningGhosts && !spawning) {
-        removeFromParent();
+      if (game.level.multipleSpawningGhosts) {
+        disconnectFromBall(); //sync
+        removeFromParent(); //async
       } else {
-        if (spawning) {
-          disconnectFromBall(spawning: true);
-          if (world.level.homingGhosts) {
-            _specialSpawnLocation = Vector2.all(0);
-            _specialSpawnLocation!
-                .setFrom(world.pacmans.pacmanList[0].position);
-            add(MoveToPositionEffect(_specialSpawnLocation!));
-          } else {
-            add(MoveToPositionEffect(maze.ghostStart));
-          }
-        } else {
-          disconnectFromBall();
-          add(MoveToPositionEffect(maze.ghostStart));
-        }
+        disconnectFromBall();
+        add(MoveToPositionEffect(maze.ghostStart,
+            onComplete: () =>
+                {bringBallToSprite(), current = CharacterState.scared}));
         add(RotateByAngleEffect(smallAngle(-angle)));
-        //will get moved to right position later by code in sequence checker
       }
+    }
+  }
+
+  void setSpawning() {
+    if (!world.gameWonOrLost) {
+      current = CharacterState.spawning; //stops further interactions
+      disconnectFromBall(spawning: true);
+      add(MoveToPositionEffect(
+          world.level.homingGhosts
+              ? (Vector2.all(0)..setFrom(world.pacmans.pacmanList[0].position))
+              : maze.ghostStart,
+          onComplete: () =>
+              {bringBallToSprite(), current = CharacterState.scared}));
     }
   }
 
   void resetSlideAfterPacmanDeath() {
+    current = CharacterState.normal;
+    removeWhere((item) => item is Effect);
     disconnectFromBall();
-    add(MoveToPositionEffect(maze.ghostStartForId(idNum)));
+    //add(MoveToPositionEffect(maze.ghostStartForId(idNum)));
+    //add(MoveToPositionEffect(maze.ghostStartForId(idNum),
+    //    onComplete: bringBallToSprite));
+    add(MoveToPositionEffect(maze.ghostStartForId(idNum),
+        onComplete: () => {
+              //bringBallToSprite()
+            })); //FIXME should be able to call bringBallToSprite here
     add(RotateByAngleEffect(smallAngle(-angle)));
   }
 
   void resetInstantAfterPacmanDeath() {
+    removeWhere((item) => item is Effect);
+    current = CharacterState.normal;
     setPositionStill(maze.ghostStartForId(idNum));
     angle = 0;
-    _ghostDeadTimeLatest = 0;
   }
 
-  void _ghostDeadScaredScaredIshNormalSequence() {
-    if (current == CharacterState.dead) {
-      if (game.now - _ghostDeadTimeLatest > kGhostResetTimeMillis) {
-        if (!world.gameWonOrLost && _ghostDeadTimeLatest != 0) {
-          //dont set on game over or after pacman death
-          if (_specialSpawnLocation != null) {
-            setPositionStill(_specialSpawnLocation!);
-            _specialSpawnLocation = null;
-          } else {
-            setPositionStill(maze.ghostStart + Vector2.random() / 100);
-          }
-        }
-        current = CharacterState.scared;
-      }
-    }
+  void _stateSequence() {
     if (current == CharacterState.scared) {
       if (game.now - world.ghosts.scaredTimeLatest >
-          kGhostChaseTimeMillis * 2 / 3) {
+          _kGhostChaseTimeMillis * 2 / 3) {
         current = CharacterState.scaredIsh;
       }
     }
-
     if (current == CharacterState.scaredIsh) {
-      if (game.now - world.ghosts.scaredTimeLatest > kGhostChaseTimeMillis) {
+      if (game.now - world.ghosts.scaredTimeLatest > _kGhostChaseTimeMillis) {
         current = CharacterState.normal;
         game.audioController.stopSfx(SfxType.ghostsScared);
       }
@@ -131,13 +131,13 @@ class Ghost extends GameCharacter {
 
   @override
   Future<void> onLoad() async {
-    super.onLoad();
     world.ghosts.ghostList.add(this);
     animations = await _getAnimations();
-    current = CharacterState.dead;
+    current = CharacterState.scared;
     if (idNum >= 3) {
-      setDead(spawning: true);
+      setSpawning();
     }
+    super.onLoad();
   }
 
   @override
@@ -148,7 +148,7 @@ class Ghost extends GameCharacter {
 
   @override
   void update(double dt) {
-    _ghostDeadScaredScaredIshNormalSequence();
+    _stateSequence();
     super.update(dt);
   }
 }

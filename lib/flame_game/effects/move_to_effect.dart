@@ -5,9 +5,10 @@ import 'package:flutter/animation.dart';
 import '../components/ghost.dart';
 
 class MoveToPositionEffect extends MoveToEffect {
-  MoveToPositionEffect(Vector2 destination)
+  MoveToPositionEffect(Vector2 destination, {onComplete})
       : super(
             destination,
             EffectController(
-                duration: kGhostResetTimeMillis / 1000, curve: Curves.easeOut));
+                duration: kGhostResetTimeMillis / 1000, curve: Curves.easeOut),
+            onComplete: onComplete);
 }

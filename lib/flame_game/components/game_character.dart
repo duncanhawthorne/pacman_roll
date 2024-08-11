@@ -43,6 +43,15 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
           : (world.gravity.x > 0 ? -1 : 1) *
               (_ball.body.linearVelocity.y > 0 ? 1 : -1);
 
+  bool get typical =>
+      connectedToBall &&
+      current != CharacterState.dead &&
+      current != CharacterState.spawning;
+
+  void bringBallToSprite() {
+    setPositionStill(position);
+  }
+
   void setPositionStill(Vector2 targetLoc) {
     _ball.position = targetLoc;
     _ball.velocity = Vector2(0, 0);
@@ -82,7 +91,8 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
 
   @override
   Future<void> onRemove() async {
-    disconnectFromBall();
+    //removeWhere((item) => item is Effect); //dont run this, runs async code which will execute after the item has already been removed and cause a crash
+    disconnectFromBall(); //sync but within async function
     _ball.removeFromParent();
     super.onRemove();
   }
@@ -94,4 +104,4 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   }
 }
 
-enum CharacterState { normal, scared, scaredIsh, eating, dead, birthing }
+enum CharacterState { normal, scared, scaredIsh, eating, dead, spawning }

@@ -14,13 +14,13 @@ class TutorialWrapper extends WrapperNoEvents
   @override
   final priority = 100;
 
-  bool _mazeEverRotated = false;
+  bool _tutorialEverManuallyHidden = false;
 
   @override
   void start() {
     Future.delayed(const Duration(milliseconds: 3000), () {
       if (!game.levelStarted &&
-          !_mazeEverRotated &&
+          !_tutorialEverManuallyHidden &&
           game.findByKey(ComponentKey.named('tutorial')) == null &&
           world.level.number == 1) {
         //if user hasn't worked out how to start by now, give a prompt
@@ -38,11 +38,11 @@ class TutorialWrapper extends WrapperNoEvents
   }
 
   void hide() {
-    if (!_mazeEverRotated) {
+    if (!_tutorialEverManuallyHidden) {
       if (game.findByKey(ComponentKey.named('tutorial')) != null) {
         game.findByKey(ComponentKey.named('tutorial'))!.removeFromParent();
       }
-      _mazeEverRotated = true;
+      _tutorialEverManuallyHidden = true;
     }
   }
 

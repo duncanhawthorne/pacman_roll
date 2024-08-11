@@ -1,3 +1,4 @@
+import 'dart:async' as async;
 import 'dart:core';
 import 'dart:math';
 
@@ -71,7 +72,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
       stopwatch.elapsed.inMilliseconds +
       world.pacmans.numberOfDeathsNotifier.value * 5000;
   bool get levelStarted => stopwatchMilliSeconds > 0;
-  int now = DateTime.now().millisecondsSinceEpoch;
+  int now = 0;
 
   bool get isGameLive =>
       !paused &&
@@ -177,18 +178,17 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
     world.start();
   }
 
-  int _showMainMenuLastRunTime = 0;
-
   void showMainMenu() {
-    _showMainMenuLastRunTime = now;
-    int showMainMenuLastRunTimeLast = now;
     overlays.add(GameScreen.startDialogKey);
-    Future.delayed(const Duration(milliseconds: 1000), () {
-      if (!isGameLive &&
-          showMainMenuLastRunTimeLast == _showMainMenuLastRunTime) {
-        //i.e. dialog still showing and haven't started playing yet
-        //and haven't restarted the dialog in the meantime
-        pauseEngine();
+
+    async.Timer.periodic(const Duration(milliseconds: 10), (timer) {
+      if (!isGameLive) {
+        if (world.isMounted) {
+          //some rendering has happened
+          pauseEngine();
+        }
+      } else {
+        timer.cancel();
       }
     });
   }
