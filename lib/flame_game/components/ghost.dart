@@ -80,7 +80,7 @@ class Ghost extends GameCharacter {
     }
   }
 
-  void setSpawning() {
+  void _setSpawning() {
     if (!world.gameWonOrLost) {
       current = CharacterState.spawning; //stops further interactions
       disconnectFromBall(spawning: true);
@@ -135,7 +135,7 @@ class Ghost extends GameCharacter {
     animations = await _getAnimations();
     current = CharacterState.scared;
     if (idNum >= 3) {
-      setSpawning();
+      _setSpawning();
     }
     super.onLoad();
   }

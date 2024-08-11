@@ -35,7 +35,7 @@ import 'pacman_world.dart';
 // Reducing map size 30x, scaling up gravity 30x, & zooming 30x changes nothing,
 // but reduces chance of hitting maximum allowed speed
 const flameGameZoom = 30.0;
-const visualZoomMultiplier = 0.92;
+const _visualZoomMultiplier = 0.92;
 const double kSquareNotionalSize = 1700; //determines speed of game
 
 class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
@@ -50,7 +50,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
           camera: CameraComponent.withFixedResolution(
               width: kSquareNotionalSize,
               height: kSquareNotionalSize), //2800, 1700 //CameraComponent(),//
-          zoom: flameGameZoom * visualZoomMultiplier,
+          zoom: flameGameZoom * _visualZoomMultiplier,
         ) {
     setMazeId(mazeId);
   }
@@ -186,6 +186,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
         if (world.isMounted) {
           //some rendering has happened
           pauseEngine();
+          timer.cancel();
         }
       } else {
         timer.cancel();
