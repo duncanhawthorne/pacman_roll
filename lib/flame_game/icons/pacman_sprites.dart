@@ -48,7 +48,7 @@ class PacmanSprites {
 
   Future<Sprite> _pacmanAtFracReal(int size, int mouthWidthAsInt) async {
     if (_loadFromFile) {
-      return Sprite(await Flame.images.load('dash/$mouthWidthAsInt.png'));
+      return Sprite(await Flame.images.load('$mouthWidthAsInt.png'));
     } else {
       return Sprite(await _pacmanRecorderAtFrac(size, mouthWidthAsInt)
           .toImage(size, size));

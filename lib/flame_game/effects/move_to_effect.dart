@@ -2,7 +2,7 @@ import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flutter/animation.dart';
 
-import '../components/ghost.dart';
+const int kGhostResetTimeMillis = 1000;
 
 class MoveToPositionEffect extends MoveToEffect {
   MoveToPositionEffect(Vector2 destination, {onComplete})

@@ -1,7 +1,7 @@
 import 'package:flame/effects.dart';
 import 'package:flutter/animation.dart';
 
-import '../components/ghost.dart';
+import 'move_to_effect.dart';
 
 class RotateByAngleEffect extends RotateEffect {
   RotateByAngleEffect(double angle, {onComplete})

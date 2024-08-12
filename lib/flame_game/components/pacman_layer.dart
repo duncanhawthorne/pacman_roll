@@ -8,8 +8,6 @@ import 'game_character.dart';
 import 'pacman.dart';
 import 'wrapper_no_events.dart';
 
-const multipleSpawningPacmans = false;
-
 class Pacmans extends WrapperNoEvents with HasWorldReference<PacmanWorld> {
   @override
   final priority = 2;

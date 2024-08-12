@@ -59,8 +59,8 @@ class PacmanWorld extends Forge2DWorld
   final pacmans = Pacmans();
   final ghosts = Ghosts();
   final pellets = PelletWrapper();
-  final walls = WallWrapper();
-  final tutorial = TutorialWrapper();
+  final _walls = WallWrapper();
+  final _tutorial = TutorialWrapper();
   final List<WrapperNoEvents> wrappers = [];
 
   bool get gameWonOrLost =>
@@ -147,7 +147,7 @@ class PacmanWorld extends Forge2DWorld
   @override
   Future<void> onLoad() async {
     add(noEventsWrapper);
-    wrappers.addAll([pacmans, ghosts, pellets, walls, tutorial]);
+    wrappers.addAll([pacmans, ghosts, pellets, _walls, _tutorial]);
     for (WrapperNoEvents wrapper in wrappers) {
       noEventsWrapper.add(wrapper);
     }
@@ -182,7 +182,7 @@ class PacmanWorld extends Forge2DWorld
             fingerCurrentDragAngle - _fingersLastDragAngle[event.pointerId]!);
         double spinMultiplier = 4 * min(1, eventVectorLengthProportion / 0.75);
 
-        tutorial.hide();
+        _tutorial.hide();
         _moveMazeAngleByDelta(angleDelta * spinMultiplier);
       }
       _fingersLastDragAngle[event.pointerId] = fingerCurrentDragAngle;

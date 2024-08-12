@@ -4,7 +4,6 @@ import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 
 import '../../style/palette.dart';
-import '../maze.dart';
 import '../pacman_game.dart';
 import '../pacman_world.dart';
 import 'wrapper_no_events.dart';
@@ -27,7 +26,7 @@ class TutorialWrapper extends WrapperNoEvents
         add(
           TextComponent(
               text: '←←←←←←←←\n↓      ↑\n↓ Drag ↑\n↓      ↑\n→→→→→→→→',
-              position: maze.cage,
+              position: Vector2(0, 0),
               anchor: Anchor.center,
               textRenderer: _tutorialTextRenderer,
               key: ComponentKey.named('tutorial'),

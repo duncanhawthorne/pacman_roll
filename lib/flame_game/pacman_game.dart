@@ -52,7 +52,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
               height: kSquareNotionalSize), //2800, 1700 //CameraComponent(),//
           zoom: flameGameZoom * _visualZoomMultiplier,
         ) {
-    setMazeId(mazeId);
+    _setMazeId(mazeId);
   }
 
   /// What the properties of the level that is played has.
@@ -61,11 +61,11 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
   /// A helper for playing sound effects and background audio.
   final AudioController audioController;
 
-  void setMazeId(id) {
+  void _setMazeId(id) {
     maze.mazeId = id;
   }
 
-  String userString = "";
+  String _userString = "";
 
   final stopwatch = Stopwatch();
   int get stopwatchMilliSeconds =>
@@ -88,7 +88,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
   Map<String, dynamic> _getEncodeCurrentGameState() {
     Map<String, dynamic> gameTmp = {};
     gameTmp = {};
-    gameTmp["userString"] = userString;
+    gameTmp["userString"] = _userString;
     gameTmp["levelNum"] = level.number;
     gameTmp["levelCompleteTime"] = stopwatchMilliSeconds;
     gameTmp["dateTime"] = now;
@@ -119,7 +119,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
         stopwatch.stop();
         if (stopwatchMilliSeconds > 10 * 1000) {
           save.firebasePushSingleScore(
-              userString, _getEncodeCurrentGameState());
+              _userString, _getEncodeCurrentGameState());
         }
         world.playerProgress
             .setLevelFinished(level.number, stopwatchMilliSeconds);
@@ -157,7 +157,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
   }
 
   void reset({firstRun = false}) {
-    userString = _getRandomString(random, 15);
+    _userString = _getRandomString(random, 15);
     _cleanOverlaysAndDialogs();
     _addOverlays();
     stopwatch.stop();

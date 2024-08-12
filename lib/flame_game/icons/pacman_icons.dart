@@ -41,7 +41,7 @@ final pacmanIconCache = List.generate(pacmanRenderFracIncrementsNumber + 1,
 // ignore: unused_element
 Widget _pacmanIconFromFile(
     {int mouthInt = pacmanRenderFracIncrementsNumber ~/ 4}) {
-  return Image.asset('assets/images/dash/$mouthInt.png',
+  return Image.asset('assets/images/$mouthInt.png',
       filterQuality: FilterQuality.none,
       height: statusWidgetHeight * statusWidgetHeightFactor,
       width: statusWidgetHeight * statusWidgetHeightFactor);

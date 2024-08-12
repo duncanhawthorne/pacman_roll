@@ -5,18 +5,19 @@ import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 
 import '../../audio/sounds.dart';
+import '../effects/move_to_effect.dart';
 import '../effects/null_effect.dart';
 import '../icons/pacman_sprites.dart';
 import '../maze.dart';
 import 'game_character.dart';
 import 'ghost.dart';
-import 'pacman_layer.dart';
 import 'pellet.dart';
 import 'super_pellet.dart';
 
 const int _kPacmanDeadResetTimeMillis = 1700;
 const int kPacmanDeadResetTimeAnimationMillis = 1250;
 const int _kPacmanHalfEatingResetTimeMillis = 180;
+const _multipleSpawningPacmans = false;
 
 /// The [GameCharacter] is the component that the physical player of the game is
 /// controlling.
@@ -102,7 +103,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     if (typical && ghost.typical) {
       _eat(isPellet: false);
       ghost.setDead();
-      if (multipleSpawningPacmans) {
+      if (_multipleSpawningPacmans) {
         world.pacmans.add(Pacman(position: position + Vector2.random() / 100));
       }
     }
@@ -138,7 +139,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
         world.pacmans.numberOfDeathsNotifier.value++; //score counting deaths
         world.resetAfterPacmanDeath(this);
       } else {
-        assert(multipleSpawningPacmans);
+        assert(_multipleSpawningPacmans);
         disconnectFromBall(); //sync //already done, but keep
         removeFromParent(); //async
       }
@@ -179,11 +180,11 @@ class Pacman extends GameCharacter with CollisionCallbacks {
 
   @override
   Future<void> onGameResize(Vector2 size) async {
+    super.onGameResize(size);
     if (size.x != _screenSizeLast.x || size.y != _screenSizeLast.y) {
       _screenSizeLast.setFrom(size);
       animations = await _getAnimations(2 * maze.spriteWidthOnScreen(size));
     }
-    super.onGameResize(size);
   }
 
   @override

@@ -11,13 +11,8 @@ import '../maze.dart';
 import 'game_character.dart';
 
 const int _kGhostChaseTimeMillis = 6000;
-const int kGhostResetTimeMillis = 1000;
 
-final _ghostSpriteMap = {
-  0: 'dash/ghost1.png',
-  1: 'dash/ghost3.png',
-  2: 'dash/ghost2.png'
-};
+final _ghostSpriteMap = {0: 'ghost1.png', 1: 'ghost3.png', 2: 'ghost2.png'};
 
 class Ghost extends GameCharacter {
   Ghost({
@@ -33,22 +28,22 @@ class Ghost extends GameCharacter {
         stepTime: double.infinity,
       ),
       CharacterState.scared: SpriteAnimation.spriteList(
-        [await game.loadSprite('dash/ghostscared1.png')],
+        [await game.loadSprite('ghostscared1.png')],
         stepTime: double.infinity,
       ),
       CharacterState.scaredIsh: SpriteAnimation.spriteList(
         [
-          await game.loadSprite('dash/ghostscared1.png'),
-          await game.loadSprite('dash/ghostscared2.png')
+          await game.loadSprite('ghostscared1.png'),
+          await game.loadSprite('ghostscared2.png')
         ],
         stepTime: 0.1,
       ),
       CharacterState.dead: SpriteAnimation.spriteList(
-        [await game.loadSprite('dash/eyes.png')],
+        [await game.loadSprite('eyes.png')],
         stepTime: double.infinity,
       ),
       CharacterState.spawning: SpriteAnimation.spriteList(
-        [await game.loadSprite('dash/eyes.png')],
+        [await game.loadSprite('eyes.png')],
         stepTime: double.infinity,
       ),
     };
@@ -97,9 +92,6 @@ class Ghost extends GameCharacter {
     current = CharacterState.normal;
     removeWhere((item) => item is Effect);
     disconnectFromBall();
-    //add(MoveToPositionEffect(maze.ghostStartForId(idNum)));
-    //add(MoveToPositionEffect(maze.ghostStartForId(idNum),
-    //    onComplete: bringBallToSprite));
     add(MoveToPositionEffect(maze.ghostStartForId(idNum),
         onComplete: () => {
               //bringBallToSprite()
@@ -132,12 +124,12 @@ class Ghost extends GameCharacter {
   @override
   Future<void> onLoad() async {
     world.ghosts.ghostList.add(this);
-    animations = await _getAnimations();
     current = CharacterState.scared;
     if (idNum >= 3) {
       _setSpawning();
     }
     super.onLoad();
+    animations = await _getAnimations();
   }
 
   @override
