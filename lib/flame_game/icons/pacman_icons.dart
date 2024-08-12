@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
-import '../components/pacman.dart';
 import '../game_screen.dart';
 import '../pacman_game.dart';
 import 'pacman_sprites.dart';

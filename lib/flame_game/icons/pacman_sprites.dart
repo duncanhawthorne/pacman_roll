@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 
 import '../../utils/helper.dart';
 
+const int kPacmanDeadResetTimeAnimationMillis = 1250;
 const int pacmanRenderFracIncrementsNumber = 64;
 const int pacmanMouthWidthDefault =
     pacmanRenderFracIncrementsNumber ~/ 4; //8 / 32; //5/32

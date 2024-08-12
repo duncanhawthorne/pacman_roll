@@ -15,7 +15,6 @@ import 'pellet.dart';
 import 'super_pellet.dart';
 
 const int _kPacmanDeadResetTimeMillis = 1700;
-const int kPacmanDeadResetTimeAnimationMillis = 1250;
 const int _kPacmanHalfEatingResetTimeMillis = 180;
 const _multipleSpawningPacmans = false;
 
@@ -47,7 +46,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
           loop: false),
       CharacterState.spawning: SpriteAnimation.spriteList(
           await pacmanSprites.pacmanBirthingSprites(size),
-          stepTime: kGhostResetTimeMillis / 1000 / pacmanDeadFrames,
+          stepTime: kResetPositionTimeMillis / 1000 / pacmanDeadFrames,
           loop: false)
     };
   }
