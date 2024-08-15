@@ -1,13 +1,14 @@
 import 'dart:async' as async;
 import 'dart:core';
 import 'dart:math';
+import 'dart:ui';
 
 import 'package:flame/camera.dart';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
-import 'package:flutter/animation.dart';
 
+import '../app_lifecycle/app_lifecycle.dart';
 import '../audio/audio_controller.dart';
 import '../firebase/firebase_saves.dart';
 import '../level_selection/levels.dart';
@@ -45,7 +46,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
     required mazeId,
     required PlayerProgress playerProgress,
     required this.audioController,
-    //required this.palette,
+    required this.appLifecycleStateNotifier,
   }) : super(
           world: PacmanWorld(level: level, playerProgress: playerProgress),
           camera: CameraComponent.withFixedResolution(
@@ -59,8 +60,8 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   /// What the properties of the level that is played has.
   final GameLevel level;
 
-  /// A helper for playing sound effects and background audio.
   final AudioController audioController;
+  final AppLifecycleStateNotifier appLifecycleStateNotifier;
 
   void _setMazeId(id) {
     maze.mazeId = id;
@@ -96,27 +97,11 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
     return gameTmp;
   }
 
-  async.Timer? _enginePausedMonitorTimer;
-
-  void _deactivateEngine() {
-    timeScale = 0;
-    //stopwatch effectively paused by timeScale = 0
-    //timer itself cancelled by other code in timer
-  }
-
-  void activateEngine() {
-    timeScale = 1.0;
-    //stopwatch started by other code on maze rotate if appropriate
-    _startEnginePausedMonitorTimer();
-  }
-
-  void _startEnginePausedMonitorTimer() {
-    _enginePausedMonitorTimer ??=
-        async.Timer.periodic(const Duration(milliseconds: 1000), (timer) {
-      if (!isGameLive) {
-        _deactivateEngine();
-        timer.cancel();
-        _enginePausedMonitorTimer = null;
+  void _lifecycleChangeListener() {
+    appLifecycleStateNotifier.addListener(() {
+      if (appLifecycleStateNotifier.value == AppLifecycleState.hidden) {
+        timeScale = 0;
+        stopwatch.pause(); //shouldn't be necessary given timeScale = 0
       }
     });
   }
@@ -235,6 +220,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
     reset(firstRun: true);
     showMainMenu();
     _winOrLoseGameListener(); //isn't disposed so run once, not on start()
+    _lifecycleChangeListener(); //isn't disposed so run once, not on start()
   }
 
   @override

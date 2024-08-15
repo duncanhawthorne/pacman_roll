@@ -55,9 +55,7 @@ class Ghosts extends WrapperNoEvents
                 _averageGhostSpeed() * flameGameZoom / 30,
                 gradual: true);
           } else {
-            game.audioController.setSirenVolume(0);
-            timer.cancel();
-            _sirenTimer = null;
+            _cancelSirenVolumeUpdatedTimer();
           }
         });
       }

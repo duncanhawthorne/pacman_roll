@@ -161,7 +161,7 @@ class PacmanWorld extends Forge2DWorld
   @override
   void onDragStart(DragStartEvent event) {
     super.onDragStart(event);
-    game.activateEngine();
+    game.timeScale = 1.0;
     if (_iOSWeb) {
       _fingersLastDragAngle[event.pointerId] = null;
     } else {
@@ -174,6 +174,7 @@ class PacmanWorld extends Forge2DWorld
   @override
   void onDragUpdate(DragUpdateEvent event) {
     super.onDragUpdate(event);
+    game.timeScale = 1.0;
     double eventVectorLengthProportion =
         (event.canvasStartPosition - game.canvasSize / 2).length /
             (min(game.canvasSize.x, game.canvasSize.y) / 2);

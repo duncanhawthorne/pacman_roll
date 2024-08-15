@@ -2,6 +2,7 @@ import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../app_lifecycle/app_lifecycle.dart';
 import '../audio/audio_controller.dart';
 import '../level_selection/levels.dart';
 import '../player_progress/player_progress.dart';
@@ -34,7 +35,6 @@ class GameScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final audioController = context.read<AudioController>();
     return PopScope(
       canPop: false,
       child: Scaffold(
@@ -45,8 +45,9 @@ class GameScreen extends StatelessWidget {
               level: level,
               mazeId: mazeId,
               playerProgress: context.read<PlayerProgress>(),
-              audioController: audioController,
-              //palette: palette,
+              audioController: context.read<AudioController>(),
+              appLifecycleStateNotifier:
+                  context.read<AppLifecycleStateNotifier>(),
             ),
             overlayBuilderMap: {
               topLeftOverlayKey: (BuildContext context, PacmanGame game) {
