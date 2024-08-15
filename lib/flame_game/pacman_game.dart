@@ -38,7 +38,8 @@ const flameGameZoom = 30.0;
 const _visualZoomMultiplier = 0.92;
 const double kSquareNotionalSize = 1700; //determines speed of game
 
-class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
+class PacmanGame extends Forge2DGame<PacmanWorld>
+    with HasCollisionDetection, HasTimeScale {
   PacmanGame({
     required this.level,
     required mazeId,
@@ -67,12 +68,11 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
 
   String _userString = "";
 
-  final stopwatch = Stopwatch();
+  Timer stopwatch = Timer(double.infinity);
   int get stopwatchMilliSeconds =>
-      stopwatch.elapsed.inMilliseconds +
+      (stopwatch.current * 1000).toInt() +
       world.pacmans.numberOfDeathsNotifier.value * 5000;
   bool get levelStarted => stopwatchMilliSeconds > 0;
-  int now = 0;
 
   bool get isGameLive =>
       !paused &&
@@ -85,15 +85,40 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
   @override
   Color backgroundColor() => Palette.flameGameBackground.color;
 
-  Map<String, dynamic> _getEncodeCurrentGameState() {
+  Map<String, dynamic> _getCurrentGameState() {
     Map<String, dynamic> gameTmp = {};
     gameTmp = {};
     gameTmp["userString"] = _userString;
     gameTmp["levelNum"] = level.number;
     gameTmp["levelCompleteTime"] = stopwatchMilliSeconds;
-    gameTmp["dateTime"] = now;
+    gameTmp["dateTime"] = DateTime.now().millisecondsSinceEpoch;
     gameTmp["mazeId"] = maze.mazeId;
     return gameTmp;
+  }
+
+  async.Timer? _enginePausedMonitorTimer;
+
+  void _deactivateEngine() {
+    timeScale = 0;
+    //stopwatch effectively paused by timeScale = 0
+    //timer itself cancelled by other code in timer
+  }
+
+  void activateEngine() {
+    timeScale = 1.0;
+    //stopwatch started by other code on maze rotate if appropriate
+    _startEnginePausedMonitorTimer();
+  }
+
+  void _startEnginePausedMonitorTimer() {
+    _enginePausedMonitorTimer ??=
+        async.Timer.periodic(const Duration(milliseconds: 1000), (timer) {
+      if (!isGameLive) {
+        _deactivateEngine();
+        timer.cancel();
+        _enginePausedMonitorTimer = null;
+      }
+    });
   }
 
   void _winOrLoseGameListener() {
@@ -116,10 +141,9 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
     if (isGameLive) {
       if (world.pellets.pelletsRemainingNotifier.value == 0) {
         world.resetAfterGameWin();
-        stopwatch.stop();
+        stopwatch.pause();
         if (stopwatchMilliSeconds > 10 * 1000) {
-          save.firebasePushSingleScore(
-              _userString, _getEncodeCurrentGameState());
+          save.firebasePushSingleScore(_userString, _getCurrentGameState());
         }
         world.playerProgress
             .setLevelFinished(level.number, stopwatchMilliSeconds);
@@ -160,7 +184,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
     _userString = _getRandomString(random, 15);
     _cleanOverlaysAndDialogs();
     _addOverlays();
-    stopwatch.stop();
+    stopwatch.pause();
     stopwatch.reset();
     if (!firstRun) {
       assert(world.isLoaded);
@@ -216,7 +240,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld> with HasCollisionDetection {
   @override
   void update(double dt) {
     super.update(dt);
-    now = DateTime.now().millisecondsSinceEpoch;
+    stopwatch.update(dt);
   }
 
   void _end() {

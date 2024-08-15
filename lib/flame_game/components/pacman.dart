@@ -25,8 +25,8 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     required super.position,
   }) : super(priority: 2);
 
-  int _pacmanStartEatingTimeLatest = 0; //a long time ago
   final Vector2 _screenSizeLast = Vector2(0, 0);
+  Timer eatTimer = Timer(_kPacmanHalfEatingResetTimeMillis * 2 / 1000);
 
   Future<Map<CharacterState, SpriteAnimation>?> _getAnimations(int size) async {
     return {
@@ -55,7 +55,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     if (typical) {
       if (current == CharacterState.normal) {
         current = CharacterState.eating;
-        _pacmanStartEatingTimeLatest = game.now;
+        eatTimer.start();
         if (isPellet) {
           world.play(SfxType.waka);
         } else {
@@ -122,8 +122,8 @@ class Pacman extends GameCharacter with CollisionCallbacks {
         if (world.pacmans.pacmanList.length == 1 ||
             world.pacmans.numberAlivePacman() == 0) {
           world.doingLevelResetFlourish = true;
-          game.stopwatch.stop();
-          world.ghosts.cancelMultiGhostAdderTimer();
+          game.stopwatch.pause();
+          world.ghosts.removeSpawner();
         }
         add(NullEffect(_kPacmanDeadResetTimeMillis,
             onComplete: _dieFromGhostActionAfterDeathAnimation));
@@ -160,11 +160,12 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     current = CharacterState.normal;
   }
 
-  void _stateSequence() {
+  void _stateSequence(double dt) {
+    eatTimer.update(dt);
     if (current == CharacterState.eating) {
-      if (game.now - _pacmanStartEatingTimeLatest >
-          _kPacmanHalfEatingResetTimeMillis * 2) {
+      if (eatTimer.finished) {
         current = CharacterState.normal;
+        eatTimer.pause(); //makes update function for timer free
       }
     }
   }
@@ -203,7 +204,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
 
   @override
   void update(double dt) {
-    _stateSequence();
+    _stateSequence(dt);
     super.update(dt);
   }
 }

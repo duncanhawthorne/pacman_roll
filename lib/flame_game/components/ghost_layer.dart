@@ -13,18 +13,19 @@ import 'wrapper_no_events.dart';
 
 final bool _iOSWeb = defaultTargetPlatform == TargetPlatform.iOS && kIsWeb;
 final bool _sirenEnabled = !_iOSWeb;
+const int _kGhostChaseTimeMillis = 6000;
 
 class Ghosts extends WrapperNoEvents
     with HasWorldReference<PacmanWorld>, HasGameReference<PacmanGame> {
   @override
   final priority = 1;
 
-  async.Timer? _ghostTimer;
   async.Timer? _sirenTimer;
 
   final List<Ghost> ghostList = [];
 
-  int scaredTimeLatest = 0;
+  CharacterState current = CharacterState.normal;
+  Timer ghostsScaredTimer = Timer(_kGhostChaseTimeMillis / 1000);
 
   double _averageGhostSpeed() {
     if (!game.isGameLive ||
@@ -78,39 +79,34 @@ class Ghosts extends WrapperNoEvents
   }
 
   void scareGhosts() {
+    current = CharacterState.scared;
     if (world.pellets.pelletsRemainingNotifier.value != 0) {
       world.play(SfxType.ghostsScared);
       for (Ghost ghost in ghostList) {
         ghost.setScared();
       }
-      scaredTimeLatest = game.now;
+      ghostsScaredTimer.start();
     }
   }
 
-  void startMultiGhostAdderTimer() {
+  SpawnComponent? ghostSpawner;
+
+  void addSpawner() {
+    ghostSpawner ??= SpawnComponent(
+      factory: (i) => Ghost(idNum: [3, 4, 5][game.random.nextInt(3)]),
+      selfPositioning: true,
+      period: world.level.ghostSpwanTimerLength.toDouble(),
+    );
     if (game.level.multipleSpawningGhosts &&
-        _ghostTimer == null &&
-        game.isGameLive &&
+        !ghostSpawner!.isMounted &&
         !world.gameWonOrLost) {
-      _ghostTimer = async.Timer.periodic(
-          Duration(milliseconds: world.level.ghostSpwanTimerLength * 1000),
-          (timer) {
-        if (game.isGameLive &&
-            !world.gameWonOrLost &&
-            !world.doingLevelResetFlourish) {
-          add(Ghost(idNum: [3, 4, 5][game.random.nextInt(3)]));
-        } else {
-          timer.cancel();
-          _ghostTimer = null;
-        }
-      });
+      add(ghostSpawner!);
     }
   }
 
-  void cancelMultiGhostAdderTimer() {
-    if (world.level.multipleSpawningGhosts && _ghostTimer != null) {
-      _ghostTimer!.cancel();
-      _ghostTimer = null;
+  void removeSpawner() {
+    if (world.level.multipleSpawningGhosts && ghostSpawner != null) {
+      ghostSpawner!.removeFromParent();
     }
   }
 
@@ -120,6 +116,7 @@ class Ghosts extends WrapperNoEvents
       ghost.disconnectFromBall(); //sync
       ghost.removeFromParent(); //async
     }
+    removeSpawner();
   }
 
   void disconnectGhostsFromBalls() {
@@ -130,19 +127,19 @@ class Ghosts extends WrapperNoEvents
   }
 
   void resetAfterGameWin() {
-    scaredTimeLatest = 0;
+    ghostsScaredTimer.pause();
     _trimAllGhosts();
   }
 
   void resetSlideAfterPacmanDeath() {
-    scaredTimeLatest = 0;
+    ghostsScaredTimer.pause();
     for (Ghost ghost in ghostList) {
       ghost.resetSlideAfterPacmanDeath();
     }
   }
 
   void resetInstantAfterPacmanDeath() {
-    scaredTimeLatest = 0;
+    ghostsScaredTimer.pause();
     if (game.level.multipleSpawningGhosts) {
       _trimAllGhosts();
       _addThreeGhosts();
@@ -153,13 +150,41 @@ class Ghosts extends WrapperNoEvents
     }
   }
 
+  void _stateSequence(double dt) {
+    ghostsScaredTimer.update(dt);
+    if (current == CharacterState.scared) {
+      if (ghostsScaredTimer.current > 2 / 3 * ghostsScaredTimer.limit) {
+        current = CharacterState.scaredIsh;
+        for (Ghost ghost in ghostList) {
+          ghost.setScaredToScaredIsh();
+        }
+      }
+    }
+    if (current == CharacterState.scaredIsh) {
+      if (ghostsScaredTimer.finished) {
+        current = CharacterState.normal;
+        for (Ghost ghost in ghostList) {
+          ghost.setScaredIshToNormal();
+          ghostsScaredTimer.pause(); //makes update function for timer free
+        }
+        game.audioController.stopSfx(SfxType.ghostsScared);
+      }
+    }
+  }
+
   @override
   void reset({bool mazeResize = false}) {
-    cancelMultiGhostAdderTimer();
+    removeSpawner();
     _cancelSirenVolumeUpdatedTimer;
-    scaredTimeLatest = 0;
+    ghostsScaredTimer.pause();
     _trimAllGhosts();
     _addThreeGhosts();
+  }
+
+  @override
+  void update(double dt) {
+    _stateSequence(dt);
+    super.update(dt);
   }
 
   @override

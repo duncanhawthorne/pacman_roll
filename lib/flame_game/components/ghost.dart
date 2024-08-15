@@ -3,14 +3,11 @@ import 'dart:core';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 
-import '../../audio/sounds.dart';
 import '../../utils/helper.dart';
 import '../effects/move_to_effect.dart';
 import '../effects/rotate_by_effect.dart';
 import '../maze.dart';
 import 'game_character.dart';
-
-const int _kGhostChaseTimeMillis = 6000;
 
 final _ghostSpriteMap = {0: 'ghost1.png', 1: 'ghost3.png', 2: 'ghost2.png'};
 
@@ -59,6 +56,22 @@ class Ghost extends GameCharacter {
     }
   }
 
+  void setScaredToScaredIsh() {
+    if (!world.gameWonOrLost) {
+      if (current == CharacterState.scared) {
+        current = CharacterState.scaredIsh;
+      }
+    }
+  }
+
+  void setScaredIshToNormal() {
+    if (!world.gameWonOrLost) {
+      if (current == CharacterState.scaredIsh) {
+        current = CharacterState.normal;
+      }
+    }
+  }
+
   void setDead() {
     if (!world.gameWonOrLost) {
       current = CharacterState.dead; //stops further interactions
@@ -69,7 +82,7 @@ class Ghost extends GameCharacter {
         disconnectFromBall();
         add(MoveToPositionEffect(maze.ghostStart,
             onComplete: () =>
-                {bringBallToSprite(), current = CharacterState.scared}));
+                {bringBallToSprite(), current = world.ghosts.current}));
         add(RotateByAngleEffect(smallAngle(-angle)));
       }
     }
@@ -84,7 +97,7 @@ class Ghost extends GameCharacter {
               ? (Vector2.all(0)..setFrom(world.pacmans.pacmanList[0].position))
               : maze.ghostStart,
           onComplete: () =>
-              {bringBallToSprite(), current = CharacterState.scared}));
+              {bringBallToSprite(), current = world.ghosts.current}));
     }
   }
 
@@ -106,25 +119,10 @@ class Ghost extends GameCharacter {
     angle = 0;
   }
 
-  void _stateSequence() {
-    if (current == CharacterState.scared) {
-      if (game.now - world.ghosts.scaredTimeLatest >
-          _kGhostChaseTimeMillis * 2 / 3) {
-        current = CharacterState.scaredIsh;
-      }
-    }
-    if (current == CharacterState.scaredIsh) {
-      if (game.now - world.ghosts.scaredTimeLatest > _kGhostChaseTimeMillis) {
-        current = CharacterState.normal;
-        game.audioController.stopSfx(SfxType.ghostsScared);
-      }
-    }
-  }
-
   @override
   Future<void> onLoad() async {
     world.ghosts.ghostList.add(this);
-    current = CharacterState.scared;
+    current = world.ghosts.current;
     if (idNum >= 3) {
       _setSpawning();
     }
@@ -136,11 +134,5 @@ class Ghost extends GameCharacter {
   Future<void> onRemove() async {
     world.ghosts.ghostList.remove(this);
     super.onRemove();
-  }
-
-  @override
-  void update(double dt) {
-    _stateSequence();
-    super.update(dt);
   }
 }

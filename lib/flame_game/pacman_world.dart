@@ -113,21 +113,24 @@ class PacmanWorld extends Forge2DWorld
     }
   }
 
-  void _resetInstantAfterPacmanDeath() {
-    pacmans.resetInstantAfterPacmanDeath();
-    ghosts.resetInstantAfterPacmanDeath();
-    _cameraRotatableOnPacmanDeathFlourish = true;
-    _setMazeAngle(0);
-    doingLevelResetFlourish = false;
-  }
-
-  void reset({firstRun = false}) {
+  void _cameraAndTimersReset() {
     //stop any rotation effect added to camera
     //note, still leaves flourish variable hot, so fix below
     game.camera.viewfinder.removeWhere((item) => item is Effect);
     _setMazeAngle(0);
     _cameraRotatableOnPacmanDeathFlourish = true;
     doingLevelResetFlourish = false;
+    game.timeScale = 0;
+  }
+
+  void _resetInstantAfterPacmanDeath() {
+    pacmans.resetInstantAfterPacmanDeath();
+    ghosts.resetInstantAfterPacmanDeath();
+    _cameraAndTimersReset();
+  }
+
+  void reset({firstRun = false}) {
+    _cameraAndTimersReset();
 
     if (!firstRun) {
       for (WrapperNoEvents wrapper in wrappers) {
@@ -158,6 +161,7 @@ class PacmanWorld extends Forge2DWorld
   @override
   void onDragStart(DragStartEvent event) {
     super.onDragStart(event);
+    game.activateEngine();
     if (_iOSWeb) {
       _fingersLastDragAngle[event.pointerId] = null;
     } else {
@@ -202,8 +206,8 @@ class PacmanWorld extends Forge2DWorld
       _setMazeAngle(game.camera.viewfinder.angle + angleDelta);
 
       if (!doingLevelResetFlourish) {
-        game.stopwatch.start();
-        ghosts.startMultiGhostAdderTimer();
+        game.stopwatch.resume();
+        ghosts.addSpawner();
         ghosts.sirenVolumeUpdatedTimer();
       }
     }
