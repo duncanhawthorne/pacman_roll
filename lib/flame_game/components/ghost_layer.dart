@@ -20,12 +20,12 @@ class Ghosts extends WrapperNoEvents
   @override
   final priority = 1;
 
-  async.Timer? _sirenTimer;
-
   final List<Ghost> ghostList = [];
 
   CharacterState current = CharacterState.normal;
   Timer ghostsScaredTimer = Timer(_kGhostChaseTimeMillis / 1000);
+  SpawnComponent? ghostSpawner;
+  async.Timer? _sirenTimer;
 
   double _averageGhostSpeed() {
     if (!game.isGameLive ||
@@ -87,8 +87,6 @@ class Ghosts extends WrapperNoEvents
     }
   }
 
-  SpawnComponent? ghostSpawner;
-
   void addSpawner() {
     ghostSpawner ??= SpawnComponent(
       factory: (i) => Ghost(idNum: [3, 4, 5][game.random.nextInt(3)]),
@@ -125,19 +123,22 @@ class Ghosts extends WrapperNoEvents
   }
 
   void resetAfterGameWin() {
-    ghostsScaredTimer.pause();
+    current = CharacterState.normal;
+    ghostsScaredTimer.pause(); //makes update function for timer free
     _trimAllGhosts();
   }
 
   void resetSlideAfterPacmanDeath() {
-    ghostsScaredTimer.pause();
+    current = CharacterState.normal;
+    ghostsScaredTimer.pause(); //makes update function for timer free
     for (Ghost ghost in ghostList) {
       ghost.resetSlideAfterPacmanDeath();
     }
   }
 
   void resetInstantAfterPacmanDeath() {
-    ghostsScaredTimer.pause();
+    current = CharacterState.normal;
+    ghostsScaredTimer.pause(); //makes update function for timer free
     if (game.level.multipleSpawningGhosts) {
       _trimAllGhosts();
       _addThreeGhosts();
@@ -145,6 +146,7 @@ class Ghosts extends WrapperNoEvents
       for (Ghost ghost in ghostList) {
         ghost.resetInstantAfterPacmanDeath();
       }
+      //no spawner to remove
     }
   }
 
@@ -172,9 +174,9 @@ class Ghosts extends WrapperNoEvents
 
   @override
   void reset({bool mazeResize = false}) {
-    removeSpawner();
     _cancelSirenVolumeUpdatedTimer;
-    ghostsScaredTimer.pause();
+    current = CharacterState.normal;
+    ghostsScaredTimer.pause(); //makes update function for timer free
     _trimAllGhosts();
     _addThreeGhosts();
   }
