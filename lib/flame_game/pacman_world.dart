@@ -99,9 +99,9 @@ class PacmanWorld extends Forge2DWorld
     game.audioController.stopSfx(SfxType.ghostsScared);
     if (!gameWonOrLost) {
       if (_slideCharactersAfterPacmanDeath) {
+        _cameraRotatableOnPacmanDeathFlourish = false;
         dyingPacman.resetSlideAfterDeath();
         ghosts.resetSlideAfterPacmanDeath();
-        _cameraRotatableOnPacmanDeathFlourish = false;
         game.camera.viewfinder.add(RotateByAngleEffect(
             smallAngle(-game.camera.viewfinder.angle),
             onComplete: _resetInstantAfterPacmanDeath));
@@ -120,7 +120,6 @@ class PacmanWorld extends Forge2DWorld
     _setMazeAngle(0);
     _cameraRotatableOnPacmanDeathFlourish = true;
     doingLevelResetFlourish = false;
-    game.timeScale = 0;
   }
 
   void _resetInstantAfterPacmanDeath() {

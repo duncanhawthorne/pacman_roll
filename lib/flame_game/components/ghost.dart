@@ -108,7 +108,9 @@ class Ghost extends GameCharacter {
     add(MoveToPositionEffect(maze.ghostStartForId(idNum),
         onComplete: () => {
               //bringBallToSprite()
-            })); //FIXME should be able to call bringBallToSprite here
+              //Calling bringBallToSprite here creates a crash
+              //also would be a race condition
+            }));
     add(RotateByAngleEffect(smallAngle(-angle)));
   }
 
