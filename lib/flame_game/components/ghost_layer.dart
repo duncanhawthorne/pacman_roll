@@ -80,6 +80,9 @@ class Ghosts extends WrapperNoEvents
   }
 
   void scareGhosts() {
+    if (!isMounted) {
+      return;
+    }
     current = CharacterState.scared;
     if (world.pellets.pelletsRemainingNotifier.value != 0) {
       world.play(SfxType.ghostsScared);

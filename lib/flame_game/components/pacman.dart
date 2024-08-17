@@ -161,6 +161,9 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   }
 
   void _stateSequence(double dt) {
+    if (this is PacmanClone) {
+      return;
+    }
     eatTimer.update(dt);
     if (current == CharacterState.eating) {
       if (eatTimer.finished) {
@@ -170,12 +173,14 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     }
   }
 
+  PacmanClone? clone;
   @override
   Future<void> onLoad() async {
     super.onLoad();
     world.pacmans.pacmanList.add(this);
     current = CharacterState.normal;
     angle = 0;
+    clone = PacmanClone(position: position, original: this);
   }
 
   @override
@@ -190,6 +195,9 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   @override
   Future<void> onRemove() async {
     world.pacmans.pacmanList.remove(this);
+    if (clone != null && clone!.isMounted) {
+      parent!.remove(clone!);
+    }
     super.onRemove();
   }
 
@@ -205,6 +213,32 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   @override
   void update(double dt) {
     _stateSequence(dt);
+    addRemoveClone(clone);
     super.update(dt);
+  }
+}
+
+class PacmanClone extends Pacman {
+  PacmanClone({required super.position, required this.original});
+
+  GameCharacter original;
+
+  @override
+  void update(double dt) {
+    super.update(dt); //super cleansed against cascade of clones
+    assert(clone == null); //i.e. no cascade of clones
+    updateCloneFrom(original);
+  }
+
+  @override
+  Future<void> onLoad() async {
+    connectedToBall = false;
+    //animations = await _getAnimations(); //dont need this. done on gameresize
+    //don't call super
+  }
+
+  @override
+  Future<void> onRemove() async {
+    //don't call super
   }
 }

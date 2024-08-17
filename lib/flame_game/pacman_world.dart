@@ -16,6 +16,7 @@ import 'components/pacman.dart';
 import 'components/pacman_layer.dart';
 import 'components/pellet_layer.dart';
 import 'components/tutorial_layer.dart';
+import 'components/wall_blocking_layer.dart';
 import 'components/wall_layer.dart';
 import 'components/wrapper_no_events.dart';
 import 'effects/rotate_by_effect.dart';
@@ -61,6 +62,7 @@ class PacmanWorld extends Forge2DWorld
   final pellets = PelletWrapper();
   final _walls = WallWrapper();
   final _tutorial = TutorialWrapper();
+  final _blockingWalls = WallBlockingWrapper();
   final List<WrapperNoEvents> wrappers = [];
 
   bool get gameWonOrLost =>
@@ -149,7 +151,8 @@ class PacmanWorld extends Forge2DWorld
   @override
   Future<void> onLoad() async {
     add(noEventsWrapper);
-    wrappers.addAll([pacmans, ghosts, pellets, _walls, _tutorial]);
+    wrappers
+        .addAll([pacmans, ghosts, pellets, _walls, _tutorial, _blockingWalls]);
     for (WrapperNoEvents wrapper in wrappers) {
       noEventsWrapper.add(wrapper);
     }

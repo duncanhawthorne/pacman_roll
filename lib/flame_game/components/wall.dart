@@ -25,6 +25,18 @@ class MazeWallSquareVisual extends RectangleComponent with IgnoreEvents {
             paint: _blackBackgroundPaint);
 }
 
+class MazeWallSquareVisualBlocking extends RectangleComponent
+    with IgnoreEvents {
+  MazeWallSquareVisualBlocking(
+      {required super.position, required width, required height})
+      : super(
+            size: Vector2(width, height),
+            anchor: Anchor.center,
+            paint: _blackBackgroundPaint);
+  @override
+  final priority = 1000;
+}
+
 class MazeWallCircleVisual extends CircleComponent with IgnoreEvents {
   MazeWallCircleVisual({required super.radius, required super.position})
       : super(anchor: Anchor.center, paint: _blackBackgroundPaint); //NOTE BLACK

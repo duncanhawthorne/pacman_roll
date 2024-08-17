@@ -121,6 +121,7 @@ class Ghost extends GameCharacter {
     angle = 0;
   }
 
+  GhostClone? clone;
   @override
   Future<void> onLoad() async {
     world.ghosts.ghostList.add(this);
@@ -130,11 +131,46 @@ class Ghost extends GameCharacter {
     }
     super.onLoad();
     animations = await _getAnimations();
+    clone = GhostClone(position: position, idNum: idNum, original: this);
   }
 
   @override
   Future<void> onRemove() async {
     world.ghosts.ghostList.remove(this);
+    if (clone != null && clone!.isMounted) {
+      parent!.remove(clone!);
+    }
     super.onRemove();
+  }
+
+  @override
+  void update(double dt) {
+    addRemoveClone(clone);
+    super.update(dt);
+  }
+}
+
+class GhostClone extends Ghost {
+  GhostClone({required position, required super.idNum, required this.original});
+
+  GameCharacter original;
+
+  @override
+  void update(double dt) {
+    super.update(dt); //super cleansed against cascade of clones
+    assert(clone == null); //i.e. no cascade of clones
+    updateCloneFrom(original);
+  }
+
+  @override
+  Future<void> onLoad() async {
+    connectedToBall = false;
+    animations = await _getAnimations();
+    //don't call super
+  }
+
+  @override
+  Future<void> onRemove() async {
+    //don't call super
   }
 }

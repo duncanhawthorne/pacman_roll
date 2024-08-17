@@ -7,6 +7,7 @@ import 'package:flame/components.dart';
 import '../maze.dart';
 import '../pacman_game.dart';
 import '../pacman_world.dart';
+import 'ghost.dart';
 import 'pacman.dart';
 import 'physics_ball.dart';
 
@@ -95,6 +96,33 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     disconnectFromBall(); //sync but within async function
     _ball.removeFromParent();
     super.onRemove();
+  }
+
+  void addRemoveClone(GameCharacter? clone) {
+    if (this is! PacmanClone && this is! GhostClone) {
+      //i.e. no cascade of clones
+      assert(clone != null);
+      assert(clone is PacmanClone || clone is GhostClone);
+      if (position.x.abs() > maze.mazeWidth / 2 - maze.spriteWidth() / 2) {
+        if (!clone!.isMounted) {
+          parent!.add(clone);
+        }
+      } else {
+        if (clone!.isMounted) {
+          parent!.remove(clone);
+        }
+      }
+    }
+  }
+
+  final Vector2 _cloneOffset = Vector2(-maze.mazeWidth, 0);
+
+  void updateCloneFrom(GameCharacter original) {
+    assert(this is PacmanClone || this is GhostClone);
+    position =
+        original.position + _cloneOffset * (original.position.x > 0 ? 1 : -1);
+    angle = original.angle;
+    current = original.current;
   }
 
   @override

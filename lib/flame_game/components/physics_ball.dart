@@ -52,10 +52,10 @@ class PhysicsBall extends BodyComponent with IgnoreEvents {
 
   void _moveThroughPipePortal() {
     if (_subConnectedBall) {
-      if (position.x.abs() > maze.mazeWidth / 2 * _portalMargin ||
-          position.y.abs() > maze.mazeHeight / 2 * _portalMargin) {
-        position = Vector2(_mod(position.x, maze.mazeWidth * _portalMargin),
-            _mod(position.y, maze.mazeHeight * _portalMargin));
+      if (position.x.abs() > maze.mazeWidth / 2 ||
+          position.y.abs() > maze.mazeHeight / 2) {
+        position = Vector2(_mod(position.x, maze.mazeWidth),
+            _mod(position.y, maze.mazeHeight));
       }
     }
   }
@@ -66,8 +66,6 @@ class PhysicsBall extends BodyComponent with IgnoreEvents {
     _moveThroughPipePortal();
   }
 }
-
-const _portalMargin = 0.97;
 
 double _mod(double position, double mod) {
   position = position % mod;
