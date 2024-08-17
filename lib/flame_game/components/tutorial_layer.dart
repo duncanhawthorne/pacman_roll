@@ -37,6 +37,9 @@ class TutorialWrapper extends WrapperNoEvents
   }
 
   void hide() {
+    if (!isMounted) {
+      return;
+    }
     if (!_tutorialEverManuallyHidden) {
       if (game.findByKey(ComponentKey.named('tutorial')) != null) {
         game.findByKey(ComponentKey.named('tutorial'))!.removeFromParent();

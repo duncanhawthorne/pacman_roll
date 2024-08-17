@@ -43,6 +43,9 @@ class Ghosts extends WrapperNoEvents
   }
 
   void sirenVolumeUpdatedTimer() async {
+    if (!isMounted) {
+      return;
+    }
     // ignore: prefer_conditional_assignment
     if (_sirenEnabled) {
       if (_sirenTimer == null && game.isGameLive && !world.gameWonOrLost) {
@@ -88,6 +91,9 @@ class Ghosts extends WrapperNoEvents
   }
 
   void addSpawner() {
+    if (!isMounted) {
+      return;
+    }
     ghostSpawner ??= SpawnComponent(
       factory: (i) => Ghost(idNum: [3, 4, 5][game.random.nextInt(3)]),
       selfPositioning: true,
