@@ -115,12 +115,11 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     }
   }
 
-  final Vector2 _cloneOffset = Vector2(-maze.mazeWidth, 0);
-
   void updateCloneFrom(GameCharacter original) {
     assert(this is PacmanClone || this is GhostClone);
-    position =
-        original.position + _cloneOffset * (original.position.x > 0 ? 1 : -1);
+    position.setFrom(Vector2(
+        original.position.x - maze.mazeWidth * original.position.x.sign,
+        original.position.y));
     angle = original.angle;
     current = original.current;
   }
