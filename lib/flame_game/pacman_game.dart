@@ -97,10 +97,16 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
     return gameTmp;
   }
 
+  void resume() {
+    timeScale = 1.0;
+    resumeEngine();
+  }
+
   void _lifecycleChangeListener() {
     appLifecycleStateNotifier.addListener(() {
       if (appLifecycleStateNotifier.value == AppLifecycleState.hidden) {
         timeScale = 0;
+        pauseEngine();
         stopwatch.pause(); //shouldn't be necessary given timeScale = 0
       }
     });
