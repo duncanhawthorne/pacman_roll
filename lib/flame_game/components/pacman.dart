@@ -178,7 +178,9 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     world.pacmans.pacmanList.add(this);
     current = CharacterState.normal;
     angle = 0;
-    clone = PacmanClone(position: position, original: this);
+    if (portalClones) {
+      clone = PacmanClone(position: position, original: this);
+    }
   }
 
   @override

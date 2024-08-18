@@ -16,6 +16,8 @@ final Paint highQualityPaint = Paint()
 //..color = const Color.fromARGB(255, 255, 255, 255)
   ..isAntiAlias = true;
 
+const bool portalClones = true;
+
 /// The [GameCharacter] is the generic object that is linked to a [PhysicsBall]
 class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     with
@@ -103,17 +105,19 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   }
 
   void _addRemoveClone(GameCharacter? clone) {
-    if (clone != null) {
-      //i.e. no cascade of clones
-      assert(clone is PacmanClone || clone is GhostClone);
-      assert(this is! PacmanClone && this is! GhostClone);
-      if (position.x.abs() > maze.mazeWidth / 2 - maze.spriteWidth / 2) {
-        if (!clone.isMounted) {
-          parent!.add(clone);
-        }
-      } else {
-        if (clone.isMounted) {
-          parent!.remove(clone);
+    if (portalClones) {
+      if (clone != null) {
+        //i.e. no cascade of clones
+        assert(clone is PacmanClone || clone is GhostClone);
+        assert(this is! PacmanClone && this is! GhostClone);
+        if (position.x.abs() > maze.mazeWidth / 2 - maze.spriteWidth / 2) {
+          if (!clone.isMounted) {
+            parent!.add(clone);
+          }
+        } else {
+          if (clone.isMounted) {
+            parent!.remove(clone);
+          }
         }
       }
     }
