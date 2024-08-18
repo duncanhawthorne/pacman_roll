@@ -9,6 +9,7 @@ import '../effects/move_to_effect.dart';
 import '../effects/null_effect.dart';
 import '../icons/pacman_sprites.dart';
 import '../maze.dart';
+import 'clones.dart';
 import 'game_character.dart';
 import 'ghost.dart';
 import 'pellet.dart';
@@ -21,9 +22,7 @@ const _multipleSpawningPacmans = false;
 /// The [GameCharacter] is the component that the physical player of the game is
 /// controlling.
 class Pacman extends GameCharacter with CollisionCallbacks {
-  Pacman({
-    required super.position,
-  }) : super(priority: 2);
+  Pacman({required super.position, super.original}) : super(priority: 2);
 
   final Vector2 _screenSizeLast = Vector2(0, 0);
   Timer eatTimer = Timer(_kPacmanHalfEatingResetTimeMillis * 2 / 1000);
@@ -173,7 +172,6 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     }
   }
 
-  PacmanClone? clone;
   @override
   Future<void> onLoad() async {
     super.onLoad();
@@ -195,9 +193,6 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   @override
   Future<void> onRemove() async {
     world.pacmans.pacmanList.remove(this);
-    if (clone != null && clone!.isMounted) {
-      parent!.remove(clone!);
-    }
     super.onRemove();
   }
 
@@ -213,32 +208,6 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   @override
   void update(double dt) {
     _stateSequence(dt);
-    addRemoveClone(clone);
     super.update(dt);
-  }
-}
-
-class PacmanClone extends Pacman {
-  PacmanClone({required super.position, required this.original});
-
-  GameCharacter original;
-
-  @override
-  void update(double dt) {
-    assert(clone == null); //i.e. no cascade of clones
-    updateCloneFrom(original);
-    super.update(dt); //super cleansed against cascade of clones
-  }
-
-  @override
-  Future<void> onLoad() async {
-    connectedToBall = false;
-    //animations = await _getAnimations(); //dont need this. done on gameresize
-    //don't call super
-  }
-
-  @override
-  Future<void> onRemove() async {
-    //don't call super
   }
 }

@@ -13,7 +13,7 @@ class PhysicsBall extends BodyComponent with IgnoreEvents {
             fixtureDefs: [
               FixtureDef(
                 CircleShape()
-                  ..radius = radius ?? maze.spriteWidth() / 2 * 0.99, //0.95
+                  ..radius = radius ?? maze.spriteWidth / 2 * 0.99, //0.95
                 restitution: 0.0,
                 friction: _useForgePhysicsBallRotation ? 1 : 0,
                 userData: PhysicsBall,

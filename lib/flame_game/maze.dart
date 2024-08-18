@@ -34,8 +34,10 @@ class Maze {
       ghostStart = _vectorOfMazeListCode(_kGhostStart);
       pacmanStart = _vectorOfMazeListCode(_kPacmanStart);
       cage = _vectorOfMazeListCode(_kCage);
+      //items below used every frame so calculate once here
       mazeWidth = blockWidth() * (_mazeLayout[0].length - _bufferColumns);
       mazeHeight = blockWidth() * _mazeLayout.length;
+      spriteWidth = _spriteWidth();
     }
   }
 
@@ -52,9 +54,10 @@ class Maze {
 
   static const bool _largeSprites = true;
   static const pelletScaleFactor = _largeSprites ? 0.4 : 0.46;
+  double spriteWidth = 0;
 
   Vector2 ghostStartForId(int idNum) {
-    return ghostStart + Vector2(spriteWidth() * (idNum % 3 - 1), 0);
+    return ghostStart + Vector2(spriteWidth * (idNum % 3 - 1), 0);
   }
 
   Vector2 ghostSpawnForId(int idNum) {
@@ -62,7 +65,7 @@ class Maze {
   }
 
   int spriteWidthOnScreen(Vector2 size) {
-    return (spriteWidth() /
+    return (spriteWidth /
             (kSquareNotionalSize / flameGameZoom) *
             min(size.x, size.y))
         .toInt();
@@ -74,7 +77,7 @@ class Maze {
         max(_mazeLayoutHorizontalLength(), _mazeLayoutVerticalLength());
   }
 
-  double spriteWidth() {
+  double _spriteWidth() {
     return blockWidth() * (_largeSprites ? 2 : 1);
   }
 
@@ -249,30 +252,6 @@ class Maze {
   List<Component> mazeBlockingWalls() {
     final List<Component> result = [];
     double scale = blockWidth();
-    /*
-    for (int i = 0; i < _mazeLayout.length; i++) {
-      if (!_wallAt(i, 0) &&
-          !_wallAt(i, _mazeLayout[i].length - 1) &&
-          !_wallAt(i + 1, 0) &&
-          !_wallAt(i + 1, _mazeLayout[i].length - 1)) {
-        Vector2 centerLeft = _vectorOfMazeListIndex(i, 0);
-        Vector2 centerRight =
-            _vectorOfMazeListIndex(i, _mazeLayout[i].length - 1);
-        result.add(
-          MazeWallSquareVisualBlocking(
-              position: centerLeft + Vector2(-1.5, 0.5) * scale,
-              width: scale * 3,
-              height: scale * (2 + _pixelationBuffer)),
-        );
-        result.add(
-          MazeWallSquareVisualBlocking(
-              position: centerRight + Vector2(1.5, 0.5) * scale,
-              width: scale * 3,
-              height: scale * (2 + _pixelationBuffer)),
-        );
-      }
-    }
-     */
     int width = 7;
     result.add(
       MazeWallSquareVisualBlocking(

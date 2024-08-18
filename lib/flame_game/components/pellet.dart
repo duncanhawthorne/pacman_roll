@@ -10,7 +10,7 @@ class Pellet extends CircleComponent
       {required super.position, double radiusFactor = 1, this.hitBoxFactor = 1})
       : super(
             radius:
-                maze.spriteWidth() / 2 * Maze.pelletScaleFactor * radiusFactor,
+                maze.spriteWidth / 2 * Maze.pelletScaleFactor * radiusFactor,
             anchor: Anchor.center);
 
   double hitBoxFactor;

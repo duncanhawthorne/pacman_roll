@@ -7,7 +7,7 @@ import 'package:flame/components.dart';
 import '../maze.dart';
 import '../pacman_game.dart';
 import '../pacman_world.dart';
-import 'ghost.dart';
+import 'clones.dart';
 import 'pacman.dart';
 import 'physics_ball.dart';
 
@@ -23,11 +23,9 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
         IgnoreEvents,
         HasWorldReference<PacmanWorld>,
         HasGameReference<PacmanGame> {
-  GameCharacter({
-    super.position,
-    super.priority = 1,
-  }) : super(
-            size: Vector2.all(maze.spriteWidth()),
+  GameCharacter({super.position, super.priority = 1, this.original})
+      : super(
+            size: Vector2.all(maze.spriteWidth),
             paint: highQualityPaint,
             anchor: Anchor.center);
 
@@ -48,6 +46,9 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
       connectedToBall &&
       current != CharacterState.dead &&
       current != CharacterState.spawning;
+
+  GameCharacter? clone;
+  GameCharacter? original;
 
   void bringBallToSprite() {
     setPositionStill(position);
@@ -95,15 +96,18 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     //removeWhere((item) => item is Effect); //dont run this, runs async code which will execute after the item has already been removed and cause a crash
     disconnectFromBall(); //sync but within async function
     _ball.removeFromParent();
+    if (clone != null && clone!.isMounted) {
+      parent!.remove(clone!);
+    }
     super.onRemove();
   }
 
-  void addRemoveClone(GameCharacter? clone) {
+  void _addRemoveClone(GameCharacter? clone) {
     if (clone != null) {
       //i.e. no cascade of clones
       assert(clone is PacmanClone || clone is GhostClone);
       assert(this is! PacmanClone && this is! GhostClone);
-      if (position.x.abs() > maze.mazeWidth / 2 - maze.spriteWidth() / 2) {
+      if (position.x.abs() > maze.mazeWidth / 2 - maze.spriteWidth / 2) {
         if (!clone.isMounted) {
           parent!.add(clone);
         }
@@ -115,18 +119,10 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     }
   }
 
-  void updateCloneFrom(GameCharacter original) {
-    assert(this is PacmanClone || this is GhostClone);
-    position.setFrom(original.position);
-    position.x =
-        original.position.x - maze.mazeWidth * original.position.x.sign;
-    angle = original.angle;
-    current = original.current;
-  }
-
   @override
   void update(double dt) {
     _oneFrameOfPhysics(dt);
+    _addRemoveClone(clone);
     super.update(dt);
   }
 }
