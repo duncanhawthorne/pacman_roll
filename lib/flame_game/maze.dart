@@ -273,17 +273,19 @@ class Maze {
       }
     }
      */
+    int width = 7;
     result.add(
       MazeWallSquareVisualBlocking(
-          position: Vector2(scale * (_mazeLayoutHorizontalLength() + 3) / 2, 0),
-          width: scale * 3,
+          position: Vector2(
+              scale * (_mazeLayoutHorizontalLength() / 2 + width / 2), 0),
+          width: scale * width,
           height: scale * _mazeLayoutVerticalLength()),
     );
     result.add(
       MazeWallSquareVisualBlocking(
-          position:
-              Vector2(-scale * (_mazeLayoutHorizontalLength() + 3) / 2, 0),
-          width: scale * 3,
+          position: Vector2(
+              -scale * (_mazeLayoutHorizontalLength() / 2 + width / 2), 0),
+          width: scale * width,
           height: scale * _mazeLayoutVerticalLength()),
     );
     return result;

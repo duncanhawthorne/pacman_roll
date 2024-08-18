@@ -99,16 +99,16 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   }
 
   void addRemoveClone(GameCharacter? clone) {
-    if (this is! PacmanClone && this is! GhostClone) {
+    if (clone != null) {
       //i.e. no cascade of clones
-      assert(clone != null);
       assert(clone is PacmanClone || clone is GhostClone);
+      assert(this is! PacmanClone && this is! GhostClone);
       if (position.x.abs() > maze.mazeWidth / 2 - maze.spriteWidth() / 2) {
-        if (!clone!.isMounted) {
+        if (!clone.isMounted) {
           parent!.add(clone);
         }
       } else {
-        if (clone!.isMounted) {
+        if (clone.isMounted) {
           parent!.remove(clone);
         }
       }
@@ -117,9 +117,9 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
 
   void updateCloneFrom(GameCharacter original) {
     assert(this is PacmanClone || this is GhostClone);
-    position.setFrom(Vector2(
-        original.position.x - maze.mazeWidth * original.position.x.sign,
-        original.position.y));
+    position.setFrom(original.position);
+    position.x =
+        original.position.x - maze.mazeWidth * original.position.x.sign;
     angle = original.angle;
     current = original.current;
   }

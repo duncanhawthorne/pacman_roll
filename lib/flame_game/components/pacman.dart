@@ -185,11 +185,11 @@ class Pacman extends GameCharacter with CollisionCallbacks {
 
   @override
   Future<void> onGameResize(Vector2 size) async {
-    super.onGameResize(size);
     if (size.x != _screenSizeLast.x || size.y != _screenSizeLast.y) {
       _screenSizeLast.setFrom(size);
       animations = await _getAnimations(2 * maze.spriteWidthOnScreen(size));
     }
+    super.onGameResize(size);
   }
 
   @override
@@ -206,8 +206,8 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     Set<Vector2> intersectionPoints,
     PositionComponent other,
   ) {
-    super.onCollisionStart(intersectionPoints, other);
     _onCollideWith(other);
+    super.onCollisionStart(intersectionPoints, other);
   }
 
   @override
@@ -225,9 +225,9 @@ class PacmanClone extends Pacman {
 
   @override
   void update(double dt) {
-    super.update(dt); //super cleansed against cascade of clones
     assert(clone == null); //i.e. no cascade of clones
     updateCloneFrom(original);
+    super.update(dt); //super cleansed against cascade of clones
   }
 
   @override

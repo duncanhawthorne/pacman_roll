@@ -74,6 +74,8 @@ class StartDialog extends StatelessWidget {
   }
 }
 
+const double width = 40; //70;
+const bool hideGrid = true;
 Widget levelSelector(BuildContext context, PacmanGame game) {
   int maxLevelToShowCache = maxLevelToShow(game);
   bool showText = maxLevelToShowCache <= 2;
@@ -82,6 +84,27 @@ Widget levelSelector(BuildContext context, PacmanGame game) {
       : bodyWidget(
           child: Column(
             children: [
+              hideGrid
+                  ? const SizedBox.shrink()
+                  : SizedBox(
+                      //alternative implementation
+                      width: width * 5,
+                      height: width * 2,
+                      child: GridView.builder(
+                          padding: EdgeInsets.zero,
+                          shrinkWrap: true,
+                          cacheExtent: 10000,
+                          reverse: false,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: 2 * 5,
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 5,
+                          ),
+                          itemBuilder: (BuildContext context, int index) {
+                            return levelButtonSingle(context, game, index);
+                          }),
+                    ),
               Row(
                 children: [
                   !showText

@@ -32,7 +32,7 @@ class Save {
   Future<void> firebasePushSingleScore(
       String recordID, Map<String, dynamic> state) async {
     if (firebaseOn) {
-      debug("firebase push");
+      //debug("firebase push");
       try {
         if (firebaseOn) {
           db!

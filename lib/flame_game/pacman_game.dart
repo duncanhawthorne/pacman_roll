@@ -231,8 +231,8 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
 
   @override
   void update(double dt) {
-    super.update(dt);
     stopwatch.update(dt);
+    super.update(dt);
   }
 
   void _end() {

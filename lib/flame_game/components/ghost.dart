@@ -124,14 +124,14 @@ class Ghost extends GameCharacter {
   GhostClone? clone;
   @override
   Future<void> onLoad() async {
+    super.onLoad();
     world.ghosts.ghostList.add(this);
     current = world.ghosts.current;
     if (idNum >= 3) {
       _setSpawning();
     }
-    super.onLoad();
-    animations = await _getAnimations();
     clone = GhostClone(position: position, idNum: idNum, original: this);
+    animations = await _getAnimations();
   }
 
   @override
@@ -157,9 +157,9 @@ class GhostClone extends Ghost {
 
   @override
   void update(double dt) {
-    super.update(dt); //super cleansed against cascade of clones
     assert(clone == null); //i.e. no cascade of clones
     updateCloneFrom(original);
+    super.update(dt); //super cleansed against cascade of clones
   }
 
   @override

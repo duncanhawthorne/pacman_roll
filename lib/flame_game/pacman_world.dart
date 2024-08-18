@@ -150,6 +150,7 @@ class PacmanWorld extends Forge2DWorld
 
   @override
   Future<void> onLoad() async {
+    super.onLoad();
     add(noEventsWrapper);
     wrappers
         .addAll([pacmans, ghosts, pellets, _walls, _tutorial, _blockingWalls]);
@@ -157,7 +158,6 @@ class PacmanWorld extends Forge2DWorld
       noEventsWrapper.add(wrapper);
     }
     reset(firstRun: true);
-    super.onLoad();
   }
 
   @override
