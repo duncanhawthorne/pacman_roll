@@ -1,10 +1,10 @@
 import 'dart:async' as async;
 
 import 'package:flame/components.dart';
-import 'package:flame/effects.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../audio/sounds.dart';
+import '../effects/remove_effects.dart';
 import '../pacman_game.dart';
 import '../pacman_world.dart';
 import 'game_character.dart';
@@ -117,7 +117,7 @@ class Ghosts extends WrapperNoEvents
 
   void _trimAllGhosts() {
     for (Ghost ghost in ghostList) {
-      ghost.removeWhere((item) => item is Effect); //sync
+      removeEffects(ghost);
       ghost.disconnectFromBall(); //sync
       ghost.removeFromParent(); //async
     }
@@ -126,7 +126,7 @@ class Ghosts extends WrapperNoEvents
 
   void disconnectGhostsFromBalls() {
     for (Ghost ghost in ghostList) {
-      ghost.removeWhere((item) => item is Effect);
+      removeEffects(ghost);
       ghost.disconnectFromBall(); //sync
     }
   }

@@ -1,5 +1,7 @@
 import 'dart:core';
 
+import 'package:flame/collisions.dart';
+
 import '../maze.dart';
 import 'game_character.dart';
 import 'ghost.dart';
@@ -31,14 +33,18 @@ mixin Clone on GameCharacter {
   void update(double dt) {
     assert(clone == null); //i.e. no cascade of clones
     updateCloneFrom(original!);
-    super.update(
-        dt); //super cleansed against cascade of clones, must call to have sprite animations
+    super.update(dt); // must call to have sprite animations
   }
 
   @override
   Future<void> onLoad() async {
     //animations = await _getAnimations(); //dont need this. done on gameresize
     //don't call super
+    add(CircleHitbox(
+      isSolid: true,
+      collisionType:
+          this is PacmanClone ? CollisionType.active : CollisionType.passive,
+    ));
   }
 
   @override

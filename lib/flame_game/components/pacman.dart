@@ -2,11 +2,11 @@ import 'dart:core';
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
-import 'package:flame/effects.dart';
 
 import '../../audio/sounds.dart';
 import '../effects/move_to_effect.dart';
 import '../effects/null_effect.dart';
+import '../effects/remove_effects.dart';
 import '../icons/pacman_sprites.dart';
 import '../maze.dart';
 import 'clones.dart';
@@ -65,12 +65,18 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     }
   }
 
-  void _onCollideWith(PositionComponent other) {
+  void onCollideWith(PositionComponent other) {
+    if (this is PacmanClone) {
+      (original as Pacman).onCollideWith(other);
+      return;
+    }
     if (typical) {
       if (other is Pellet) {
         _onCollideWithPellet(other);
-      } else if (other is Ghost) {
+      } else if (other is Ghost && other is! GhostClone) {
         _onCollideWithGhost(other);
+      } else if (other is GhostClone) {
+        _onCollideWithGhost(other.original as Ghost);
       }
     }
   }
@@ -134,18 +140,26 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     if (current == CharacterState.dead && !world.gameWonOrLost) {
       if (world.pacmans.pacmanList.length == 1 ||
           world.pacmans.numberAlivePacman() == 0) {
-        world.pacmans.numberOfDeathsNotifier.value++; //score counting deaths
-        world.resetAfterPacmanDeath(this);
+        if (world.doingLevelResetFlourish) {
+          // must test doingLevelResetFlourish
+          // as could have been removed by reset during delay
+          world.pacmans.numberOfDeathsNotifier.value++; //score counting deaths
+          world.resetAfterPacmanDeath(this);
+        }
       } else {
         assert(_multipleSpawningPacmans);
-        disconnectFromBall(); //sync //already done, but keep
-        removeFromParent(); //async
+        //possible bug here if two pacmans are removed in quick succession
+        if (isMounted) {
+          //must test isMounted as could have been removed by reset during delay
+          disconnectFromBall(); //sync //already done, but keep
+          removeFromParent(); //async
+        }
       }
     }
   }
 
   void resetSlideAfterDeath() {
-    removeWhere((item) => item is Effect);
+    removeEffects(this);
     setPositionStill(maze.pacmanStart);
     disconnectFromBall();
     angle = 0;
@@ -153,7 +167,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   }
 
   void resetInstantAfterDeath() {
-    removeWhere((item) => item is Effect);
+    removeEffects(this);
     setPositionStill(maze.pacmanStart);
     angle = 0;
     current = CharacterState.normal;
@@ -203,12 +217,13 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     Set<Vector2> intersectionPoints,
     PositionComponent other,
   ) {
-    _onCollideWith(other);
+    onCollideWith(other);
     super.onCollisionStart(intersectionPoints, other);
   }
 
   @override
   void update(double dt) {
+    //note, this function is also run for clones
     _stateSequence(dt);
     super.update(dt);
   }

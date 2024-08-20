@@ -1,11 +1,11 @@
 import 'dart:core';
 
 import 'package:flame/components.dart';
-import 'package:flame/effects.dart';
 
 import '../../utils/helper.dart';
 import '../effects/move_to_effect.dart';
-import '../effects/rotate_by_effect.dart';
+import '../effects/remove_effects.dart';
+import '../effects/rotate_effect.dart';
 import '../maze.dart';
 import 'clones.dart';
 import 'game_character.dart';
@@ -83,7 +83,8 @@ class Ghost extends GameCharacter {
         add(MoveToPositionEffect(maze.ghostStart,
             onComplete: () =>
                 {bringBallToSprite(), current = world.ghosts.current}));
-        add(RotateByAngleEffect(smallAngle(-angle)));
+        angle = smallAngle(angle);
+        add(RotateToAngleEffect(0));
       }
     }
   }
@@ -103,7 +104,7 @@ class Ghost extends GameCharacter {
 
   void resetSlideAfterPacmanDeath() {
     current = CharacterState.normal;
-    removeWhere((item) => item is Effect);
+    removeEffects(this);
     disconnectFromBall();
     add(MoveToPositionEffect(maze.ghostStartForId(idNum),
         onComplete: () => {
@@ -111,11 +112,12 @@ class Ghost extends GameCharacter {
               //Calling bringBallToSprite here creates a crash
               //also would be a race condition
             }));
-    add(RotateByAngleEffect(smallAngle(-angle)));
+    angle = smallAngle(angle);
+    add(RotateToAngleEffect(0));
   }
 
   void resetInstantAfterPacmanDeath() {
-    removeWhere((item) => item is Effect);
+    removeEffects(this);
     current = CharacterState.normal;
     setPositionStill(maze.ghostStartForId(idNum));
     angle = 0;

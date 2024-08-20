@@ -53,7 +53,11 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   GameCharacter? original;
 
   void bringBallToSprite() {
-    setPositionStill(position);
+    if (isMounted && !isRemoving) {
+      // must test isMounted as bringBallToSprite typically runs after a delay
+      // and could have reset to remove the ball in the meantime
+      setPositionStill(position);
+    }
   }
 
   void setPositionStill(Vector2 targetLoc) {
@@ -95,7 +99,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
 
   @override
   Future<void> onRemove() async {
-    //removeWhere((item) => item is Effect); //dont run this, runs async code which will execute after the item has already been removed and cause a crash
+    //removeEffects(this); //dont run this, runs async code which will execute after the item has already been removed and cause a crash
     disconnectFromBall(); //sync but within async function
     _ball.removeFromParent();
     if (clone != null && clone!.isMounted) {
@@ -125,6 +129,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
 
   @override
   void update(double dt) {
+    //note, this function is also run for clones
     _oneFrameOfPhysics(dt);
     _addRemoveClone(clone);
     super.update(dt);

@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flame/components.dart';
-import 'package:flame/effects.dart';
 import 'package:flame/events.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flutter/foundation.dart';
@@ -19,7 +18,8 @@ import 'components/tutorial_layer.dart';
 import 'components/wall_blocking_layer.dart';
 import 'components/wall_layer.dart';
 import 'components/wrapper_no_events.dart';
-import 'effects/rotate_by_effect.dart';
+import 'effects/remove_effects.dart';
+import 'effects/rotate_effect.dart';
 import 'pacman_game.dart';
 
 /// The world is where you place all the components that should live inside of
@@ -104,9 +104,9 @@ class PacmanWorld extends Forge2DWorld
         _cameraRotatableOnPacmanDeathFlourish = false;
         dyingPacman.resetSlideAfterDeath();
         ghosts.resetSlideAfterPacmanDeath();
-        game.camera.viewfinder.add(RotateByAngleEffect(
-            smallAngle(-game.camera.viewfinder.angle),
-            onComplete: _resetInstantAfterPacmanDeath));
+        game.camera.viewfinder.angle = smallAngle(game.camera.viewfinder.angle);
+        game.camera.viewfinder.add(
+            RotateToAngleEffect(0, onComplete: _resetInstantAfterPacmanDeath));
       } else {
         _resetInstantAfterPacmanDeath();
       }
@@ -118,16 +118,25 @@ class PacmanWorld extends Forge2DWorld
   void _cameraAndTimersReset() {
     //stop any rotation effect added to camera
     //note, still leaves flourish variable hot, so fix below
-    game.camera.viewfinder.removeWhere((item) => item is Effect);
+    removeEffects(game.camera.viewfinder);
     _setMazeAngle(0);
     _cameraRotatableOnPacmanDeathFlourish = true;
     doingLevelResetFlourish = false;
   }
 
   void _resetInstantAfterPacmanDeath() {
-    pacmans.resetInstantAfterPacmanDeath();
-    ghosts.resetInstantAfterPacmanDeath();
-    _cameraAndTimersReset();
+    // ignore: dead_code
+    if (true || doingLevelResetFlourish) {
+      // must test doingLevelResetFlourish
+      // as could have been removed by reset during delay x 2
+      // but this code is only run from resetSlide,
+      // so if we have got here (accidentally) then resetSlide has run
+      // and rotation will be wrong
+      // so should clean up anyway
+      pacmans.resetInstantAfterPacmanDeath();
+      ghosts.resetInstantAfterPacmanDeath();
+      _cameraAndTimersReset();
+    }
   }
 
   void reset({firstRun = false}) {

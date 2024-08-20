@@ -4,6 +4,7 @@ import 'package:flame_forge2d/flame_forge2d.dart';
 import '../maze.dart';
 
 const _useForgePhysicsBallRotation = false;
+const _instantSetPosition = true;
 
 class PhysicsBall extends BodyComponent with IgnoreEvents {
   PhysicsBall({
@@ -34,7 +35,22 @@ class PhysicsBall extends BodyComponent with IgnoreEvents {
 
   set velocity(Vector2 vel) => body.linearVelocity.setFrom(vel);
 
-  set position(Vector2 pos) => body.setTransform(pos, 0); //realCharacter.angle
+  set position(Vector2 pos) =>
+      {_instantSetPosition ? _setPositionNow(pos) : _setPositionNextFrame(pos)};
+
+  final Vector2 _oneTimeManualPosition = Vector2(0, 0);
+  bool _oneTimeManualPositionSet = false;
+
+  void _setPositionNextFrame(Vector2 pos) {
+    assert(!_instantSetPosition);
+    _oneTimeManualPosition.setFrom(pos);
+    _oneTimeManualPositionSet = true;
+  }
+
+  void _setPositionNow(Vector2 pos) {
+    assert(_instantSetPosition);
+    body.setTransform(pos, 0); //realCharacter.angle
+  }
 
   bool _subConnectedBall = true;
 
@@ -62,8 +78,12 @@ class PhysicsBall extends BodyComponent with IgnoreEvents {
 
   @override
   void update(double dt) {
-    super.update(dt);
     _moveThroughPipePortal();
+    if (!_instantSetPosition && _oneTimeManualPositionSet) {
+      _setPositionNow(_oneTimeManualPosition);
+      _oneTimeManualPositionSet = false;
+    }
+    super.update(dt);
   }
 }
 
