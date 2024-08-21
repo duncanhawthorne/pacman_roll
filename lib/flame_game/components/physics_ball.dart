@@ -60,8 +60,12 @@ class PhysicsBall extends BodyComponent with IgnoreEvents {
   }
 
   void setStatic() {
-    body.setType(BodyType.static);
-    body.setActive(false);
+    if (isMounted && body.isActive) {
+      // avoid crashes if body not yet initialised
+      // Probably about to remove ball anyway
+      body.setType(BodyType.static);
+      body.setActive(false);
+    }
     _subConnectedBall = false;
   }
 

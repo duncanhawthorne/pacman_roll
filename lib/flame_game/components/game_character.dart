@@ -127,7 +127,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
           }
         } else {
           if (clone.isMounted) {
-            parent!.remove(clone);
+            clone.removeFromParent();
           }
         }
       }
