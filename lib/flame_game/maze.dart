@@ -29,9 +29,10 @@ class Maze {
       pacmanStart.setFrom(_vectorOfMazeListCode(_kPacmanStart));
       cage.setFrom(_vectorOfMazeListCode(_kCage));
       //items below used every frame so calculate once here
-      mazeWidth = blockWidth() * (_mazeLayout[0].length - _bufferColumns);
-      mazeHeight = blockWidth() * _mazeLayout.length;
+      blockWidth = _blockWidth();
       spriteWidth = _spriteWidth();
+      mazeWidth = blockWidth * _mazeLayoutHorizontalLength();
+      mazeHeight = blockWidth * _mazeLayoutVerticalLength();
       spriteSize.setFrom(Vector2.all(spriteWidth));
       //item below used regularly
       ghostStartForIdMap[0] = _ghostStartForId(0);
@@ -54,6 +55,7 @@ class Maze {
   final Vector2 cage = Vector2.zero(); //set properly in initializer
   double mazeWidth = 0; //set properly in initializer
   double mazeHeight = 0; //set properly in initializer
+  double blockWidth = 0; //set properly in initializer
   double spriteWidth = 0; //set properly in initializer
   final Vector2 spriteSize = Vector2.zero(); //set properly in initializer
   Map<int, Vector2> ghostStartForIdMap = {}; //set properly in initializer
@@ -80,14 +82,14 @@ class Maze {
         .toInt();
   }
 
-  double blockWidth() {
+  double _blockWidth() {
     return kSquareNotionalSize /
         flameGameZoom /
         max(_mazeLayoutHorizontalLength(), _mazeLayoutVerticalLength());
   }
 
   double _spriteWidth() {
-    return blockWidth() * (_largeSprites ? 2 : 1);
+    return blockWidth * (_largeSprites ? 2 : 1);
   }
 
   int _mazeLayoutHorizontalLength() {
@@ -119,8 +121,8 @@ class Maze {
       {double ioffset = 0, double joffset = 0}) {
     double i = ioffset + icore;
     double j = joffset + jcore;
-    return Vector2((j + 1 / 2 - _mazeLayout[0].length / 2) * blockWidth(),
-        (i + 1 / 2 - _mazeLayout.length / 2) * blockWidth());
+    return Vector2((j + 1 / 2 - _mazeLayout[0].length / 2) * blockWidth,
+        (i + 1 / 2 - _mazeLayout.length / 2) * blockWidth);
   }
 
   Vector2 _vectorOfMazeListCode(String code) {
@@ -181,7 +183,7 @@ class Maze {
 
   List<Component> mazeWalls() {
     final List<Component> result = [];
-    double scale = blockWidth();
+    double scale = blockWidth;
     for (int i = 0; i < _mazeLayout.length; i++) {
       for (int j = 0; j < _mazeLayout[i].length; j++) {
         final Vector2 center = _vectorOfMazeListIndex(i, j);
@@ -262,7 +264,7 @@ class Maze {
 
   List<Component> mazeBlockingWalls() {
     final List<Component> result = [];
-    double scale = blockWidth();
+    double scale = blockWidth;
     int width = 7;
     result.add(
       MazeVisualBlockingBar(
