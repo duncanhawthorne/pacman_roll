@@ -35,8 +35,7 @@ class Pacmans extends WrapperNoEvents with HasWorldReference<PacmanWorld> {
   @override
   void reset({bool mazeResize = false}) {
     for (Pacman pacman in pacmanList) {
-      pacman.disconnectFromBall(); //sync
-      pacman.removeFromParent(); //async
+      pacman.removeFromParent();
     }
     add(Pacman(position: maze.pacmanStart));
     numberOfDeathsNotifier.value = 0;

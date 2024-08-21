@@ -25,14 +25,9 @@ class MazeWallSquareVisual extends RectangleComponent with IgnoreEvents {
             paint: _blackBackgroundPaint);
 }
 
-class MazeWallSquareVisualBlocking extends RectangleComponent
-    with IgnoreEvents {
-  MazeWallSquareVisualBlocking(
-      {required super.position, required width, required height})
-      : super(
-            size: Vector2(width, height),
-            anchor: Anchor.center,
-            paint: _blackBackgroundPaint);
+class MazeVisualBlockingBar extends MazeWallSquareVisual {
+  MazeVisualBlockingBar(
+      {required super.position, required super.width, required super.height});
   @override
   final priority = 1000;
 }
@@ -48,7 +43,8 @@ class MazeWallRectangleGround extends BodyComponent with IgnoreEvents {
   final double width;
   final double height;
 
-  MazeWallRectangleGround(this.position, this.width, this.height);
+  MazeWallRectangleGround(
+      {required this.position, required this.width, required this.height});
 
   @override
   // ignore: overridden_fields
@@ -84,7 +80,7 @@ class MazeWallCircleGround extends BodyComponent with IgnoreEvents {
   final Vector2 position;
   final double radius;
 
-  MazeWallCircleGround(this.position, this.radius);
+  MazeWallCircleGround({required this.position, required this.radius});
 
   @override
   // ignore: overridden_fields

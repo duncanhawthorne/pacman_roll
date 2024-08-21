@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:flame/geometry.dart';
 import 'package:flutter/material.dart';
 
 import '../game_screen.dart';
@@ -72,8 +73,8 @@ class MyPainter extends CustomPainter {
     mouthWidth = max(0, min(1, mouthWidth));
     canvas.drawArc(
         _pacmanRectStatusBar,
-        2 * pi / 2 + 2 * pi * ((mouthWidth / 2) + 0.5),
-        2 * pi * (1 - mouthWidth),
+        tau / 2 + tau * ((mouthWidth / 2) + 0.5),
+        tau * (1 - mouthWidth),
         true,
         yellowPacmanPaint);
   }
@@ -121,8 +122,8 @@ class MyPainterDirect extends CustomPainter {
             kPacmanDeadResetTimeAnimationMillis;
     double mouthWidth = mouthDouble / pacmanRenderFracIncrementsNumber;
     mouthWidth = max(0, min(1, mouthWidth));
-    canvas.drawArc(_pacmanRectStatusBar, 2 * pi * ((mouthWidth / 2) + 0.5),
-        2 * pi * (1 - mouthWidth), true, yellowPacmanPaint);
+    canvas.drawArc(_pacmanRectStatusBar, tau * ((mouthWidth / 2) + 0.5),
+        tau * (1 - mouthWidth), true, yellowPacmanPaint);
   }
 
   @override

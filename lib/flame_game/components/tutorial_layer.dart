@@ -26,7 +26,7 @@ class TutorialWrapper extends WrapperNoEvents
         add(
           TextComponent(
               text: '←←←←←←←←\n↓      ↑\n↓ Drag ↑\n↓      ↑\n→→→→→→→→',
-              position: Vector2(0, 0),
+              position: Vector2.zero(),
               anchor: Anchor.center,
               textRenderer: _tutorialTextRenderer,
               key: ComponentKey.named('tutorial'),
@@ -38,18 +38,14 @@ class TutorialWrapper extends WrapperNoEvents
 
   void hide() {
     if (!_tutorialEverManuallyHidden && isMounted) {
-      if (game.findByKey(ComponentKey.named('tutorial')) != null) {
-        game.findByKey(ComponentKey.named('tutorial'))!.removeFromParent();
-      }
+      game.findByKey(ComponentKey.named('tutorial'))?.removeFromParent();
       _tutorialEverManuallyHidden = true;
     }
   }
 
   @override
   void reset() {
-    if (game.findByKey(ComponentKey.named('tutorial')) != null) {
-      game.findByKey(ComponentKey.named('tutorial'))!.removeFromParent();
-    }
+    game.findByKey(ComponentKey.named('tutorial'))?.removeFromParent();
   }
 
   @override

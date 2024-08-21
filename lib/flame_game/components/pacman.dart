@@ -149,11 +149,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
       } else {
         assert(_multipleSpawningPacmans);
         //possible bug here if two pacmans are removed in quick succession
-        if (isMounted) {
-          //must test isMounted as could have been removed by reset during delay
-          disconnectFromBall(); //sync //already done, but keep
-          removeFromParent(); //async
-        }
+        removeFromParent();
       }
     }
   }

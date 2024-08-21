@@ -110,16 +110,14 @@ class Ghosts extends WrapperNoEvents
   }
 
   void removeSpawner() {
-    if (world.level.multipleSpawningGhosts && ghostSpawner != null) {
-      ghostSpawner!.removeFromParent();
+    if (world.level.multipleSpawningGhosts) {
+      ghostSpawner?.removeFromParent();
     }
   }
 
   void _trimAllGhosts() {
     for (Ghost ghost in ghostList) {
-      removeEffects(ghost);
-      ghost.disconnectFromBall(); //sync
-      ghost.removeFromParent(); //async
+      ghost.removeFromParent();
     }
     removeSpawner();
   }

@@ -3,19 +3,19 @@ import 'dart:math';
 
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
+import 'package:flame/geometry.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../audio/sounds.dart';
 import '../level_selection/levels.dart';
 import '../player_progress/player_progress.dart';
-import '../utils/helper.dart';
+import 'components/blocking_bar_layer.dart';
 import 'components/ghost_layer.dart';
 import 'components/pacman.dart';
 import 'components/pacman_layer.dart';
 import 'components/pellet_layer.dart';
 import 'components/tutorial_layer.dart';
-import 'components/wall_blocking_layer.dart';
 import 'components/wall_layer.dart';
 import 'components/wrapper_no_events.dart';
 import 'effects/remove_effects.dart';
@@ -62,7 +62,7 @@ class PacmanWorld extends Forge2DWorld
   final pellets = PelletWrapper();
   final _walls = WallWrapper();
   final _tutorial = TutorialWrapper();
-  final _blockingWalls = WallBlockingWrapper();
+  final _blocking = BlockingBarWrapper();
   final List<WrapperNoEvents> wrappers = [];
 
   bool get gameWonOrLost =>
@@ -93,10 +93,10 @@ class PacmanWorld extends Forge2DWorld
   static const bool _slideCharactersAfterPacmanDeath = true;
 
   void resetAfterPacmanDeath(Pacman dyingPacman) {
-    resetSlideAfterPacmanDeath(dyingPacman);
+    _resetSlideAfterPacmanDeath(dyingPacman);
   }
 
-  void resetSlideAfterPacmanDeath(Pacman dyingPacman) {
+  void _resetSlideAfterPacmanDeath(Pacman dyingPacman) {
     //reset ghost scared status. Shouldn't be relevant as just died
     game.audioController.stopSfx(SfxType.ghostsScared);
     if (!gameWonOrLost) {
@@ -104,24 +104,14 @@ class PacmanWorld extends Forge2DWorld
         _cameraRotatableOnPacmanDeathFlourish = false;
         dyingPacman.resetSlideAfterDeath();
         ghosts.resetSlideAfterPacmanDeath();
-        game.camera.viewfinder.angle = smallAngle(game.camera.viewfinder.angle);
-        game.camera.viewfinder.add(
-            RotateToAngleEffect(0, onComplete: _resetInstantAfterPacmanDeath));
+        resetSlideAngle(game.camera.viewfinder,
+            onComplete: _resetInstantAfterPacmanDeath);
       } else {
         _resetInstantAfterPacmanDeath();
       }
     } else {
       doingLevelResetFlourish = false;
     }
-  }
-
-  void _cameraAndTimersReset() {
-    //stop any rotation effect added to camera
-    //note, still leaves flourish variable hot, so fix below
-    removeEffects(game.camera.viewfinder);
-    _setMazeAngle(0);
-    _cameraRotatableOnPacmanDeathFlourish = true;
-    doingLevelResetFlourish = false;
   }
 
   void _resetInstantAfterPacmanDeath() {
@@ -137,6 +127,15 @@ class PacmanWorld extends Forge2DWorld
       ghosts.resetInstantAfterPacmanDeath();
       _cameraAndTimersReset();
     }
+  }
+
+  void _cameraAndTimersReset() {
+    //stop any rotation effect added to camera
+    //note, still leaves flourish variable hot, so fix below
+    removeEffects(game.camera.viewfinder);
+    _setMazeAngle(0);
+    _cameraRotatableOnPacmanDeathFlourish = true;
+    doingLevelResetFlourish = false;
   }
 
   void reset({firstRun = false}) {
@@ -161,8 +160,7 @@ class PacmanWorld extends Forge2DWorld
   Future<void> onLoad() async {
     super.onLoad();
     add(noEventsWrapper);
-    wrappers
-        .addAll([pacmans, ghosts, pellets, _walls, _tutorial, _blockingWalls]);
+    wrappers.addAll([pacmans, ghosts, pellets, _walls, _tutorial, _blocking]);
     for (WrapperNoEvents wrapper in wrappers) {
       noEventsWrapper.add(wrapper);
     }
@@ -224,10 +222,14 @@ class PacmanWorld extends Forge2DWorld
     }
   }
 
+  final _tmpGravity = Vector2.zero();
+  static const double _gravityScale = 50 * (30 / flameGameZoom);
   void _setMazeAngle(double angle) {
-    gravity = Vector2(cos(angle + 2 * pi / 4), sin(angle + 2 * pi / 4)) *
-        50 *
-        (30 / flameGameZoom);
+    //using tmpGravity to avoid creating a new Vector2 on each update / frame
+    //could instead directly do gravity = Vector2(calc, calc);
+    _tmpGravity.x = cos(angle + tau / 4) * _gravityScale;
+    _tmpGravity.y = sin(angle + tau / 4) * _gravityScale;
+    gravity = _tmpGravity;
     game.camera.viewfinder.angle = angle;
   }
 }

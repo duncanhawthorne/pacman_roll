@@ -165,9 +165,8 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
 
   @override
   Future<void> onGameResize(Vector2 size) async {
-    Vector2 targetViewPortSize = _sanitizeScreenSize(size);
-    camera.viewport = FixedResolutionViewport(
-        resolution: Vector2(targetViewPortSize.x, targetViewPortSize.y));
+    camera.viewport =
+        FixedResolutionViewport(resolution: _sanitizeScreenSize(size));
     super.onGameResize(size);
   }
 

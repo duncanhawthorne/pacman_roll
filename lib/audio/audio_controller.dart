@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:collection';
-//import 'dart:js_interop';
 import 'dart:math';
 
 import 'package:audioplayers/audioplayers.dart';
@@ -21,7 +20,7 @@ class AudioController {
 
   /// This is a list of [AudioPlayer] instances which are rotated to play
   /// sound effects.
-  final Map<SfxType, AudioPlayer> _sfxPlayersNew;
+  final Map<SfxType, AudioPlayer> _sfxPlayers;
 
   //int _currentSfxPlayer = 0;
 
@@ -40,14 +39,14 @@ class AudioController {
   /// Use [polyphony] to configure the number of sound effects (SFX) that can
   /// play at the same time. A [polyphony] of `1` will always only play one
   /// sound (a new sound will stop the previous one). See discussion
-  /// of [_sfxPlayersOld] to learn why this is the case.
+  /// of [_sfxPlayers] to learn why this is the case.
   ///
   /// Background music does not count into the [polyphony] limit. Music will
   /// never be overridden by sound effects because that would be silly.
   AudioController({int polyphony = 10})
       : assert(polyphony >= 1),
         _musicPlayer = AudioPlayer(playerId: 'musicPlayer'),
-        _sfxPlayersNew = {
+        _sfxPlayers = {
           for (int item in List<int>.generate(SfxType.values.length, (i) => i))
             SfxType.values[item]: AudioPlayer(playerId: 'sfxPlayer#$item')
         },
@@ -69,7 +68,7 @@ class AudioController {
     _lifecycleNotifier?.removeListener(_handleAppLifecycle);
     _stopAllSound();
     _musicPlayer.dispose();
-    for (final player in _sfxPlayersNew.values) {
+    for (final player in _sfxPlayers.values) {
       player.dispose();
     }
   }
@@ -97,7 +96,7 @@ class AudioController {
     final filename = options[_random.nextInt(options.length)];
     _log.fine(() => '- Chosen filename: $filename');
 
-    final AudioPlayer currentPlayer = _sfxPlayersNew[type] ?? AudioPlayer();
+    final AudioPlayer currentPlayer = _sfxPlayers[type] ?? AudioPlayer();
 
     //extra code
     if (type == SfxType.ghostsRoamingSiren) {
@@ -112,7 +111,7 @@ class AudioController {
   }
 
   void stopSfx(SfxType type) {
-    _sfxPlayersNew[type]!.stop();
+    _sfxPlayers[type]!.stop();
   }
 
   double getTargetSirenVolume(double averageGhostSpeed) {
@@ -125,21 +124,20 @@ class AudioController {
   }
 
   void setSirenVolume(double normalisedAverageGhostSpeed, {gradual = false}) {
-    if (_sfxPlayersNew[SfxType.ghostsRoamingSiren]!.state !=
-        PlayerState.playing) {
+    if (_sfxPlayers[SfxType.ghostsRoamingSiren]!.state != PlayerState.playing) {
       playSfx(SfxType.ghostsRoamingSiren);
-      _sfxPlayersNew[SfxType.ghostsRoamingSiren]!.setVolume(0);
+      _sfxPlayers[SfxType.ghostsRoamingSiren]!.setVolume(0);
     }
     double calcedVolume = getTargetSirenVolume(normalisedAverageGhostSpeed);
     double currentVolume =
-        _sfxPlayersNew[SfxType.ghostsRoamingSiren]!.volume / volumeScalar;
+        _sfxPlayers[SfxType.ghostsRoamingSiren]!.volume / volumeScalar;
     double targetVolume = 0;
     if (gradual) {
       targetVolume = (calcedVolume + currentVolume) / 2;
     } else {
       targetVolume = calcedVolume;
     }
-    _sfxPlayersNew[SfxType.ghostsRoamingSiren]!
+    _sfxPlayers[SfxType.ghostsRoamingSiren]!
         .setVolume(targetVolume * volumeScalar);
   }
 
@@ -281,7 +279,7 @@ class AudioController {
   }
 
   void _soundsOnHandler() {
-    for (final player in _sfxPlayersNew.values) {
+    for (final player in _sfxPlayers.values) {
       if (player.state == PlayerState.playing) {
         player.stop();
       }
@@ -310,7 +308,7 @@ class AudioController {
   void _stopAllSound() {
     _log.info('Stopping all sound');
     _musicPlayer.pause();
-    for (final player in _sfxPlayersNew.values) {
+    for (final player in _sfxPlayers.values) {
       player.stop();
     }
   }

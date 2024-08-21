@@ -2,7 +2,6 @@ import 'dart:core';
 
 import 'package:flame/components.dart';
 
-import '../../utils/helper.dart';
 import '../effects/move_to_effect.dart';
 import '../effects/remove_effects.dart';
 import '../effects/rotate_effect.dart';
@@ -76,15 +75,13 @@ class Ghost extends GameCharacter {
     if (!world.gameWonOrLost) {
       current = CharacterState.dead; //stops further interactions
       if (game.level.multipleSpawningGhosts) {
-        disconnectFromBall(); //sync
-        removeFromParent(); //async
+        removeFromParent();
       } else {
         disconnectFromBall();
         add(MoveToPositionEffect(maze.ghostStart,
             onComplete: () =>
                 {bringBallToSprite(), current = world.ghosts.current}));
-        angle = smallAngle(angle);
-        add(RotateToAngleEffect(0));
+        resetSlideAngle(this);
       }
     }
   }
@@ -95,7 +92,7 @@ class Ghost extends GameCharacter {
       disconnectFromBall(spawning: true);
       add(MoveToPositionEffect(
           world.level.homingGhosts
-              ? (Vector2.all(0)..setFrom(world.pacmans.pacmanList[0].position))
+              ? world.pacmans.pacmanList[0].position
               : maze.ghostStart,
           onComplete: () =>
               {bringBallToSprite(), current = world.ghosts.current}));
@@ -112,8 +109,7 @@ class Ghost extends GameCharacter {
               //Calling bringBallToSprite here creates a crash
               //also would be a race condition
             }));
-    angle = smallAngle(angle);
-    add(RotateToAngleEffect(0));
+    resetSlideAngle(this);
   }
 
   void resetInstantAfterPacmanDeath() {

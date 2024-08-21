@@ -5,7 +5,7 @@ import '../pacman_game.dart';
 import '../pacman_world.dart';
 import 'wrapper_no_events.dart';
 
-class WallBlockingWrapper extends WrapperNoEvents
+class BlockingBarWrapper extends WrapperNoEvents
     with HasWorldReference<PacmanWorld>, HasGameReference<PacmanGame> {
   @override
   final priority = 1000;

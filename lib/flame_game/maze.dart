@@ -14,30 +14,29 @@ const _bufferColumns = 2;
 
 class Maze {
   Maze({
-    required mazeIdInitial,
+    required mazeId,
   }) {
-    setMazeIdReal(mazeIdInitial);
+    setMazeIdReal(mazeId);
   }
 
-  late final ValueNotifier<int> mazeIdNotifier = ValueNotifier(0);
-
-  int get mazeId => mazeIdNotifier.value;
-
+  int get mazeId => _mazeId;
   set mazeId(int i) => setMazeIdReal(i);
 
-  double mazeWidth = 0;
-  double mazeHeight = 0;
-
-  void setMazeIdReal(int i) {
+  void setMazeIdReal(int id) {
     {
-      mazeIdNotifier.value = i;
-      ghostStart = _vectorOfMazeListCode(_kGhostStart);
-      pacmanStart = _vectorOfMazeListCode(_kPacmanStart);
-      cage = _vectorOfMazeListCode(_kCage);
+      _mazeId = id;
+      ghostStart.setFrom(_vectorOfMazeListCode(_kGhostStart));
+      pacmanStart.setFrom(_vectorOfMazeListCode(_kPacmanStart));
+      cage.setFrom(_vectorOfMazeListCode(_kCage));
       //items below used every frame so calculate once here
       mazeWidth = blockWidth() * (_mazeLayout[0].length - _bufferColumns);
       mazeHeight = blockWidth() * _mazeLayout.length;
       spriteWidth = _spriteWidth();
+      spriteSize.setFrom(Vector2.all(spriteWidth));
+      //item below used regularly
+      ghostStartForIdMap[0] = _ghostStartForId(0);
+      ghostStartForIdMap[1] = _ghostStartForId(1);
+      ghostStartForIdMap[2] = _ghostStartForId(2);
     }
   }
 
@@ -48,15 +47,25 @@ class Maze {
   ];
 
   get _mazeLayout => _decodedMazeList[mazeId];
-  late Vector2 ghostStart = _vectorOfMazeListCode(_kGhostStart);
-  late Vector2 pacmanStart = _vectorOfMazeListCode(_kPacmanStart);
-  late Vector2 cage = _vectorOfMazeListCode(_kCage);
+
+  int _mazeId = -1; //set properly in initializer
+  final Vector2 ghostStart = Vector2.zero(); //set properly in initializer
+  final Vector2 pacmanStart = Vector2.zero(); //set properly in initializer
+  final Vector2 cage = Vector2.zero(); //set properly in initializer
+  double mazeWidth = 0; //set properly in initializer
+  double mazeHeight = 0; //set properly in initializer
+  double spriteWidth = 0; //set properly in initializer
+  final Vector2 spriteSize = Vector2.zero(); //set properly in initializer
+  Map<int, Vector2> ghostStartForIdMap = {}; //set properly in initializer
 
   static const bool _largeSprites = true;
   static const pelletScaleFactor = _largeSprites ? 0.4 : 0.46;
-  double spriteWidth = 0;
 
   Vector2 ghostStartForId(int idNum) {
+    return ghostStartForIdMap[idNum % 3]!;
+  }
+
+  Vector2 _ghostStartForId(int idNum) {
     return ghostStart + Vector2(spriteWidth * (idNum % 3 - 1), 0);
   }
 
@@ -179,7 +188,8 @@ class Maze {
         Vector2 center = _vectorOfMazeListIndex(i, j);
         if (_wallAt(i, j)) {
           if (_circleAt(i, j)) {
-            result.add(MazeWallCircleGround(center, scale / 2));
+            result
+                .add(MazeWallCircleGround(position: center, radius: scale / 2));
             result.add(MazeWallCircleVisual(
                 position: center,
                 radius: scale / 2 * _mazeInnerWallWidthFactor));
@@ -191,9 +201,9 @@ class Maze {
             }
             if (k > 0) {
               result.add(MazeWallRectangleGround(
-                  center + Vector2(scale * k / 2, 0),
-                  scale * (k + _pixelationBuffer),
-                  scale));
+                  position: center + Vector2(scale * k / 2, 0),
+                  width: scale * (k + _pixelationBuffer),
+                  height: scale));
               result.add(MazeWallSquareVisual(
                   position: center + Vector2(scale * k / 2, 0),
                   width: scale * (k + _pixelationBuffer),
@@ -208,9 +218,9 @@ class Maze {
             }
             if (k > 0) {
               result.add(MazeWallRectangleGround(
-                  center + Vector2(0, scale * k / 2),
-                  scale,
-                  scale * (k + _pixelationBuffer)));
+                  position: center + Vector2(0, scale * k / 2),
+                  width: scale,
+                  height: scale * (k + _pixelationBuffer)));
               result.add(MazeWallSquareVisual(
                   position: center + Vector2(0, scale * k / 2),
                   width: scale * _mazeInnerWallWidthFactor,
@@ -254,14 +264,14 @@ class Maze {
     double scale = blockWidth();
     int width = 7;
     result.add(
-      MazeWallSquareVisualBlocking(
+      MazeVisualBlockingBar(
           position: Vector2(
               scale * (_mazeLayoutHorizontalLength() / 2 + width / 2), 0),
           width: scale * width,
           height: scale * _mazeLayoutVerticalLength()),
     );
     result.add(
-      MazeWallSquareVisualBlocking(
+      MazeVisualBlockingBar(
           position: Vector2(
               -scale * (_mazeLayoutHorizontalLength() / 2 + width / 2), 0),
           width: scale * width,
@@ -388,18 +398,12 @@ class Maze {
   ];
 }
 
-List<List<String>> _decodeMazeLayout(encodedMazeLayout) {
+List<List<String>> _decodeMazeLayout(List<String> encodedMazeLayout) {
   List<List<String>> result = [];
   for (String row in encodedMazeLayout) {
-    List rowListString = row.split("");
-    List<String> rowListInt = [];
-    for (String letter in rowListString) {
-      //rowListInt.add(int.parse(letter));
-      rowListInt.add(letter);
-    }
-    result.add(rowListInt);
+    result.add(row.split(""));
   }
   return result;
 }
 
-Maze maze = Maze(mazeIdInitial: 0);
+Maze maze = Maze(mazeId: 0);

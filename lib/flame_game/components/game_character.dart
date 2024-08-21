@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 
+import '../effects/remove_effects.dart';
 import '../maze.dart';
 import '../pacman_game.dart';
 import '../pacman_world.dart';
@@ -17,6 +18,7 @@ final Paint highQualityPaint = Paint()
   ..isAntiAlias = true;
 
 const bool portalClones = true;
+final vector2Zero = Vector2.zero();
 
 /// The [GameCharacter] is the generic object that is linked to a [PhysicsBall]
 class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
@@ -27,7 +29,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
         HasGameReference<PacmanGame> {
   GameCharacter({super.position, super.priority = 1, this.original})
       : super(
-            size: Vector2.all(maze.spriteWidth),
+            size: maze.spriteSize,
             paint: highQualityPaint,
             anchor: Anchor.center);
 
@@ -62,7 +64,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
 
   void setPositionStill(Vector2 targetLoc) {
     _ball.position = targetLoc;
-    _ball.velocity = Vector2(0, 0);
+    _ball.velocity = vector2Zero;
     position.setFrom(targetLoc);
     _connectToBall();
   }
@@ -88,6 +90,13 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   }
 
   @override
+  void removeFromParent() {
+    disconnectFromBall(); //sync
+    removeEffects(this); //sync and async
+    super.removeFromParent(); //async
+  }
+
+  @override
   Future<void> onLoad() async {
     parent!.add(_ball); //should be added to static parent but risks going stray
     add(CircleHitbox(
@@ -102,9 +111,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     //removeEffects(this); //dont run this, runs async code which will execute after the item has already been removed and cause a crash
     disconnectFromBall(); //sync but within async function
     _ball.removeFromParent();
-    if (clone != null && clone!.isMounted) {
-      parent!.remove(clone!);
-    }
+    clone?.removeFromParent();
     super.onRemove();
   }
 

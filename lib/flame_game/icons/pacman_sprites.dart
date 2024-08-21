@@ -5,6 +5,7 @@ import 'dart:ui';
 
 import 'package:flame/components.dart';
 import 'package:flame/flame.dart';
+import 'package:flame/geometry.dart';
 import 'package:flutter/material.dart';
 
 import '../../utils/helper.dart';
@@ -41,8 +42,8 @@ class PacmanSprites {
         center: Offset(size / 2, size / 2),
         width: size.toDouble(),
         height: size.toDouble());
-    canvas.drawArc(pacmanRect, 2 * pi / 2 + 2 * pi * ((mouthWidth / 2) + 0.5),
-        2 * pi * (1 - mouthWidth), true, yellowPacmanPaint);
+    canvas.drawArc(pacmanRect, tau / 2 + tau * ((mouthWidth / 2) + 0.5),
+        tau * (1 - mouthWidth), true, yellowPacmanPaint);
     Picture picture = recorder.endRecording();
     return picture;
   }

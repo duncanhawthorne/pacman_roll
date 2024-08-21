@@ -48,7 +48,6 @@ class PhysicsBall extends BodyComponent with IgnoreEvents {
   }
 
   void _setPositionNow(Vector2 pos) {
-    assert(_instantSetPosition);
     body.setTransform(pos, 0); //realCharacter.angle
   }
 
