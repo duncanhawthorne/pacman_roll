@@ -18,7 +18,7 @@ final Paint highQualityPaint = Paint()
   ..isAntiAlias = true;
 
 const bool portalClones = true;
-final vector2Zero = Vector2.zero();
+final kVector2Zero = Vector2.zero();
 
 /// The [GameCharacter] is the generic object that is linked to a [PhysicsBall]
 class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
@@ -64,7 +64,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
 
   void setPositionStill(Vector2 targetLoc) {
     _ball.position = targetLoc;
-    _ball.velocity = vector2Zero;
+    _ball.velocity = kVector2Zero;
     position.setFrom(targetLoc);
     _connectToBall();
   }

@@ -227,8 +227,9 @@ class PacmanWorld extends Forge2DWorld
   void _setMazeAngle(double angle) {
     //using tmpGravity to avoid creating a new Vector2 on each update / frame
     //could instead directly do gravity = Vector2(calc, calc);
-    _tmpGravity.x = cos(angle + tau / 4) * _gravityScale;
-    _tmpGravity.y = sin(angle + tau / 4) * _gravityScale;
+    _tmpGravity
+      ..x = cos(angle + tau / 4) * _gravityScale
+      ..y = sin(angle + tau / 4) * _gravityScale;
     gravity = _tmpGravity;
     game.camera.viewfinder.angle = angle;
   }

@@ -57,20 +57,9 @@ class MazeWallRectangleGround extends BodyComponent with IgnoreEvents {
   Body createBody() {
     final shape = PolygonShape();
     paint = _blueMazePaint;
-
-    final List<Vector2> vertices = [
-      Vector2(0, 0),
-      Vector2(width, 0),
-      Vector2(width, height),
-      Vector2(0, height),
-    ];
-
-    shape.set(vertices);
+    shape.setAsBoxXY(width / 2, height / 2);
     final fixtureDef = FixtureDef(shape);
-
-    final bodyDef = BodyDef(
-        type: BodyType.static,
-        position: position - Vector2(width / 2, height / 2));
+    final bodyDef = BodyDef(type: BodyType.static, position: position);
     return world.createBody(bodyDef)..createFixture(fixtureDef);
   }
 }

@@ -65,12 +65,15 @@ class PhysicsBall extends BodyComponent with IgnoreEvents {
     _subConnectedBall = false;
   }
 
+  final Vector2 _oneTimeManualPortalPosition = Vector2.zero();
   void _moveThroughPipePortal() {
     if (_subConnectedBall) {
       if (position.x.abs() > maze.mazeWidth / 2 ||
           position.y.abs() > maze.mazeHeight / 2) {
-        position = Vector2(_mod(position.x, maze.mazeWidth),
-            _mod(position.y, maze.mazeHeight));
+        _oneTimeManualPortalPosition
+          ..x = _mod(position.x, maze.mazeWidth)
+          ..y = _mod(position.y, maze.mazeHeight);
+        position = _oneTimeManualPortalPosition;
       }
     }
   }

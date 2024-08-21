@@ -119,9 +119,8 @@ class Maze {
       {double ioffset = 0, double joffset = 0}) {
     double i = ioffset + icore;
     double j = joffset + jcore;
-    return Vector2(j + 1 / 2 - _mazeLayout[0].length / 2,
-            i + 1 / 2 - _mazeLayout.length / 2) *
-        blockWidth();
+    return Vector2((j + 1 / 2 - _mazeLayout[0].length / 2) * blockWidth(),
+        (i + 1 / 2 - _mazeLayout.length / 2) * blockWidth());
   }
 
   Vector2 _vectorOfMazeListCode(String code) {
@@ -132,7 +131,7 @@ class Maze {
         }
       }
     }
-    return Vector2(0, 0);
+    return Vector2.zero();
   }
 
   bool _pelletCodeAtCell(int i, int j) {
@@ -185,7 +184,7 @@ class Maze {
     double scale = blockWidth();
     for (int i = 0; i < _mazeLayout.length; i++) {
       for (int j = 0; j < _mazeLayout[i].length; j++) {
-        Vector2 center = _vectorOfMazeListIndex(i, j);
+        final Vector2 center = _vectorOfMazeListIndex(i, j);
         if (_wallAt(i, j)) {
           if (_circleAt(i, j)) {
             result
@@ -200,12 +199,13 @@ class Maze {
               k++;
             }
             if (k > 0) {
+              final Vector2 newCentre = center + Vector2(scale * k / 2, 0);
               result.add(MazeWallRectangleGround(
-                  position: center + Vector2(scale * k / 2, 0),
+                  position: newCentre,
                   width: scale * (k + _pixelationBuffer),
                   height: scale));
               result.add(MazeWallSquareVisual(
-                  position: center + Vector2(scale * k / 2, 0),
+                  position: newCentre,
                   width: scale * (k + _pixelationBuffer),
                   height: scale * _mazeInnerWallWidthFactor));
             }
@@ -217,12 +217,13 @@ class Maze {
               k++;
             }
             if (k > 0) {
+              final Vector2 newCentre = center + Vector2(0, scale * k / 2);
               result.add(MazeWallRectangleGround(
-                  position: center + Vector2(0, scale * k / 2),
+                  position: newCentre,
                   width: scale,
                   height: scale * (k + _pixelationBuffer)));
               result.add(MazeWallSquareVisual(
-                  position: center + Vector2(0, scale * k / 2),
+                  position: newCentre,
                   width: scale * _mazeInnerWallWidthFactor,
                   height: scale * (k + _pixelationBuffer)));
             }
