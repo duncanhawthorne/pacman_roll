@@ -209,12 +209,12 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   }
 
   @override
-  void onCollisionStart(
+  void onCollision(
     Set<Vector2> intersectionPoints,
     PositionComponent other,
   ) {
     onCollideWith(other);
-    super.onCollisionStart(intersectionPoints, other);
+    super.onCollision(intersectionPoints, other);
   }
 
   @override
