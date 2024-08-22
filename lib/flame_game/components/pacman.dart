@@ -25,7 +25,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   Pacman({required super.position, super.original}) : super(priority: 2);
 
   final Vector2 _screenSizeLast = Vector2(0, 0);
-  Timer eatTimer = Timer(_kPacmanHalfEatingResetTimeMillis * 2 / 1000);
+  final Timer _eatTimer = Timer(_kPacmanHalfEatingResetTimeMillis * 2 / 1000);
 
   Future<Map<CharacterState, SpriteAnimation>?> _getAnimations(int size) async {
     return {
@@ -54,7 +54,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     if (typical) {
       if (current == CharacterState.normal) {
         current = CharacterState.eating;
-        eatTimer.start();
+        _eatTimer.start();
         if (isPellet) {
           world.play(SfxType.waka);
         } else {
@@ -173,11 +173,11 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     if (this is PacmanClone) {
       return;
     }
-    eatTimer.update(dt);
+    _eatTimer.update(dt);
     if (current == CharacterState.eating) {
-      if (eatTimer.finished) {
+      if (_eatTimer.finished) {
         current = CharacterState.normal;
-        eatTimer.pause(); //makes update function for timer free
+        _eatTimer.pause(); //makes update function for timer free
       }
     }
   }

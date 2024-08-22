@@ -29,7 +29,8 @@ Effect _rotateToAngleEffect(double angle, {Function()? onComplete}) {
 }
 
 double smallAngle(double angleDelta) {
-  //avoid +2*pi-delta jump when go around the circle, instead give -delta
+  //produces number between -tau / 2 and +tau / 2
+  //avoids +2*pi-delta jump when go around the circle, instead give -delta
   angleDelta = angleDelta % tau;
   return angleDelta > tau / 2 ? angleDelta - tau : angleDelta;
 }

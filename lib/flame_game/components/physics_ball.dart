@@ -75,8 +75,8 @@ class PhysicsBall extends BodyComponent with IgnoreEvents {
       if (position.x.abs() > maze.mazeWidth / 2 ||
           position.y.abs() > maze.mazeHeight / 2) {
         _oneTimeManualPortalPosition
-          ..x = _mod(position.x, maze.mazeWidth)
-          ..y = _mod(position.y, maze.mazeHeight);
+          ..x = _smallMod(position.x, maze.mazeWidth)
+          ..y = _smallMod(position.y, maze.mazeHeight);
         position = _oneTimeManualPortalPosition;
       }
     }
@@ -93,7 +93,8 @@ class PhysicsBall extends BodyComponent with IgnoreEvents {
   }
 }
 
-double _mod(double position, double mod) {
+double _smallMod(double position, double mod) {
+  //produces number between -mod / 2 and +mod / 2
   position = position % mod;
   return position > mod / 2 ? position - mod : position;
 }

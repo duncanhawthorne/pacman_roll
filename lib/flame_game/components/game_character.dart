@@ -39,12 +39,10 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
 
   double get speed => _ball.speed;
 
-  int get _spinParity =>
+  double get _spinParity =>
       _ball.body.linearVelocity.x.abs() > _ball.body.linearVelocity.y.abs()
-          ? (world.gravity.y > 0 ? 1 : -1) *
-              (_ball.body.linearVelocity.x > 0 ? 1 : -1)
-          : (world.gravity.x > 0 ? -1 : 1) *
-              (_ball.body.linearVelocity.y > 0 ? 1 : -1);
+          ? world.gravity.y.sign * _ball.body.linearVelocity.x.sign
+          : -world.gravity.x.sign * _ball.body.linearVelocity.y.sign;
 
   bool get typical =>
       connectedToBall &&

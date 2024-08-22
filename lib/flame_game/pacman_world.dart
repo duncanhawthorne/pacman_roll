@@ -3,7 +3,6 @@ import 'dart:math';
 
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
-import 'package:flame/geometry.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flutter/foundation.dart';
 
@@ -228,8 +227,8 @@ class PacmanWorld extends Forge2DWorld
     //using tmpGravity to avoid creating a new Vector2 on each update / frame
     //could instead directly do gravity = Vector2(calc, calc);
     _tmpGravity
-      ..x = cos(angle + tau / 4) * _gravityScale
-      ..y = sin(angle + tau / 4) * _gravityScale;
+      ..x = -sin(angle) * _gravityScale
+      ..y = cos(angle) * _gravityScale;
     gravity = _tmpGravity;
     game.camera.viewfinder.angle = angle;
   }
