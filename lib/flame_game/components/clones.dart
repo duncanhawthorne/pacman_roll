@@ -1,7 +1,5 @@
 import 'dart:core';
 
-import 'package:flame/collisions.dart';
-
 import '../maze.dart';
 import 'game_character.dart';
 import 'ghost.dart';
@@ -22,7 +20,7 @@ mixin Clone on GameCharacter {
   final connectedToBall = false;
 
   void updateCloneFrom(GameCharacter original) {
-    assert(this is PacmanClone || this is GhostClone);
+    assert(isClone);
     position.setFrom(original.position);
     position.x -= maze.mazeWidth * position.x.sign;
     angle = original.angle;
@@ -40,11 +38,7 @@ mixin Clone on GameCharacter {
   Future<void> onLoad() async {
     //animations = await _getAnimations(); //dont need this. done on gameresize
     //don't call super
-    add(CircleHitbox(
-      isSolid: true,
-      collisionType:
-          this is PacmanClone ? CollisionType.active : CollisionType.passive,
-    ));
+    add(hitbox);
   }
 
   @override

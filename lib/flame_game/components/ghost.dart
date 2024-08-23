@@ -121,6 +121,7 @@ class Ghost extends GameCharacter {
 
   @override
   Future<void> onLoad() async {
+    assert(!isClone);
     super.onLoad();
     world.ghosts.ghostList.add(this);
     current = world.ghosts.current;
@@ -143,6 +144,7 @@ class Ghost extends GameCharacter {
 
   @override
   Future<void> onRemove() async {
+    assert(!isClone);
     world.ghosts.ghostList.remove(this);
     super.onRemove();
   }

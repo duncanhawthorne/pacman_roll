@@ -49,8 +49,16 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
       current != CharacterState.dead &&
       current != CharacterState.spawning;
 
+  CollisionType get collisionType => this is Pacman || this is PacmanClone
+      ? CollisionType.active
+      : CollisionType.passive;
+
+  bool get isClone => this is PacmanClone || this is GhostClone;
+
   GameCharacter? clone;
   GameCharacter? original;
+  late final CircleHitbox hitbox =
+      CircleHitbox(isSolid: true, collisionType: collisionType);
 
   void bringBallToSprite() {
     if (isMounted && !isRemoving) {
@@ -73,11 +81,14 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
       _ball.setStatic();
     }
     connectedToBall = false;
+    hitbox.collisionType = CollisionType.inactive;
   }
 
   void _connectToBall() {
     connectedToBall = true;
     _ball.setDynamic();
+    assert(!isClone); //not called on clones
+    hitbox.collisionType = collisionType;
   }
 
   void _oneFrameOfPhysics(double dt) {
@@ -96,16 +107,14 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
 
   @override
   Future<void> onLoad() async {
+    assert(!isClone);
     parent!.add(_ball); //should be added to static parent but risks going stray
-    add(CircleHitbox(
-      isSolid: true,
-      collisionType:
-          this is Pacman ? CollisionType.active : CollisionType.passive,
-    )); //hitbox as large as possible
+    add(hitbox);
   }
 
   @override
   Future<void> onRemove() async {
+    assert(!isClone);
     //removeEffects(this); //dont run this, runs async code which will execute after the item has already been removed and cause a crash
     disconnectFromBall(); //sync but within async function
     _ball.removeFromParent();
@@ -117,8 +126,8 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     if (portalClones) {
       if (clone != null) {
         //i.e. no cascade of clones
-        assert(clone is PacmanClone || clone is GhostClone);
-        assert(this is! PacmanClone && this is! GhostClone);
+        assert(clone.isClone);
+        assert(!isClone);
         if (position.x.abs() > maze.mazeWidth / 2 - maze.spriteWidth / 2) {
           if (!clone.isMounted) {
             parent!.add(clone);
