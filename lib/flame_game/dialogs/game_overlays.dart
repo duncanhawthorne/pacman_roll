@@ -45,19 +45,6 @@ Widget topRightOverlayWidget(BuildContext context, PacmanGame game) {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          //FIXME first ElapsedTimeDisplay shouldn't be necessary
-          //but without it the pacman icon doesn't animate
-          ElapsedTimeDisplay(
-            startTime: DateTime.now(), //actually ignored
-            interval: const Duration(milliseconds: 100),
-            style: const TextStyle(
-                fontSize: 1 * statusWidgetHeightFactor,
-                color: Colors.transparent,
-                fontFamily: 'Press Start 2P'),
-            formatter: (elapsedTime) {
-              return elapsedTime.milliseconds.toString().padLeft(4, " ");
-            },
-          ),
           ValueListenableBuilder<int>(
             valueListenable: game.world.pacmans.numberOfDeathsNotifier,
             builder: (BuildContext context, int value, Widget? child) {
