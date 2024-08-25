@@ -24,7 +24,7 @@ Widget topLeftOverlayWidget(BuildContext context, PacmanGame game) {
       children: [
         IconButton(
           onPressed: () {
-            game.showMainMenu();
+            game.overlays.add(GameScreen.startDialogKey);
           },
           icon: const Icon(Icons.menu, color: Colors.white),
         ),

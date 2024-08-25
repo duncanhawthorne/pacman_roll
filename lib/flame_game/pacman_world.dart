@@ -125,6 +125,7 @@ class PacmanWorld extends Forge2DWorld
       pacmans.resetInstantAfterPacmanDeath();
       ghosts.resetInstantAfterPacmanDeath();
       _cameraAndTimersReset();
+      game.pauseIfNoAction();
     }
   }
 

@@ -175,6 +175,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   }
 
   void reset({firstRun = false}) {
+    pauseIfNoAction();
     _userString = _getRandomString(random, 15);
     _cleanOverlaysAndDialogs();
     _addOverlays();
@@ -192,22 +193,32 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   }
 
   void start() {
-    resumeEngine();
+    //resumeEngine();
+    pauseIfNoAction();
     world.start();
   }
 
-  void showMainMenu() {
-    overlays.add(GameScreen.startDialogKey);
+  int _framesRendered = 0;
 
+  void pauseIfNoAction() {
+    _framesRendered = 0;
     async.Timer.periodic(const Duration(milliseconds: 10), (timer) {
-      if (!isGameLive) {
-        if (world.isMounted) {
-          //some rendering has happened
-          pauseEngine();
-          timer.cancel();
-        }
-      } else {
+      if (paused) {
         timer.cancel();
+      } else {
+        if (stopwatch.isRunning()) {
+          //some game action has happened, so just cancel timer
+          timer.cancel();
+        } else {
+          //no action has happened
+          if (world.isMounted && _framesRendered > 5) {
+            //some rendering has happened
+            pauseEngine();
+            timer.cancel();
+          } else {
+            //keep waiting until at least some rendering has happened
+          }
+        }
       }
     });
   }
@@ -227,7 +238,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
     super.onLoad();
     _bugFixes();
     reset(firstRun: true);
-    showMainMenu();
+    overlays.add(GameScreen.startDialogKey);
     _winOrLoseGameListener(); //isn't disposed so run once, not on start()
     _lifecycleChangeListener(); //isn't disposed so run once, not on start()
   }
@@ -235,6 +246,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   @override
   void update(double dt) {
     stopwatch.update(dt * timeScale);
+    _framesRendered++;
     super.update(dt);
   }
 
