@@ -6,6 +6,8 @@ import '../app_lifecycle/app_lifecycle.dart';
 import '../audio/audio_controller.dart';
 import '../level_selection/levels.dart';
 import '../player_progress/player_progress.dart';
+import '../style/palette.dart';
+import '../utils/helper.dart';
 import 'dialogs/game_lose_dialog.dart';
 import 'dialogs/game_overlays.dart';
 import 'dialogs/game_start_dialog.dart';
@@ -37,41 +39,46 @@ class GameScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return PopScope(
       canPop: false,
-      child: Scaffold(
-        body: SafeArea(
-          child: GameWidget<PacmanGame>(
-            key: const Key('play session'),
-            game: PacmanGame(
-              level: level,
-              mazeId: mazeId,
-              playerProgress: context.read<PlayerProgress>(),
-              audioController: context.read<AudioController>(),
-              appLifecycleStateNotifier:
-                  context.read<AppLifecycleStateNotifier>(),
-            ),
-            overlayBuilderMap: {
-              topLeftOverlayKey: (BuildContext context, PacmanGame game) {
-                return topLeftOverlayWidget(context, game);
-              },
-              topRightOverlayKey: (BuildContext context, PacmanGame game) {
-                return topRightOverlayWidget(context, game);
-              },
-              loseDialogKey: (BuildContext context, PacmanGame game) {
-                return GameLoseDialog(
-                  level: level,
-                  game: game,
-                );
-              },
-              wonDialogKey: (BuildContext context, PacmanGame game) {
-                return GameWonDialog(
+      child: Container(
+        decoration: BoxDecoration(color: Palette.flameGameBackground.color),
+        child: SafeArea(
+          child: Padding(
+            padding: EdgeInsets.only(bottom: gestureInset()),
+            child: Scaffold(
+                body: GameWidget<PacmanGame>(
+              key: const Key('play session'),
+              game: PacmanGame(
+                level: level,
+                mazeId: mazeId,
+                playerProgress: context.read<PlayerProgress>(),
+                audioController: context.read<AudioController>(),
+                appLifecycleStateNotifier:
+                    context.read<AppLifecycleStateNotifier>(),
+              ),
+              overlayBuilderMap: {
+                topLeftOverlayKey: (BuildContext context, PacmanGame game) {
+                  return topLeftOverlayWidget(context, game);
+                },
+                topRightOverlayKey: (BuildContext context, PacmanGame game) {
+                  return topRightOverlayWidget(context, game);
+                },
+                loseDialogKey: (BuildContext context, PacmanGame game) {
+                  return GameLoseDialog(
                     level: level,
-                    levelCompletedInMillis: game.stopwatchMilliSeconds,
-                    game: game);
+                    game: game,
+                  );
+                },
+                wonDialogKey: (BuildContext context, PacmanGame game) {
+                  return GameWonDialog(
+                      level: level,
+                      levelCompletedInMillis: game.stopwatchMilliSeconds,
+                      game: game);
+                },
+                startDialogKey: (BuildContext context, PacmanGame game) {
+                  return StartDialog(level: level, game: game);
+                }
               },
-              startDialogKey: (BuildContext context, PacmanGame game) {
-                return StartDialog(level: level, game: game);
-              }
-            },
+            )),
           ),
         ),
       ),

@@ -21,3 +21,8 @@ void fixTitle(Color color) {
   // to workaround a bug in flutter on ios web
   fixTitleReal(color); //either from web or stub depending on platform
 }
+
+double gestureInset() {
+  // to workaround a bug in flutter on ios web
+  return gestureInsetReal(); //either from web or stub depending on platform
+}

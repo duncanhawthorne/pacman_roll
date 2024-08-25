@@ -46,3 +46,16 @@ void fixTitle3() {
     url,
   );
 }
+
+final isPwa =
+    kIsWeb && web.window.matchMedia('(display-mode: standalone)').matches;
+// Check if it's web iOS
+final isWebiOS = kIsWeb &&
+    web.window.navigator.userAgent.contains(RegExp(r'iPad|iPod|iPhone'));
+
+const double _iOSWebPWAInset = 25;
+
+double gestureInsetReal() {
+  // Check if it's an installed PWA
+  return isPwa && isWebiOS ? _iOSWebPWAInset : 0;
+}
