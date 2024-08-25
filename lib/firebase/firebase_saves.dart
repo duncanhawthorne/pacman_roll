@@ -47,20 +47,25 @@ class Save {
     }
   }
 
-  Future<double> firebasePercentile(int levelNum, int vsMillis) async {
+  Future<double> firebasePercentile(
+      {required int levelNum,
+      required int levelCompletedInMillis,
+      required int mazeId}) async {
     if (firebaseOn) {
       try {
         if (firebaseOn) {
           final collectionRef = db!.collection(mainDB);
           AggregateQuerySnapshot fasterSnapshot = await collectionRef
-              .where("levelCompleteTime", isLessThan: vsMillis)
+              .where("levelCompleteTime", isLessThan: levelCompletedInMillis)
               .where("levelNum", isEqualTo: levelNum)
+              .where("mazeId", isEqualTo: mazeId)
               .count()
               .get();
           int fasterCount = fasterSnapshot.count ?? 0;
           AggregateQuerySnapshot slowerSnapshot = await collectionRef
-              .where("levelCompleteTime", isGreaterThan: vsMillis)
+              .where("levelCompleteTime", isGreaterThan: levelCompletedInMillis)
               .where("levelNum", isEqualTo: levelNum)
+              .where("mazeId", isEqualTo: mazeId)
               .count()
               .get();
           int slowerCount = slowerSnapshot.count ?? 100;

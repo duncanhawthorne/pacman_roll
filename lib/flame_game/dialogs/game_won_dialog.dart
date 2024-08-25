@@ -4,6 +4,7 @@ import '../../firebase/firebase_saves.dart';
 import '../../level_selection/levels.dart';
 import '../../style/dialog.dart';
 import '../game_screen.dart';
+import '../maze.dart';
 import '../pacman_game.dart';
 import 'game_start_dialog.dart';
 
@@ -44,7 +45,9 @@ class GameWonDialog extends StatelessWidget {
             : bodyWidget(
                 child: FutureBuilder(
                     future: _scoreboardRankText(
-                        level.number, levelCompletedInMillis),
+                        levelNum: level.number,
+                        levelCompletedInMillis: levelCompletedInMillis,
+                        mazeId: maze.mazeId),
                     initialData: _scoreboardLoadingText(),
                     builder:
                         (BuildContext context, AsyncSnapshot<String> text) {
@@ -81,9 +84,14 @@ String _scoreboardLoadingText() {
 }
 
 Future<String> _scoreboardRankText(
-    int levelNum, int levelCompletedInMillis) async {
+    {required int levelNum,
+    required int levelCompletedInMillis,
+    required int mazeId}) async {
   double x = Save.firebaseOn
-      ? (await save.firebasePercentile(levelNum, levelCompletedInMillis)) *
+      ? (await save.firebasePercentile(
+              levelNum: levelNum,
+              levelCompletedInMillis: levelCompletedInMillis,
+              mazeId: mazeId)) *
           100.0
       : 100.0;
   String y = !Save.firebaseOn
