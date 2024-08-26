@@ -165,6 +165,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
     overlays.remove(GameScreen.startDialogKey);
     overlays.remove(GameScreen.loseDialogKey);
     overlays.remove(GameScreen.wonDialogKey);
+    overlays.remove(GameScreen.tutorialDialogKey);
   }
 
   @override
@@ -201,6 +202,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   int _framesRendered = 0;
 
   void pauseIfNoAction() {
+    resumeEngine(); //for any catch up animation, if not already resumed
     _framesRendered = 0;
     async.Timer.periodic(const Duration(milliseconds: 10), (timer) {
       if (paused) {
@@ -211,12 +213,22 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
           timer.cancel();
         } else {
           //no action has happened
-          if (world.isMounted && _framesRendered > 5) {
-            //some rendering has happened
-            pauseEngine();
-            timer.cancel();
+          if (world.isMounted &&
+              world.ghosts.ghostList.isNotEmpty &&
+              world.ghosts.ghostList[0].isLoaded) {
+            //core loaded has happened
+            //wait 5 more frames
+            if (_framesRendered > 5) {
+              //some rendering has happened
+              pauseEngine();
+              timer.cancel();
+            } else {
+              //keep waiting until at least some rendering has happened
+            }
           } else {
-            //keep waiting until at least some rendering has happened
+            //keep waiting until all core components have loaded
+            // before start count
+            _framesRendered = 0;
           }
         }
       }

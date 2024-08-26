@@ -140,6 +140,7 @@ class PacmanWorld extends Forge2DWorld
 
   void reset({firstRun = false}) {
     _cameraAndTimersReset();
+    game.audioController.stopSfx(SfxType.ghostsScared);
 
     if (!firstRun) {
       for (WrapperNoEvents wrapper in wrappers) {
