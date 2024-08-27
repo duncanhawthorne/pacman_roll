@@ -176,7 +176,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   }
 
   void reset({firstRun = false}) {
-    pauseIfNoAction();
+    pauseEngineIfNoActivity();
     _userString = _getRandomString(random, 15);
     _cleanOverlaysAndDialogs();
     _addOverlays();
@@ -195,42 +195,33 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
 
   void start() {
     //resumeEngine();
-    pauseIfNoAction();
+    pauseEngineIfNoActivity();
     world.start();
   }
 
   int _framesRendered = 0;
 
-  void pauseIfNoAction() {
+  void pauseEngineIfNoActivity() {
     resumeEngine(); //for any catch up animation, if not already resumed
     _framesRendered = 0;
     async.Timer.periodic(const Duration(milliseconds: 10), (timer) {
       if (paused) {
+        //already paused, no further action required, just cancel timer
         timer.cancel();
+      } else if (stopwatch.isRunning()) {
+        //some game activity has happened, no need to pause, just cancel timer
+        timer.cancel();
+      } else if (!(world.isMounted &&
+          world.ghosts.ghostList.isNotEmpty &&
+          world.ghosts.ghostList[0].isLoaded)) {
+        //core components haven't loaded yet, so wait before start frame count
+        _framesRendered = 0;
+      } else if (_framesRendered <= 5) {
+        //core components loaded, but not yet had 5 good safety frame
       } else {
-        if (stopwatch.isRunning()) {
-          //some game action has happened, so just cancel timer
-          timer.cancel();
-        } else {
-          //no action has happened
-          if (world.isMounted &&
-              world.ghosts.ghostList.isNotEmpty &&
-              world.ghosts.ghostList[0].isLoaded) {
-            //core loaded has happened
-            //wait 5 more frames
-            if (_framesRendered > 5) {
-              //some rendering has happened
-              pauseEngine();
-              timer.cancel();
-            } else {
-              //keep waiting until at least some rendering has happened
-            }
-          } else {
-            //keep waiting until all core components have loaded
-            // before start count
-            _framesRendered = 0;
-          }
-        }
+        //everything loaded and rendered, and still no game activity
+        pauseEngine();
+        timer.cancel();
       }
     });
   }
