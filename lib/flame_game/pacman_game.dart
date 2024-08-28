@@ -97,21 +97,21 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
     return gameTmp;
   }
 
-  void pause() {
-    timeScale = 0;
+  void pauseGame() {
+    pause(); //timeScale = 0;
     pauseEngine();
     //stopwatch.pause(); //shouldn't be necessary given timeScale = 0
   }
 
-  void resume() {
-    timeScale = 1.0;
+  void resumeGame() {
+    resume(); //timeScale = 1.0;
     resumeEngine();
   }
 
   void _lifecycleChangeListener() {
     appLifecycleStateNotifier.addListener(() {
       if (appLifecycleStateNotifier.value == AppLifecycleState.hidden) {
-        pause();
+        pauseGame();
       }
     });
   }
@@ -248,7 +248,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
 
   @override
   void update(double dt) {
-    stopwatch.update(dt * timeScale);
+    stopwatch.update(dt * timeScale); //stops stopwatch when timeScale = 0
     _framesRendered++;
     super.update(dt);
   }

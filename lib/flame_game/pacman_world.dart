@@ -183,7 +183,7 @@ class PacmanWorld extends Forge2DWorld
   @override
   void onDragUpdate(DragUpdateEvent event) {
     super.onDragUpdate(event);
-    game.resume();
+    game.resumeGame();
     double eventVectorLengthProportion =
         (event.canvasStartPosition - game.canvasSize / 2).length /
             (min(game.canvasSize.x, game.canvasSize.y) / 2);
