@@ -123,18 +123,16 @@ class Ghost extends GameCharacter {
 
   @override
   Future<void> onLoad() async {
-    loadStubAnimationsOnDebugMode();
-    assert(!isClone);
     super.onLoad();
-    world.ghosts.ghostList.add(this);
-    current = world.ghosts.current;
-    if (idNum >= 3) {
-      _setSpawning();
-    }
-    if (portalClones) {
+    if (!isClone) {
+      world.ghosts.ghostList.add(this);
+      current = world.ghosts.current;
+      if (idNum >= 3) {
+        _setSpawning();
+      }
       clone = GhostClone(position: position, idNum: idNum, original: this);
+      animations = await getAnimations();
     }
-    animations = await getAnimations();
   }
 
   @override
@@ -147,8 +145,9 @@ class Ghost extends GameCharacter {
 
   @override
   Future<void> onRemove() async {
-    assert(!isClone);
-    world.ghosts.ghostList.remove(this);
+    if (!isClone) {
+      world.ghosts.ghostList.remove(this);
+    }
     super.onRemove();
   }
 }

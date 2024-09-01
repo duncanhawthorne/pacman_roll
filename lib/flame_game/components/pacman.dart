@@ -186,12 +186,10 @@ class Pacman extends GameCharacter with CollisionCallbacks {
 
   @override
   Future<void> onLoad() async {
-    loadStubAnimationsOnDebugMode();
-    assert(!isClone);
     super.onLoad();
-    world.pacmans.pacmanList.add(this);
-    current = CharacterState.normal;
-    if (portalClones) {
+    if (!isClone) {
+      world.pacmans.pacmanList.add(this);
+      current = CharacterState.normal;
       clone = PacmanClone(position: position, original: this);
     }
   }
@@ -207,8 +205,9 @@ class Pacman extends GameCharacter with CollisionCallbacks {
 
   @override
   Future<void> onRemove() async {
-    assert(!isClone);
-    world.pacmans.pacmanList.remove(this);
+    if (!isClone) {
+      world.pacmans.pacmanList.remove(this);
+    }
     super.onRemove();
   }
 

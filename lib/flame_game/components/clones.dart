@@ -33,17 +33,4 @@ mixin Clone on GameCharacter {
     updateCloneFrom(original!);
     super.update(dt); // must call to have sprite animations
   }
-
-  @override
-  Future<void> onLoad() async {
-    loadStubAnimationsOnDebugMode();
-    //animations = await _getAnimations(); //dont need this. done on gameresize
-    //don't call super
-    add(hitbox);
-  }
-
-  @override
-  Future<void> onRemove() async {
-    //don't call super
-  }
 }

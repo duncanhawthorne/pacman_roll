@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
+import 'package:flutter/foundation.dart';
 
 import '../effects/remove_effects.dart';
 import '../icons/stub_sprites.dart';
@@ -18,7 +19,6 @@ final Paint highQualityPaint = Paint()
 //..color = const Color.fromARGB(255, 255, 255, 255)
   ..isAntiAlias = true;
 
-const bool portalClones = true;
 final kVector2Zero = Vector2.zero();
 
 /// The [GameCharacter] is the generic object that is linked to a [PhysicsBall]
@@ -64,10 +64,10 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   void loadStubAnimationsOnDebugMode() {
     // works around changes made in flame 1.19
     // where animations have to be loaded before can set current
+    // only fails due to assert, which is only tested in debug mode
+    // so if in debug mode, quickly load up stub animations first
     // https://github.com/flame-engine/flame/pull/3258
-    try {
-      assert(false); //i.e. fails in debug mode only
-    } catch (e) {
+    if (kDebugMode) {
       animations = stubSprites.stubAnimation;
     }
   }
@@ -93,6 +93,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   }
 
   void disconnectFromBall({spawning = false}) {
+    assert(!isClone); //as for clone have no way to turn collisionType back on
     if (!spawning) {
       /// if body not yet initialised, this will crash
       _ball.setStatic();
@@ -124,35 +125,37 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
 
   @override
   Future<void> onLoad() async {
-    assert(!isClone);
-    parent!.add(_ball); //should be added to static parent but risks going stray
+    loadStubAnimationsOnDebugMode();
+    if (!isClone) {
+      parent!
+          .add(_ball); //should be added to static parent but risks going stray
+    }
     add(hitbox);
   }
 
   @override
   Future<void> onRemove() async {
-    assert(!isClone);
-    //removeEffects(this); //dont run this, runs async code which will execute after the item has already been removed and cause a crash
-    disconnectFromBall(); //sync but within async function
-    _ball.removeFromParent();
-    clone?.removeFromParent();
+    if (!isClone) {
+      //removeEffects(this); //dont run this, runs async code which will execute after the item has already been removed and cause a crash
+      disconnectFromBall(); //sync but within async function
+      _ball.removeFromParent();
+      clone?.removeFromParent();
+    }
     super.onRemove();
   }
 
   void _addRemoveClone(GameCharacter? clone) {
-    if (portalClones) {
-      if (clone != null) {
-        //i.e. no cascade of clones
-        assert(clone.isClone);
-        assert(!isClone);
-        if (position.x.abs() > maze.mazeWidth / 2 - maze.spriteWidth / 2) {
-          if (!clone.isMounted) {
-            parent!.add(clone);
-          }
-        } else {
-          if (clone.isMounted) {
-            clone.removeFromParent();
-          }
+    if (clone != null) {
+      //i.e. no cascade of clones
+      assert(clone.isClone);
+      assert(!isClone);
+      if (position.x.abs() > maze.mazeWidth / 2 - maze.spriteWidth / 2) {
+        if (!clone.isMounted) {
+          parent!.add(clone);
+        }
+      } else {
+        if (clone.isMounted) {
+          clone.removeFromParent();
         }
       }
     }
