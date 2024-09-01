@@ -17,7 +17,9 @@ class Ghost extends GameCharacter {
 
   int idNum;
 
-  Future<Map<CharacterState, SpriteAnimation>?> _getAnimations() async {
+  @override
+  Future<Map<CharacterState, SpriteAnimation>?> getAnimations(
+      [int size = 1]) async {
     return {
       CharacterState.normal: SpriteAnimation.spriteList(
         [await game.loadSprite(_ghostSpriteMap[idNum % 3]!)],
@@ -121,6 +123,7 @@ class Ghost extends GameCharacter {
 
   @override
   Future<void> onLoad() async {
+    loadStubAnimationsOnDebugMode();
     assert(!isClone);
     super.onLoad();
     world.ghosts.ghostList.add(this);
@@ -131,14 +134,14 @@ class Ghost extends GameCharacter {
     if (portalClones) {
       clone = GhostClone(position: position, idNum: idNum, original: this);
     }
-    animations = await _getAnimations();
+    animations = await getAnimations();
   }
 
   @override
   Future<void> onGameResize(Vector2 size) async {
     //load animations here too, for clone, which doesn't run onLoad
     //can't just run it here, as runs slower than onLoad, so causes a flash here
-    animations ??= await _getAnimations();
+    animations ??= await getAnimations();
     super.onGameResize(size);
   }
 

@@ -5,6 +5,7 @@ import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 
 import '../effects/remove_effects.dart';
+import '../icons/stub_sprites.dart';
 import '../maze.dart';
 import '../pacman_game.dart';
 import '../pacman_world.dart';
@@ -59,6 +60,22 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   GameCharacter? original;
   late final CircleHitbox hitbox =
       CircleHitbox(isSolid: true, collisionType: collisionType);
+
+  void loadStubAnimationsOnDebugMode() {
+    // works around changes made in flame 1.19
+    // where animations have to be loaded before can set current
+    // https://github.com/flame-engine/flame/pull/3258
+    try {
+      assert(false); //i.e. fails in debug mode only
+    } catch (e) {
+      animations = stubSprites.stubAnimation;
+    }
+  }
+
+  Future<Map<CharacterState, SpriteAnimation>?> getAnimations(
+      [int size = 1]) async {
+    return {};
+  }
 
   void bringBallToSprite() {
     if (isMounted && !isRemoving) {

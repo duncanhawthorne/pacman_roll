@@ -27,7 +27,9 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   final Vector2 _screenSizeLast = Vector2(0, 0);
   final Timer _eatTimer = Timer(_kPacmanHalfEatingResetTimeMillis * 2 / 1000);
 
-  Future<Map<CharacterState, SpriteAnimation>?> _getAnimations(int size) async {
+  @override
+  Future<Map<CharacterState, SpriteAnimation>?> getAnimations(
+      [int size = 1]) async {
     return {
       CharacterState.normal: SpriteAnimation.spriteList(
         await pacmanSprites.pacmanNormalSprites(size),
@@ -184,6 +186,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
 
   @override
   Future<void> onLoad() async {
+    loadStubAnimationsOnDebugMode();
     assert(!isClone);
     super.onLoad();
     world.pacmans.pacmanList.add(this);
@@ -197,7 +200,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   Future<void> onGameResize(Vector2 size) async {
     if (size.x != _screenSizeLast.x || size.y != _screenSizeLast.y) {
       _screenSizeLast.setFrom(size);
-      animations = await _getAnimations(2 * maze.spriteWidthOnScreen(size));
+      animations = await getAnimations(2 * maze.spriteWidthOnScreen(size));
     }
     super.onGameResize(size);
   }

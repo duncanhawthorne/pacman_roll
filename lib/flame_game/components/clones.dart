@@ -36,6 +36,7 @@ mixin Clone on GameCharacter {
 
   @override
   Future<void> onLoad() async {
+    loadStubAnimationsOnDebugMode();
     //animations = await _getAnimations(); //dont need this. done on gameresize
     //don't call super
     add(hitbox);
