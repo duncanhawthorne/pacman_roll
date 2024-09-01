@@ -12,12 +12,9 @@ import '../../utils/helper.dart';
 
 const int kPacmanDeadResetTimeAnimationMillis = 1250;
 const int pacmanRenderFracIncrementsNumber = 64;
-const int pacmanMouthWidthDefault =
-    pacmanRenderFracIncrementsNumber ~/ 4; //8 / 32; //5/32
-const int pacmanDeadFrames = (pacmanRenderFracIncrementsNumber * 3) ~/
-    4; //(kPacmanDeadResetTimeAnimationMillis / 33).ceil();
-const int pacmanEatingHalfFrames = (pacmanRenderFracIncrementsNumber * 1) ~/
-    4; //(kPacmanHalfEatingResetTimeMillis / 67).ceil();
+const int pacmanMouthWidthDefault = pacmanRenderFracIncrementsNumber ~/ 4;
+const int pacmanDeadFrames = (pacmanRenderFracIncrementsNumber * 3) ~/ 4;
+const int pacmanEatingHalfFrames = (pacmanRenderFracIncrementsNumber * 1) ~/ 4;
 final Paint yellowPacmanPaint = Paint()
   ..color = Colors.yellowAccent; //blue; //yellowAccent;
 const _loadFromFile = false;

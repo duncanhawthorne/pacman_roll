@@ -118,8 +118,10 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
 
   @override
   void removeFromParent() {
-    disconnectFromBall(); //sync
-    removeEffects(this); //sync and async
+    if (!isClone) {
+      disconnectFromBall(); //sync
+      removeEffects(this); //sync and async
+    }
     super.removeFromParent(); //async
   }
 
