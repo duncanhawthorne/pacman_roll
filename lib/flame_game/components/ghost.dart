@@ -9,20 +9,20 @@ import '../maze.dart';
 import 'clones.dart';
 import 'game_character.dart';
 
-final _ghostSpriteMap = {0: 'ghost1.png', 1: 'ghost3.png', 2: 'ghost2.png'};
+const _ghostSpritePaths = {0: 'ghost1.png', 1: 'ghost3.png', 2: 'ghost2.png'};
 
 class Ghost extends GameCharacter {
-  Ghost({required this.idNum, super.original})
-      : super(position: maze.ghostSpawnForId(idNum));
+  Ghost({required this.ghostID, super.original})
+      : super(position: maze.ghostSpawnForId(ghostID));
 
-  int idNum;
+  int ghostID;
 
   @override
   Future<Map<CharacterState, SpriteAnimation>?> getAnimations(
       [int size = 1]) async {
     return {
       CharacterState.normal: SpriteAnimation.spriteList(
-        [await game.loadSprite(_ghostSpriteMap[idNum % 3]!)],
+        [await game.loadSprite(_ghostSpritePaths[ghostID % 3]!)],
         stepTime: double.infinity,
       ),
       CharacterState.scared: SpriteAnimation.spriteList(
@@ -105,7 +105,7 @@ class Ghost extends GameCharacter {
     current = CharacterState.normal;
     removeEffects(this);
     disconnectFromBall();
-    add(MoveToPositionEffect(maze.ghostStartForId(idNum),
+    add(MoveToPositionEffect(maze.ghostStartForId(ghostID),
         onComplete: () => {
               //bringBallToSprite()
               //Calling bringBallToSprite here creates a crash
@@ -117,7 +117,7 @@ class Ghost extends GameCharacter {
   void resetInstantAfterPacmanDeath() {
     removeEffects(this);
     current = CharacterState.normal;
-    setPositionStill(maze.ghostStartForId(idNum));
+    setPositionStill(maze.ghostStartForId(ghostID));
     angle = 0;
   }
 
@@ -127,10 +127,10 @@ class Ghost extends GameCharacter {
     if (!isClone) {
       world.ghosts.ghostList.add(this);
       current = world.ghosts.current;
-      if (idNum >= 3) {
+      if (ghostID >= 3) {
         _setSpawning();
       }
-      clone = GhostClone(position: position, idNum: idNum, original: this);
+      clone = GhostClone(position: position, ghostID: ghostID, original: this);
       animations = await getAnimations();
     }
   }

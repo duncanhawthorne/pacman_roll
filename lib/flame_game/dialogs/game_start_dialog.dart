@@ -141,7 +141,7 @@ Widget levelButtonSingle(BuildContext context, PacmanGame game, int index) {
               : buttonStyle(small: true, borderColor: Palette.transp),
           onPressed: () {
             context.go(
-                '/?$levelUrl=${index + 1}&$mapUrl=${mazeNames[maze.mazeId]}');
+                '/?$levelUrlKey=${index + 1}&$mazeUrlKey=${mazeNames[maze.mazeId]}');
           },
           child: Text('${index + 1}',
               style: game.world.playerProgress.levels.containsKey(index + 1)
@@ -184,7 +184,7 @@ Widget mazeButtonSingle(BuildContext context, PacmanGame game, int index) {
           onPressed: () {
             if (index != maze.mazeId) {
               context.go(
-                  '/?$levelUrl=${game.level.number}&$mapUrl=${mazeNames[index]}');
+                  '/?$levelUrlKey=${game.level.number}&$mazeUrlKey=${mazeNames[index]}');
             }
           },
           child: Text(mazeNames[index], style: textStyleBody)));

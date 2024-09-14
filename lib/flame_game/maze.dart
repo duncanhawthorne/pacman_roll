@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:flame/components.dart';
-import 'package:flutter/foundation.dart';
 
 import 'components/mini_pellet.dart';
 import 'components/pellet.dart';
@@ -16,18 +15,19 @@ class Maze {
   Maze({
     required mazeId,
   }) {
-    setMazeIdReal(mazeId);
+    setMazeId(mazeId);
   }
 
   int get mazeId => _mazeId;
-  set mazeId(int i) => setMazeIdReal(i);
 
-  void setMazeIdReal(int id) {
+  set mazeId(int i) => setMazeId(i);
+
+  void setMazeId(int id) {
     {
       _mazeId = id;
       ghostStart.setFrom(_vectorOfMazeListCode(_kGhostStart));
       pacmanStart.setFrom(_vectorOfMazeListCode(_kPacmanStart));
-      cage.setFrom(_vectorOfMazeListCode(_kCage));
+      _cage.setFrom(_vectorOfMazeListCode(_kCage));
       //items below used every frame so calculate once here
       blockWidth = _blockWidth();
       spriteWidth = _spriteWidth();
@@ -52,7 +52,7 @@ class Maze {
   int _mazeId = -1; //set properly in initializer
   final Vector2 ghostStart = Vector2.zero(); //set properly in initializer
   final Vector2 pacmanStart = Vector2.zero(); //set properly in initializer
-  final Vector2 cage = Vector2.zero(); //set properly in initializer
+  final Vector2 _cage = Vector2.zero(); //set properly in initializer
   double mazeWidth = 0; //set properly in initializer
   double mazeHeight = 0; //set properly in initializer
   double blockWidth = 0; //set properly in initializer
@@ -72,18 +72,18 @@ class Maze {
   }
 
   Vector2 ghostSpawnForId(int idNum) {
-    return idNum <= 2 ? ghostStartForId(idNum) : cage;
+    return idNum <= 2 ? ghostStartForId(idNum) : _cage;
   }
 
   int spriteWidthOnScreen(Vector2 size) {
     return (spriteWidth /
-            (kSquareNotionalSize / flameGameZoom) *
+            (kVirtualGameSize / flameGameZoom) *
             min(size.x, size.y))
         .toInt();
   }
 
   double _blockWidth() {
-    return kSquareNotionalSize /
+    return kVirtualGameSize /
         flameGameZoom /
         max(_mazeLayoutHorizontalLength(), _mazeLayoutVerticalLength());
   }
@@ -101,14 +101,11 @@ class Maze {
   }
 
   bool _wallAt(int i, int j) {
-    if (i >= _mazeLayout.length ||
-        i < 0 ||
-        j >= _mazeLayout[i].length ||
-        j < 0) {
-      return false;
-    } else {
-      return _mazeLayout[i][j] == _kWall;
-    }
+    return i >= 0 &&
+        i < _mazeLayout.length &&
+        j >= 0 &&
+        j < _mazeLayout[i].length &&
+        _mazeLayout[i][j] == _kWall;
   }
 
   bool _circleAt(int i, int j) {
@@ -152,25 +149,18 @@ class Maze {
         _pelletCodeAtCell(i + 1, j + 1);
   }
 
-  List<Pellet> pellets(
-      ValueNotifier pelletsRemainingNotifier, bool superPelletsEnabled) {
+  List<Pellet> pellets(bool superPelletsEnabled) {
     final List<Pellet> result = [];
-    //pelletsRemainingNotifier.value = 0;
     for (int i = 0; i < _mazeLayout.length; i++) {
       for (int j = 0; j < _mazeLayout[i].length; j++) {
         Vector2 center = _vectorOfMazeListIndex(i, j,
             ioffset: _largeSprites ? 1 / 2 : 0,
             joffset: _largeSprites ? 1 / 2 : 0);
         if (_pelletAt(i, j)) {
-          if (_mazeLayout[i][j] == _kMiniPellet) {
+          if (_mazeLayout[i][j] == _kSuperPellet && superPelletsEnabled) {
+            result.add(SuperPellet(position: center));
+          } else {
             result.add(MiniPellet(position: center));
-          }
-          if (_mazeLayout[i][j] == _kSuperPellet) {
-            if (superPelletsEnabled) {
-              result.add(SuperPellet(position: center));
-            } else {
-              result.add(MiniPellet(position: center));
-            }
           }
         }
       }
@@ -206,7 +196,7 @@ class Maze {
                   position: newCentre,
                   width: scale * (k + _pixelationBuffer),
                   height: scale));
-              result.add(MazeWallSquareVisual(
+              result.add(MazeWallRectangleVisual(
                   position: newCentre,
                   width: scale * (k + _pixelationBuffer),
                   height: scale * _mazeInnerWallWidthFactor));
@@ -224,7 +214,7 @@ class Maze {
                   position: newCentre,
                   width: scale,
                   height: scale * (k + _pixelationBuffer)));
-              result.add(MazeWallSquareVisual(
+              result.add(MazeWallRectangleVisual(
                   position: newCentre,
                   width: scale * _mazeInnerWallWidthFactor,
                   height: scale * (k + _pixelationBuffer)));
@@ -250,7 +240,7 @@ class Maze {
               l++;
             }
             if (k > 0 && l > 0) {
-              result.add(MazeWallSquareVisual(
+              result.add(MazeWallRectangleVisual(
                   position: center + Vector2(scale * k / 2, scale * l / 2),
                   width: scale * k,
                   height: scale * l));

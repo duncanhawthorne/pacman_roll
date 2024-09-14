@@ -11,7 +11,7 @@ class PacmanClone extends Pacman with Clone {
 
 class GhostClone extends Ghost with Clone {
   GhostClone(
-      {required position, required super.idNum, required super.original});
+      {required position, required super.ghostID, required super.original});
 }
 
 mixin Clone on GameCharacter {
@@ -22,7 +22,7 @@ mixin Clone on GameCharacter {
   void updateCloneFrom(GameCharacter original) {
     assert(isClone);
     position.setFrom(original.position);
-    position.x -= maze.mazeWidth * position.x.sign;
+    position.x -= maze.mazeWidth * position.x.sign; //mirror on other side
     angle = original.angle;
     current = original.current;
   }

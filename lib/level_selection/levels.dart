@@ -4,7 +4,7 @@ const gameLevels = <GameLevel>[
     maxAllowedDeaths: 3,
     superPelletsEnabled: true,
     multipleSpawningGhosts: false,
-    ghostSpwanTimerLength: -1,
+    ghostSpawnTimerLength: -1,
     homingGhosts: false,
   ),
   (
@@ -12,7 +12,7 @@ const gameLevels = <GameLevel>[
     maxAllowedDeaths: 3,
     superPelletsEnabled: false,
     multipleSpawningGhosts: false,
-    ghostSpwanTimerLength: -1,
+    ghostSpawnTimerLength: -1,
     homingGhosts: false,
   ),
   (
@@ -20,7 +20,7 @@ const gameLevels = <GameLevel>[
     maxAllowedDeaths: 3,
     superPelletsEnabled: false,
     multipleSpawningGhosts: true,
-    ghostSpwanTimerLength: 5,
+    ghostSpawnTimerLength: 5,
     homingGhosts: false,
   ),
   (
@@ -28,7 +28,7 @@ const gameLevels = <GameLevel>[
     maxAllowedDeaths: 3,
     superPelletsEnabled: false,
     multipleSpawningGhosts: true,
-    ghostSpwanTimerLength: 3,
+    ghostSpawnTimerLength: 3,
     homingGhosts: false,
   ),
   (
@@ -36,7 +36,7 @@ const gameLevels = <GameLevel>[
     maxAllowedDeaths: 3,
     superPelletsEnabled: false,
     multipleSpawningGhosts: true,
-    ghostSpwanTimerLength: 2,
+    ghostSpawnTimerLength: 2,
     homingGhosts: false,
   ),
   (
@@ -44,7 +44,7 @@ const gameLevels = <GameLevel>[
     maxAllowedDeaths: 3,
     superPelletsEnabled: false,
     multipleSpawningGhosts: true,
-    ghostSpwanTimerLength: 1,
+    ghostSpawnTimerLength: 1,
     homingGhosts: false,
   ),
   (
@@ -52,7 +52,7 @@ const gameLevels = <GameLevel>[
     maxAllowedDeaths: 3,
     superPelletsEnabled: false,
     multipleSpawningGhosts: true,
-    ghostSpwanTimerLength: 5,
+    ghostSpawnTimerLength: 5,
     homingGhosts: true,
   ),
   (
@@ -60,7 +60,7 @@ const gameLevels = <GameLevel>[
     maxAllowedDeaths: 3,
     superPelletsEnabled: false,
     multipleSpawningGhosts: true,
-    ghostSpwanTimerLength: 3,
+    ghostSpawnTimerLength: 3,
     homingGhosts: true,
   ),
   (
@@ -68,7 +68,7 @@ const gameLevels = <GameLevel>[
     maxAllowedDeaths: 3,
     superPelletsEnabled: false,
     multipleSpawningGhosts: true,
-    ghostSpwanTimerLength: 2,
+    ghostSpawnTimerLength: 2,
     homingGhosts: true,
   ),
   (
@@ -76,7 +76,7 @@ const gameLevels = <GameLevel>[
     maxAllowedDeaths: 3,
     superPelletsEnabled: false,
     multipleSpawningGhosts: true,
-    ghostSpwanTimerLength: 1,
+    ghostSpawnTimerLength: 1,
     homingGhosts: true,
   ),
 ];
@@ -86,6 +86,6 @@ typedef GameLevel = ({
   int maxAllowedDeaths,
   bool superPelletsEnabled,
   bool multipleSpawningGhosts,
-  int ghostSpwanTimerLength,
+  int ghostSpawnTimerLength,
   bool homingGhosts,
 });

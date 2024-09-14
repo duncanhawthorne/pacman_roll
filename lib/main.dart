@@ -19,7 +19,7 @@ import 'utils/helper.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  save.fbStart();
+  save.initialize();
 
   fixTitle(Palette.lightBluePMR);
   GoogleFonts.config.allowRuntimeFetching = false;

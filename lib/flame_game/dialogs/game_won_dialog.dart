@@ -87,15 +87,11 @@ Future<String> _scoreboardRankText(
     {required int levelNum,
     required int levelCompletedInMillis,
     required int mazeId}) async {
-  double x = Save.firebaseOn
-      ? (await save.firebasePercentile(
-              levelNum: levelNum,
-              levelCompletedInMillis: levelCompletedInMillis,
-              mazeId: mazeId)) *
-          100.0
-      : 100.0;
-  String y = !Save.firebaseOn
-      ? ""
-      : "Rank: ${x == 0 ? "World Record" : "Top ${x.toStringAsFixed(0)}%"}";
-  return y;
+  if (!Save.firebaseOn) return "";
+  final double percentile = await save.firebasePercentile(
+          levelNum: levelNum,
+          levelCompletedInMillis: levelCompletedInMillis,
+          mazeId: mazeId) *
+      100.0;
+  return "Rank: ${percentile == 0 ? "World Record" : "Top ${percentile.toStringAsFixed(0)}%"}";
 }

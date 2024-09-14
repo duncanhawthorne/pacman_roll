@@ -17,6 +17,7 @@ void fixTitleReal(Color color) {
   }
 }
 
+/*
 void fixTitle1(Color color) {
   //https://github.com/flutter/flutter/issues/98248
   if (true) {
@@ -37,6 +38,7 @@ void fixTitle2() {
     url,
   );
 }
+ */
 
 void fixTitle3() {
   String url = web.window.location.href;

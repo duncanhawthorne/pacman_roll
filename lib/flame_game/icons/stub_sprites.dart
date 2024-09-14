@@ -1,4 +1,3 @@
-import 'dart:core';
 import 'dart:ui';
 
 import 'package:flame/components.dart';
@@ -11,8 +10,7 @@ class StubSprites {
     // need to use recorder else throws error
     // ignore: unused_local_variable
     final canvas = Canvas(recorder);
-    Picture picture = recorder.endRecording();
-    return picture;
+    return recorder.endRecording();
   }
 
   late final _stubSprite = Sprite(_stubRecorder().toImageSync(1, 1));

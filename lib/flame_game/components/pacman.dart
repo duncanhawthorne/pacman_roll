@@ -37,17 +37,18 @@ class Pacman extends GameCharacter with CollisionCallbacks {
       ),
       CharacterState.eating: SpriteAnimation.spriteList(
           await pacmanSprites.pacmanEatingSprites(size),
-          stepTime:
-              _kPacmanHalfEatingResetTimeMillis / 1000 / pacmanEatingHalfFrames,
+          stepTime: _kPacmanHalfEatingResetTimeMillis /
+              1000 /
+              pacmanEatingHalfIncrements,
           loop: false),
       CharacterState.dead: SpriteAnimation.spriteList(
           await pacmanSprites.pacmanDyingSprites(size),
           stepTime:
-              kPacmanDeadResetTimeAnimationMillis / 1000 / pacmanDeadFrames,
+              kPacmanDeadResetTimeAnimationMillis / 1000 / pacmanDeadIncrements,
           loop: false),
       CharacterState.spawning: SpriteAnimation.spriteList(
           await pacmanSprites.pacmanBirthingSprites(size),
-          stepTime: kResetPositionTimeMillis / 1000 / pacmanDeadFrames,
+          stepTime: kResetPositionTimeMillis / 1000 / pacmanDeadIncrements,
           loop: false)
     };
   }

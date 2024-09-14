@@ -23,7 +23,7 @@ import 'pacman_world.dart';
 ///
 /// This class defines a few different properties for the game:
 ///  - That it should have a [FixedResolutionViewport] containing
-///  a square of size [kSquareNotionalSize]
+///  a square of size [kVirtualGameSize]
 ///  this means that even if you resize the window, the square itself will keep
 ///  the defined virtual resolution.
 ///  - That the default world that the camera is looking at should be the
@@ -37,7 +37,7 @@ import 'pacman_world.dart';
 // but reduces chance of hitting maximum allowed speed
 const flameGameZoom = 30.0;
 const _visualZoomMultiplier = 0.92;
-const double kSquareNotionalSize = 1700; //determines speed of game
+const double kVirtualGameSize = 1700; //determines speed of game
 
 class PacmanGame extends Forge2DGame<PacmanWorld>
     with HasCollisionDetection, HasTimeScale {
@@ -50,8 +50,8 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   }) : super(
           world: PacmanWorld(level: level, playerProgress: playerProgress),
           camera: CameraComponent.withFixedResolution(
-              width: kSquareNotionalSize,
-              height: kSquareNotionalSize), //2800, 1700 //CameraComponent(),//
+              width: kVirtualGameSize,
+              height: kVirtualGameSize), //2800, 1700 //CameraComponent(),//
           zoom: flameGameZoom * _visualZoomMultiplier,
         ) {
     _setMazeId(mazeId);
@@ -63,16 +63,17 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   final AudioController audioController;
   final AppLifecycleStateNotifier appLifecycleStateNotifier;
 
-  void _setMazeId(id) {
+  void _setMazeId(int id) {
     maze.mazeId = id;
   }
 
   String _userString = "";
 
+  static const deathPenaltyMillis = 5000;
   Timer stopwatch = Timer(double.infinity);
   int get stopwatchMilliSeconds =>
       (stopwatch.current * 1000).toInt() +
-      world.pacmans.numberOfDeathsNotifier.value * 5000;
+      world.pacmans.numberOfDeathsNotifier.value * deathPenaltyMillis;
   bool get levelStarted => stopwatchMilliSeconds > 0;
 
   bool get isGameLive =>
@@ -87,14 +88,13 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   Color backgroundColor() => Palette.flameGameBackground.color;
 
   Map<String, dynamic> _getCurrentGameState() {
-    Map<String, dynamic> gameTmp = {};
-    gameTmp = {};
-    gameTmp["userString"] = _userString;
-    gameTmp["levelNum"] = level.number;
-    gameTmp["levelCompleteTime"] = stopwatchMilliSeconds;
-    gameTmp["dateTime"] = DateTime.now().millisecondsSinceEpoch;
-    gameTmp["mazeId"] = maze.mazeId;
-    return gameTmp;
+    final Map<String, dynamic> gameStateTmp = {};
+    gameStateTmp["userString"] = _userString;
+    gameStateTmp["levelNum"] = level.number;
+    gameStateTmp["levelCompleteTime"] = stopwatchMilliSeconds;
+    gameStateTmp["dateTime"] = DateTime.now().millisecondsSinceEpoch;
+    gameStateTmp["mazeId"] = maze.mazeId;
+    return gameStateTmp;
   }
 
   void pauseGame() {
@@ -253,25 +253,21 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
     super.update(dt);
   }
 
-  void _end() {
-    audioController.stopAllSfx();
-  }
-
   @override
   Future<void> onRemove() async {
     _cleanOverlaysAndDialogs();
     setStatusBarColor(Palette.mainBackground.color);
     fixTitle(Palette.lightBluePMR);
-    _end();
+    audioController.stopAllSfx();
     super.onRemove();
   }
 }
 
 Vector2 _sanitizeScreenSize(Vector2 size) {
   if (size.x > size.y) {
-    return Vector2(kSquareNotionalSize * size.x / size.y, kSquareNotionalSize);
+    return Vector2(kVirtualGameSize * size.x / size.y, kVirtualGameSize);
   } else {
-    return Vector2(kSquareNotionalSize, kSquareNotionalSize * size.y / size.x);
+    return Vector2(kVirtualGameSize, kVirtualGameSize * size.y / size.x);
   }
 }
 

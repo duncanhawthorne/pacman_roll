@@ -7,13 +7,15 @@ import '../pacman_world.dart';
 class Pellet extends CircleComponent
     with HasWorldReference<PacmanWorld>, IgnoreEvents {
   Pellet(
-      {required super.position, double radiusFactor = 1, this.hitBoxFactor = 1})
+      {required super.position,
+      double radiusFactor = 1,
+      this.hitBoxRadiusFactor = 1})
       : super(
             radius:
                 maze.spriteWidth / 2 * Maze.pelletScaleFactor * radiusFactor,
             anchor: Anchor.center);
 
-  double hitBoxFactor;
+  double hitBoxRadiusFactor;
 
   @override
   Future<void> onLoad() async {
@@ -21,7 +23,7 @@ class Pellet extends CircleComponent
     add(CircleHitbox(
       isSolid: true,
       collisionType: CollisionType.passive,
-      radius: radius * hitBoxFactor,
+      radius: radius * hitBoxRadiusFactor,
       position: Vector2.all(radius),
       anchor: Anchor.center,
     ));

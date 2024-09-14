@@ -16,8 +16,8 @@ final Paint _blueMazePaint = Paint()
 //..isAntiAlias = false
   ..color = Palette.blueMaze;
 
-class MazeWallSquareVisual extends RectangleComponent with IgnoreEvents {
-  MazeWallSquareVisual(
+class MazeWallRectangleVisual extends RectangleComponent with IgnoreEvents {
+  MazeWallRectangleVisual(
       {required super.position, required width, required height})
       : super(
             size: Vector2(width, height),
@@ -25,7 +25,7 @@ class MazeWallSquareVisual extends RectangleComponent with IgnoreEvents {
             paint: _blackBackgroundPaint);
 }
 
-class MazeVisualBlockingBar extends MazeWallSquareVisual {
+class MazeVisualBlockingBar extends MazeWallRectangleVisual {
   MazeVisualBlockingBar(
       {required super.position, required super.width, required super.height});
   @override

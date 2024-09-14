@@ -75,7 +75,7 @@ class Ghosts extends WrapperNoEvents
 
   void _addThreeGhosts() {
     for (int i = 0; i < 3; i++) {
-      add(Ghost(idNum: i));
+      add(Ghost(ghostID: i));
     }
   }
 
@@ -98,9 +98,9 @@ class Ghosts extends WrapperNoEvents
       return; //else cant use game references
     }
     ghostSpawner ??= SpawnComponent(
-      factory: (i) => Ghost(idNum: [3, 4, 5][game.random.nextInt(3)]),
+      factory: (i) => Ghost(ghostID: [3, 4, 5][game.random.nextInt(3)]),
       selfPositioning: true,
-      period: world.level.ghostSpwanTimerLength.toDouble(),
+      period: world.level.ghostSpawnTimerLength.toDouble(),
     );
     if (game.level.multipleSpawningGhosts &&
         !ghostSpawner!.isMounted &&
@@ -115,7 +115,7 @@ class Ghosts extends WrapperNoEvents
     }
   }
 
-  void _trimAllGhosts() {
+  void _removeAllGhosts() {
     for (Ghost ghost in ghostList) {
       ghost.removeFromParent();
     }
@@ -132,7 +132,7 @@ class Ghosts extends WrapperNoEvents
   void resetAfterGameWin() {
     current = CharacterState.normal;
     ghostsScaredTimer.pause(); //makes update function for timer free
-    _trimAllGhosts();
+    _removeAllGhosts();
   }
 
   void resetSlideAfterPacmanDeath() {
@@ -147,7 +147,7 @@ class Ghosts extends WrapperNoEvents
     current = CharacterState.normal;
     ghostsScaredTimer.pause(); //makes update function for timer free
     if (game.level.multipleSpawningGhosts) {
-      _trimAllGhosts();
+      _removeAllGhosts();
       _addThreeGhosts();
     } else {
       for (Ghost ghost in ghostList) {
@@ -157,10 +157,12 @@ class Ghosts extends WrapperNoEvents
     }
   }
 
+  static const double scaredToScaredIshThreshold = 2 / 3;
   void _stateSequence(double dt) {
     ghostsScaredTimer.update(dt);
     if (current == CharacterState.scared) {
-      if (ghostsScaredTimer.current > 2 / 3 * ghostsScaredTimer.limit) {
+      if (ghostsScaredTimer.current >
+          scaredToScaredIshThreshold * ghostsScaredTimer.limit) {
         current = CharacterState.scaredIsh;
         for (Ghost ghost in ghostList) {
           ghost.setScaredToScaredIsh();
@@ -184,7 +186,7 @@ class Ghosts extends WrapperNoEvents
     _cancelSirenVolumeUpdatedTimer;
     current = CharacterState.normal;
     ghostsScaredTimer.pause(); //makes update function for timer free
-    _trimAllGhosts();
+    _removeAllGhosts();
     _addThreeGhosts();
   }
 

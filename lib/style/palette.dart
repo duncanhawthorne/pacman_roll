@@ -23,6 +23,7 @@ class Palette {
   static const mainBackground = PaletteEntry(black); //0xffa2fff3
   static const mainContrast = PaletteEntry(white);
   static const backgroundLevelSelection = PaletteEntry(Color(0xffffcd75));
+  static const yellowPacman = Colors.yellowAccent;
 
   static const playSessionBackground = PaletteEntry(black); //0xffa2fff3
 

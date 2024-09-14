@@ -23,8 +23,7 @@ class PelletWrapper extends WrapperNoEvents
     if (children.isNotEmpty) {
       removeAll(children);
     }
-    addAll(maze.pellets(
-        pelletsRemainingNotifier, world.level.superPelletsEnabled));
+    addAll(maze.pellets(world.level.superPelletsEnabled));
   }
 
   @override

@@ -1,9 +1,7 @@
 import 'dart:async';
 
 import 'package:flame/components.dart';
-import 'package:flutter/material.dart';
 
-import '../../style/palette.dart';
 import '../game_screen.dart';
 import '../pacman_game.dart';
 import '../pacman_world.dart';
@@ -15,24 +13,15 @@ class TutorialWrapper extends WrapperNoEvents
   final priority = 100;
 
   bool _tutorialEverManuallyHidden = false;
-
-  final tutorialComponent = TextComponent(
-      text: '←←←←←←←←\n↓      ↑\n↓ Drag ↑\n↓      ↑\n→→→→→→→→',
-      position: Vector2.zero(),
-      anchor: Anchor.center,
-      textRenderer: _tutorialTextRenderer,
-      key: ComponentKey.named('tutorial'),
-      priority: 100);
+  static const tutorialDelay = Duration(milliseconds: 3000);
 
   @override
   void start() {
-    Future.delayed(const Duration(milliseconds: 3000), () {
+    Future.delayed(tutorialDelay, () {
       if (!game.levelStarted &&
           !_tutorialEverManuallyHidden &&
-          game.findByKey(ComponentKey.named('tutorial')) == null &&
           world.level.number == 1) {
         //if user hasn't worked out how to start by now, give a prompt
-        //add(tutorialComponent);
         game.overlays.add(GameScreen.tutorialDialogKey);
       }
     });
@@ -40,7 +29,6 @@ class TutorialWrapper extends WrapperNoEvents
 
   void hide() {
     if (!_tutorialEverManuallyHidden && isMounted) {
-      //tutorialComponent.removeFromParent();
       game.overlays.remove(GameScreen.tutorialDialogKey);
       _tutorialEverManuallyHidden = true;
     }
@@ -48,7 +36,6 @@ class TutorialWrapper extends WrapperNoEvents
 
   @override
   void reset() {
-    //tutorialComponent.removeFromParent();
     game.overlays.remove(GameScreen.tutorialDialogKey);
   }
 
@@ -58,12 +45,3 @@ class TutorialWrapper extends WrapperNoEvents
     reset();
   }
 }
-
-final TextPaint _tutorialTextRenderer = TextPaint(
-  style: const TextStyle(
-    backgroundColor: Palette.blueMaze,
-    fontSize: 3,
-    color: Palette.playSessionContrast,
-    fontFamily: 'Press Start 2P',
-  ),
-);

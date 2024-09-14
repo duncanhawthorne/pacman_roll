@@ -1,16 +1,11 @@
-// ignore_for_file: unused_import
-
 import 'package:elapsed_time_display/elapsed_time_display.dart';
-import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../settings/settings.dart';
 import '../game_screen.dart';
 import '../icons/pacman_icons.dart';
 import '../pacman_game.dart';
-import '../pacman_world.dart';
 
 Widget topLeftOverlayWidget(BuildContext context, PacmanGame game) {
   final settingsController = context.watch<SettingsController>();

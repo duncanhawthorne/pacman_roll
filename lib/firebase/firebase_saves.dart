@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 
@@ -16,9 +14,7 @@ class Save {
 
   FirebaseFirestore? db;
 
-  Random random = Random();
-
-  void fbStart() async {
+  void initialize() async {
     if (firebaseOn) {
       await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,

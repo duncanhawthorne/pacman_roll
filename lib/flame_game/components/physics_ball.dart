@@ -5,6 +5,7 @@ import '../maze.dart';
 
 const _useForgePhysicsBallRotation = false;
 const _instantSetPosition = true;
+const _radiusScaleFactor = 0.99;
 
 class PhysicsBall extends BodyComponent with IgnoreEvents {
   PhysicsBall({
@@ -14,7 +15,8 @@ class PhysicsBall extends BodyComponent with IgnoreEvents {
             fixtureDefs: [
               FixtureDef(
                 CircleShape()
-                  ..radius = radius ?? maze.spriteWidth / 2 * 0.99, //0.95
+                  ..radius =
+                      radius ?? maze.spriteWidth / 2 * _radiusScaleFactor,
                 restitution: 0.0,
                 friction: _useForgePhysicsBallRotation ? 1 : 0,
                 userData: PhysicsBall,
