@@ -7,7 +7,7 @@ import '../audio/audio_controller.dart';
 import '../level_selection/levels.dart';
 import '../player_progress/player_progress.dart';
 import '../style/palette.dart';
-import '../utils/helper.dart';
+import '../utils/src/workarounds.dart';
 import 'dialogs/game_lose_dialog.dart';
 import 'dialogs/game_overlays.dart';
 import 'dialogs/game_start_dialog.dart';

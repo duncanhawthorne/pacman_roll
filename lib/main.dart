@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:nes_ui/nes_ui.dart';
+import 'utils/src/workarounds.dart';
 import 'package:provider/provider.dart';
 
 import 'app_lifecycle/app_lifecycle.dart';
@@ -13,7 +14,6 @@ import 'router.dart';
 import 'settings/settings.dart';
 import 'style/palette.dart';
 import 'utils/constants.dart';
-import 'utils/helper.dart';
 //firebase_options.dart as per direct download from google, not included in repo
 
 void main() async {
@@ -26,6 +26,9 @@ void main() async {
 
   FlutterNativeSplash.remove();
   await Flame.device.fullScreen();
+
+  fixTitlePerm();
+
   runApp(const MyGame());
 }
 
