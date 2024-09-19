@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 
+import '../level_selection/levels.dart';
 import 'persistence/local_storage_player_progress_persistence.dart';
 import 'persistence/player_progress_persistence.dart';
 
@@ -25,7 +26,7 @@ class PlayerProgress extends ChangeNotifier {
   Map<int, int> get levels => _levelsFinished;
 
   int get maxLevelCompleted =>
-      levels.isEmpty ? 0 : levels.keys.toList().reduce(max);
+      levels.isEmpty ? tutorialLevelNum - 1 : levels.keys.toList().reduce(max);
 
   /// Fetches the latest data from the backing persistence store.
   Future<void> _getLatestFromStore() async {

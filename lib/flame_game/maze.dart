@@ -8,7 +8,7 @@ import 'components/super_pellet.dart';
 import 'components/wall.dart';
 import 'pacman_game.dart';
 
-final List<String> mazeNames = ["A", "B", "C"];
+final Map<int, String> mazeNames = {-1: "T", 0: "A", 1: "B", 2: "C"};
 const _bufferColumns = 2;
 
 class Maze {
@@ -41,11 +41,12 @@ class Maze {
     }
   }
 
-  final List _decodedMazeList = [
-    _decodeMazeLayout(_mazeP1Layout),
-    _decodeMazeLayout(_mazeMP4Layout),
-    _decodeMazeLayout(_mazeMP1Layout)
-  ];
+  final Map<int, List> _decodedMazeList = {
+    -1: _decodeMazeLayout(_mazeTutorialLayout),
+    0: _decodeMazeLayout(_mazeP1Layout),
+    1: _decodeMazeLayout(_mazeMP4Layout),
+    2: _decodeMazeLayout(_mazeMP1Layout)
+  };
 
   get _mazeLayout => _decodedMazeList[mazeId];
 
@@ -389,6 +390,41 @@ class Maze {
     '4100000000000000000000000000014',
     '4111111111111111111111111111114'
   ];
+
+  static const _mazeTutorialLayout = [
+    '4111111111111111111111111111114',
+    '4100000444444441444444440000014',
+    '4100000444444441444444440000014',
+    '4133111441111441441111441113314',
+    '4100111441111441441111441110014',
+    '4144444444444000004444444444414',
+    '4144444444444000004444444444414',
+    '4144111441441111111441441114414',
+    '4144444441444441444441444444414',
+    '4144444441444441444441444444414',
+    '4111111001111441441111001111114',
+    '4444441001444447444441001444444',
+    '4444441001444444444441001444444',
+    '1111111001441111111441001111111',
+    '4444444004441229221444004444444',
+    '4444444004441222221444004444444',
+    '1111111001441111111441001111111',
+    '4444441001444444444441001444444',
+    '4444441001444444444441001444444',
+    '4111111001441111111441001111114',
+    '4100000444444441444444440000014',
+    '4100000444444441444444440000014',
+    '4133111441111441441111441113314',
+    '4100001444444448444444441000014',
+    '4100001444444444444444441000014',
+    '4111441441441111111441441441114',
+    '4144444441444441444441444444414',
+    '4144444441444441444441444444414',
+    '4144111111111441441111111114414',
+    '4100000000000000000000000000014',
+    '4100000000000000000000000000014',
+    '4111111111111111111111111111114'
+  ];
 }
 
 List<List<String>> _decodeMazeLayout(List<String> encodedMazeLayout) {
@@ -398,5 +434,12 @@ List<List<String>> _decodeMazeLayout(List<String> encodedMazeLayout) {
   }
   return result;
 }
+
+bool isTutorialMaze(int mazeId) {
+  return mazeId == tutorialMazeId;
+}
+
+const tutorialMazeId = -1;
+const defaultMazeId = 0;
 
 Maze maze = Maze(mazeId: 0);

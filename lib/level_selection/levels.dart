@@ -1,5 +1,13 @@
 const gameLevels = <GameLevel>[
   (
+    number: 0,
+    maxAllowedDeaths: 5,
+    superPelletsEnabled: true,
+    multipleSpawningGhosts: false,
+    ghostSpawnTimerLength: -1,
+    homingGhosts: false,
+  ),
+  (
     number: 1,
     maxAllowedDeaths: 3,
     superPelletsEnabled: true,
@@ -89,3 +97,20 @@ typedef GameLevel = ({
   int ghostSpawnTimerLength,
   bool homingGhosts,
 });
+
+GameLevel levelSelect(int levelNum) {
+  return gameLevels.firstWhere((level) => level.number == levelNum,
+      orElse: () =>
+          gameLevels.firstWhere((level) => level.number == defaultLevelNum));
+}
+
+bool isTutorialLevel(GameLevel level) {
+  return level.number == tutorialLevelNum;
+}
+
+int maxLevel() {
+  return gameLevels.last.number;
+}
+
+const defaultLevelNum = 1;
+const tutorialLevelNum = 0;

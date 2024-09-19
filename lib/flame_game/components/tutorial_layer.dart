@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flame/components.dart';
 
+import '../../level_selection/levels.dart';
 import '../game_screen.dart';
 import '../pacman_game.dart';
 import '../pacman_world.dart';
@@ -20,7 +21,7 @@ class TutorialWrapper extends WrapperNoEvents
     Future.delayed(tutorialDelay, () {
       if (!game.levelStarted &&
           !_tutorialEverManuallyHidden &&
-          world.level.number == 1) {
+          isTutorialLevel(world.level)) {
         //if user hasn't worked out how to start by now, give a prompt
         game.overlays.add(GameScreen.tutorialDialogKey);
       }
