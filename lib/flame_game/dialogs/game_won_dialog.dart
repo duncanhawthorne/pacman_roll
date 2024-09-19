@@ -40,7 +40,7 @@ class GameWonDialog extends StatelessWidget {
             style: textStyleBody,
           ),
         ),
-        !Save.firebaseOn
+        !Save.firebaseOn || isTutorialLevel(game.level)
             ? const SizedBox.shrink()
             : bodyWidget(
                 child: FutureBuilder(

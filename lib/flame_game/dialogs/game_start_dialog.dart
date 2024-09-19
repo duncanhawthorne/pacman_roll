@@ -77,6 +77,7 @@ class StartDialog extends StatelessWidget {
 const double width = 40; //70;
 Widget levelSelector(BuildContext context, PacmanGame game) {
   int maxLevelToShowCache = maxLevelToShow(game);
+  // ignore: dead_code
   bool showText = false && maxLevelToShowCache <= 2;
   return bodyWidget(
     child: Column(
@@ -85,6 +86,7 @@ Widget levelSelector(BuildContext context, PacmanGame game) {
           children: [
             !showText
                 ? const SizedBox.shrink()
+                // ignore: dead_code
                 : Padding(
                     padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
                     child: Text('Level:', style: textStyleBody),
@@ -139,6 +141,7 @@ Widget levelButtonSingle(BuildContext context, PacmanGame game, int levelNum) {
 
 Widget mazeSelector(BuildContext context, PacmanGame game) {
   int maxLevelToShowCache = maxLevelToShow(game);
+  // ignore: dead_code
   bool showText = false && maxLevelToShowCache <= 2;
   return maxLevelToShowCache == 1 ||
           isTutorialLevel(levelSelect(game.level.number))
@@ -150,6 +153,7 @@ Widget mazeSelector(BuildContext context, PacmanGame game) {
                 children: [
                   !showText
                       ? const SizedBox.shrink()
+                      // ignore: dead_code
                       : Padding(
                           padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
                           child: Text('Maze:', style: textStyleBody),
