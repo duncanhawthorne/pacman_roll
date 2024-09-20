@@ -1,10 +1,7 @@
-import 'dart:ui';
-
+// ignore: dangling_library_doc_comments
 /// This file runs on non-web platforms and has no effect
 
 void titleFixPermReal() {}
-
-void fixTitleReal(Color color) {}
 
 double gestureInsetReal() {
   return 0;

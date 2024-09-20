@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 // ignore: depend_on_referenced_packages
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 // ignore: depend_on_referenced_packages
@@ -34,46 +33,6 @@ class CustomPathStrategy extends PathUrlStrategy {
     final pageTitle = title == "flutter" ? appTitle : title;
     super.pushState(state, pageTitle, url);
   }
-}
-
-void fixTitleReal(Color color) {
-  if (isiOSMobile) {
-    //fixTitle1(color);
-    //fixTitle2();
-    fixTitle3();
-  }
-}
-
-/*
-void fixTitle1(Color color) {
-  //https://github.com/flutter/flutter/issues/98248
-  if (true) {
-    SystemChrome.setApplicationSwitcherDescription(ApplicationSwitcherDescription(
-        label: appTitle,
-        primaryColor: color
-            .value //Theme.of(context).primaryColor.value, // This line is required
-        ));
-  }
-}
-
-void fixTitle2() {
-  String url = web.window.location.href;
-  web.window.history.replaceState(
-    //or pushState
-    web.window.history.state, // Note that we don't change the historyState
-    appTitle,
-    url,
-  );
-}
- */
-
-void fixTitle3() {
-  String url = web.window.location.href;
-  web.window.history.pushState(
-    web.window.history.state, // Note that we don't change the historyState
-    appTitle,
-    url,
-  );
 }
 
 final isPwa =

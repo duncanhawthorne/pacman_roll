@@ -66,7 +66,7 @@ class PacmanPainter extends CustomPainter {
         tau / 2 + tau * ((mouthWidth / 2) + 0.5),
         tau * (1 - mouthWidth),
         true,
-        yellowPacmanPaint);
+        pacmanPaint);
   }
 
   @override
@@ -113,7 +113,7 @@ class PacmanPainterDirect extends CustomPainter {
     double mouthWidth = mouthDouble / pacmanCircleIncrements;
     mouthWidth = mouthWidth.clamp(0, 1);
     canvas.drawArc(_pacmanRectStatusBar, tau * ((mouthWidth / 2) + 0.5),
-        tau * (1 - mouthWidth), true, yellowPacmanPaint);
+        tau * (1 - mouthWidth), true, pacmanPaint);
   }
 
   @override

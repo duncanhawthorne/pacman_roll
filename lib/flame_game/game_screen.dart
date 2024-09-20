@@ -42,7 +42,7 @@ class GameScreen extends StatelessWidget {
     return PopScope(
       canPop: false,
       child: Container(
-        decoration: BoxDecoration(color: Palette.flameGameBackground.color),
+        decoration: BoxDecoration(color: Palette.background.color),
         child: SafeArea(
           child: Padding(
             padding: EdgeInsets.only(bottom: gestureInset()),

@@ -10,9 +10,9 @@ Widget popupDialog({required List<Widget> children}) {
         padding: const EdgeInsets.all(75.0),
         child: Container(
           decoration: BoxDecoration(
-              border: Border.all(color: Palette.borderColor.color, width: 3),
+              border: Border.all(color: Palette.seed.color, width: 3),
               borderRadius: BorderRadius.circular(10),
-              color: Palette.playSessionBackground.color),
+              color: Palette.background.color),
           child: Padding(
               padding: const EdgeInsets.fromLTRB(40.0, 4, 40, 4),
               child: Column(
@@ -61,14 +61,14 @@ Widget bottomRowWidget({required List<Widget> children}) {
 TextStyle textStyleHeading =
     const TextStyle(fontFamily: 'Press Start 2P', fontSize: 28);
 
-TextStyle textStyleBody = const TextStyle(
-    fontFamily: 'Press Start 2P', color: Palette.playSessionContrast);
+TextStyle textStyleBody =
+    const TextStyle(fontFamily: 'Press Start 2P', color: Palette.textColor);
 
-TextStyle textStyleBodyDull = const TextStyle(
-    fontFamily: 'Press Start 2P', color: Palette.playSessionDull);
+TextStyle textStyleBodyDull =
+    const TextStyle(fontFamily: 'Press Start 2P', color: Palette.dullColor);
 
 ButtonStyle buttonStyle(
-    {Color borderColor = Palette.blueMaze, bool small = false}) {
+    {Color borderColor = Palette.seedColor, bool small = false}) {
   return TextButton.styleFrom(
     minimumSize: Size.zero,
     padding: EdgeInsets.all(small ? 16 : 24),

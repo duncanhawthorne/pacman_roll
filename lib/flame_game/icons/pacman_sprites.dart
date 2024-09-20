@@ -14,8 +14,7 @@ const int pacmanCircleIncrements = 64;
 const int pacmanMouthWidthDefault = pacmanCircleIncrements ~/ 4;
 const int pacmanDeadIncrements = (pacmanCircleIncrements * 3) ~/ 4;
 const int pacmanEatingHalfIncrements = (pacmanCircleIncrements * 1) ~/ 4;
-final Paint yellowPacmanPaint = Paint()
-  ..color = Palette.yellowPacman; //blue; //yellowAccent;
+final Paint pacmanPaint = Paint()..color = Palette.pacman.color;
 const _loadFromFile = false;
 
 class PacmanSprites {
@@ -39,7 +38,7 @@ class PacmanSprites {
         width: size.toDouble(),
         height: size.toDouble());
     canvas.drawArc(rect, tau / 2 + tau * ((mouthWidth / 2) + 0.5),
-        tau * (1 - mouthWidth), true, yellowPacmanPaint);
+        tau * (1 - mouthWidth), true, pacmanPaint);
     Picture picture = recorder.endRecording();
     return picture;
   }

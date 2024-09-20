@@ -85,7 +85,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   final Random random = Random();
 
   @override
-  Color backgroundColor() => Palette.flameGameBackground.color;
+  Color backgroundColor() => Palette.background.color;
 
   Map<String, dynamic> _getCurrentGameState() {
     final Map<String, dynamic> gameStateTmp = {};
@@ -227,11 +227,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   }
 
   void _bugFixes() {
-    setStatusBarColor(Palette.flameGameBackground.color);
-    fixTitle(Palette.black);
-    Future.delayed(const Duration(seconds: 1), () {
-      fixTitle(Palette.black);
-    });
+    setStatusBarColor(Palette.background.color);
   }
 
   /// In the [onLoad] method you load different type of assets and set things
@@ -256,8 +252,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   @override
   Future<void> onRemove() async {
     _cleanOverlaysAndDialogs();
-    setStatusBarColor(Palette.mainBackground.color);
-    fixTitle(Palette.lightBluePMR);
+    setStatusBarColor(Palette.background.color);
     audioController.stopAllSfx();
     super.onRemove();
   }
