@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../settings/settings.dart';
+import '../../style/palette.dart';
 import '../game_screen.dart';
 import '../icons/pacman_icons.dart';
 import '../pacman_game.dart';
@@ -21,10 +22,10 @@ Widget topLeftOverlayWidget(BuildContext context, PacmanGame game) {
           onPressed: () {
             game.overlays.add(GameScreen.startDialogKey);
           },
-          icon: const Icon(Icons.menu, color: Colors.white),
+          icon: const Icon(Icons.menu, color: Palette.textColor),
         ),
         const SizedBox(width: 20 * statusWidgetHeightFactor, height: 1),
-        audioOnOffButton(settingsController, color: Colors.white),
+        audioOnOffButton(settingsController, color: Palette.textColor),
       ],
     ),
   );
@@ -64,7 +65,7 @@ Widget topRightOverlayWidget(BuildContext context, PacmanGame game) {
               interval: const Duration(milliseconds: 100),
               style: const TextStyle(
                   fontSize: 18 * statusWidgetHeightFactor,
-                  color: Colors.white,
+                  color: Palette.textColor,
                   fontFamily: 'Press Start 2P'),
               formatter: (elapsedTime) {
                 return (game.stopwatchMilliSeconds / 1000)
