@@ -110,6 +110,9 @@ class Ghosts extends WrapperNoEvents
   }
 
   void removeSpawner() {
+    if (!isMounted) {
+      return; //else cant use game references
+    }
     if (world.level.multipleSpawningGhosts) {
       ghostSpawner?.removeFromParent();
     }
