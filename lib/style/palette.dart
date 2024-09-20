@@ -24,5 +24,3 @@ class Palette {
   static const _white = Color(0xffffffff);
   static const _grey = Colors.grey;
 }
-
-class ColorsP {}
