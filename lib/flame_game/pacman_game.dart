@@ -155,13 +155,11 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   }
 
   void _addOverlays() {
-    overlays.add(GameScreen.topLeftOverlayKey);
-    overlays.add(GameScreen.topRightOverlayKey);
+    overlays.add(GameScreen.topOverlayKey);
   }
 
   void _cleanOverlaysAndDialogs() {
-    overlays.remove(GameScreen.topLeftOverlayKey);
-    overlays.remove(GameScreen.topRightOverlayKey);
+    overlays.remove(GameScreen.topOverlayKey);
     overlays.remove(GameScreen.startDialogKey);
     overlays.remove(GameScreen.loseDialogKey);
     overlays.remove(GameScreen.wonDialogKey);
@@ -252,7 +250,6 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   @override
   Future<void> onRemove() async {
     _cleanOverlaysAndDialogs();
-    setStatusBarColor(Palette.background.color);
     audioController.stopAllSfx();
     super.onRemove();
   }

@@ -8,71 +8,23 @@ import '../game_screen.dart';
 import '../icons/pacman_icons.dart';
 import '../pacman_game.dart';
 
-Widget topLeftOverlayWidget(BuildContext context, PacmanGame game) {
-  final settingsController = context.watch<SettingsController>();
-  return Positioned(
-    top: 20,
-    left: 25, //30
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        IconButton(
-          onPressed: () {
-            game.overlays.add(GameScreen.startDialogKey);
-          },
-          icon: const Icon(Icons.menu, color: Palette.textColor),
-        ),
-        const SizedBox(width: 20 * statusWidgetHeightFactor, height: 1),
-        audioOnOffButton(settingsController, color: Palette.textColor),
-      ],
-    ),
-  );
-}
+const double _statusWidgetHeightFactor = 1.0;
+const _widgetSpacing = 15 * _statusWidgetHeightFactor;
+const _pacmanSpacing = 6 * _statusWidgetHeightFactor;
+const _fontSize = 15 * _statusWidgetHeightFactor;
+const pacmanIconSize = 21 * _statusWidgetHeightFactor;
 
-Widget topRightOverlayWidget(BuildContext context, PacmanGame game) {
-  return Positioned(
-    top: 27,
-    right: 30,
-    child: Container(
-      height: statusWidgetHeight.toDouble(),
-      alignment: Alignment.center,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
+Widget topOverlayWidget(BuildContext context, PacmanGame game) {
+  return Center(
+    child: Padding(
+      padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          ValueListenableBuilder<int>(
-            valueListenable: game.world.pacmans.numberOfDeathsNotifier,
-            builder: (BuildContext context, int value, Widget? child) {
-              return Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: List.generate(
-                      game.level.maxAllowedDeaths,
-                      (index) => Padding(
-                          padding: const EdgeInsets.fromLTRB(
-                              4 * statusWidgetHeightFactor,
-                              0,
-                              4 * statusWidgetHeightFactor,
-                              0),
-                          child: animatedPacmanIcon(game, index))));
-            },
-          ),
-          const SizedBox(width: 20 * statusWidgetHeightFactor, height: 1),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(0, 3, 0, 0),
-            child: ElapsedTimeDisplay(
-              startTime: DateTime.now(), //actually ignored
-              interval: const Duration(milliseconds: 100),
-              style: const TextStyle(
-                  fontSize: 18 * statusWidgetHeightFactor,
-                  color: Palette.textColor,
-                  fontFamily: 'Press Start 2P'),
-              formatter: (elapsedTime) {
-                return (game.stopwatchMilliSeconds / 1000)
-                    .toStringAsFixed(1)
-                    .padLeft(4, " ");
-              },
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [topLeft(context, game), topRight(context, game)],
           ),
         ],
       ),
@@ -80,7 +32,73 @@ Widget topRightOverlayWidget(BuildContext context, PacmanGame game) {
   );
 }
 
-Widget audioOnOffButton(settingsController, {Color? color}) {
+Widget topLeft(BuildContext context, PacmanGame game) {
+  return Row(
+    crossAxisAlignment: CrossAxisAlignment.center,
+    mainAxisAlignment: MainAxisAlignment.start,
+    mainAxisSize: MainAxisSize.min,
+    spacing: _widgetSpacing,
+    children: [
+      mainMenuButtonWidget(context, game),
+      audioOnOffButtonWidget(context, game),
+    ],
+  );
+}
+
+Widget topRight(BuildContext context, PacmanGame game) {
+  return Row(
+    crossAxisAlignment: CrossAxisAlignment.center,
+    mainAxisAlignment: MainAxisAlignment.end,
+    mainAxisSize: MainAxisSize.min,
+    spacing: _widgetSpacing,
+    children: [
+      livesWidget(context, game),
+      clockWidget(game),
+    ],
+  );
+}
+
+Widget mainMenuButtonWidget(BuildContext context, PacmanGame game) {
+  return IconButton(
+    onPressed: () {
+      game.overlays.add(GameScreen.startDialogKey);
+    },
+    icon: const Icon(Icons.menu, color: Palette.textColor),
+  );
+}
+
+Widget livesWidget(BuildContext context, PacmanGame game) {
+  return ValueListenableBuilder<int>(
+    valueListenable: game.world.pacmans.numberOfDeathsNotifier,
+    builder: (BuildContext context, int value, Widget? child) {
+      return Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          spacing: _pacmanSpacing,
+          children: List.generate(game.level.maxAllowedDeaths,
+              (index) => animatedPacmanIcon(game, index)));
+    },
+  );
+}
+
+Widget clockWidget(PacmanGame game) {
+  return ElapsedTimeDisplay(
+    startTime: DateTime.now(), //actually ignored
+    interval: const Duration(milliseconds: 100),
+    style: const TextStyle(
+        fontSize: _fontSize,
+        color: Palette.textColor,
+        fontFamily: 'Press Start 2P'),
+    formatter: (elapsedTime) {
+      return (game.stopwatchMilliSeconds / 1000)
+          .toStringAsFixed(1)
+          .padLeft(4, " ");
+    },
+  );
+}
+
+Widget audioOnOffButtonWidget(BuildContext context, PacmanGame game) {
+  const color = Palette.textColor;
+  final settingsController = context.watch<SettingsController>();
   return ValueListenableBuilder<bool>(
     valueListenable: settingsController.audioOn,
     builder: (context, audioOn, child) {

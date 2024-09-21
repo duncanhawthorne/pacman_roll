@@ -21,9 +21,6 @@ import 'pacman_game.dart';
 /// the gets the [AudioController] from the context and passes it in to the
 /// [PacmanGame] class so that it can play audio.
 
-const double statusWidgetHeightFactor = 0.75;
-const statusWidgetHeight = 30;
-
 class GameScreen extends StatelessWidget {
   const GameScreen({required this.level, required this.mazeId, super.key});
 
@@ -34,8 +31,7 @@ class GameScreen extends StatelessWidget {
   static const String wonDialogKey = 'won_dialog';
   static const String startDialogKey = 'start_dialog';
   static const String tutorialDialogKey = 'tutorial_dialog';
-  static const String topLeftOverlayKey = 'top_left_overlay';
-  static const String topRightOverlayKey = 'top_right_overlay';
+  static const String topOverlayKey = 'top_overlay';
 
   @override
   Widget build(BuildContext context) {
@@ -58,11 +54,8 @@ class GameScreen extends StatelessWidget {
                     context.read<AppLifecycleStateNotifier>(),
               ),
               overlayBuilderMap: {
-                topLeftOverlayKey: (BuildContext context, PacmanGame game) {
-                  return topLeftOverlayWidget(context, game);
-                },
-                topRightOverlayKey: (BuildContext context, PacmanGame game) {
-                  return topRightOverlayWidget(context, game);
+                topOverlayKey: (BuildContext context, PacmanGame game) {
+                  return topOverlayWidget(context, game);
                 },
                 loseDialogKey: (BuildContext context, PacmanGame game) {
                   return GameLoseDialog(

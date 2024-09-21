@@ -1,7 +1,7 @@
 import 'package:flame/geometry.dart';
 import 'package:flutter/material.dart';
 
-import '../game_screen.dart';
+import '../dialogs/game_overlays.dart';
 import '../pacman_game.dart';
 import 'pacman_sprites.dart';
 
@@ -34,18 +34,17 @@ final pacmanIconCache = List.generate(pacmanCircleIncrements + 1,
 Widget _pacmanIconFromFile({int mouthSize = pacmanCircleIncrements ~/ 4}) {
   return Image.asset('assets/images/$mouthSize.png',
       filterQuality: FilterQuality.none,
-      height: statusWidgetHeight * statusWidgetHeightFactor,
-      width: statusWidgetHeight * statusWidgetHeightFactor);
+      height: pacmanIconSize,
+      width: pacmanIconSize);
 }
 
 Widget _pacmanIconFromPainter({int mouthSize = pacmanCircleIncrements ~/ 4}) {
   return CustomPaint(
-      size: const Size(statusWidgetHeight * statusWidgetHeightFactor,
-          statusWidgetHeight * statusWidgetHeightFactor),
+      size: const Size(pacmanIconSize, pacmanIconSize),
       painter: PacmanPainter(mouthSize: mouthSize));
 }
 
-const _pacmanRectStatusBarSize = statusWidgetHeight * statusWidgetHeightFactor;
+const _pacmanRectStatusBarSize = pacmanIconSize;
 final Rect _pacmanRectStatusBar = Rect.fromCenter(
     center: const Offset(
         _pacmanRectStatusBarSize / 2, _pacmanRectStatusBarSize / 2),
@@ -91,8 +90,7 @@ Widget _animatedPacmanIconDirect(PacmanGame game, int startValue) {
 Widget _pacmanIconFromPainterDirect(
     {int mouthSize = pacmanCircleIncrements ~/ 4}) {
   return CustomPaint(
-      size: const Size(statusWidgetHeight * statusWidgetHeightFactor,
-          statusWidgetHeight * statusWidgetHeightFactor),
+      size: const Size(pacmanIconSize, pacmanIconSize),
       painter: PacmanPainterDirect(mouthSize: mouthSize));
 }
 
