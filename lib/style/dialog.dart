@@ -14,8 +14,9 @@ Widget popupDialog({required List<Widget> children}) {
               borderRadius: BorderRadius.circular(10),
               color: Palette.background.color),
           child: Padding(
-              padding: const EdgeInsets.fromLTRB(40.0, 4, 40, 4),
+              padding: const EdgeInsets.fromLTRB(40.0, 12, 40, 12),
               child: Column(
+                  spacing: 16,
                   mainAxisAlignment: MainAxisAlignment.center,
                   mainAxisSize: MainAxisSize.min,
                   children: children)),
@@ -27,7 +28,7 @@ Widget popupDialog({required List<Widget> children}) {
 
 Widget titleWidget({required Widget child}) {
   return Padding(
-    padding: const EdgeInsets.fromLTRB(0, 16, 0, 16),
+    padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
     child: child,
   );
 }
@@ -39,22 +40,16 @@ Widget titleText({required String text}) {
 }
 
 Widget bodyWidget({required Widget child}) {
-  return Padding(
-    padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
-    child: child,
-  );
+  return child;
 }
 
 Widget bottomRowWidget({required List<Widget> children}) {
   return Padding(
-      padding: const EdgeInsets.fromLTRB(0, 16, 0, 16),
+      padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
       child: Row(
+          spacing: 10,
           children: List<Widget>.generate(
-              children.length,
-              (int index) => Padding(
-                    padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
-                    child: children[index],
-                  ),
+              children.length, (int index) => children[index],
               growable: false)));
 }
 
@@ -72,8 +67,6 @@ ButtonStyle buttonStyle(
   return TextButton.styleFrom(
     minimumSize: Size.zero,
     padding: EdgeInsets.all(small ? 16 : 24),
-    //padding: EdgeInsets.zero,
-    //tapTargetSize: MaterialTapTargetSize.shrinkWrap,
     shape: RoundedRectangleBorder(
       borderRadius: const BorderRadius.all(Radius.circular(8)),
       side: BorderSide(

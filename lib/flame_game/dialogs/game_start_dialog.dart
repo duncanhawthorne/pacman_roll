@@ -30,16 +30,7 @@ class StartDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return popupDialog(
       children: [
-        titleWidget(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(0, 16, 0, 8),
-            child: Transform.rotate(
-              angle: -0.1,
-              child: Text(appTitle,
-                  style: textStyleHeading, textAlign: TextAlign.center),
-            ),
-          ),
-        ),
+        rotatedTitle(),
         levelSelector(context, game),
         mazeSelector(context, game),
         bottomRowWidget(
@@ -83,6 +74,7 @@ Widget levelSelector(BuildContext context, PacmanGame game) {
     child: Column(
       children: [
         Row(
+          spacing: 4,
           children: [
             !showText
                 ? const SizedBox.shrink()
@@ -99,6 +91,7 @@ Widget levelSelector(BuildContext context, PacmanGame game) {
         maxLevelToShowCache <= 5
             ? const SizedBox.shrink()
             : Row(
+                spacing: 4,
                 children: [
                   ...List.generate(
                       maxLevelToShowCache - 5,
@@ -118,25 +111,21 @@ Widget levelButtonSingle(BuildContext context, PacmanGame game, int levelNum) {
       : isTutorialLevel(levelSelect(levelNum)) && !isTutorialMaze(maze.mazeId)
           ? tutorialMazeId
           : maze.mazeId;
-  return Padding(
-      padding: const EdgeInsets.fromLTRB(2, 0, 2, 0),
-      child: TextButton(
-          style: game.level.number == levelNum
-              ? buttonStyle(small: true)
-              : buttonStyle(small: true, borderColor: Palette.transp.color),
-          onPressed: () {
-            context.go(
-                '/?$levelUrlKey=$levelNum&$mazeUrlKey=${mazeNames[fixedMazeId]}');
-          },
-          child: Text(
-              isTutorialLevel(levelSelect(levelNum))
-                  ? (maxLevelToShow(game) == tutorialLevelNum
-                      ? "Tutorial"
-                      : "T")
-                  : '$levelNum',
-              style: game.world.playerProgress.levels.containsKey(levelNum)
-                  ? textStyleBody
-                  : textStyleBodyDull)));
+  return TextButton(
+      style: game.level.number == levelNum
+          ? buttonStyle(small: true)
+          : buttonStyle(small: true, borderColor: Palette.transp.color),
+      onPressed: () {
+        context.go(
+            '/?$levelUrlKey=$levelNum&$mazeUrlKey=${mazeNames[fixedMazeId]}');
+      },
+      child: Text(
+          isTutorialLevel(levelSelect(levelNum))
+              ? (maxLevelToShow(game) == tutorialLevelNum ? "Tutorial" : "T")
+              : '$levelNum',
+          style: game.world.playerProgress.levels.containsKey(levelNum)
+              ? textStyleBody
+              : textStyleBodyDull));
 }
 
 Widget mazeSelector(BuildContext context, PacmanGame game) {
@@ -150,6 +139,7 @@ Widget mazeSelector(BuildContext context, PacmanGame game) {
           child: Column(
             children: [
               Row(
+                spacing: 4,
                 children: [
                   !showText
                       ? const SizedBox.shrink()
@@ -168,19 +158,17 @@ Widget mazeSelector(BuildContext context, PacmanGame game) {
 }
 
 Widget mazeButtonSingle(BuildContext context, PacmanGame game, int mazeId) {
-  return Padding(
-      padding: const EdgeInsets.fromLTRB(2, 0, 2, 0),
-      child: TextButton(
-          style: maze.mazeId == mazeId
-              ? buttonStyle(small: true)
-              : buttonStyle(small: true, borderColor: Palette.transp.color),
-          onPressed: () {
-            if (mazeId != maze.mazeId) {
-              context.go(
-                  '/?$levelUrlKey=${game.level.number}&$mazeUrlKey=${mazeNames[mazeId]}');
-            }
-          },
-          child: Text(mazeNames[mazeId] ?? "X", style: textStyleBody)));
+  return TextButton(
+      style: maze.mazeId == mazeId
+          ? buttonStyle(small: true)
+          : buttonStyle(small: true, borderColor: Palette.transp.color),
+      onPressed: () {
+        if (mazeId != maze.mazeId) {
+          context.go(
+              '/?$levelUrlKey=${game.level.number}&$mazeUrlKey=${mazeNames[mazeId]}');
+        }
+      },
+      child: Text(mazeNames[mazeId] ?? "X", style: textStyleBody));
 }
 
 int maxLevelToShow(PacmanGame game) {
@@ -191,4 +179,17 @@ int maxLevelToShow(PacmanGame game) {
         : defaultLevelNum + 1,
     game.world.playerProgress.maxLevelCompleted + 1
   ].reduce(max).clamp(0, maxLevel());
+}
+
+Widget rotatedTitle() {
+  return titleWidget(
+    child: Padding(
+      padding: const EdgeInsets.fromLTRB(0, 16, 0, 8),
+      child: Transform.rotate(
+        angle: -0.1,
+        child: Text(appTitle,
+            style: textStyleHeading, textAlign: TextAlign.center),
+      ),
+    ),
+  );
 }
