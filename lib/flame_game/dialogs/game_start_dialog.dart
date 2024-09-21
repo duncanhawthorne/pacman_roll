@@ -42,13 +42,13 @@ class StartDialog extends StatelessWidget {
                         game.overlays.remove(GameScreen.startDialogKey);
                         game.resetAndStart();
                       },
-                      child: Text('Reset', style: textStyleBody)),
+                      child: const Text('Reset', style: textStyleBody)),
                   TextButton(
                       style: buttonStyle(),
                       onPressed: () {
                         game.overlays.remove(GameScreen.startDialogKey);
                       },
-                      child: Text('Resume', style: textStyleBody))
+                      child: const Text('Resume', style: textStyleBody))
                 ]
               : [
                   TextButton(
@@ -57,7 +57,7 @@ class StartDialog extends StatelessWidget {
                         game.overlays.remove(GameScreen.startDialogKey);
                         game.start();
                       },
-                      child: Text('Play', style: textStyleBody)),
+                      child: const Text('Play', style: textStyleBody)),
                 ],
         )
       ],
@@ -79,8 +79,8 @@ Widget levelSelector(BuildContext context, PacmanGame game) {
             !showText
                 ? const SizedBox.shrink()
                 // ignore: dead_code
-                : Padding(
-                    padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
+                : const Padding(
+                    padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
                     child: Text('Level:', style: textStyleBody),
                   ),
             levelButtonSingle(context, game, 0),
@@ -144,8 +144,8 @@ Widget mazeSelector(BuildContext context, PacmanGame game) {
                   !showText
                       ? const SizedBox.shrink()
                       // ignore: dead_code
-                      : Padding(
-                          padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
+                      : const Padding(
+                          padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
                           child: Text('Maze:', style: textStyleBody),
                         ),
                   ...List.generate(
@@ -187,7 +187,7 @@ Widget rotatedTitle() {
       padding: const EdgeInsets.fromLTRB(0, 16, 0, 8),
       child: Transform.rotate(
         angle: -0.1,
-        child: Text(appTitle,
+        child: const Text(appTitle,
             style: textStyleHeading, textAlign: TextAlign.center),
       ),
     ),

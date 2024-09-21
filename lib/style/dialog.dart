@@ -53,14 +53,14 @@ Widget bottomRowWidget({required List<Widget> children}) {
               growable: false)));
 }
 
-TextStyle textStyleHeading =
-    const TextStyle(fontFamily: 'Press Start 2P', fontSize: 28);
+const TextStyle textStyleHeading =
+    TextStyle(fontFamily: 'Press Start 2P', fontSize: 28);
 
-TextStyle textStyleBody =
-    const TextStyle(fontFamily: 'Press Start 2P', color: Palette.textColor);
+const TextStyle textStyleBody =
+    TextStyle(fontFamily: 'Press Start 2P', color: Palette.textColor);
 
-TextStyle textStyleBodyDull =
-    const TextStyle(fontFamily: 'Press Start 2P', color: Palette.dullColor);
+const TextStyle textStyleBodyDull =
+    TextStyle(fontFamily: 'Press Start 2P', color: Palette.dullColor);
 
 ButtonStyle buttonStyle(
     {Color borderColor = Palette.seedColor, bool small = false}) {
