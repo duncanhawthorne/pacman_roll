@@ -24,7 +24,10 @@ Widget topOverlayWidget(BuildContext context, PacmanGame game) {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
-            children: [topLeft(context, game), topRight(context, game)],
+            children: [
+              topLeftWidget(context, game),
+              topRightWidget(context, game)
+            ],
           ),
         ],
       ),
@@ -32,7 +35,7 @@ Widget topOverlayWidget(BuildContext context, PacmanGame game) {
   );
 }
 
-Widget topLeft(BuildContext context, PacmanGame game) {
+Widget topLeftWidget(BuildContext context, PacmanGame game) {
   return Row(
     crossAxisAlignment: CrossAxisAlignment.center,
     mainAxisAlignment: MainAxisAlignment.start,
@@ -45,7 +48,7 @@ Widget topLeft(BuildContext context, PacmanGame game) {
   );
 }
 
-Widget topRight(BuildContext context, PacmanGame game) {
+Widget topRightWidget(BuildContext context, PacmanGame game) {
   return Row(
     crossAxisAlignment: CrossAxisAlignment.center,
     mainAxisAlignment: MainAxisAlignment.end,
