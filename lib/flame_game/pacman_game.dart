@@ -73,7 +73,9 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   Timer stopwatch = Timer(double.infinity);
   int get stopwatchMilliSeconds =>
       (stopwatch.current * 1000).toInt() +
-      world.pacmans.numberOfDeathsNotifier.value * deathPenaltyMillis;
+      min(world.level.maxAllowedDeaths - 1,
+              world.pacmans.numberOfDeathsNotifier.value) *
+          deathPenaltyMillis;
   bool get levelStarted => stopwatchMilliSeconds > 0;
 
   bool get isGameLive =>
@@ -142,7 +144,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
         }
         world.playerProgress
             .setLevelFinished(level.number, stopwatchMilliSeconds);
-        _cleanOverlaysAndDialogs();
+        _cleanDialogs();
         overlays.add(GameScreen.wonDialogKey);
       }
     }
@@ -150,16 +152,11 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
 
   void _handleLoseGame() {
     audioController.stopAllSfx();
-    _cleanOverlaysAndDialogs();
+    _cleanDialogs();
     overlays.add(GameScreen.loseDialogKey);
   }
 
-  void _addOverlays() {
-    overlays.add(GameScreen.topOverlayKey);
-  }
-
-  void _cleanOverlaysAndDialogs() {
-    overlays.remove(GameScreen.topOverlayKey);
+  void _cleanDialogs() {
     overlays.remove(GameScreen.startDialogKey);
     overlays.remove(GameScreen.loseDialogKey);
     overlays.remove(GameScreen.wonDialogKey);
@@ -176,8 +173,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   void reset({firstRun = false}) {
     pauseEngineIfNoActivity();
     _userString = _getRandomString(random, 15);
-    _cleanOverlaysAndDialogs();
-    _addOverlays();
+    _cleanDialogs();
     stopwatch.pause();
     stopwatch.reset();
     if (!firstRun) {
@@ -249,7 +245,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
 
   @override
   Future<void> onRemove() async {
-    _cleanOverlaysAndDialogs();
+    _cleanDialogs();
     audioController.stopAllSfx();
     super.onRemove();
   }

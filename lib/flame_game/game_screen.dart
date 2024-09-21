@@ -76,6 +76,7 @@ class GameScreen extends StatelessWidget {
                   return TutorialDialog(game: game);
                 }
               },
+              initialActiveOverlays: const [topOverlayKey],
             )),
           ),
         ),
