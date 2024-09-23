@@ -68,40 +68,28 @@ class StartDialog extends StatelessWidget {
 const double width = 40; //70;
 Widget levelSelector(BuildContext context, PacmanGame game) {
   int maxLevelToShowCache = maxLevelToShow(game);
-  // ignore: dead_code
-  bool showText = false && maxLevelToShowCache <= 2;
   return bodyWidget(
     child: Column(
-      children: [
-        Row(
-          spacing: 4,
-          children: [
-            !showText
-                ? const SizedBox.shrink()
-                // ignore: dead_code
-                : const Padding(
-                    padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
-                    child: Text('Level:', style: textStyleBody),
-                  ),
-            levelButtonSingle(context, game, 0),
-            ...List.generate(min(5, maxLevelToShowCache),
-                (index) => levelButtonSingle(context, game, index + 1)),
-          ],
-        ),
-        maxLevelToShowCache <= 5
-            ? const SizedBox.shrink()
-            : Row(
-                spacing: 4,
-                children: [
-                  ...List.generate(
-                      maxLevelToShowCache - 5,
-                      (index) =>
-                          levelButtonSingle(context, game, 5 + index + 1)),
-                ],
-              )
-      ],
-    ),
+        spacing: 0,
+        children: List.generate(
+            maxLevelToShowCache ~/ 5 + 1,
+            (rowIndex) => levelSelectorRow(
+                context, game, maxLevelToShowCache, rowIndex))),
   );
+}
+
+Widget levelSelectorRow(BuildContext context, PacmanGame game,
+    int maxLevelToShowCache, int rowIndex) {
+  bool showTutorialButton = true;
+  return Row(spacing: 4, children: [
+    showTutorialButton && rowIndex == 0
+        ? levelButtonSingle(context, game, 0)
+        : const SizedBox.shrink(),
+    ...List.generate(
+        min(5, maxLevelToShowCache - rowIndex * 5),
+        (colIndex) =>
+            levelButtonSingle(context, game, rowIndex * 5 + colIndex + 1))
+  ]);
 }
 
 Widget levelButtonSingle(BuildContext context, PacmanGame game, int levelNum) {

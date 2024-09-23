@@ -70,7 +70,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   String _userString = "";
 
   static const deathPenaltyMillis = 5000;
-  Timer stopwatch = Timer(double.infinity);
+  final Timer stopwatch = Timer(double.infinity);
   int get stopwatchMilliSeconds =>
       (stopwatch.current * 1000).toInt() +
       min(world.level.maxAllowedDeaths - 1,
