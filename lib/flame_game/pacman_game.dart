@@ -144,7 +144,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
         }
         world.playerProgress
             .setLevelFinished(level.number, stopwatchMilliSeconds);
-        _cleanDialogs();
+        cleanDialogs();
         overlays.add(GameScreen.wonDialogKey);
       }
     }
@@ -152,11 +152,11 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
 
   void _handleLoseGame() {
     audioController.stopAllSfx();
-    _cleanDialogs();
+    cleanDialogs();
     overlays.add(GameScreen.loseDialogKey);
   }
 
-  void _cleanDialogs() {
+  void cleanDialogs() {
     overlays.remove(GameScreen.startDialogKey);
     overlays.remove(GameScreen.loseDialogKey);
     overlays.remove(GameScreen.wonDialogKey);
@@ -173,7 +173,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   void reset({firstRun = false}) {
     pauseEngineIfNoActivity();
     _userString = _getRandomString(random, 15);
-    _cleanDialogs();
+    cleanDialogs();
     stopwatch.pause();
     stopwatch.reset();
     if (!firstRun) {
@@ -245,7 +245,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
 
   @override
   Future<void> onRemove() async {
-    _cleanDialogs();
+    cleanDialogs();
     audioController.stopAllSfx();
     super.onRemove();
   }

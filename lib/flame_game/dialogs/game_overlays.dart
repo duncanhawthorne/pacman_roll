@@ -64,6 +64,7 @@ Widget _topRightWidget(BuildContext context, PacmanGame game) {
 Widget _mainMenuButtonWidget(BuildContext context, PacmanGame game) {
   return IconButton(
     onPressed: () {
+      game.cleanDialogs();
       game.overlays.add(GameScreen.startDialogKey);
     },
     icon: const Icon(Icons.menu, color: Palette.textColor),
