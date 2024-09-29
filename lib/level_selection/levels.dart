@@ -1,7 +1,7 @@
 class Levels {
   static const defaultLevelNum = tutorialLevelNum;
   static const tutorialLevelNum = 0;
-  static const levelToShowInstructions = tutorialLevelNum;
+  static const levelToShowInstructions = defaultLevelNum;
   static const firstRealLevel = 1;
   static const max = 10;
 
