@@ -62,15 +62,17 @@ const TextStyle textStyleBody =
 const TextStyle textStyleBodyDull =
     TextStyle(fontFamily: 'Press Start 2P', color: Palette.dullColor);
 
+const Color _defaultButtonStyleBorderColor = Palette.seedColor;
 ButtonStyle buttonStyle(
-    {Color borderColor = Palette.seedColor, bool small = false}) {
+    {Color? borderColor = _defaultButtonStyleBorderColor, bool small = false}) {
+  Color borderColorReal = borderColor ?? _defaultButtonStyleBorderColor;
   return TextButton.styleFrom(
     minimumSize: Size.zero,
     padding: EdgeInsets.all(small ? 16 : 24),
     shape: RoundedRectangleBorder(
       borderRadius: const BorderRadius.all(Radius.circular(8)),
       side: BorderSide(
-        color: borderColor,
+        color: borderColorReal,
         width: 3,
       ),
     ),

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../firebase/firebase_saves.dart';
 import '../../level_selection/levels.dart';
+import '../../router.dart';
 import '../../style/dialog.dart';
+import '../../style/palette.dart';
 import '../game_screen.dart';
 import '../maze.dart';
 import '../pacman_game.dart';
@@ -31,6 +34,7 @@ class GameWonDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool showNextButton = game.level.number + 1 <= Levels.max;
     return popupDialog(
       children: [
         titleText(text: 'Complete'),
@@ -62,12 +66,22 @@ class GameWonDialog extends StatelessWidget {
         bottomRowWidget(
           children: [
             TextButton(
-                style: buttonStyle(),
+                style: buttonStyle(
+                    borderColor: showNextButton ? Palette.transp.color : null),
                 onPressed: () {
                   game.overlays.remove(GameScreen.wonDialogKey);
                   game.resetAndStart();
                 },
                 child: const Text('Retry', style: textStyleBody)),
+            !showNextButton
+                ? SizedBox.shrink()
+                : TextButton(
+                    style: buttonStyle(),
+                    onPressed: () {
+                      context.go(
+                          '/?$levelUrlKey=${game.level.number + 1}&$mazeUrlKey=${maze.mazeId}');
+                    },
+                    child: const Text('Next', style: textStyleBody))
           ],
         ),
       ],
