@@ -94,10 +94,10 @@ Widget levelSelectorRow(BuildContext context, PacmanGame game,
 
 Widget levelButtonSingle(BuildContext context, PacmanGame game, int levelNum) {
   GameLevel level = levels.getLevel(levelNum);
-  int fixedMazeId = !level.isTutorial && isTutorialMaze(maze.mazeId)
-      ? defaultMazeId
-      : level.isTutorial && !isTutorialMaze(maze.mazeId)
-          ? tutorialMazeId
+  int fixedMazeId = !level.isTutorial && maze.isTutorial
+      ? Maze.defaultMazeId
+      : level.isTutorial && !maze.isTutorial
+          ? Maze.tutorialMazeId
           : maze.mazeId;
   return TextButton(
       style: game.level.number == levelNum
@@ -163,7 +163,7 @@ Widget mazeButtonSingle(BuildContext context, PacmanGame game, int mazeId) {
 int maxLevelToShow(PacmanGame game) {
   return [
     game.level.number,
-    isTutorialMaze(maze.mazeId) || maze.mazeId == tutorialMazeId + 1
+    maze.isTutorial || maze.mazeId == Maze.tutorialMazeId + 1
         ? Levels.tutorialLevelNum - 1
         : Levels.defaultLevelNum + 1,
     game.world.playerProgress.maxLevelCompleted + 1

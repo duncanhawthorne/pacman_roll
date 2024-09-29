@@ -50,6 +50,11 @@ class Maze {
 
   get _mazeLayout => _decodedMazeList[mazeId];
 
+  static const tutorialMazeId = -1;
+  static const defaultMazeId = 0;
+
+  get isTutorial => isTutorialMaze(mazeId);
+
   int _mazeId = -1; //set properly in initializer
   final Vector2 ghostStart = Vector2.zero(); //set properly in initializer
   final Vector2 pacmanStart = Vector2.zero(); //set properly in initializer
@@ -436,10 +441,7 @@ List<List<String>> _decodeMazeLayout(List<String> encodedMazeLayout) {
 }
 
 bool isTutorialMaze(int mazeId) {
-  return mazeId == tutorialMazeId;
+  return mazeId == Maze.tutorialMazeId;
 }
-
-const tutorialMazeId = -1;
-const defaultMazeId = 0;
 
 Maze maze = Maze(mazeId: 0);
