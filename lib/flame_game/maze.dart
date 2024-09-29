@@ -55,6 +55,8 @@ class Maze {
 
   get isTutorial => isTutorialMaze(mazeId);
 
+  get isDefault => mazeId == defaultMazeId;
+
   int _mazeId = -1; //set properly in initializer
   final Vector2 ghostStart = Vector2.zero(); //set properly in initializer
   final Vector2 pacmanStart = Vector2.zero(); //set properly in initializer

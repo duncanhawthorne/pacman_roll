@@ -30,7 +30,7 @@ final router = GoRouter(
 );
 
 GameLevel _parseGameLevel(String? levelString) {
-  int levelNumberRaw = Levels.tutorialLevelNum;
+  int levelNumberRaw = Levels.defaultLevelNum;
   try {
     levelNumberRaw = int.parse(levelString ?? levelNumberRaw.toString());
   } catch (e) {
