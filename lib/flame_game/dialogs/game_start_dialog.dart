@@ -70,7 +70,7 @@ Widget levelSelector(BuildContext context, PacmanGame game) {
   int maxLevelToShowCache = maxLevelToShow(game);
   return bodyWidget(
     child: Column(
-        spacing: 0,
+        spacing: 8,
         children: List.generate(
             maxLevelToShowCache ~/ 5 + 1,
             (rowIndex) => levelSelectorRow(
