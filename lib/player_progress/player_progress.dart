@@ -23,10 +23,11 @@ class PlayerProgress extends ChangeNotifier {
   Map<int, int> _levelsFinished = {};
 
   /// The times for the levels that the player has finished so far.
-  Map<int, int> get levels => _levelsFinished;
+  Map<int, int> get ppLevels => _levelsFinished;
 
-  int get maxLevelCompleted =>
-      levels.isEmpty ? tutorialLevelNum - 1 : levels.keys.toList().reduce(max);
+  int get maxLevelCompleted => ppLevels.isEmpty
+      ? Levels.tutorialLevelNum - 1
+      : ppLevels.keys.toList().reduce(max);
 
   /// Fetches the latest data from the backing persistence store.
   Future<void> _getLatestFromStore() async {
