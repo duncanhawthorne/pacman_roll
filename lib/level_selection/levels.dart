@@ -1,6 +1,7 @@
 class Levels {
   static const defaultLevelNum = 1;
   static const tutorialLevelNum = 0;
+  static const levelToShowInstructions = tutorialLevelNum;
   static const max = 10;
 
   static const _ghostSpawnTimerLengthPattern = [5, 3, 2, 1];
@@ -15,7 +16,8 @@ class Levels {
           ? -1
           : _ghostSpawnTimerLengthPattern[
               (levelNum - 3) % _ghostSpawnTimerLengthPattern.length],
-      homingGhosts: levelNum <= 6 ? false : true,
+      homingGhosts:
+          levelNum <= 2 + _ghostSpawnTimerLengthPattern.length ? false : true,
       isTutorial: levelNum == tutorialLevelNum,
     );
     return result;
