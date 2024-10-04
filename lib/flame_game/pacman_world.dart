@@ -148,6 +148,9 @@ class PacmanWorld extends Forge2DWorld
         wrapper.reset();
       }
     }
+    if (kDebugMode) {
+      pellets.pelletsRemainingNotifier.value = 3;
+    }
   }
 
   void start() {

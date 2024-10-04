@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'app_lifecycle/app_lifecycle.dart';
 import 'audio/audio_controller.dart';
 import 'firebase/firebase_saves.dart';
+import 'google_logic.dart';
 import 'player_progress/player_progress.dart';
 import 'router.dart';
 import 'settings/settings.dart';
@@ -19,12 +20,14 @@ import 'utils/src/workarounds.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  save.initialize();
+  fBase.initialize();
 
   GoogleFonts.config.allowRuntimeFetching = false;
 
   FlutterNativeSplash.remove();
   await Flame.device.fullScreen();
+
+  g.startGoogleAccountChangeListener();
 
   fixTitlePerm();
 

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../level_selection/levels.dart';
+import '../../player_progress/player_progress.dart';
 import '../../router.dart';
 import '../../style/dialog.dart';
 import '../../style/palette.dart';
@@ -65,8 +66,15 @@ class StartDialog extends StatelessWidget {
   }
 }
 
-const double width = 40; //70;
 Widget levelSelector(BuildContext context, PacmanGame game) {
+  return ListenableBuilder(
+      listenable: playerProgress,
+      builder: (BuildContext context, _) {
+        return levelSelectorReal(context, game);
+      });
+}
+
+Widget levelSelectorReal(BuildContext context, PacmanGame game) {
   int maxLevelToShowCache = maxLevelToShow(game);
   return bodyWidget(
     child: Column(
@@ -81,7 +89,12 @@ Widget levelSelector(BuildContext context, PacmanGame game) {
 Widget levelSelectorRow(BuildContext context, PacmanGame game,
     int maxLevelToShowCache, int rowIndex) {
   bool showTutorialButton = true;
+  final bool showResetButton =
+      playerProgress.maxLevelCompleted >= Levels.firstRealLevel;
   return Row(spacing: 4, children: [
+    showResetButton && rowIndex == 0
+        ? resetWidget(context, game)
+        : const SizedBox.shrink(),
     showTutorialButton && rowIndex == 0
         ? levelButtonSingle(context, game, 0)
         : const SizedBox.shrink(),
@@ -113,12 +126,20 @@ Widget levelButtonSingle(BuildContext context, PacmanGame game, int levelNum) {
                   ? "Tutorial"
                   : "T")
               : '$levelNum',
-          style: game.world.playerProgress.ppLevels.containsKey(levelNum)
+          style: playerProgress.isComplete(levelNum)
               ? textStyleBody
               : textStyleBodyDull));
 }
 
 Widget mazeSelector(BuildContext context, PacmanGame game) {
+  return ListenableBuilder(
+      listenable: playerProgress,
+      builder: (BuildContext context, _) {
+        return mazeSelectorReal(context, game);
+      });
+}
+
+Widget mazeSelectorReal(BuildContext context, PacmanGame game) {
   const bool enableMazeSelector = true;
   int maxLevelToShowCache = maxLevelToShow(game);
   // ignore: dead_code
@@ -169,7 +190,7 @@ int maxLevelToShow(PacmanGame game) {
     maze.isTutorial || maze.isDefault
         ? Levels.tutorialLevelNum - 1 //no effect to max
         : Levels.firstRealLevel + 1, //at least something
-    game.world.playerProgress.maxLevelCompleted + 1
+    playerProgress.maxLevelCompleted + 1
   ].reduce(max).clamp(0, Levels.max);
 }
 
@@ -183,5 +204,12 @@ Widget rotatedTitle() {
             style: textStyleHeading, textAlign: TextAlign.center),
       ),
     ),
+  );
+}
+
+Widget resetWidget(BuildContext context, PacmanGame game) {
+  return IconButton(
+    onPressed: () => game.toggleOverlay(GameScreen.resetDialogKey),
+    icon: Icon(Icons.refresh, color: Palette.textColor),
   );
 }

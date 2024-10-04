@@ -31,6 +31,8 @@ dependencies:
   firebase_core: ^3.0.0
   elapsed_time_display: ^1.0.0  
 #  just_audio: ^0.9.37
+  google_sign_in: ^6.2.1
+  google_sign_in_web: ^0.12.0+5
 
 dev_dependencies:
 #  flame_test: ^1.15.3

@@ -44,7 +44,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   PacmanGame({
     required this.level,
     required mazeId,
-    required PlayerProgress playerProgress,
+    required this.playerProgress,
     required this.audioController,
     required this.appLifecycleStateNotifier,
   }) : super(
@@ -62,6 +62,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
 
   final AudioController audioController;
   final AppLifecycleStateNotifier appLifecycleStateNotifier;
+  final PlayerProgress playerProgress;
 
   void _setMazeId(int id) {
     maze.mazeId = id;
@@ -140,10 +141,9 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
         world.resetAfterGameWin();
         stopwatch.pause();
         if (stopwatchMilliSeconds > 10 * 1000) {
-          save.firebasePushSingleScore(_userString, _getCurrentGameState());
+          fBase.firebasePushSingleScore(_userString, _getCurrentGameState());
         }
-        world.playerProgress
-            .setLevelFinished(level.number, stopwatchMilliSeconds);
+        playerProgress.saveLevelComplete(_getCurrentGameState());
         cleanDialogs();
         overlays.add(GameScreen.wonDialogKey);
       }
@@ -161,6 +161,16 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
     overlays.remove(GameScreen.loseDialogKey);
     overlays.remove(GameScreen.wonDialogKey);
     overlays.remove(GameScreen.tutorialDialogKey);
+    overlays.remove(GameScreen.resetDialogKey);
+  }
+
+  void toggleOverlay(String overlayKey) {
+    if (overlays.activeOverlays.contains(overlayKey)) {
+      overlays.remove(overlayKey);
+    } else {
+      cleanDialogs();
+      overlays.add(overlayKey);
+    }
   }
 
   @override

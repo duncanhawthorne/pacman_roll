@@ -44,7 +44,7 @@ class GameWonDialog extends StatelessWidget {
             style: textStyleBody,
           ),
         ),
-        !Save.firebaseOn || game.level.isTutorial
+        !FBase.firebaseOn || game.level.isTutorial
             ? const SizedBox.shrink()
             : bodyWidget(
                 child: FutureBuilder(
@@ -94,15 +94,15 @@ String _levelCompleteText(int levelCompletedInMillis) {
 }
 
 String _scoreboardLoadingText() {
-  return !Save.firebaseOn ? "" : "Rank: Loading...";
+  return !FBase.firebaseOn ? "" : "Rank: Loading...";
 }
 
 Future<String> _scoreboardRankText(
     {required int levelNum,
     required int levelCompletedInMillis,
     required int mazeId}) async {
-  if (!Save.firebaseOn) return "";
-  final double percentile = await save.firebasePercentile(
+  if (!FBase.firebaseOn) return "";
+  final double percentile = await fBase.firebasePercentile(
           levelNum: levelNum,
           levelCompletedInMillis: levelCompletedInMillis,
           mazeId: mazeId) *

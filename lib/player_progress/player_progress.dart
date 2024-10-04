@@ -1,67 +1,129 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import '../firebase/firebase_saves.dart';
+import '../google_logic.dart';
 import '../level_selection/levels.dart';
-import 'persistence/local_storage_player_progress_persistence.dart';
-import 'persistence/player_progress_persistence.dart';
+import '../utils/helper.dart';
 
-/// Encapsulates the player's progress.
 class PlayerProgress extends ChangeNotifier {
-  PlayerProgress({PlayerProgressPersistence? store})
-      : _store = store ?? LocalStoragePlayerProgressPersistence() {
-    unawaited(_getLatestFromStore());
+  PlayerProgress() {
+    g.loadUser();
+    loadFromFirebaseOrFilesystem();
   }
 
-  /// TODO: If needed, replace this with some other mechanism for saving
-  ///       the player's progress. Currently, this uses the local storage
-  ///       (i.e. NSUserDefaults on iOS, SharedPreferences on Android
-  ///       or local storage on the web).
-  final PlayerProgressPersistence _store;
+  final Map<String, List<Map<String, int>>> _playerProgress = {"levels": []};
 
-  Map<int, int> _levelsFinished = {};
-
-  /// The times for the levels that the player has finished so far.
-  Map<int, int> get ppLevels => _levelsFinished;
-
-  int get maxLevelCompleted => ppLevels.isEmpty
+  int get maxLevelCompleted => _playerProgress["levels"]!.isEmpty
       ? Levels.tutorialLevelNum - 1
-      : ppLevels.keys.toList().reduce(max);
+      : _playerProgress["levels"]!
+          .map((item) => item["levelNum"] as int)
+          .reduce(max);
 
-  /// Fetches the latest data from the backing persistence store.
-  Future<void> _getLatestFromStore() async {
-    final levelsFinished = await _store.getFinishedLevels();
-    if (!mapEquals(_levelsFinished, levelsFinished)) {
-      _levelsFinished = levelsFinished;
-      notifyListeners();
-    }
+  bool isComplete(int levelNum) {
+    return _playerProgress["levels"]!
+        .map((item) => item["levelNum"] as int)
+        .contains(levelNum);
   }
 
-  /// Resets the player's progress so it's like if they just started
-  /// playing the game for the first time.
+  void saveLevelComplete(var currentGameState) {
+    final Map<String, int> win = _cleanupWin(currentGameState);
+    playerProgress._addWin(win);
+    playerProgress._saveToFirebaseAndFilesystem();
+    debug(["saveWin"]);
+  }
+
   void reset() {
-    _store.reset();
-    _levelsFinished.clear();
+    _playerProgress.remove("levels");
+    _playerProgress["levels"] = [];
+    playerProgress._saveToFirebaseAndFilesystem();
+  }
+
+  void _addWin(Map<String, int> win) {
+    if (!_playerProgress.keys.contains("levels")) {
+      _playerProgress["levels"] = [];
+    }
+    final List<Map<String, int>> saveFileLevels = _playerProgress["levels"]!;
+    Map? relevantSave = saveFileLevels
+        .where((item) => item["levelNum"] == win["levelNum"])
+        .firstOrNull;
+    if (relevantSave == null) {
+      saveFileLevels.add(win);
+    } else if (win["levelCompleteTime"]! < relevantSave["levelCompleteTime"]!) {
+      for (String key in win.keys) {
+        relevantSave[key] = win[key];
+      }
+    }
     notifyListeners();
   }
 
-  /// Registers [level] as reached.
-  ///
-  /// If this is higher than [highestLevelReached], it will update that
-  /// value and save it to the injected persistence store.
-  void setLevelFinished(int level, int time) {
-    if (_levelsFinished.containsKey(level)) {
-      final int currentTime = _levelsFinished[level]!;
-      if (time < currentTime) {
-        _levelsFinished[level] = time;
-        notifyListeners();
-        unawaited(_store.saveLevelFinished(level, time));
-      }
+  Future<void> loadFromFirebaseOrFilesystem() async {
+    debug(["loadKeys"]);
+    final prefs = await SharedPreferences.getInstance();
+    String gameEncoded = "";
+
+    if (!FBase.firebaseOn || !g.signedIn) {
+      // load from local save
+      gameEncoded = prefs.getString('game') ?? "";
     } else {
-      _levelsFinished[level] = time;
-      notifyListeners();
-      unawaited(_store.saveLevelFinished(level, time));
+      // load from firebase
+      gameEncoded = await fBase.firebasePullPlayerProgress();
+    }
+    _loadFromEncoded(gameEncoded, true);
+  }
+
+  Future<void> _saveToFirebaseAndFilesystem() async {
+    String gameEncoded = _getEncodeCurrent();
+    debug(["saveKeys", gameEncoded]);
+    // save locally
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('game', gameEncoded);
+
+    // if possible save to firebase
+    if (FBase.firebaseOn && g.signedIn) {
+      fBase.firebasePushPlayerProgress(gameEncoded);
     }
   }
+
+  String _getEncodeCurrent() {
+    return json.encode(_playerProgress);
+  }
+
+  void _loadFromEncoded(String gameEncoded, bool sync) {
+    if (gameEncoded == "") {
+      debug("blank gameEncoded");
+    } else {
+      try {
+        final jsonGameTmp = json.decode(gameEncoded);
+        final jsonLevels = jsonGameTmp["levels"];
+        if (jsonLevels != null) {
+          for (var jsonLevel in jsonLevels) {
+            final Map<String, int> win = _cleanupWin(jsonLevel);
+            playerProgress._addWin(win);
+          }
+        }
+      } catch (e) {
+        debug(["malformed load", e]);
+      }
+    }
+  }
+}
+
+PlayerProgress playerProgress = PlayerProgress();
+
+Map<String, int> _cleanupWin(var winRaw) {
+  Map<String, int> result = {
+    "levelNum": -1,
+    "mazeId": -1,
+    "levelCompleteTime": -1,
+    "dateTime": -1
+  };
+  for (String key in result.keys) {
+    result[key] = winRaw[key] as int;
+  }
+  return result;
 }

@@ -1,20 +1,23 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 
 import '../firebase_options.dart';
+import '../google_logic.dart';
 import '../utils/helper.dart';
 
 /// This file has utilities for loading and saving the leaderboard in firebase
 
-class Save {
+class FBase {
   static const bool firebaseOn =
       true && firebaseOnReal; //!(windows && !kIsWeb);
 
   static const String mainDB = "records";
+  static const String userSaves = "userSaves";
 
   FirebaseFirestore? db;
 
-  void initialize() async {
+  Future<void> initialize() async {
     if (firebaseOn) {
       await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
@@ -27,6 +30,9 @@ class Save {
 
   Future<void> firebasePushSingleScore(
       String recordID, Map<String, dynamic> state) async {
+    if (kDebugMode) {
+      return;
+    }
     if (firebaseOn) {
       //debug("firebase push");
       try {
@@ -74,6 +80,35 @@ class Save {
     }
     return 1.0;
   }
+
+  Future<void> firebasePushPlayerProgress(state) async {
+    debug("firebasePush");
+    if (firebaseOn && g.signedIn) {
+      final dhState = <String, dynamic>{"data": state};
+      db!
+          .collection("userSaves")
+          .doc(g.gUser)
+          .set(dhState)
+          .onError((e, _) => debug("Error writing document: $e"));
+    }
+  }
+
+  Future<String> firebasePullPlayerProgress() async {
+    await initialize();
+    String gameEncoded = "";
+    debug(["firebasePull"]);
+    if (firebaseOn && g.signedIn) {
+      final docRef = db!.collection("userSaves").doc(g.gUser);
+      await docRef.get().then(
+        (DocumentSnapshot doc) {
+          final gameEncodedTmp = doc.data() as Map<String, dynamic>;
+          gameEncoded = gameEncodedTmp["data"];
+        },
+        onError: (e) => debug("Error getting document: $e"),
+      );
+    }
+    return gameEncoded;
+  }
 }
 
-Save save = Save();
+FBase fBase = FBase();
