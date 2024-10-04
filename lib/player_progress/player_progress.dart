@@ -6,14 +6,22 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../firebase/firebase_saves.dart';
-import '../google_logic.dart';
+import '../google/google.dart';
 import '../level_selection/levels.dart';
 import '../utils/helper.dart';
 
 class PlayerProgress extends ChangeNotifier {
   PlayerProgress() {
-    g.loadUser();
-    loadFromFirebaseOrFilesystem();
+    userChangeListener();
+  }
+
+  final G g = G();
+
+  void userChangeListener() {
+    loadFromFirebaseOrFilesystem(); //initial
+    g.gUserNotifier.addListener(() {
+      loadFromFirebaseOrFilesystem();
+    });
   }
 
   final Map<String, List<Map<String, int>>> _playerProgress = {"levels": []};
@@ -71,7 +79,7 @@ class PlayerProgress extends ChangeNotifier {
       gameEncoded = prefs.getString('game') ?? "";
     } else {
       // load from firebase
-      gameEncoded = await fBase.firebasePullPlayerProgress();
+      gameEncoded = await fBase.firebasePullPlayerProgress(g);
     }
     _loadFromEncoded(gameEncoded, true);
   }
@@ -85,7 +93,7 @@ class PlayerProgress extends ChangeNotifier {
 
     // if possible save to firebase
     if (FBase.firebaseOn && g.signedIn) {
-      fBase.firebasePushPlayerProgress(gameEncoded);
+      fBase.firebasePushPlayerProgress(g, gameEncoded);
     }
   }
 

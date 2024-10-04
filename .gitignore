@@ -46,7 +46,8 @@ app.*.map.json
 /android/app/release
 
 lib/firebase_options.dart
-lib/secrets.dart
+lib/google/secrets.dart
+lib/google/secrets.dart
 /android/
 #  /test/
 /windows/

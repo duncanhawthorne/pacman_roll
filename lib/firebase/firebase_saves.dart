@@ -3,7 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 
 import '../firebase_options.dart';
-import '../google_logic.dart';
+import '../google/google.dart';
 import '../utils/helper.dart';
 
 /// This file has utilities for loading and saving the leaderboard in firebase
@@ -81,7 +81,7 @@ class FBase {
     return 1.0;
   }
 
-  Future<void> firebasePushPlayerProgress(state) async {
+  Future<void> firebasePushPlayerProgress(G g, String state) async {
     debug("firebasePush");
     if (firebaseOn && g.signedIn) {
       final dhState = <String, dynamic>{"data": state};
@@ -93,7 +93,7 @@ class FBase {
     }
   }
 
-  Future<String> firebasePullPlayerProgress() async {
+  Future<String> firebasePullPlayerProgress(G g) async {
     await initialize();
     String gameEncoded = "";
     debug(["firebasePull"]);

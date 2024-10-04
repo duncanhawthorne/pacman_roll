@@ -3,13 +3,11 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-import 'flame_game/pacman_game.dart';
-import 'player_progress/player_progress.dart';
-import 'player_progress/user.dart';
+import '../google/src/sign_in_button/mobile.dart';
+import '../utils/helper.dart';
 import 'secrets.dart';
-import 'utils/helper.dart';
-import 'utils/src/sign_in_button/mobile.dart';
 
 /// The type of the onClick callback for the (mobile) Sign In Button.
 //typedef HandleSignInFn = Future<void> Function();
@@ -21,6 +19,65 @@ final gOn = googleOnReal &&
     !(defaultTargetPlatform == TargetPlatform.windows && !kIsWeb);
 
 class G {
+  G() {
+    _startGoogleAccountChangeListener();
+    _loadUser();
+  }
+
+  double _iconWidth = 1;
+  Color _color = Colors.white;
+
+  Widget loginLogoutWidget(
+      BuildContext context, double iconWidth, Color color) {
+    _iconWidth = iconWidth;
+    _color = color;
+    return !gOn
+        ? SizedBox.shrink()
+        : ValueListenableBuilder<String>(
+            valueListenable: gUserNotifier,
+            builder: (context, audioOn, child) {
+              return !signedIn ? _loginButton(context) : _logoutButton(context);
+            });
+  }
+
+  Widget _loginButton(BuildContext context) {
+    const bool newLoginButtons = false;
+    return newLoginButtons
+        // ignore: dead_code
+        ? _platformAdaptiveSignInButton(context)
+        : lockStyleSignInButton(context);
+  }
+
+  Widget lockStyleSignInButton(BuildContext context) {
+    return IconButton(
+      icon: Icon(Icons.lock, color: _color),
+      onPressed: () {
+        _signInSilentlyThenDirectly();
+      },
+    );
+  }
+
+  Widget _platformAdaptiveSignInButton(BuildContext context) {
+    // different buttons depending on web or mobile. See sign_in_button folder
+    return buildSignInButton(
+        onPressed:
+            _signInDirectly, //relevant on web only, else uses separate code
+        context: context,
+        g: this);
+  }
+
+  Widget _logoutButton(BuildContext context) {
+    return IconButton(
+      icon: gUserIcon == G._gUserIconDefault
+          ? Icon(Icons.face_outlined, color: _color)
+          : CircleAvatar(
+              radius: _iconWidth / 2, backgroundImage: NetworkImage(gUserIcon)),
+      onPressed: () {
+        signOutAndExtractDetails();
+      },
+    );
+  }
+
   GoogleSignIn googleSignIn = GoogleSignIn(
     //gID defined in secrets.dart, not included in repo
     //in format XXXXXX.apps.googleusercontent.com
@@ -30,21 +87,36 @@ class G {
     ],
   );
 
-  static const String gUserDefault = "JoeBloggs";
-  static const String gUserIconDefault = "JoeBloggs";
+  Future<List<String>> _loadUserFromFilesystem() async {
+    final prefs = await SharedPreferences.getInstance();
+    String gUser = prefs.getString('gUser') ?? G._gUserDefault;
+    String gUserIcon = prefs.getString('gUserIcon') ?? G._gUserIconDefault;
+    debug(["loadUser", gUser, gUserIcon]);
+    return [gUser, gUserIcon];
+  }
+
+  Future<void> _saveUserToFilesystem(String gUser, String gUserIcon) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('gUser', gUser);
+    await prefs.setString('gUserIcon', gUserIcon);
+    debug(["saveUser", gUser, gUserIcon]);
+  }
+
+  static const String _gUserDefault = "JoeBloggs";
+  static const String _gUserIconDefault = "JoeBloggs";
 
   GoogleSignInAccount? _user;
 
   ValueNotifier<String> gUserNotifier = ValueNotifier("JoeBloggs");
   String _gUserIcon = "JoeBloggs";
 
-  Future<void> loadUser() async {
-    List<String> tmp = await user.loadFromFilesystem();
+  Future<void> _loadUser() async {
+    List<String> tmp = await _loadUserFromFilesystem();
     gUser = tmp[0];
     gUserIcon = tmp[1];
   }
 
-  void startGoogleAccountChangeListener() {
+  void _startGoogleAccountChangeListener() {
     if (gOn) {
       googleSignIn.onCurrentUserChanged
           .listen((GoogleSignInAccount? account) async {
@@ -60,14 +132,15 @@ class G {
     }
   }
 
-  void signInSilently() async {
+  // ignore: unused_element
+  void _signInSilently() async {
     if (gOn) {
       await googleSignIn.signInSilently();
       _successfulLoginExtractDetails();
     }
   }
 
-  Future<void> signInDirectly() async {
+  Future<void> _signInDirectly() async {
     debug("webSignIn()");
     if (gOn) {
       try {
@@ -83,7 +156,7 @@ class G {
     }
   }
 
-  Future<void> signOut() async {
+  Future<void> _signOut() async {
     if (gOn) {
       if (_debugFakeLogin) {
       } else {
@@ -98,7 +171,7 @@ class G {
     }
   }
 
-  Future<void> signInSilentlyThenDirectly() async {
+  Future<void> _signInSilentlyThenDirectly() async {
     debug("mobileSignIn()");
     if (gOn) {
       if (_debugFakeLogin) {
@@ -122,10 +195,9 @@ class G {
       debug("login extract details");
       gUser = _user!.email;
       if (_user!.photoUrl != null) {
-        gUserIcon = _user!.photoUrl ?? gUserIconDefault;
+        gUserIcon = _user!.photoUrl ?? _gUserIconDefault;
       }
-      await user.saveToFilesystem(gUser, gUserIcon);
-      await playerProgress.loadFromFirebaseOrFilesystem();
+      await _saveUserToFilesystem(gUser, gUserIcon);
     }
   }
 
@@ -133,35 +205,24 @@ class G {
     debug("debugLoginExtractDetails");
     assert(_debugFakeLogin);
     gUser = _gUserFakeLogin;
-    await user.saveToFilesystem(gUser, gUserIcon);
-    await playerProgress.loadFromFirebaseOrFilesystem();
+    await _saveUserToFilesystem(gUser, gUserIcon);
   }
 
   void _logoutExtractDetails() async {
     debug("logout extract details");
-    gUser = gUserDefault;
-    await user.saveToFilesystem(gUser, gUserIcon);
-    await playerProgress.loadFromFirebaseOrFilesystem();
+    gUser = _gUserDefault;
+    await _saveUserToFilesystem(gUser, gUserIcon);
   }
 
   Future<void> signOutAndExtractDetails() async {
     debug("sign out and extract details");
     if (gOn) {
-      await signOut();
+      await _signOut();
       _logoutExtractDetails();
     }
   }
 
-  Widget platformAdaptiveSignInButton(BuildContext context, PacmanGame game) {
-    // different buttons depending on web or mobile. See sign_in_button folder
-    return buildSignInButton(
-        onPressed:
-            signInDirectly, //relevant on web only, else uses separate code
-        context: context,
-        game: game);
-  }
-
-  bool get signedIn => gUser != gUserDefault;
+  bool get signedIn => gUser != _gUserDefault;
 
   String get gUser => gUserNotifier.value;
 
@@ -171,5 +232,3 @@ class G {
 
   set gUserIcon(gui) => _gUserIcon = gui;
 }
-
-final G g = G();

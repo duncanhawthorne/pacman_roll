@@ -8,7 +8,6 @@ import 'package:provider/provider.dart';
 import 'app_lifecycle/app_lifecycle.dart';
 import 'audio/audio_controller.dart';
 import 'firebase/firebase_saves.dart';
-import 'google_logic.dart';
 import 'player_progress/player_progress.dart';
 import 'router.dart';
 import 'settings/settings.dart';
@@ -26,8 +25,6 @@ void main() async {
 
   FlutterNativeSplash.remove();
   await Flame.device.fullScreen();
-
-  g.startGoogleAccountChangeListener();
 
   fixTitlePerm();
 
