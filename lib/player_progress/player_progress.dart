@@ -18,9 +18,9 @@ class PlayerProgress extends ChangeNotifier {
   final G g = G();
 
   void userChangeListener() {
-    loadFromFirebaseOrFilesystem(); //initial
+    _loadFromFirebaseOrFilesystem(); //initial
     g.gUserNotifier.addListener(() {
-      loadFromFirebaseOrFilesystem();
+      _loadFromFirebaseOrFilesystem();
     });
   }
 
@@ -69,7 +69,7 @@ class PlayerProgress extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> loadFromFirebaseOrFilesystem() async {
+  Future<void> _loadFromFirebaseOrFilesystem() async {
     debug(["loadKeys"]);
     final prefs = await SharedPreferences.getInstance();
     String gameEncoded = "";

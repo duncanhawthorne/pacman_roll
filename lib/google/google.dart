@@ -24,6 +24,16 @@ class G {
     _loadUser();
   }
 
+  bool get signedIn => gUser != _gUserDefault;
+
+  String get gUser => gUserNotifier.value;
+
+  set gUser(g) => gUserNotifier.value = g;
+
+  String get _gUserIcon => _gUserIconReal;
+
+  set _gUserIcon(gui) => _gUserIconReal = gui;
+
   double _iconWidth = 1;
   Color _color = Colors.white;
 
@@ -68,10 +78,11 @@ class G {
 
   Widget _logoutButton(BuildContext context) {
     return IconButton(
-      icon: gUserIcon == G._gUserIconDefault
+      icon: _gUserIcon == G._gUserIconDefault
           ? Icon(Icons.face_outlined, color: _color)
           : CircleAvatar(
-              radius: _iconWidth / 2, backgroundImage: NetworkImage(gUserIcon)),
+              radius: _iconWidth / 2,
+              backgroundImage: NetworkImage(_gUserIcon)),
       onPressed: () {
         signOutAndExtractDetails();
       },
@@ -108,12 +119,12 @@ class G {
   GoogleSignInAccount? _user;
 
   ValueNotifier<String> gUserNotifier = ValueNotifier("JoeBloggs");
-  String _gUserIcon = "JoeBloggs";
+  String _gUserIconReal = "JoeBloggs";
 
   Future<void> _loadUser() async {
     List<String> tmp = await _loadUserFromFilesystem();
     gUser = tmp[0];
-    gUserIcon = tmp[1];
+    _gUserIcon = tmp[1];
   }
 
   void _startGoogleAccountChangeListener() {
@@ -195,9 +206,9 @@ class G {
       debug("login extract details");
       gUser = _user!.email;
       if (_user!.photoUrl != null) {
-        gUserIcon = _user!.photoUrl ?? _gUserIconDefault;
+        _gUserIcon = _user!.photoUrl ?? _gUserIconDefault;
       }
-      await _saveUserToFilesystem(gUser, gUserIcon);
+      await _saveUserToFilesystem(gUser, _gUserIcon);
     }
   }
 
@@ -205,13 +216,13 @@ class G {
     debug("debugLoginExtractDetails");
     assert(_debugFakeLogin);
     gUser = _gUserFakeLogin;
-    await _saveUserToFilesystem(gUser, gUserIcon);
+    await _saveUserToFilesystem(gUser, _gUserIcon);
   }
 
   void _logoutExtractDetails() async {
     debug("logout extract details");
     gUser = _gUserDefault;
-    await _saveUserToFilesystem(gUser, gUserIcon);
+    await _saveUserToFilesystem(gUser, _gUserIcon);
   }
 
   Future<void> signOutAndExtractDetails() async {
@@ -221,14 +232,4 @@ class G {
       _logoutExtractDetails();
     }
   }
-
-  bool get signedIn => gUser != _gUserDefault;
-
-  String get gUser => gUserNotifier.value;
-
-  String get gUserIcon => _gUserIcon;
-
-  set gUser(g) => gUserNotifier.value = g;
-
-  set gUserIcon(gui) => _gUserIcon = gui;
 }
