@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../player_progress/player_progress.dart';
 import '../../style/dialog.dart';
@@ -37,6 +38,7 @@ class ResetDialog extends StatelessWidget {
               onPressed: () {
                 playerProgress.reset();
                 game.overlays.remove(GameScreen.resetDialogKey);
+                context.go('/');
               },
               child: Text("Delete all progress across levels",
                   style: textStyleBody))

@@ -120,13 +120,15 @@ Widget _audioOnOffButtonWidget(BuildContext context, PacmanGame game) {
 }
 
 Widget loginLogoutWidget(BuildContext context, PacmanGame game) {
-  return ValueListenableBuilder<String>(
-      valueListenable: g.gUserNotifier,
-      builder: (context, audioOn, child) {
-        return !g.signedIn
-            ? loginButton(context, game)
-            : logoutButton(context, game);
-      });
+  return !gOn
+      ? SizedBox.shrink()
+      : ValueListenableBuilder<String>(
+          valueListenable: g.gUserNotifier,
+          builder: (context, audioOn, child) {
+            return !g.signedIn
+                ? loginButton(context, game)
+                : logoutButton(context, game);
+          });
 }
 
 Widget loginButton(BuildContext context, PacmanGame game) {
