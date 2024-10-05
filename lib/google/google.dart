@@ -28,7 +28,10 @@ class G {
 
   String get gUser => gUserNotifier.value;
 
-  set gUser(g) => gUserNotifier.value = g;
+  set _gUser(g) => {
+        debug(["gUserChanged", g]),
+        gUserNotifier.value = g
+      };
 
   String get _gUserIcon => _gUserIconReal;
 
@@ -84,7 +87,7 @@ class G {
               radius: _iconWidth / 2,
               backgroundImage: NetworkImage(_gUserIcon)),
       onPressed: () {
-        signOutAndExtractDetails();
+        _signOutAndExtractDetails();
       },
     );
   }
@@ -123,7 +126,7 @@ class G {
 
   Future<void> _loadUser() async {
     List<String> tmp = await _loadUserFromFilesystem();
-    gUser = tmp[0];
+    _gUser = tmp[0];
     _gUserIcon = tmp[1];
   }
 
@@ -131,6 +134,7 @@ class G {
     if (gOn) {
       googleSignIn.onCurrentUserChanged
           .listen((GoogleSignInAccount? account) async {
+        debug("gUser changed");
         _user = account;
         if (_user != null) {
           debug(["login successful", _user]);
@@ -204,28 +208,32 @@ class G {
   void _successfulLoginExtractDetails() async {
     if (_user != null) {
       debug("login extract details");
-      gUser = _user!.email;
+      _gUser = _user!.email;
       if (_user!.photoUrl != null) {
         _gUserIcon = _user!.photoUrl ?? _gUserIconDefault;
       }
       await _saveUserToFilesystem(gUser, _gUserIcon);
+      debug(["gUser", gUser]);
     }
   }
 
   void _debugLoginExtractDetails() async {
     debug("debugLoginExtractDetails");
     assert(_debugFakeLogin);
-    gUser = _gUserFakeLogin;
+    _gUser = _gUserFakeLogin;
     await _saveUserToFilesystem(gUser, _gUserIcon);
+    debug(["gUser", gUser]);
   }
 
   void _logoutExtractDetails() async {
     debug("logout extract details");
-    gUser = _gUserDefault;
+    _gUser = _gUserDefault;
+    assert(!signedIn);
     await _saveUserToFilesystem(gUser, _gUserIcon);
+    debug(["gUser", gUser]);
   }
 
-  Future<void> signOutAndExtractDetails() async {
+  Future<void> _signOutAndExtractDetails() async {
     debug("sign out and extract details");
     if (gOn) {
       await _signOut();
@@ -233,3 +241,5 @@ class G {
     }
   }
 }
+
+final G g = G();

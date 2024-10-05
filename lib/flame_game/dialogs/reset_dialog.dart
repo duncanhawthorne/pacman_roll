@@ -40,8 +40,7 @@ class ResetDialog extends StatelessWidget {
                 game.overlays.remove(GameScreen.resetDialogKey);
                 context.go('/');
               },
-              child: Text("Delete all progress across levels",
-                  style: textStyleBody))
+              child: Text("Reset completed levels", style: textStyleBody))
         ]),
       ],
     );

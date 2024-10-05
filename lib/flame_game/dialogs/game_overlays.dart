@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../google/google.dart';
 import '../../settings/settings.dart';
 import '../../style/dialog.dart';
 import '../../style/palette.dart';
@@ -49,8 +50,7 @@ Widget _topLeftWidget(BuildContext context, PacmanGame game) {
       _audioOnOffButtonWidget(context, game),
       game.level.isTutorial
           ? SizedBox.shrink()
-          : game.playerProgress.g
-              .loginLogoutWidget(context, gIconSize, Palette.textColor),
+          : g.loginLogoutWidget(context, gIconSize, Palette.textColor),
     ],
   );
 }

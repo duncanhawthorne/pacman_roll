@@ -12,55 +12,50 @@ import '../utils/helper.dart';
 
 class PlayerProgress extends ChangeNotifier {
   PlayerProgress() {
-    userChangeListener();
+    _userChangeListener();
   }
 
-  final G g = G();
-
-  void userChangeListener() {
+  void _userChangeListener() {
     _loadFromFirebaseOrFilesystem(); //initial
     g.gUserNotifier.addListener(() {
       _loadFromFirebaseOrFilesystem();
     });
   }
 
-  final Map<String, List<Map<String, int>>> _playerProgress = {"levels": []};
+  final List<Map<String, int>> _playerProgressLevels = [];
+  late final Map<String, dynamic> _playerProgress = {
+    "levels": _playerProgressLevels
+  };
 
-  int get maxLevelCompleted => _playerProgress["levels"]!.isEmpty
+  Iterable<int> get _levelNumsCompleted =>
+      _playerProgressLevels.map((item) => item["levelNum"] as int);
+
+  int get maxLevelCompleted => _playerProgressLevels.isEmpty
       ? Levels.tutorialLevelNum - 1
-      : _playerProgress["levels"]!
-          .map((item) => item["levelNum"] as int)
-          .reduce(max);
+      : _levelNumsCompleted.reduce(max);
 
   bool isComplete(int levelNum) {
-    return _playerProgress["levels"]!
-        .map((item) => item["levelNum"] as int)
-        .contains(levelNum);
+    return _levelNumsCompleted.contains(levelNum);
   }
 
   void saveLevelComplete(var currentGameState) {
+    debug(["saveWin"]);
     final Map<String, int> win = _cleanupWin(currentGameState);
     playerProgress._addWin(win);
     playerProgress._saveToFirebaseAndFilesystem();
-    debug(["saveWin"]);
   }
 
   void reset() {
-    _playerProgress.remove("levels");
-    _playerProgress["levels"] = [];
+    _playerProgressLevels.clear();
     playerProgress._saveToFirebaseAndFilesystem();
   }
 
   void _addWin(Map<String, int> win) {
-    if (!_playerProgress.keys.contains("levels")) {
-      _playerProgress["levels"] = [];
-    }
-    final List<Map<String, int>> saveFileLevels = _playerProgress["levels"]!;
-    Map? relevantSave = saveFileLevels
+    Map? relevantSave = _playerProgressLevels
         .where((item) => item["levelNum"] == win["levelNum"])
         .firstOrNull;
     if (relevantSave == null) {
-      saveFileLevels.add(win);
+      _playerProgressLevels.add(win);
     } else if (win["levelCompleteTime"]! < relevantSave["levelCompleteTime"]!) {
       for (String key in win.keys) {
         relevantSave[key] = win[key];
@@ -93,7 +88,10 @@ class PlayerProgress extends ChangeNotifier {
 
     // if possible save to firebase
     if (FBase.firebaseOn && g.signedIn) {
+      debug(["saveKeys gUser", g.gUser]);
       fBase.firebasePushPlayerProgress(g, gameEncoded);
+    } else {
+      debug(["not signed in", g.gUser]);
     }
   }
 

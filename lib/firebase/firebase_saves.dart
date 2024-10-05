@@ -82,7 +82,7 @@ class FBase {
   }
 
   Future<void> firebasePushPlayerProgress(G g, String state) async {
-    debug("firebasePush");
+    debug(["firebasePush", g.gUser]);
     if (firebaseOn && g.signedIn) {
       final dhState = <String, dynamic>{"data": state};
       db!
