@@ -9,12 +9,14 @@ import 'move_to_effect.dart';
 void resetSlideAngle(Component component, {Function()? onComplete}) {
   assert(component is PositionComponent || component is Viewfinder);
   if (component is PositionComponent) {
-    component.angle = smallAngle(component.angle);
-    component.add(_rotateToAngleEffect(0, onComplete: onComplete));
+    component
+      ..angle = smallAngle(component.angle)
+      ..add(_rotateToAngleEffect(0, onComplete: onComplete));
   }
   if (component is Viewfinder) {
-    component.angle = smallAngle(component.angle);
-    component.add(_rotateToAngleEffect(0, onComplete: onComplete));
+    component
+      ..angle = smallAngle(component.angle)
+      ..add(_rotateToAngleEffect(0, onComplete: onComplete));
   }
 }
 

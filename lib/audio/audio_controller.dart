@@ -11,18 +11,6 @@ import 'sounds.dart';
 
 /// Allows playing music and sound. A facade to `package:audioplayers`.
 class AudioController {
-  static final _log = Logger('AudioController');
-
-  /// This is a list of [AudioPlayer] instances which are rotated to play
-  /// sound effects.
-  final Map<SfxType, AudioPlayer> _sfxPlayers;
-
-  final Random _random = Random();
-
-  SettingsController? _settings;
-
-  ValueNotifier<AppLifecycleState>? _lifecycleNotifier;
-
   //AudioLogger.logLevel = AudioLogLevel.info;
 
   /// Creates an instance that plays music and sound.
@@ -36,12 +24,25 @@ class AudioController {
   /// never be overridden by sound effects because that would be silly.
   AudioController({int polyphony = 10})
       : assert(polyphony >= 1),
-        _sfxPlayers = {
-          for (int item in List<int>.generate(SfxType.values.length, (i) => i))
+        _sfxPlayers = <SfxType, AudioPlayer>{
+          for (int item
+              in List<int>.generate(SfxType.values.length, (int i) => i))
             SfxType.values[item]: AudioPlayer(playerId: 'sfxPlayer#$item')
         } {
     unawaited(_preloadSfx());
   }
+
+  static final Logger _log = Logger('AudioController');
+
+  /// This is a list of [AudioPlayer] instances which are rotated to play
+  /// sound effects.
+  final Map<SfxType, AudioPlayer> _sfxPlayers;
+
+  final Random _random = Random();
+
+  SettingsController? _settings;
+
+  ValueNotifier<AppLifecycleState>? _lifecycleNotifier;
 
   /// Makes sure the audio controller is listening to changes
   /// of both the app lifecycle (e.g. suspended app) and to changes
@@ -55,7 +56,7 @@ class AudioController {
   void dispose() {
     _lifecycleNotifier?.removeListener(_handleAppLifecycle);
     _stopAllSound();
-    for (final player in _sfxPlayers.values) {
+    for (final AudioPlayer player in _sfxPlayers.values) {
       player.dispose();
     }
   }
@@ -66,12 +67,12 @@ class AudioController {
   /// [SettingsController.audioOn] is `true` or if its
   /// [SettingsController.soundsOn] is `false`.
   void playSfx(SfxType type) {
-    final audioOn = _settings?.audioOn.value ?? true;
+    final bool audioOn = _settings?.audioOn.value ?? true;
     if (!audioOn) {
       _log.fine(() => 'Ignoring playing sound ($type) because audio is muted.');
       return;
     }
-    final soundsOn = _settings?.soundsOn.value ?? true;
+    final bool soundsOn = _settings?.soundsOn.value ?? true;
     if (!soundsOn) {
       _log.fine(() =>
           'Ignoring playing sound ($type) because sounds are turned off.');
@@ -79,8 +80,8 @@ class AudioController {
     }
 
     _log.fine(() => 'Playing sound: $type');
-    final options = soundTypeToFilename(type);
-    final filename = options[_random.nextInt(options.length)];
+    final List<String> options = soundTypeToFilename(type);
+    final String filename = options[_random.nextInt(options.length)];
     _log.fine(() => '- Chosen filename: $filename');
 
     final AudioPlayer currentPlayer = _sfxPlayers[type] ?? AudioPlayer();
@@ -102,18 +103,20 @@ class AudioController {
   }
 
   double getTargetSirenVolume(double averageGhostSpeed) {
-    double tmpSirenVolume = averageGhostSpeed / 30;
+    final double tmpSirenVolume = averageGhostSpeed / 30;
     return tmpSirenVolume < 0.01 ? 0 : min(0.4, tmpSirenVolume);
   }
 
-  void setSirenVolume(double normalisedAverageGhostSpeed, {gradual = false}) {
-    final sirenPlayer = _sfxPlayers[SfxType.ghostsRoamingSiren]!;
+  void setSirenVolume(double normalisedAverageGhostSpeed,
+      {bool gradual = false}) {
+    final AudioPlayer sirenPlayer = _sfxPlayers[SfxType.ghostsRoamingSiren]!;
     if (sirenPlayer.state != PlayerState.playing) {
       playSfx(SfxType.ghostsRoamingSiren);
       sirenPlayer.setVolume(0);
     }
-    double calcedVolume = getTargetSirenVolume(normalisedAverageGhostSpeed);
-    double currentVolume = sirenPlayer.volume / volumeScalar;
+    final double calcedVolume =
+        getTargetSirenVolume(normalisedAverageGhostSpeed);
+    final double currentVolume = sirenPlayer.volume / volumeScalar;
     double targetVolume = 0;
     if (gradual) {
       targetVolume = (calcedVolume + currentVolume) / 2;
@@ -148,7 +151,7 @@ class AudioController {
     }
 
     // Remove handlers from the old settings controller if present
-    final oldSettings = _settings;
+    final SettingsController? oldSettings = _settings;
     if (oldSettings != null) {
       oldSettings.audioOn.removeListener(_audioOnHandler);
       oldSettings.soundsOn.removeListener(_soundsOnHandler);
@@ -193,12 +196,12 @@ class AudioController {
     // to be more selective when preloading.
     await AudioCache.instance.loadAll(SfxType.values
         .expand(soundTypeToFilename)
-        .map((path) => 'sfx/$path')
+        .map((String path) => 'sfx/$path')
         .toList());
   }
 
   void _soundsOnHandler() {
-    for (final player in _sfxPlayers.values) {
+    for (final AudioPlayer player in _sfxPlayers.values) {
       if (player.state == PlayerState.playing) {
         player.stop();
       }
@@ -207,7 +210,7 @@ class AudioController {
 
   void _stopAllSound() {
     _log.info('Stopping all sound');
-    for (final player in _sfxPlayers.values) {
+    for (final AudioPlayer player in _sfxPlayers.values) {
       player.stop();
     }
   }

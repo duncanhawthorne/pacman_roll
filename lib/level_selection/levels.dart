@@ -1,14 +1,14 @@
 class Levels {
-  static const tutorialLevelNum = 0;
-  static const firstRealLevel = 1;
-  static const max = 10;
-  static const levelToShowInstructions = defaultLevelNum;
-  static const defaultLevelNum = tutorialLevelNum;
+  static const int tutorialLevelNum = 0;
+  static const int firstRealLevel = 1;
+  static const int max = 10;
+  static const int levelToShowInstructions = defaultLevelNum;
+  static const int defaultLevelNum = tutorialLevelNum;
 
-  static const _ghostSpawnTimerLengthPattern = [5, 3, 2, 1];
+  static const List<int> _ghostSpawnTimerLengthPattern = <int>[5, 3, 2, 1];
 
   GameLevel getLevel(int levelNum) {
-    GameLevel result = (
+    final GameLevel result = (
       number: levelNum,
       maxAllowedDeaths: levelNum <= 0 ? 5 : 3,
       superPelletsEnabled: levelNum <= 1 ? true : false,
@@ -25,7 +25,7 @@ class Levels {
   }
 }
 
-final levels = Levels();
+final Levels levels = Levels();
 
 typedef GameLevel = ({
   int number,

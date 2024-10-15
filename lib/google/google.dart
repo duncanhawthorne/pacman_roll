@@ -15,7 +15,7 @@ import 'secrets.dart';
 const bool _debugFakeLogin = false;
 const String _gUserFakeLogin = "joebloggs@gmail.com";
 
-final gOn = googleOnReal &&
+final bool gOn = googleOnReal &&
     !(defaultTargetPlatform == TargetPlatform.windows && !kIsWeb);
 
 class G {
@@ -28,14 +28,10 @@ class G {
 
   String get gUser => gUserNotifier.value;
 
-  set _gUser(g) => {
-        debug(["gUserChanged", g]),
+  set _gUser(String g) => <void>{
+        debug(<dynamic>["gUserChanged", g]),
         gUserNotifier.value = g
       };
-
-  String get _gUserIcon => _gUserIconReal;
-
-  set _gUserIcon(gui) => _gUserIconReal = gui;
 
   double _iconWidth = 1;
   Color _color = Colors.white;
@@ -45,10 +41,10 @@ class G {
     _iconWidth = iconWidth;
     _color = color;
     return !gOn
-        ? SizedBox.shrink()
+        ? const SizedBox.shrink()
         : ValueListenableBuilder<String>(
             valueListenable: gUserNotifier,
-            builder: (context, audioOn, child) {
+            builder: (BuildContext context, String audioOn, Widget? child) {
               return !signedIn ? _loginButton(context) : _logoutButton(context);
             });
   }
@@ -102,18 +98,19 @@ class G {
   );
 
   Future<List<String>> _loadUserFromFilesystem() async {
-    final prefs = await SharedPreferences.getInstance();
-    String gUser = prefs.getString('gUser') ?? G._gUserDefault;
-    String gUserIcon = prefs.getString('gUserIcon') ?? G._gUserIconDefault;
-    debug(["loadUser", gUser, gUserIcon]);
-    return [gUser, gUserIcon];
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String gUser = prefs.getString('gUser') ?? G._gUserDefault;
+    final String gUserIcon =
+        prefs.getString('gUserIcon') ?? G._gUserIconDefault;
+    debug(<String>["loadUser", gUser, gUserIcon]);
+    return <String>[gUser, gUserIcon];
   }
 
   Future<void> _saveUserToFilesystem(String gUser, String gUserIcon) async {
-    final prefs = await SharedPreferences.getInstance();
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('gUser', gUser);
     await prefs.setString('gUserIcon', gUserIcon);
-    debug(["saveUser", gUser, gUserIcon]);
+    debug(<String>["saveUser", gUser, gUserIcon]);
   }
 
   static const String _gUserDefault = "JoeBloggs";
@@ -121,11 +118,11 @@ class G {
 
   GoogleSignInAccount? _user;
 
-  ValueNotifier<String> gUserNotifier = ValueNotifier("JoeBloggs");
-  String _gUserIconReal = "JoeBloggs";
+  ValueNotifier<String> gUserNotifier = ValueNotifier<String>("JoeBloggs");
+  String _gUserIcon = "JoeBloggs";
 
   Future<void> _loadUser() async {
-    List<String> tmp = await _loadUserFromFilesystem();
+    final List<String> tmp = await _loadUserFromFilesystem();
     _gUser = tmp[0];
     _gUserIcon = tmp[1];
   }
@@ -137,21 +134,21 @@ class G {
         debug("gUser changed");
         _user = account;
         if (_user != null) {
-          debug(["login successful", _user]);
-          _successfulLoginExtractDetails();
+          debug(<Object?>["login successful", _user]);
+          unawaited(_successfulLoginExtractDetails());
         } else {
-          debug(["logout"]);
-          _logoutExtractDetails();
+          debug(<String>["logout"]);
+          unawaited(_logoutExtractDetails());
         }
       });
     }
   }
 
   // ignore: unused_element
-  void _signInSilently() async {
+  Future<void> _signInSilently() async {
     if (gOn) {
       await googleSignIn.signInSilently();
-      _successfulLoginExtractDetails();
+      unawaited(_successfulLoginExtractDetails());
     }
   }
 
@@ -160,13 +157,13 @@ class G {
     if (gOn) {
       try {
         if (_debugFakeLogin) {
-          _debugLoginExtractDetails();
+          unawaited(_debugLoginExtractDetails());
         } else {
           await googleSignIn.signIn();
-          _successfulLoginExtractDetails();
+          unawaited(_successfulLoginExtractDetails());
         }
       } catch (e) {
-        debug(["signInDirectly", e]);
+        debug(<Object>["signInDirectly", e]);
       }
     }
   }
@@ -177,9 +174,9 @@ class G {
       } else {
         try {
           await googleSignIn.disconnect();
-          _logoutExtractDetails();
+          unawaited(_logoutExtractDetails());
         } catch (e) {
-          debug(["signOut", e]);
+          debug(<Object>["signOut", e]);
         }
       }
       //logoutExtractDetails(); //now handled by listener
@@ -190,7 +187,7 @@ class G {
     debug("mobileSignIn()");
     if (gOn) {
       if (_debugFakeLogin) {
-        _debugLoginExtractDetails();
+        unawaited(_debugLoginExtractDetails());
       } else {
         await googleSignIn.signInSilently();
         _user = googleSignIn.currentUser;
@@ -200,12 +197,12 @@ class G {
           await googleSignIn.signIn();
           _user = googleSignIn.currentUser;
         }
-        _successfulLoginExtractDetails();
+        unawaited(_successfulLoginExtractDetails());
       }
     }
   }
 
-  void _successfulLoginExtractDetails() async {
+  Future<void> _successfulLoginExtractDetails() async {
     if (_user != null) {
       debug("login extract details");
       _gUser = _user!.email;
@@ -213,31 +210,31 @@ class G {
         _gUserIcon = _user!.photoUrl ?? _gUserIconDefault;
       }
       await _saveUserToFilesystem(gUser, _gUserIcon);
-      debug(["gUser", gUser]);
+      debug(<String>["gUser", gUser]);
     }
   }
 
-  void _debugLoginExtractDetails() async {
+  Future<void> _debugLoginExtractDetails() async {
     debug("debugLoginExtractDetails");
     assert(_debugFakeLogin);
     _gUser = _gUserFakeLogin;
     await _saveUserToFilesystem(gUser, _gUserIcon);
-    debug(["gUser", gUser]);
+    debug(<String>["gUser", gUser]);
   }
 
-  void _logoutExtractDetails() async {
+  Future<void> _logoutExtractDetails() async {
     debug("logout extract details");
     _gUser = _gUserDefault;
     assert(!signedIn);
     await _saveUserToFilesystem(gUser, _gUserIcon);
-    debug(["gUser", gUser]);
+    debug(<String>["gUser", gUser]);
   }
 
   Future<void> _signOutAndExtractDetails() async {
     debug("sign out and extract details");
     if (gOn) {
       await _signOut();
-      _logoutExtractDetails();
+      unawaited(_logoutExtractDetails());
     }
   }
 }

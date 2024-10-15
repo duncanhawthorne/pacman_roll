@@ -8,7 +8,7 @@ import 'wrapper_no_events.dart';
 class BlockingBarWrapper extends WrapperNoEvents
     with HasWorldReference<PacmanWorld>, HasGameReference<PacmanGame> {
   @override
-  final priority = 1000;
+  final int priority = 1000;
 
   @override
   void reset() {

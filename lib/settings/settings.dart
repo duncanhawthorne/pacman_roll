@@ -11,7 +11,17 @@ import 'persistence/settings_persistence.dart';
 /// An class that holds settings like [playerName] or [musicOn],
 /// and saves them to an injected persistence store.
 class SettingsController {
-  static final _log = Logger('SettingsController');
+  /// Creates a new instance of [SettingsController] backed by [store].
+  ///
+  /// By default, settings are persisted using [LocalStorageSettingsPersistence]
+  /// (i.e. NSUserDefaults on iOS, SharedPreferences on Android or
+  /// local storage on the web).
+  SettingsController({SettingsPersistence? store})
+      : _store = store ?? LocalStorageSettingsPersistence() {
+    _loadStateFromPersistence();
+  }
+
+  static final Logger _log = Logger('SettingsController');
 
   /// The persistence store that is used to save settings.
   final SettingsPersistence _store;
@@ -24,26 +34,16 @@ class SettingsController {
   /// a separate flag (as opposed to some kind of {off, sound, everything}
   /// enum) means that the player will not lose their [soundsOn] and
   /// [musicOn] preferences when they temporarily mute the game.
-  ValueNotifier<bool> audioOn = ValueNotifier(true);
+  ValueNotifier<bool> audioOn = ValueNotifier<bool>(true);
 
   /// The player's name. Used for things like high score lists.
-  ValueNotifier<String> playerName = ValueNotifier('Player');
+  ValueNotifier<String> playerName = ValueNotifier<String>('Player');
 
   /// Whether or not the sound effects (sfx) are on.
-  ValueNotifier<bool> soundsOn = ValueNotifier(true);
+  ValueNotifier<bool> soundsOn = ValueNotifier<bool>(true);
 
   /// Whether or not the music is on.
-  ValueNotifier<bool> musicOn = ValueNotifier(true);
-
-  /// Creates a new instance of [SettingsController] backed by [store].
-  ///
-  /// By default, settings are persisted using [LocalStorageSettingsPersistence]
-  /// (i.e. NSUserDefaults on iOS, SharedPreferences on Android or
-  /// local storage on the web).
-  SettingsController({SettingsPersistence? store})
-      : _store = store ?? LocalStorageSettingsPersistence() {
-    _loadStateFromPersistence();
-  }
+  ValueNotifier<bool> musicOn = ValueNotifier<bool>(true);
 
   void setPlayerName(String name) {
     playerName.value = name;
@@ -67,8 +67,8 @@ class SettingsController {
 
   /// Asynchronously loads values from the injected persistence store.
   Future<void> _loadStateFromPersistence() async {
-    final loadedValues = await Future.wait([
-      _store.getAudioOn(defaultValue: false).then((value) {
+    final List<Object> loadedValues = await Future.wait(<Future<Object>>[
+      _store.getAudioOn(defaultValue: false).then((bool value) {
         if (kIsWeb) {
           // On the web, sound can only start after user interaction, so
           // we start muted there on every game start.
@@ -79,11 +79,11 @@ class SettingsController {
       }),
       _store
           .getSoundsOn(defaultValue: true)
-          .then((value) => soundsOn.value = true), //value
+          .then((bool value) => soundsOn.value = true), //value
       _store
           .getMusicOn(defaultValue: true)
-          .then((value) => musicOn.value = false), //value
-      _store.getPlayerName().then((value) => playerName.value = value),
+          .then((bool value) => musicOn.value = false), //value
+      _store.getPlayerName().then((String value) => playerName.value = value),
     ]);
 
     _log.fine(() => 'Loaded settings: $loadedValues');

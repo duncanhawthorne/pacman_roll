@@ -19,7 +19,7 @@ final Paint highQualityPaint = Paint()
 //..color = const Color.fromARGB(255, 255, 255, 255)
   ..isAntiAlias = true;
 
-final kVector2Zero = Vector2.zero();
+final Vector2 kVector2Zero = Vector2.zero();
 
 /// The [GameCharacter] is the generic object that is linked to a [PhysicsBall]
 class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
@@ -74,7 +74,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
 
   Future<Map<CharacterState, SpriteAnimation>?> getAnimations(
       [int size = 1]) async {
-    return {};
+    return <CharacterState, SpriteAnimation>{};
   }
 
   void bringBallToSprite() {
@@ -86,13 +86,14 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   }
 
   void setPositionStill(Vector2 targetLoc) {
-    _ball.position = targetLoc;
-    _ball.velocity = kVector2Zero;
+    _ball
+      ..position = targetLoc
+      ..velocity = kVector2Zero;
     position.setFrom(targetLoc);
     _connectToBall();
   }
 
-  void disconnectFromBall({spawning = false}) {
+  void disconnectFromBall({bool spawning = false}) {
     assert(!isClone); //as for clone have no way to turn collisionType back on
     if (!spawning) {
       /// if body not yet initialised, this will crash

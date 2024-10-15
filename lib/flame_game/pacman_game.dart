@@ -35,15 +35,18 @@ import 'pacman_world.dart';
 // flame_forge2d has a maximum allowed speed for physical objects.
 // Reducing map size 30x, scaling up gravity 30x, & zooming 30x changes nothing,
 // but reduces chance of hitting maximum allowed speed
-const flameGameZoom = 30.0;
-const _visualZoomMultiplier = 0.92;
+const double flameGameZoom = 30.0;
+const double _visualZoomMultiplier = 0.92;
 const double kVirtualGameSize = 1700; //determines speed of game
 
 class PacmanGame extends Forge2DGame<PacmanWorld>
-    with HasCollisionDetection, HasTimeScale {
+    with
+        // ignore: always_specify_types
+        HasCollisionDetection,
+        HasTimeScale {
   PacmanGame({
     required this.level,
-    required mazeId,
+    required int mazeId,
     required this.playerProgress,
     required this.audioController,
     required this.appLifecycleStateNotifier,
@@ -70,7 +73,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
 
   String _userString = "";
 
-  static const deathPenaltyMillis = 5000;
+  static const int deathPenaltyMillis = 5000;
   final Timer stopwatch = Timer(double.infinity);
   int get stopwatchMilliSeconds =>
       (stopwatch.current * 1000).toInt() +
@@ -91,7 +94,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   Color backgroundColor() => Palette.background.color;
 
   Map<String, dynamic> _getCurrentGameState() {
-    final Map<String, dynamic> gameStateTmp = {};
+    final Map<String, dynamic> gameStateTmp = <String, dynamic>{};
     gameStateTmp["userString"] = _userString;
     gameStateTmp["levelNum"] = level.number;
     gameStateTmp["levelCompleteTime"] = stopwatchMilliSeconds;
@@ -157,11 +160,12 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   }
 
   void cleanDialogs() {
-    overlays.remove(GameScreen.startDialogKey);
-    overlays.remove(GameScreen.loseDialogKey);
-    overlays.remove(GameScreen.wonDialogKey);
-    overlays.remove(GameScreen.tutorialDialogKey);
-    overlays.remove(GameScreen.resetDialogKey);
+    overlays
+      ..remove(GameScreen.startDialogKey)
+      ..remove(GameScreen.loseDialogKey)
+      ..remove(GameScreen.wonDialogKey)
+      ..remove(GameScreen.tutorialDialogKey)
+      ..remove(GameScreen.resetDialogKey);
   }
 
   void toggleOverlay(String overlayKey) {
@@ -180,12 +184,13 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
     super.onGameResize(size);
   }
 
-  void reset({firstRun = false}) {
+  void reset({bool firstRun = false}) {
     pauseEngineIfNoActivity();
     _userString = _getRandomString(random, 15);
     cleanDialogs();
-    stopwatch.pause();
-    stopwatch.reset();
+    stopwatch
+      ..pause()
+      ..reset();
     if (!firstRun) {
       assert(world.isLoaded);
       world.reset();
@@ -208,7 +213,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   void pauseEngineIfNoActivity() {
     resumeEngine(); //for any catch up animation, if not already resumed
     _framesRendered = 0;
-    async.Timer.periodic(const Duration(milliseconds: 10), (timer) {
+    async.Timer.periodic(const Duration(milliseconds: 10), (async.Timer timer) {
       if (paused) {
         //already paused, no further action required, just cancel timer
         timer.cancel();
@@ -272,6 +277,6 @@ Vector2 _sanitizeScreenSize(Vector2 size) {
 const String _chars =
     'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
 
-String _getRandomString(random, int length) =>
-    String.fromCharCodes(Iterable.generate(
+String _getRandomString(Random random, int length) =>
+    String.fromCharCodes(Iterable<int>.generate(
         length, (_) => _chars.codeUnitAt(random.nextInt(_chars.length))));

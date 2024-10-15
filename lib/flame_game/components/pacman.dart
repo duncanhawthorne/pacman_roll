@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:core';
 
 import 'package:flame/collisions.dart';
@@ -17,7 +18,7 @@ import 'super_pellet.dart';
 
 const int _kPacmanDeadResetTimeMillis = 1700;
 const int _kPacmanHalfEatingResetTimeMillis = 180;
-const _multipleSpawningPacmans = false;
+const bool _multipleSpawningPacmans = false;
 
 /// The [GameCharacter] is the component that the physical player of the game is
 /// controlling.
@@ -30,7 +31,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   @override
   Future<Map<CharacterState, SpriteAnimation>?> getAnimations(
       [int size = 1]) async {
-    return {
+    return <CharacterState, SpriteAnimation>{
       CharacterState.normal: SpriteAnimation.spriteList(
         await pacmanSprites.pacmanNormalSprites(size),
         stepTime: double.infinity,
@@ -53,7 +54,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     };
   }
 
-  void _eat({required isPellet}) {
+  void _eat({required bool isPellet}) {
     if (typical) {
       if (current == CharacterState.normal) {
         current = CharacterState.eating;
@@ -187,7 +188,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
 
   @override
   Future<void> onLoad() async {
-    super.onLoad();
+    await super.onLoad();
     if (!isClone) {
       world.pacmans.pacmanList.add(this);
       current = CharacterState.normal;
@@ -209,7 +210,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     if (!isClone) {
       world.pacmans.pacmanList.remove(this);
     }
-    super.onRemove();
+    unawaited(super.onRemove());
   }
 
   @override

@@ -65,7 +65,7 @@ const TextStyle textStyleBodyDull =
 const Color _defaultButtonStyleBorderColor = Palette.seedColor;
 ButtonStyle buttonStyle(
     {Color? borderColor = _defaultButtonStyleBorderColor, bool small = false}) {
-  Color borderColorReal = borderColor ?? _defaultButtonStyleBorderColor;
+  final Color borderColorReal = borderColor ?? _defaultButtonStyleBorderColor;
   return TextButton.styleFrom(
     minimumSize: Size.zero,
     padding: EdgeInsets.all(small ? 16 : 24),

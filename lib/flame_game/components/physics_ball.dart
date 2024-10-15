@@ -3,16 +3,17 @@ import 'package:flame_forge2d/flame_forge2d.dart';
 
 import '../maze.dart';
 
-const _useForgePhysicsBallRotation = false;
-const _instantSetPosition = true;
-const _radiusScaleFactor = 0.99;
+const bool _useForgePhysicsBallRotation = false;
+const bool _instantSetPosition = true;
+const double _radiusScaleFactor = 0.99;
 
+// ignore: always_specify_types
 class PhysicsBall extends BodyComponent with IgnoreEvents {
   PhysicsBall({
     required Vector2 position,
     double? radius,
   }) : super(
-            fixtureDefs: [
+            fixtureDefs: <FixtureDef>[
               FixtureDef(
                 CircleShape()
                   ..radius =
@@ -31,14 +32,15 @@ class PhysicsBall extends BodyComponent with IgnoreEvents {
 
   @override
   // ignore: overridden_fields
-  final renderBody = false;
+  final bool renderBody = false;
 
   double get speed => body.linearVelocity.length;
 
   set velocity(Vector2 vel) => body.linearVelocity.setFrom(vel);
 
-  set position(Vector2 pos) =>
-      {_instantSetPosition ? _setPositionNow(pos) : _setPositionNextFrame(pos)};
+  set position(Vector2 pos) => <void>{
+        _instantSetPosition ? _setPositionNow(pos) : _setPositionNextFrame(pos)
+      };
 
   final Vector2 _oneTimeManualPosition = Vector2(0, 0);
   bool _oneTimeManualPositionSet = false;
@@ -56,8 +58,9 @@ class PhysicsBall extends BodyComponent with IgnoreEvents {
   bool _subConnectedBall = true;
 
   void setDynamic() {
-    body.setType(BodyType.dynamic);
-    body.setActive(true);
+    body
+      ..setType(BodyType.dynamic)
+      ..setActive(true);
     _subConnectedBall = true;
   }
 
@@ -65,8 +68,9 @@ class PhysicsBall extends BodyComponent with IgnoreEvents {
     if (isMounted && body.isActive) {
       // avoid crashes if body not yet initialised
       // Probably about to remove ball anyway
-      body.setType(BodyType.static);
-      body.setActive(false);
+      body
+        ..setType(BodyType.static)
+        ..setActive(false);
     }
     _subConnectedBall = false;
   }

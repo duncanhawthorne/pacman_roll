@@ -22,7 +22,7 @@ class GameLoseDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return popupDialog(
-      children: [
+      children: <Widget>[
         titleText(text: 'Game Over'),
         bodyWidget(
           child: Text(
@@ -33,7 +33,7 @@ class GameLoseDialog extends StatelessWidget {
         levelSelector(context, game),
         mazeSelector(context, game),
         bottomRowWidget(
-          children: [
+          children: <Widget>[
             TextButton(
                 style: buttonStyle(),
                 onPressed: () {

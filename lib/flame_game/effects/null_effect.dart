@@ -2,7 +2,7 @@ import 'package:flame/effects.dart';
 import 'package:flutter/animation.dart';
 
 class NullEffect extends RotateEffect {
-  NullEffect(int durationMillis, {onComplete})
+  NullEffect(int durationMillis, {Function()? onComplete})
       : super.by(
             0,
             EffectController(

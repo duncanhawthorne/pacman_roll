@@ -14,7 +14,7 @@ class TutorialDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return popupDialog(
-      children: [
+      children: <Widget>[
         titleText(text: '←←←←←←←←\n↓      ↑\n↓ Drag ↑\n↓      ↑\n→→→→→→→→'),
       ],
     );

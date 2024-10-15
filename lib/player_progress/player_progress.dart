@@ -22,13 +22,13 @@ class PlayerProgress extends ChangeNotifier {
     });
   }
 
-  final List<Map<String, int>> _playerProgressLevels = [];
-  late final Map<String, dynamic> _playerProgress = {
+  final List<Map<String, int>> _playerProgressLevels = <Map<String, int>>[];
+  late final Map<String, dynamic> _playerProgress = <String, dynamic>{
     "levels": _playerProgressLevels
   };
 
-  Iterable<int> get _levelNumsCompleted =>
-      _playerProgressLevels.map((item) => item["levelNum"] as int);
+  Iterable<int> get _levelNumsCompleted => _playerProgressLevels
+      .map((Map<String, int> item) => item["levelNum"] as int);
 
   int get maxLevelCompleted => _playerProgressLevels.isEmpty
       ? Levels.tutorialLevelNum - 1
@@ -38,11 +38,12 @@ class PlayerProgress extends ChangeNotifier {
     return _levelNumsCompleted.contains(levelNum);
   }
 
-  void saveLevelComplete(var currentGameState) {
-    debug(["saveWin"]);
+  void saveLevelComplete(Map<String, dynamic> currentGameState) {
+    debug(<String>["saveWin"]);
     final Map<String, int> win = _cleanupWin(currentGameState);
-    playerProgress._addWin(win);
-    playerProgress._saveToFirebaseAndFilesystem();
+    playerProgress
+      .._addWin(win)
+      .._saveToFirebaseAndFilesystem();
   }
 
   void reset() {
@@ -51,22 +52,22 @@ class PlayerProgress extends ChangeNotifier {
   }
 
   void _addWin(Map<String, int> win) {
-    Map? relevantSave = _playerProgressLevels
-        .where((item) => item["levelNum"] == win["levelNum"])
+    final Map<String, int>? relevantSave = _playerProgressLevels
+        .where((Map<String, int> item) => item["levelNum"] == win["levelNum"])
         .firstOrNull;
     if (relevantSave == null) {
       _playerProgressLevels.add(win);
     } else if (win["levelCompleteTime"]! < relevantSave["levelCompleteTime"]!) {
       for (String key in win.keys) {
-        relevantSave[key] = win[key];
+        relevantSave[key] = win[key]!;
       }
     }
     notifyListeners();
   }
 
   Future<void> _loadFromFirebaseOrFilesystem() async {
-    debug(["loadKeys"]);
-    final prefs = await SharedPreferences.getInstance();
+    debug(<String>["loadKeys"]);
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
     String gameEncoded = "";
 
     if (!FBase.firebaseOn || !g.signedIn) {
@@ -80,18 +81,18 @@ class PlayerProgress extends ChangeNotifier {
   }
 
   Future<void> _saveToFirebaseAndFilesystem() async {
-    String gameEncoded = _getEncodeCurrent();
-    debug(["saveKeys", gameEncoded]);
+    final String gameEncoded = _getEncodeCurrent();
+    debug(<String>["saveKeys", gameEncoded]);
     // save locally
-    final prefs = await SharedPreferences.getInstance();
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('game', gameEncoded);
 
     // if possible save to firebase
     if (FBase.firebaseOn && g.signedIn) {
-      debug(["saveKeys gUser", g.gUser]);
-      fBase.firebasePushPlayerProgress(g, gameEncoded);
+      debug(<String>["saveKeys gUser", g.gUser]);
+      unawaited(fBase.firebasePushPlayerProgress(g, gameEncoded));
     } else {
-      debug(["not signed in", g.gUser]);
+      debug(<String>["not signed in", g.gUser]);
     }
   }
 
@@ -104,16 +105,16 @@ class PlayerProgress extends ChangeNotifier {
       debug("blank gameEncoded");
     } else {
       try {
-        final jsonGameTmp = json.decode(gameEncoded);
-        final jsonLevels = jsonGameTmp["levels"];
+        final dynamic jsonGameTmp = json.decode(gameEncoded);
+        final dynamic jsonLevels = jsonGameTmp["levels"];
         if (jsonLevels != null) {
-          for (var jsonLevel in jsonLevels) {
+          for (dynamic jsonLevel in jsonLevels) {
             final Map<String, int> win = _cleanupWin(jsonLevel);
             playerProgress._addWin(win);
           }
         }
       } catch (e) {
-        debug(["malformed load", e]);
+        debug(<Object>["malformed load", e]);
       }
     }
   }
@@ -121,8 +122,8 @@ class PlayerProgress extends ChangeNotifier {
 
 PlayerProgress playerProgress = PlayerProgress();
 
-Map<String, int> _cleanupWin(var winRaw) {
-  Map<String, int> result = {
+Map<String, int> _cleanupWin(Map<String, dynamic> winRaw) {
+  final Map<String, int> result = <String, int>{
     "levelNum": -1,
     "mazeId": -1,
     "levelCompleteTime": -1,

@@ -18,9 +18,9 @@ const int _kGhostChaseTimeMillis = 6000;
 class Ghosts extends WrapperNoEvents
     with HasWorldReference<PacmanWorld>, HasGameReference<PacmanGame> {
   @override
-  final priority = 1;
+  final int priority = 1;
 
-  final List<Ghost> ghostList = [];
+  final List<Ghost> ghostList = <Ghost>[];
 
   CharacterState current = CharacterState.normal;
   Timer ghostsScaredTimer = Timer(_kGhostChaseTimeMillis / 1000);
@@ -37,20 +37,20 @@ class Ghosts extends WrapperNoEvents
       return ghostList
               .map((Ghost ghost) =>
                   ghost.current == CharacterState.normal ? ghost.speed : 0.0)
-              .reduce((value, element) => value + element) /
+              .reduce((double value, double element) => value + element) /
           ghostList.length;
     }
   }
 
-  void sirenVolumeUpdatedTimer() async {
+  async.Future<void> sirenVolumeUpdatedTimer() async {
     // ignore: prefer_conditional_assignment
     if (_sirenEnabled) {
       if (_sirenTimer == null &&
           isMounted &&
           game.isGameLive &&
           !world.gameWonOrLost) {
-        _sirenTimer =
-            async.Timer.periodic(const Duration(milliseconds: 250), (timer) {
+        _sirenTimer = async.Timer.periodic(const Duration(milliseconds: 250),
+            (async.Timer timer) {
           if (game.isGameLive &&
               !world.gameWonOrLost &&
               !world.doingLevelResetFlourish) {
@@ -98,7 +98,8 @@ class Ghosts extends WrapperNoEvents
       return; //else cant use game references
     }
     ghostSpawner ??= SpawnComponent(
-      factory: (i) => Ghost(ghostID: [3, 4, 5][game.random.nextInt(3)]),
+      factory: (int i) =>
+          Ghost(ghostID: <int>[3, 4, 5][game.random.nextInt(3)]),
       selfPositioning: true,
       period: world.level.ghostSpawnTimerLength.toDouble(),
     );

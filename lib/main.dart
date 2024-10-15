@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:flame/flame.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:nes_ui/nes_ui.dart';
 import 'package:provider/provider.dart';
+import 'package:provider/single_child_widget.dart';
 
 import 'app_lifecycle/app_lifecycle.dart';
 import 'audio/audio_controller.dart';
@@ -19,7 +22,7 @@ import 'utils/src/workarounds.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  fBase.initialize();
+  unawaited(fBase.initialize());
 
   GoogleFonts.config.allowRuntimeFetching = false;
 
@@ -38,24 +41,30 @@ class MyGame extends StatelessWidget {
   Widget build(BuildContext context) {
     return AppLifecycleObserver(
       child: MultiProvider(
-        providers: [
-          Provider(create: (context) => Palette()),
-          ChangeNotifierProvider(create: (context) => PlayerProgress()),
-          Provider(create: (context) => SettingsController()),
+        providers: <SingleChildWidget>[
+          Provider<Palette>(create: (BuildContext context) => Palette()),
+          ChangeNotifierProvider<PlayerProgress>(
+              create: (BuildContext context) => PlayerProgress()),
+          Provider<SettingsController>(
+              create: (BuildContext context) => SettingsController()),
           // Set up audio.
           ProxyProvider2<SettingsController, AppLifecycleStateNotifier,
               AudioController>(
             // Ensures that music starts immediately.
             lazy: false,
-            create: (context) => AudioController(),
-            update: (context, settings, lifecycleNotifier, audio) {
+            create: (BuildContext context) => AudioController(),
+            update: (BuildContext context,
+                SettingsController settings,
+                AppLifecycleStateNotifier lifecycleNotifier,
+                AudioController? audio) {
               audio!.attachDependencies(lifecycleNotifier, settings);
               return audio;
             },
-            dispose: (context, audio) => audio.dispose(),
+            dispose: (BuildContext context, AudioController audio) =>
+                audio.dispose(),
           ),
         ],
-        child: Builder(builder: (context) {
+        child: Builder(builder: (BuildContext context) {
           //context.watch<Palette>();
 
           return MaterialApp.router(

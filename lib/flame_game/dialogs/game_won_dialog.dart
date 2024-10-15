@@ -34,9 +34,9 @@ class GameWonDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool showNextButton = game.level.number + 1 <= Levels.max;
+    final bool showNextButton = game.level.number + 1 <= Levels.max;
     return popupDialog(
-      children: [
+      children: <Widget>[
         titleText(text: 'Complete'),
         bodyWidget(
           child: Text(
@@ -47,7 +47,7 @@ class GameWonDialog extends StatelessWidget {
         !FBase.firebaseOn || game.level.isTutorial
             ? const SizedBox.shrink()
             : bodyWidget(
-                child: FutureBuilder(
+                child: FutureBuilder<String>(
                     future: _scoreboardRankText(
                         levelNum: level.number,
                         levelCompletedInMillis: levelCompletedInMillis,
@@ -64,7 +64,7 @@ class GameWonDialog extends StatelessWidget {
         levelSelector(context, game),
         mazeSelector(context, game),
         bottomRowWidget(
-          children: [
+          children: <Widget>[
             TextButton(
                 style: buttonStyle(
                     borderColor: showNextButton ? Palette.transp.color : null),
@@ -74,7 +74,7 @@ class GameWonDialog extends StatelessWidget {
                 },
                 child: const Text('Retry', style: textStyleBody)),
             !showNextButton
-                ? SizedBox.shrink()
+                ? const SizedBox.shrink()
                 : TextButton(
                     style: buttonStyle(),
                     onPressed: () {

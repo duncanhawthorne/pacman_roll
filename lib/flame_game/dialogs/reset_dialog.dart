@@ -24,15 +24,15 @@ class ResetDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return popupDialog(
-      children: [
+      children: <Widget>[
         titleText(text: appTitle),
-        bottomRowWidget(children: [
+        bottomRowWidget(children: <Widget>[
           TextButton(
               style: buttonStyle(),
               onPressed: () {
                 game.overlays.remove(GameScreen.resetDialogKey);
               },
-              child: Text("Cancel", style: textStyleBody)),
+              child: const Text("Cancel", style: textStyleBody)),
           TextButton(
               style: buttonStyle(borderColor: Palette.warning.color),
               onPressed: () {
@@ -40,7 +40,7 @@ class ResetDialog extends StatelessWidget {
                 game.overlays.remove(GameScreen.resetDialogKey);
                 context.go('/');
               },
-              child: Text("Reset completed levels", style: textStyleBody))
+              child: const Text("Reset completed levels", style: textStyleBody))
         ]),
       ],
     );

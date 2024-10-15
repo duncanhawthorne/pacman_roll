@@ -6,27 +6,29 @@ import '../components/game_character.dart';
 
 class StubSprites {
   Picture _stubRecorder() {
-    final recorder = PictureRecorder();
+    final PictureRecorder recorder = PictureRecorder();
     // need to use recorder else throws error
     // ignore: unused_local_variable
-    final canvas = Canvas(recorder);
+    final Canvas canvas = Canvas(recorder);
     return recorder.endRecording();
   }
 
-  late final _stubSprite = Sprite(_stubRecorder().toImageSync(1, 1));
+  late final Sprite _stubSprite = Sprite(_stubRecorder().toImageSync(1, 1));
 
   Map<CharacterState, SpriteAnimation> _stubAnimations() {
-    Map<CharacterState, SpriteAnimation> result = {};
+    final Map<CharacterState, SpriteAnimation> result =
+        <CharacterState, SpriteAnimation>{};
     for (CharacterState state in CharacterState.values) {
       result[state] = SpriteAnimation.spriteList(
-        [_stubSprite],
+        <Sprite>[_stubSprite],
         stepTime: double.infinity,
       );
     }
     return result;
   }
 
-  late final stubAnimation = _stubAnimations();
+  late final Map<CharacterState, SpriteAnimation> stubAnimation =
+      _stubAnimations();
 }
 
 StubSprites stubSprites = StubSprites();

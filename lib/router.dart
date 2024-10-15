@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'flame_game/game_screen.dart';
@@ -10,12 +11,13 @@ import 'level_selection/levels.dart';
 const String levelUrlKey = "level";
 const String mazeUrlKey = "maze";
 
-final router = GoRouter(
-  routes: [
+final GoRouter router = GoRouter(
+  routes: <RouteBase>[
     GoRoute(
       path: '/',
-      builder: (context, state) {
-        final level = _parseGameLevel(state.uri.queryParameters[levelUrlKey]);
+      builder: (BuildContext context, GoRouterState state) {
+        final GameLevel level =
+            _parseGameLevel(state.uri.queryParameters[levelUrlKey]);
         int mazeId = _parseMazeId(state.uri.queryParameters[mazeUrlKey]);
         if (level.isTutorial && !isTutorialMaze(mazeId)) {
           mazeId = Maze.tutorialMazeId;
@@ -40,10 +42,13 @@ GameLevel _parseGameLevel(String? levelString) {
 }
 
 int _parseMazeId(String? levelString) {
-  final mazeIdRaw = levelString ?? mazeNames[Maze.defaultMazeId];
+  final String? mazeIdRaw = levelString ?? mazeNames[Maze.defaultMazeId];
   return !mazeNames.containsValue(mazeIdRaw)
       ? Maze.defaultMazeId
       : _reverseMap(mazeNames)[mazeIdRaw];
 }
 
-Map _reverseMap(Map map) => {for (var e in map.entries) e.value: e.key};
+Map<dynamic, dynamic> _reverseMap(Map<dynamic, dynamic> map) =>
+    <dynamic, dynamic>{
+      for (MapEntry<dynamic, dynamic> e in map.entries) e.value: e.key
+    };

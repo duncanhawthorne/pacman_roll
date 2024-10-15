@@ -18,7 +18,7 @@ final Paint _wallGroundPaint = Paint()
 
 class MazeWallRectangleVisual extends RectangleComponent with IgnoreEvents {
   MazeWallRectangleVisual(
-      {required super.position, required width, required height})
+      {required super.position, required double width, required double height})
       : super(
             size: Vector2(width, height),
             anchor: Anchor.center,
@@ -29,7 +29,7 @@ class MazeVisualBlockingBar extends MazeWallRectangleVisual {
   MazeVisualBlockingBar(
       {required super.position, required super.width, required super.height});
   @override
-  final priority = 1000;
+  final int priority = 1000;
 }
 
 class MazeWallCircleVisual extends CircleComponent with IgnoreEvents {
@@ -37,56 +37,56 @@ class MazeWallCircleVisual extends CircleComponent with IgnoreEvents {
       : super(anchor: Anchor.center, paint: _wallVisualPaint);
 }
 
+// ignore: always_specify_types
 class MazeWallRectangleGround extends BodyComponent with IgnoreEvents {
+  MazeWallRectangleGround(
+      {required this.position, required this.width, required this.height});
   @override
   final Vector2 position;
   final double width;
   final double height;
 
-  MazeWallRectangleGround(
-      {required this.position, required this.width, required this.height});
-
   @override
   // ignore: overridden_fields
-  final renderBody = true;
+  final bool renderBody = true;
 
   @override
-  final priority = -2;
+  final int priority = -2;
 
   @override
   Body createBody() {
-    final shape = PolygonShape();
+    final PolygonShape shape = PolygonShape();
     paint = _wallGroundPaint;
     shape.setAsBoxXY(width / 2, height / 2);
-    final fixtureDef = FixtureDef(shape);
-    final bodyDef = BodyDef(type: BodyType.static, position: position);
+    final FixtureDef fixtureDef = FixtureDef(shape);
+    final BodyDef bodyDef = BodyDef(type: BodyType.static, position: position);
     return world.createBody(bodyDef)..createFixture(fixtureDef);
   }
 }
 
+// ignore: always_specify_types
 class MazeWallCircleGround extends BodyComponent with IgnoreEvents {
+  MazeWallCircleGround({required this.position, required this.radius});
   @override
   final Vector2 position;
   final double radius;
 
-  MazeWallCircleGround({required this.position, required this.radius});
-
   @override
   // ignore: overridden_fields
-  final renderBody = true;
+  final bool renderBody = true;
 
   @override
-  final priority = -2;
+  final int priority = -2;
 
   @override
   Body createBody() {
-    final shape = CircleShape();
+    final CircleShape shape = CircleShape();
     paint = _wallGroundPaint;
 
     shape.radius = radius;
-    final fixtureDef = FixtureDef(shape);
+    final FixtureDef fixtureDef = FixtureDef(shape);
 
-    final bodyDef = BodyDef(type: BodyType.static, position: position);
+    final BodyDef bodyDef = BodyDef(type: BodyType.static, position: position);
     return world.createBody(bodyDef)..createFixture(fixtureDef);
   }
 }

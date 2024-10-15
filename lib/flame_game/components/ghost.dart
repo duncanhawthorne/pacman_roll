@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:core';
 
 import 'package:flame/components.dart';
@@ -9,7 +10,11 @@ import '../maze.dart';
 import 'clones.dart';
 import 'game_character.dart';
 
-const _ghostSpritePaths = {0: 'ghost1.png', 1: 'ghost3.png', 2: 'ghost2.png'};
+const Map<int, String> _ghostSpritePaths = <int, String>{
+  0: 'ghost1.png',
+  1: 'ghost3.png',
+  2: 'ghost2.png'
+};
 
 class Ghost extends GameCharacter {
   Ghost({required this.ghostID, super.original})
@@ -20,28 +25,28 @@ class Ghost extends GameCharacter {
   @override
   Future<Map<CharacterState, SpriteAnimation>?> getAnimations(
       [int size = 1]) async {
-    return {
+    return <CharacterState, SpriteAnimation>{
       CharacterState.normal: SpriteAnimation.spriteList(
-        [await game.loadSprite(_ghostSpritePaths[ghostID % 3]!)],
+        <Sprite>[await game.loadSprite(_ghostSpritePaths[ghostID % 3]!)],
         stepTime: double.infinity,
       ),
       CharacterState.scared: SpriteAnimation.spriteList(
-        [await game.loadSprite('ghostscared1.png')],
+        <Sprite>[await game.loadSprite('ghostscared1.png')],
         stepTime: double.infinity,
       ),
       CharacterState.scaredIsh: SpriteAnimation.spriteList(
-        [
+        <Sprite>[
           await game.loadSprite('ghostscared1.png'),
           await game.loadSprite('ghostscared2.png')
         ],
         stepTime: 0.1,
       ),
       CharacterState.dead: SpriteAnimation.spriteList(
-        [await game.loadSprite('eyes.png')],
+        <Sprite>[await game.loadSprite('eyes.png')],
         stepTime: double.infinity,
       ),
       CharacterState.spawning: SpriteAnimation.spriteList(
-        [await game.loadSprite('eyes.png')],
+        <Sprite>[await game.loadSprite('eyes.png')],
         stepTime: double.infinity,
       ),
     };
@@ -82,7 +87,7 @@ class Ghost extends GameCharacter {
         disconnectFromBall();
         add(MoveToPositionEffect(maze.ghostStart,
             onComplete: () =>
-                {bringBallToSprite(), current = world.ghosts.current}));
+                <void>{bringBallToSprite(), current = world.ghosts.current}));
         resetSlideAngle(this);
       }
     }
@@ -97,7 +102,7 @@ class Ghost extends GameCharacter {
               ? world.pacmans.pacmanList[0].position
               : maze.ghostStart,
           onComplete: () =>
-              {bringBallToSprite(), current = world.ghosts.current}));
+              <void>{bringBallToSprite(), current = world.ghosts.current}));
     }
   }
 
@@ -106,7 +111,7 @@ class Ghost extends GameCharacter {
     removeEffects(this);
     disconnectFromBall();
     add(MoveToPositionEffect(maze.ghostStartForId(ghostID),
-        onComplete: () => {
+        onComplete: () => <void>{
               //bringBallToSprite()
               //Calling bringBallToSprite here creates a crash
               //also would be a race condition
@@ -123,14 +128,14 @@ class Ghost extends GameCharacter {
 
   @override
   Future<void> onLoad() async {
-    super.onLoad();
+    await super.onLoad();
     if (!isClone) {
       world.ghosts.ghostList.add(this);
       current = world.ghosts.current;
       if (ghostID >= 3) {
         _setSpawning();
       }
-      clone = GhostClone(position: position, ghostID: ghostID, original: this);
+      clone = GhostClone(ghostID: ghostID, original: this);
       animations = await getAnimations();
     }
   }
@@ -148,6 +153,6 @@ class Ghost extends GameCharacter {
     if (!isClone) {
       world.ghosts.ghostList.remove(this);
     }
-    super.onRemove();
+    unawaited(super.onRemove());
   }
 }

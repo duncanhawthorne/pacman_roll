@@ -11,14 +11,14 @@ import 'wrapper_no_events.dart';
 class TutorialWrapper extends WrapperNoEvents
     with HasWorldReference<PacmanWorld>, HasGameReference<PacmanGame> {
   @override
-  final priority = 100;
+  final int priority = 100;
 
   bool _tutorialEverManuallyHidden = false;
-  static const tutorialDelay = Duration(milliseconds: 3000);
+  static const Duration tutorialDelay = Duration(milliseconds: 3000);
 
   @override
   void start() {
-    Future.delayed(tutorialDelay, () {
+    Future<void>.delayed(tutorialDelay, () {
       if (!game.levelStarted &&
           !_tutorialEverManuallyHidden &&
           world.level.number == Levels.levelToShowInstructions) {

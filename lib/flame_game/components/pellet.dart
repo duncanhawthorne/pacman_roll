@@ -19,7 +19,7 @@ class Pellet extends CircleComponent
 
   @override
   Future<void> onLoad() async {
-    super.onLoad();
+    await super.onLoad();
     add(CircleHitbox(
       isSolid: true,
       collisionType: CollisionType.passive,

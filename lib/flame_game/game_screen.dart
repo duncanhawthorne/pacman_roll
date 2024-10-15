@@ -55,7 +55,7 @@ class GameScreen extends StatelessWidget {
                 appLifecycleStateNotifier:
                     context.read<AppLifecycleStateNotifier>(),
               ),
-              overlayBuilderMap: {
+              overlayBuilderMap: <String, OverlayWidgetBuilder<PacmanGame>>{
                 topOverlayKey: (BuildContext context, PacmanGame game) {
                   return topOverlayWidget(context, game);
                 },
@@ -81,7 +81,7 @@ class GameScreen extends StatelessWidget {
                   return ResetDialog(game: game);
                 },
               },
-              initialActiveOverlays: const [topOverlayKey],
+              initialActiveOverlays: const <String>[topOverlayKey],
             )),
           ),
         ),

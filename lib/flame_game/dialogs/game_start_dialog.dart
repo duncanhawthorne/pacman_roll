@@ -30,13 +30,13 @@ class StartDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return popupDialog(
-      children: [
+      children: <Widget>[
         rotatedTitle(),
         levelSelector(context, game),
         mazeSelector(context, game),
         bottomRowWidget(
           children: game.levelStarted
-              ? [
+              ? <Widget>[
                   TextButton(
                       style: buttonStyle(borderColor: Palette.warning.color),
                       onPressed: () {
@@ -51,7 +51,7 @@ class StartDialog extends StatelessWidget {
                       },
                       child: const Text('Resume', style: textStyleBody))
                 ]
-              : [
+              : <Widget>[
                   TextButton(
                       style: buttonStyle(),
                       onPressed: () {
@@ -75,39 +75,39 @@ Widget levelSelector(BuildContext context, PacmanGame game) {
 }
 
 Widget levelSelectorReal(BuildContext context, PacmanGame game) {
-  int maxLevelToShowCache = maxLevelToShow(game);
+  final int maxLevelToShowCache = maxLevelToShow(game);
   return bodyWidget(
     child: Column(
         spacing: 8,
-        children: List.generate(
+        children: List<Widget>.generate(
             maxLevelToShowCache ~/ 5 + 1,
-            (rowIndex) => levelSelectorRow(
+            (int rowIndex) => levelSelectorRow(
                 context, game, maxLevelToShowCache, rowIndex))),
   );
 }
 
 Widget levelSelectorRow(BuildContext context, PacmanGame game,
     int maxLevelToShowCache, int rowIndex) {
-  bool showTutorialButton = true;
+  final bool showTutorialButton = true;
   final bool showResetButton =
       playerProgress.maxLevelCompleted >= Levels.firstRealLevel;
-  return Row(spacing: 4, children: [
+  return Row(spacing: 4, children: <Widget>[
     showResetButton && rowIndex == 0
         ? resetWidget(context, game)
         : const SizedBox.shrink(),
     showTutorialButton && rowIndex == 0
         ? levelButtonSingle(context, game, 0)
         : const SizedBox.shrink(),
-    ...List.generate(
+    ...List<Widget>.generate(
         min(5, maxLevelToShowCache - rowIndex * 5),
-        (colIndex) =>
+        (int colIndex) =>
             levelButtonSingle(context, game, rowIndex * 5 + colIndex + 1))
   ]);
 }
 
 Widget levelButtonSingle(BuildContext context, PacmanGame game, int levelNum) {
-  GameLevel level = levels.getLevel(levelNum);
-  int fixedMazeId = !level.isTutorial && maze.isTutorial
+  final GameLevel level = levels.getLevel(levelNum);
+  final int fixedMazeId = !level.isTutorial && maze.isTutorial
       ? Maze.defaultMazeId
       : level.isTutorial && !maze.isTutorial
           ? Maze.tutorialMazeId
@@ -141,19 +141,19 @@ Widget mazeSelector(BuildContext context, PacmanGame game) {
 
 Widget mazeSelectorReal(BuildContext context, PacmanGame game) {
   const bool enableMazeSelector = true;
-  int maxLevelToShowCache = maxLevelToShow(game);
+  final int maxLevelToShowCache = maxLevelToShow(game);
   // ignore: dead_code
-  bool showText = false && maxLevelToShowCache <= 2;
+  final bool showText = false && maxLevelToShowCache <= 2;
   return !enableMazeSelector ||
           maxLevelToShowCache == 1 ||
           game.level.isTutorial
       ? const SizedBox.shrink()
       : bodyWidget(
           child: Column(
-            children: [
+            children: <Widget>[
               Row(
                 spacing: 4,
-                children: [
+                children: <Widget>[
                   !showText
                       ? const SizedBox.shrink()
                       // ignore: dead_code
@@ -161,8 +161,8 @@ Widget mazeSelectorReal(BuildContext context, PacmanGame game) {
                           padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
                           child: Text('Maze:', style: textStyleBody),
                         ),
-                  ...List.generate(
-                      3, (index) => mazeButtonSingle(context, game, index)),
+                  ...List<Widget>.generate(
+                      3, (int index) => mazeButtonSingle(context, game, index)),
                 ],
               ),
             ],
@@ -185,7 +185,7 @@ Widget mazeButtonSingle(BuildContext context, PacmanGame game, int mazeId) {
 }
 
 int maxLevelToShow(PacmanGame game) {
-  return [
+  return <int>[
     game.level.number,
     maze.isTutorial || maze.isDefault
         ? Levels.tutorialLevelNum - 1 //no effect to max
@@ -210,6 +210,6 @@ Widget rotatedTitle() {
 Widget resetWidget(BuildContext context, PacmanGame game) {
   return IconButton(
     onPressed: () => game.toggleOverlay(GameScreen.resetDialogKey),
-    icon: Icon(Icons.refresh, color: Palette.textColor),
+    icon: const Icon(Icons.refresh, color: Palette.textColor),
   );
 }

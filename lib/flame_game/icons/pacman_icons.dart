@@ -9,7 +9,7 @@ Widget animatedPacmanIcon(PacmanGame game, int index) {
   return ValueListenableBuilder<int>(
       valueListenable: game.world.pacmans.pacmanDyingNotifier,
       builder: (BuildContext context, int value, Widget? child) {
-        return TweenAnimationBuilder(
+        return TweenAnimationBuilder<int>(
             tween: IntTween(
                 begin: pacmanCircleIncrements ~/ 4,
                 end: pacmanCircleIncrements ~/ 4 +
@@ -27,7 +27,8 @@ Widget animatedPacmanIcon(PacmanGame game, int index) {
       });
 }
 
-final _pacmanIconCache = List.generate(pacmanCircleIncrements + 1,
+final List<Widget> _pacmanIconCache = List<Widget>.generate(
+    pacmanCircleIncrements + 1,
     (int index) => _pacmanIconFromPainter(mouthSize: index));
 
 Widget _pacmanIconFromPainter({int mouthSize = pacmanCircleIncrements ~/ 4}) {

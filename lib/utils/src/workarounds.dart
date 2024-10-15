@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'workarounds_stub.dart'
     if (dart.library.js_interop) 'workarounds_web.dart';
 
-void setStatusBarColor(color) {
+void setStatusBarColor(Color color) {
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
     statusBarColor: color, // Status bar color
   ));

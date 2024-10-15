@@ -4,9 +4,9 @@ import 'package:provider/provider.dart';
 typedef AppLifecycleStateNotifier = ValueNotifier<AppLifecycleState>;
 
 class AppLifecycleObserver extends StatefulWidget {
-  final Widget child;
-
   const AppLifecycleObserver({required this.child, super.key});
+
+  final Widget child;
 
   @override
   State<AppLifecycleObserver> createState() => _AppLifecycleObserverState();
@@ -16,7 +16,7 @@ class _AppLifecycleObserverState extends State<AppLifecycleObserver> {
   late final AppLifecycleListener _appLifecycleListener;
 
   final ValueNotifier<AppLifecycleState> lifecycleListenable =
-      ValueNotifier(AppLifecycleState.inactive);
+      ValueNotifier<AppLifecycleState>(AppLifecycleState.inactive);
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +48,7 @@ class _AppLifecycleObserverState extends State<AppLifecycleObserver> {
   void initState() {
     super.initState();
     _appLifecycleListener = AppLifecycleListener(
-      onStateChange: (s) => lifecycleListenable.value = s,
+      onStateChange: (AppLifecycleState s) => lifecycleListenable.value = s,
     );
   }
 }

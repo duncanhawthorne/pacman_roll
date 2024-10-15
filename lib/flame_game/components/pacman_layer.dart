@@ -10,12 +10,12 @@ import 'wrapper_no_events.dart';
 
 class Pacmans extends WrapperNoEvents with HasWorldReference<PacmanWorld> {
   @override
-  final priority = 2;
+  final int priority = 2;
 
-  final List<Pacman> pacmanList = [];
+  final List<Pacman> pacmanList = <Pacman>[];
 
-  final ValueNotifier<int> numberOfDeathsNotifier = ValueNotifier(0);
-  final ValueNotifier<int> pacmanDyingNotifier = ValueNotifier(0);
+  final ValueNotifier<int> numberOfDeathsNotifier = ValueNotifier<int>(0);
+  final ValueNotifier<int> pacmanDyingNotifier = ValueNotifier<int>(0);
 
   int numberAlivePacman() {
     if (pacmanList.isEmpty) {
@@ -23,13 +23,12 @@ class Pacmans extends WrapperNoEvents with HasWorldReference<PacmanWorld> {
     }
     return pacmanList
         .map((Pacman pacman) => pacman.current != CharacterState.dead ? 1 : 0)
-        .reduce((value, element) => value + element);
+        .reduce((int value, int element) => value + element);
   }
 
   void resetInstantAfterPacmanDeath() {
     assert(pacmanList.length == 1);
-    Pacman dyingPacman = pacmanList[0];
-    dyingPacman.resetInstantAfterDeath();
+    pacmanList[0].resetInstantAfterDeath(); //dying pacman
   }
 
   @override

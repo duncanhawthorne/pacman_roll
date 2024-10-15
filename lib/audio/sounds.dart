@@ -1,27 +1,27 @@
 List<String> soundTypeToFilename(SfxType type) {
   switch (type) {
     case SfxType.ghostsScared:
-      return const [
+      return const <String>[
         'ghosts_runaway.mp3',
       ];
     case SfxType.endMusic:
-      return const [
+      return const <String>[
         'win.mp3',
       ];
     case SfxType.eatGhost:
-      return const ['eat_ghost.mp3'];
+      return const <String>['eat_ghost.mp3'];
     case SfxType.pacmanDeath:
-      return const ['pacman_death.mp3'];
+      return const <String>['pacman_death.mp3'];
     case SfxType.waka:
-      return const [
+      return const <String>[
         'pacman_waka_waka.mp3',
       ];
     case SfxType.startMusic:
-      return const [
+      return const <String>[
         'pacman_beginning.mp3',
       ];
     case SfxType.ghostsRoamingSiren:
-      return const [
+      return const <String>[
         'ghosts_siren.mp3',
       ];
   }

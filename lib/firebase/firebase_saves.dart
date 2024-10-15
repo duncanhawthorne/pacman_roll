@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
@@ -37,14 +39,14 @@ class FBase {
       //debug("firebase push");
       try {
         if (firebaseOn) {
-          db!
+          unawaited(db!
               .collection(mainDB)
               .doc(recordID)
               .set(state)
-              .onError((e, _) => debug("Error writing document: $e"));
+              .onError((Object? e, _) => debug("Error writing document: $e")));
         }
       } catch (e) {
-        debug(["firebasePushSingleScore", e]);
+        debug(<Object>["firebasePushSingleScore", e]);
       }
     }
   }
@@ -56,55 +58,59 @@ class FBase {
     if (firebaseOn) {
       try {
         if (firebaseOn) {
-          final collectionRef = db!.collection(mainDB);
-          AggregateQuerySnapshot fasterSnapshot = await collectionRef
+          final CollectionReference<Map<String, dynamic>> collectionRef =
+              db!.collection(mainDB);
+          final AggregateQuerySnapshot fasterSnapshot = await collectionRef
               .where("levelCompleteTime", isLessThan: levelCompletedInMillis)
               .where("levelNum", isEqualTo: levelNum)
               .where("mazeId", isEqualTo: mazeId)
               .count()
               .get();
-          int fasterCount = fasterSnapshot.count ?? 0;
-          AggregateQuerySnapshot slowerSnapshot = await collectionRef
+          final int fasterCount = fasterSnapshot.count ?? 0;
+          final AggregateQuerySnapshot slowerSnapshot = await collectionRef
               .where("levelCompleteTime", isGreaterThan: levelCompletedInMillis)
               .where("levelNum", isEqualTo: levelNum)
               .where("mazeId", isEqualTo: mazeId)
               .count()
               .get();
-          int slowerCount = slowerSnapshot.count ?? 100;
-          int allCount = fasterCount + slowerCount + 1; //ignore equal times
+          final int slowerCount = slowerSnapshot.count ?? 100;
+          final int allCount =
+              fasterCount + slowerCount + 1; //ignore equal times
           return (fasterCount + 1 - 1) / (allCount == 1 ? 100 : allCount - 1);
         }
       } catch (e) {
-        debug(["firebasePercentile error", e]);
+        debug(<Object>["firebasePercentile error", e]);
       }
     }
     return 1.0;
   }
 
   Future<void> firebasePushPlayerProgress(G g, String state) async {
-    debug(["firebasePush", g.gUser]);
+    debug(<String>["firebasePush", g.gUser]);
     if (firebaseOn && g.signedIn) {
-      final dhState = <String, dynamic>{"data": state};
-      db!
+      final Map<String, dynamic> dhState = <String, dynamic>{"data": state};
+      unawaited(db!
           .collection("userSaves")
           .doc(g.gUser)
           .set(dhState)
-          .onError((e, _) => debug("Error writing document: $e"));
+          .onError((Object? e, _) => debug("Error writing document: $e")));
     }
   }
 
   Future<String> firebasePullPlayerProgress(G g) async {
     await initialize();
     String gameEncoded = "";
-    debug(["firebasePull"]);
+    debug(<String>["firebasePull"]);
     if (firebaseOn && g.signedIn) {
-      final docRef = db!.collection("userSaves").doc(g.gUser);
+      final DocumentReference<Map<String, dynamic>> docRef =
+          db!.collection("userSaves").doc(g.gUser);
       await docRef.get().then(
-        (DocumentSnapshot doc) {
-          final gameEncodedTmp = doc.data() as Map<String, dynamic>;
+        (DocumentSnapshot<dynamic> doc) {
+          final Map<String, dynamic> gameEncodedTmp =
+              doc.data() as Map<String, dynamic>;
           gameEncoded = gameEncodedTmp["data"];
         },
-        onError: (e) => debug("Error getting document: $e"),
+        onError: (dynamic e) => debug("Error getting document: $e"),
       );
     }
     return gameEncoded;

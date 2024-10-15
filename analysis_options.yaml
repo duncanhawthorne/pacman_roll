@@ -23,6 +23,17 @@ linter:
   rules:
     - prefer_relative_imports
     - invalid_runtime_check_with_js_interop_types
+    - always_specify_types
+    - always_declare_return_types
+    - avoid_return_types_on_setters
+    - prefer_final_locals
+    - sort_constructors_first
+    - cascade_invocations
+    - prefer_final_fields
+    - prefer_const_constructors
+    - avoid_print
+    - unawaited_futures
+    - avoid_void_async
     # avoid_print: false  # Uncomment to disable the `avoid_print` rule
     # prefer_single_quotes: true  # Uncomment to enable the `prefer_single_quotes` rule
 
