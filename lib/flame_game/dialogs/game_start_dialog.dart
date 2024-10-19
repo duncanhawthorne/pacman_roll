@@ -88,7 +88,7 @@ Widget levelSelectorReal(BuildContext context, PacmanGame game) {
 
 Widget levelSelectorRow(BuildContext context, PacmanGame game,
     int maxLevelToShowCache, int rowIndex) {
-  final bool showTutorialButton = true;
+  const bool showTutorialButton = true;
   final bool showResetButton =
       playerProgress.maxLevelCompleted >= Levels.firstRealLevel;
   return Row(spacing: 4, children: <Widget>[

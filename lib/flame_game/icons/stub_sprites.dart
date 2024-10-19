@@ -18,7 +18,7 @@ class StubSprites {
   Map<CharacterState, SpriteAnimation> _stubAnimations() {
     final Map<CharacterState, SpriteAnimation> result =
         <CharacterState, SpriteAnimation>{};
-    for (CharacterState state in CharacterState.values) {
+    for (final CharacterState state in CharacterState.values) {
       result[state] = SpriteAnimation.spriteList(
         <Sprite>[_stubSprite],
         stepTime: double.infinity,

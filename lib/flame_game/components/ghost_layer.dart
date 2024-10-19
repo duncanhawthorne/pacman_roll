@@ -86,7 +86,7 @@ class Ghosts extends WrapperNoEvents
     current = CharacterState.scared;
     if (world.pellets.pelletsRemainingNotifier.value != 0) {
       world.play(SfxType.ghostsScared);
-      for (Ghost ghost in ghostList) {
+      for (final Ghost ghost in ghostList) {
         ghost.setScared();
       }
       ghostsScaredTimer.start();
@@ -120,14 +120,14 @@ class Ghosts extends WrapperNoEvents
   }
 
   void _removeAllGhosts() {
-    for (Ghost ghost in ghostList) {
+    for (final Ghost ghost in ghostList) {
       ghost.removeFromParent();
     }
     removeSpawner();
   }
 
   void disconnectGhostsFromBalls() {
-    for (Ghost ghost in ghostList) {
+    for (final Ghost ghost in ghostList) {
       removeEffects(ghost);
       ghost.disconnectFromBall(); //sync
     }
@@ -142,7 +142,7 @@ class Ghosts extends WrapperNoEvents
   void resetSlideAfterPacmanDeath() {
     current = CharacterState.normal;
     ghostsScaredTimer.pause(); //makes update function for timer free
-    for (Ghost ghost in ghostList) {
+    for (final Ghost ghost in ghostList) {
       ghost.resetSlideAfterPacmanDeath();
     }
   }
@@ -154,7 +154,7 @@ class Ghosts extends WrapperNoEvents
       _removeAllGhosts();
       _addThreeGhosts();
     } else {
-      for (Ghost ghost in ghostList) {
+      for (final Ghost ghost in ghostList) {
         ghost.resetInstantAfterPacmanDeath();
       }
       //no spawner to remove
@@ -168,7 +168,7 @@ class Ghosts extends WrapperNoEvents
       if (ghostsScaredTimer.current >
           scaredToScaredIshThreshold * ghostsScaredTimer.limit) {
         current = CharacterState.scaredIsh;
-        for (Ghost ghost in ghostList) {
+        for (final Ghost ghost in ghostList) {
           ghost.setScaredToScaredIsh();
         }
       }
@@ -176,7 +176,7 @@ class Ghosts extends WrapperNoEvents
     if (current == CharacterState.scaredIsh) {
       if (ghostsScaredTimer.finished) {
         current = CharacterState.normal;
-        for (Ghost ghost in ghostList) {
+        for (final Ghost ghost in ghostList) {
           ghost.setScaredIshToNormal();
           ghostsScaredTimer.pause(); //makes update function for timer free
         }
@@ -187,7 +187,7 @@ class Ghosts extends WrapperNoEvents
 
   @override
   void reset({bool mazeResize = false}) {
-    _cancelSirenVolumeUpdatedTimer;
+    _cancelSirenVolumeUpdatedTimer();
     current = CharacterState.normal;
     ghostsScaredTimer.pause(); //makes update function for timer free
     _removeAllGhosts();

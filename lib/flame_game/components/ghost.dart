@@ -56,7 +56,8 @@ class Ghost extends GameCharacter {
     if (!world.gameWonOrLost) {
       if (current != CharacterState.dead &&
           current != CharacterState.spawning) {
-        // if dead, need to continue dead animation without physics applying, then get sequenced to scared via standard sequence code
+        // if dead, need to continue dead animation without physics applying,
+        // then get sequenced to scared via standard sequence code
         current = CharacterState.scared;
       }
     }

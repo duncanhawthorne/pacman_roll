@@ -272,7 +272,7 @@ class Maze {
   List<Component> mazeBlockingWalls() {
     final List<Component> result = <Component>[];
     final double scale = blockWidth;
-    final int width = 7;
+    const int width = 7;
     result
       ..add(
         MazeVisualBlockingBar(
@@ -446,7 +446,7 @@ class Maze {
 
 List<List<String>> _decodeMazeLayout(List<String> encodedMazeLayout) {
   final List<List<String>> result = <List<String>>[];
-  for (String row in encodedMazeLayout) {
+  for (final String row in encodedMazeLayout) {
     result.add(row.split(""));
   }
   return result;

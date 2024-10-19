@@ -33,7 +33,7 @@ class Pacmans extends WrapperNoEvents with HasWorldReference<PacmanWorld> {
 
   @override
   void reset({bool mazeResize = false}) {
-    for (Pacman pacman in pacmanList) {
+    for (final Pacman pacman in pacmanList) {
       pacman.removeFromParent();
     }
     add(Pacman(position: maze.pacmanStart));

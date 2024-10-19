@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:flame/camera.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
@@ -45,7 +46,6 @@ class PacmanWorld extends Forge2DWorld
   PacmanWorld({
     required this.level,
     required this.playerProgress,
-    Random? random,
   });
 
   /// The properties of the current level.
@@ -143,7 +143,7 @@ class PacmanWorld extends Forge2DWorld
     game.audioController.stopSfx(SfxType.ghostsScared);
 
     if (!firstRun) {
-      for (WrapperNoEvents wrapper in wrappers) {
+      for (final WrapperNoEvents wrapper in wrappers) {
         assert(wrapper.isLoaded);
         wrapper.reset();
       }
@@ -152,7 +152,7 @@ class PacmanWorld extends Forge2DWorld
 
   void start() {
     play(SfxType.startMusic);
-    for (WrapperNoEvents wrapper in wrappers) {
+    for (final WrapperNoEvents wrapper in wrappers) {
       wrapper.start();
     }
   }
@@ -169,7 +169,7 @@ class PacmanWorld extends Forge2DWorld
       _tutorial,
       _blocking
     ]);
-    for (WrapperNoEvents wrapper in wrappers) {
+    for (final WrapperNoEvents wrapper in wrappers) {
       noEventsWrapper.add(wrapper);
     }
     reset(firstRun: true);

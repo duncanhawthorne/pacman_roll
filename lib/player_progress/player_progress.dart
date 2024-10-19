@@ -27,8 +27,8 @@ class PlayerProgress extends ChangeNotifier {
     "levels": _playerProgressLevels
   };
 
-  Iterable<int> get _levelNumsCompleted => _playerProgressLevels
-      .map((Map<String, int> item) => item["levelNum"] as int);
+  Iterable<int> get _levelNumsCompleted =>
+      _playerProgressLevels.map((Map<String, int> item) => item["levelNum"]!);
 
   int get maxLevelCompleted => _playerProgressLevels.isEmpty
       ? Levels.tutorialLevelNum - 1
@@ -58,7 +58,7 @@ class PlayerProgress extends ChangeNotifier {
     if (relevantSave == null) {
       _playerProgressLevels.add(win);
     } else if (win["levelCompleteTime"]! < relevantSave["levelCompleteTime"]!) {
-      for (String key in win.keys) {
+      for (final String key in win.keys) {
         relevantSave[key] = win[key]!;
       }
     }
@@ -129,7 +129,7 @@ Map<String, int> _cleanupWin(Map<String, dynamic> winRaw) {
     "levelCompleteTime": -1,
     "dateTime": -1
   };
-  for (String key in result.keys) {
+  for (final String key in result.keys) {
     result[key] = winRaw[key] as int;
   }
   return result;

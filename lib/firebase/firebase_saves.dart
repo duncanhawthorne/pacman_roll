@@ -108,7 +108,7 @@ class FBase {
         (DocumentSnapshot<dynamic> doc) {
           final Map<String, dynamic> gameEncodedTmp =
               doc.data() as Map<String, dynamic>;
-          gameEncoded = gameEncodedTmp["data"];
+          gameEncoded = gameEncodedTmp["data"] as String;
         },
         onError: (dynamic e) => debug("Error getting document: $e"),
       );

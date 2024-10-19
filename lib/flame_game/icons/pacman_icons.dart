@@ -39,8 +39,8 @@ Widget _pacmanIconFromPainter({int mouthSize = pacmanCircleIncrements ~/ 4}) {
 
 final Rect _pacmanRect = Rect.fromCenter(
     center: const Offset(pacmanIconSize / 2, pacmanIconSize / 2),
-    width: pacmanIconSize.toDouble(),
-    height: pacmanIconSize.toDouble());
+    width: pacmanIconSize,
+    height: pacmanIconSize);
 
 class _PacmanPainter extends CustomPainter {
   _PacmanPainter({required this.mouthSize});

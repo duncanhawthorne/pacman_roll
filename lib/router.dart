@@ -45,10 +45,10 @@ int _parseMazeId(String? levelString) {
   final String? mazeIdRaw = levelString ?? mazeNames[Maze.defaultMazeId];
   return !mazeNames.containsValue(mazeIdRaw)
       ? Maze.defaultMazeId
-      : _reverseMap(mazeNames)[mazeIdRaw];
+      : _reverseMap(mazeNames)[mazeIdRaw] as int;
 }
 
 Map<dynamic, dynamic> _reverseMap(Map<dynamic, dynamic> map) =>
     <dynamic, dynamic>{
-      for (MapEntry<dynamic, dynamic> e in map.entries) e.value: e.key
+      for (final MapEntry<dynamic, dynamic> e in map.entries) e.value: e.key
     };

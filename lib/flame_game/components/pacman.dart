@@ -71,7 +71,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
 
   void onCollideWith(PositionComponent other) {
     if (this is PacmanClone) {
-      (original as Pacman).onCollideWith(other);
+      (original! as Pacman).onCollideWith(other);
       return;
     }
     if (typical) {
@@ -80,14 +80,15 @@ class Pacman extends GameCharacter with CollisionCallbacks {
       } else if (other is Ghost && other is! GhostClone) {
         _onCollideWithGhost(other);
       } else if (other is GhostClone) {
-        _onCollideWithGhost(other.original as Ghost);
+        _onCollideWithGhost(other.original! as Ghost);
       }
     }
   }
 
   void _onCollideWithPellet(Pellet pellet) {
     if (typical) {
-      // can simultaneously eat pellet and die to ghost so don't want to do this if just died
+      // can simultaneously eat pellet and die to ghost
+      // so don't want to do this if just died
       pellet.removeFromParent(); //do this first, for checks based on game over
       if (pellet is SuperPellet) {
         world.ghosts.scareGhosts();

@@ -101,7 +101,9 @@ Future<String> _scoreboardRankText(
     {required int levelNum,
     required int levelCompletedInMillis,
     required int mazeId}) async {
-  if (!FBase.firebaseOn) return "";
+  if (!FBase.firebaseOn) {
+    return "";
+  }
   final double percentile = await fBase.firebasePercentile(
           levelNum: levelNum,
           levelCompletedInMillis: levelCompletedInMillis,

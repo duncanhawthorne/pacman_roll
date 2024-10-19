@@ -62,7 +62,7 @@ class PacmanSprites {
   Future<List<Sprite>> _lf2fl(List<Future<Sprite>> lf) async {
     //converts list of futures to a future of a list
     final List<Sprite> finalItems = <Sprite>[];
-    for (Future<Sprite> item in lf) {
+    for (final Future<Sprite> item in lf) {
       final Sprite finalItem = await item;
       finalItems.add(finalItem);
     }
@@ -117,7 +117,7 @@ class PacmanSprites {
     unawaited(_precacheAllPacmanAtFrac(
         size)); //call first time, later times no effect
     mouthWidth = mouthWidth.clamp(0, pacmanCircleIncrements);
-    return await _pacmanSpriteAtFracCache[mouthWidth]!;
+    return _pacmanSpriteAtFracCache[mouthWidth]!;
   }
 }
 
