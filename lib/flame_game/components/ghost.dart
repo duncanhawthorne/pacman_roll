@@ -99,7 +99,7 @@ class Ghost extends GameCharacter {
       current = CharacterState.spawning; //stops further interactions
       disconnectFromBall(spawning: true);
       add(MoveToPositionEffect(
-          world.level.homingGhosts
+          game.level.homingGhosts
               ? world.pacmans.pacmanList[0].position
               : maze.ghostStart,
           onComplete: () =>

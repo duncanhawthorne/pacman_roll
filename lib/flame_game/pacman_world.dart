@@ -8,8 +8,6 @@ import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../audio/sounds.dart';
-import '../level_selection/levels.dart';
-import '../player_progress/player_progress.dart';
 import 'components/blocking_bar_layer.dart';
 import 'components/ghost_layer.dart';
 import 'components/pacman.dart';
@@ -38,23 +36,7 @@ import 'pacman_game.dart';
 final bool _iOSWeb = defaultTargetPlatform == TargetPlatform.iOS && kIsWeb;
 
 class PacmanWorld extends Forge2DWorld
-    with
-        //TapCallbacks,
-        HasGameReference<PacmanGame>,
-        //PointerMoveCallbacks,
-        DragCallbacks {
-  PacmanWorld({
-    required this.level,
-    required this.playerProgress,
-  });
-
-  /// The properties of the current level.
-  final GameLevel level;
-
-  /// Used to see what the current progress of the player is and to update the
-  /// progress if a level is finished.
-  final PlayerProgress playerProgress;
-
+    with HasGameReference<PacmanGame>, DragCallbacks {
   final WrapperNoEvents noEventsWrapper = WrapperNoEvents();
   final Pacmans pacmans = Pacmans();
   final Ghosts ghosts = Ghosts();
@@ -66,7 +48,7 @@ class PacmanWorld extends Forge2DWorld
 
   bool get gameWonOrLost =>
       pellets.pelletsRemainingNotifier.value <= 0 ||
-      pacmans.numberOfDeathsNotifier.value >= level.maxAllowedDeaths;
+      pacmans.numberOfDeathsNotifier.value >= game.level.maxAllowedDeaths;
 
   final Map<int, double?> _fingersLastDragAngle = <int, double?>{};
 

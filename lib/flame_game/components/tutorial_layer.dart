@@ -21,7 +21,7 @@ class TutorialWrapper extends WrapperNoEvents
     Future<void>.delayed(tutorialDelay, () {
       if (!game.levelStarted &&
           !_tutorialEverManuallyHidden &&
-          world.level.number == Levels.levelToShowInstructions) {
+          game.level.number == Levels.levelToShowInstructions) {
         //if user hasn't worked out how to start by now, give a prompt
         game.overlays.add(GameScreen.tutorialDialogKey);
       }

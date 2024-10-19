@@ -101,7 +101,7 @@ class Ghosts extends WrapperNoEvents
       factory: (int i) =>
           Ghost(ghostID: <int>[3, 4, 5][game.random.nextInt(3)]),
       selfPositioning: true,
-      period: world.level.ghostSpawnTimerLength.toDouble(),
+      period: game.level.ghostSpawnTimerLength.toDouble(),
     );
     if (game.level.multipleSpawningGhosts &&
         !ghostSpawner!.isMounted &&
@@ -114,7 +114,7 @@ class Ghosts extends WrapperNoEvents
     if (!isMounted) {
       return; //else cant use game references
     }
-    if (world.level.multipleSpawningGhosts) {
+    if (game.level.multipleSpawningGhosts) {
       ghostSpawner?.removeFromParent();
     }
   }
