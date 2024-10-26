@@ -79,7 +79,8 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
       (stopwatch.current * 1000).toInt() +
       min(level.maxAllowedDeaths - 1,
               world.pacmans.numberOfDeathsNotifier.value) *
-          _deathPenaltyMillis;
+          _deathPenaltyMillis *
+          (level.isTutorial ? 0 : 1);
   bool get levelStarted => stopwatchMilliSeconds > 0;
 
   bool get isGameLive =>

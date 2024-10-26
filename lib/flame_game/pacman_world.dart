@@ -104,6 +104,10 @@ class PacmanWorld extends Forge2DWorld
       // so if we have got here (accidentally) then resetSlide has run
       // and rotation will be wrong
       // so should clean up anyway
+      if (game.level.isTutorial) {
+        pacmans.numberOfDeathsNotifier.value = 0;
+        pacmans.pacmanDyingNotifier.value = 0;
+      }
       pacmans.resetInstantAfterPacmanDeath();
       ghosts.resetInstantAfterPacmanDeath();
       _cameraAndTimersReset();

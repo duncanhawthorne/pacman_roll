@@ -13,7 +13,7 @@ import 'wrapper_no_events.dart';
 
 final bool _iOSWeb = defaultTargetPlatform == TargetPlatform.iOS && kIsWeb;
 final bool _sirenEnabled = !_iOSWeb;
-const int _kGhostChaseTimeMillis = 6000;
+const int _kGhostScaredTimeMillis = 6000;
 
 class Ghosts extends WrapperNoEvents
     with HasWorldReference<PacmanWorld>, HasGameReference<PacmanGame> {
@@ -23,7 +23,7 @@ class Ghosts extends WrapperNoEvents
   final List<Ghost> ghostList = <Ghost>[];
 
   CharacterState current = CharacterState.normal;
-  final Timer _ghostsScaredTimer = Timer(_kGhostChaseTimeMillis / 1000);
+  final Timer _ghostsScaredTimer = Timer(_kGhostScaredTimeMillis / 1000);
   SpawnComponent? ghostSpawner;
   async.Timer? _sirenTimer;
 

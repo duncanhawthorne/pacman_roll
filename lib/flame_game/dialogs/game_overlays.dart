@@ -48,9 +48,7 @@ Widget _topLeftWidget(BuildContext context, PacmanGame game) {
     children: <Widget>[
       _mainMenuButtonWidget(context, game),
       _audioOnOffButtonWidget(context, game),
-      game.level.isTutorial
-          ? const SizedBox.shrink()
-          : g.loginLogoutWidget(context, gIconSize, Palette.textColor),
+      g.loginLogoutWidget(context, gIconSize, Palette.textColor),
     ],
   );
 }
