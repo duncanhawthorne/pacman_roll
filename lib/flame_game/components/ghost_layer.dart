@@ -23,7 +23,7 @@ class Ghosts extends WrapperNoEvents
   final List<Ghost> ghostList = <Ghost>[];
 
   CharacterState current = CharacterState.normal;
-  Timer ghostsScaredTimer = Timer(_kGhostChaseTimeMillis / 1000);
+  final Timer _ghostsScaredTimer = Timer(_kGhostChaseTimeMillis / 1000);
   SpawnComponent? ghostSpawner;
   async.Timer? _sirenTimer;
 
@@ -89,7 +89,7 @@ class Ghosts extends WrapperNoEvents
       for (final Ghost ghost in ghostList) {
         ghost.setScared();
       }
-      ghostsScaredTimer.start();
+      _ghostsScaredTimer.start();
     }
   }
 
@@ -135,13 +135,13 @@ class Ghosts extends WrapperNoEvents
 
   void resetAfterGameWin() {
     current = CharacterState.normal;
-    ghostsScaredTimer.pause(); //makes update function for timer free
+    _ghostsScaredTimer.pause(); //makes update function for timer free
     _removeAllGhosts();
   }
 
   void resetSlideAfterPacmanDeath() {
     current = CharacterState.normal;
-    ghostsScaredTimer.pause(); //makes update function for timer free
+    _ghostsScaredTimer.pause(); //makes update function for timer free
     for (final Ghost ghost in ghostList) {
       ghost.resetSlideAfterPacmanDeath();
     }
@@ -149,7 +149,7 @@ class Ghosts extends WrapperNoEvents
 
   void resetInstantAfterPacmanDeath() {
     current = CharacterState.normal;
-    ghostsScaredTimer.pause(); //makes update function for timer free
+    _ghostsScaredTimer.pause(); //makes update function for timer free
     if (game.level.multipleSpawningGhosts) {
       _removeAllGhosts();
       _addThreeGhosts();
@@ -163,10 +163,10 @@ class Ghosts extends WrapperNoEvents
 
   static const double scaredToScaredIshThreshold = 2 / 3;
   void _stateSequence(double dt) {
-    ghostsScaredTimer.update(dt);
+    _ghostsScaredTimer.update(dt);
     if (current == CharacterState.scared) {
-      if (ghostsScaredTimer.current >
-          scaredToScaredIshThreshold * ghostsScaredTimer.limit) {
+      if (_ghostsScaredTimer.current >
+          scaredToScaredIshThreshold * _ghostsScaredTimer.limit) {
         current = CharacterState.scaredIsh;
         for (final Ghost ghost in ghostList) {
           ghost.setScaredToScaredIsh();
@@ -174,12 +174,12 @@ class Ghosts extends WrapperNoEvents
       }
     }
     if (current == CharacterState.scaredIsh) {
-      if (ghostsScaredTimer.finished) {
+      if (_ghostsScaredTimer.finished) {
         current = CharacterState.normal;
         for (final Ghost ghost in ghostList) {
           ghost.setScaredIshToNormal();
-          ghostsScaredTimer.pause(); //makes update function for timer free
         }
+        _ghostsScaredTimer.pause(); //makes update function for timer free
         game.audioController.stopSfx(SfxType.ghostsScared);
       }
     }
@@ -189,7 +189,7 @@ class Ghosts extends WrapperNoEvents
   void reset({bool mazeResize = false}) {
     _cancelSirenVolumeUpdatedTimer();
     current = CharacterState.normal;
-    ghostsScaredTimer.pause(); //makes update function for timer free
+    _ghostsScaredTimer.pause(); //makes update function for timer free
     _removeAllGhosts();
     _addThreeGhosts();
   }
