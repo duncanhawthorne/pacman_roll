@@ -6,6 +6,7 @@ import '../maze.dart';
 const bool _useForgePhysicsBallRotation = false;
 const bool _instantSetPosition = true;
 const double _radiusScaleFactor = 0.99;
+const bool _kVerticalPortalsEnabled = false;
 
 // ignore: always_specify_types
 class PhysicsBall extends BodyComponent with IgnoreEvents {
@@ -79,10 +80,13 @@ class PhysicsBall extends BodyComponent with IgnoreEvents {
   void _moveThroughPipePortal() {
     if (_subConnectedBall) {
       if (position.x.abs() > maze.mazeWidth / 2 ||
-          position.y.abs() > maze.mazeHeight / 2) {
-        _oneTimeManualPortalPosition
-          ..x = _smallMod(position.x, maze.mazeWidth)
-          ..y = _smallMod(position.y, maze.mazeHeight);
+          (_kVerticalPortalsEnabled &&
+              position.y.abs() > maze.mazeHeight / 2)) {
+        _oneTimeManualPortalPosition.setValues(
+            _smallMod(position.x, maze.mazeWidth),
+            !_kVerticalPortalsEnabled
+                ? position.y
+                : _smallMod(position.y, maze.mazeHeight));
         position = _oneTimeManualPortalPosition;
       }
     }
