@@ -62,6 +62,9 @@ const TextStyle textStyleBody =
 const TextStyle textStyleBodyDull =
     TextStyle(fontFamily: 'Press Start 2P', color: Palette.dullColor);
 
+const TextStyle textStyleBodyPacman =
+    TextStyle(fontFamily: 'Press Start 2P', color: Palette.pacmanColor);
+
 const Color _defaultButtonStyleBorderColor = Palette.seedColor;
 ButtonStyle buttonStyle(
     {Color? borderColor = _defaultButtonStyleBorderColor, bool small = false}) {

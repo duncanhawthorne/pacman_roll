@@ -74,8 +74,13 @@ class Ghosts extends WrapperNoEvents
   }
 
   void _addThreeGhosts() {
-    for (int i = 0; i < 3; i++) {
-      add(Ghost(ghostID: i));
+    final List<int> positions = game.level.numStartingGhosts == 3
+        ? <int>[0, 1, 2]
+        : game.level.numStartingGhosts == 2
+            ? <int>[0, 2]
+            : <int>[1];
+    for (int i = 0; i < game.level.numStartingGhosts; i++) {
+      add(Ghost(ghostID: positions[i]));
     }
   }
 

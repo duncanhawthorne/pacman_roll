@@ -22,7 +22,7 @@ final GoRouter router = GoRouter(
         if (level.isTutorial && !isTutorialMaze(mazeId)) {
           mazeId = Maze.tutorialMazeId;
         }
-        if (isTutorialMaze(mazeId) && !level.isTutorial) {
+        if (!level.isTutorial && isTutorialMaze(mazeId)) {
           mazeId = Maze.defaultMazeId;
         }
         return GameScreen(level: level, mazeId: mazeId);

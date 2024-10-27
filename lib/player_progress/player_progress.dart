@@ -31,7 +31,7 @@ class PlayerProgress extends ChangeNotifier {
       _playerProgressLevels.map((Map<String, int> item) => item["levelNum"]!);
 
   int get maxLevelCompleted => _playerProgressLevels.isEmpty
-      ? Levels.tutorialLevelNum - 1
+      ? Levels.min - 1
       : _levelNumsCompleted.reduce(max);
 
   bool isComplete(int levelNum) {

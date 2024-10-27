@@ -60,6 +60,7 @@ Widget _topRightWidget(BuildContext context, PacmanGame game) {
     mainAxisSize: MainAxisSize.min,
     spacing: _widgetSpacing,
     children: <Widget>[
+      _infintyWidget(context, game),
       _livesWidget(context, game),
       _clockWidget(game),
     ],
@@ -90,6 +91,12 @@ Widget _livesWidget(BuildContext context, PacmanGame game) {
       },
     ),
   );
+}
+
+Widget _infintyWidget(BuildContext context, PacmanGame game) {
+  return !game.level.infLives
+      ? const SizedBox.shrink()
+      : Text("∞", style: TextStyle(color: Palette.pacman.color));
 }
 
 Widget _clockWidget(PacmanGame game) {

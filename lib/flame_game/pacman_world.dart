@@ -104,7 +104,7 @@ class PacmanWorld extends Forge2DWorld
       // so if we have got here (accidentally) then resetSlide has run
       // and rotation will be wrong
       // so should clean up anyway
-      if (game.level.isTutorial) {
+      if (game.level.infLives) {
         pacmans.numberOfDeathsNotifier.value = 0;
         pacmans.pacmanDyingNotifier.value = 0;
       }
@@ -222,13 +222,12 @@ class PacmanWorld extends Forge2DWorld
   }
 
   final Vector2 _tmpGravity = Vector2.zero();
-  static const double _gravityScale = 50 * (30 / flameGameZoom);
   void _setMazeAngle(double angle) {
     //using tmpGravity to avoid creating a new Vector2 on each update / frame
     //could instead directly do gravity = Vector2(calc, calc);
     _tmpGravity
       ..setValues(-sin(angle), cos(angle))
-      ..scale(_gravityScale);
+      ..scale(game.level.levelSpeed);
     gravity = _tmpGravity;
     game.camera.viewfinder.angle = angle;
   }

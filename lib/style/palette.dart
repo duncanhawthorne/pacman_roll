@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 class Palette {
   static const PaletteEntry seed = PaletteEntry(seedColor);
   static const PaletteEntry text = PaletteEntry(textColor);
-  static const PaletteEntry pacman = PaletteEntry(_yellow);
+  static const PaletteEntry pacman = PaletteEntry(pacmanColor);
   static const PaletteEntry background = PaletteEntry(_black);
   static const PaletteEntry warning = PaletteEntry(_red);
   static const PaletteEntry transp = PaletteEntry(_transp);
@@ -15,6 +15,7 @@ class Palette {
   static const Color seedColor = _blueMaze;
   static const Color textColor = _white;
   static const MaterialColor dullColor = _grey;
+  static const MaterialAccentColor pacmanColor = _yellow;
 
   static const MaterialAccentColor _yellow = Colors.yellowAccent;
   static const Color _black = Color(0xff000000);
