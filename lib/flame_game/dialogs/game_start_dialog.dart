@@ -88,8 +88,7 @@ Widget levelSelectorReal(BuildContext context, PacmanGame game) {
 
 Widget levelSelectorRow(BuildContext context, PacmanGame game,
     int maxLevelToShowCache, int rowIndex) {
-  final bool showResetButton =
-      playerProgress.maxLevelCompleted >= Levels.firstRealLevel;
+  final bool showResetButton = maxLevelToShow(game) > Levels.firstRealLevel;
   return Row(spacing: 4, children: <Widget>[
     showResetButton && rowIndex == 0
         ? resetWidget(context, game)
@@ -119,7 +118,8 @@ Widget levelButtonSingle(BuildContext context, PacmanGame game, int levelNum) {
         context.go(
             '/?$levelUrlKey=$levelNum&$mazeUrlKey=${mazeNames[fixedMazeId]}');
       },
-      child: Text(level.levelString,
+      child: Text(
+          maxLevelToShow(game) == Levels.min ? "Tutorial" : level.levelString,
           style: playerProgress.isComplete(levelNum)
               ? textStyleBody
               : textStyleBodyDull));

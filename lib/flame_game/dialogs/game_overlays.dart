@@ -86,7 +86,8 @@ Widget _livesWidget(BuildContext context, PacmanGame game) {
         return Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             spacing: _pacmanSpacing,
-            children: List<Widget>.generate(game.level.maxAllowedDeaths,
+            children: List<Widget>.generate(
+                game.level.infLives ? 1 : game.level.maxAllowedDeaths,
                 (int index) => animatedPacmanIcon(game, index)));
       },
     ),
