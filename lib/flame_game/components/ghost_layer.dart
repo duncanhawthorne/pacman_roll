@@ -24,7 +24,7 @@ class Ghosts extends WrapperNoEvents
 
   CharacterState current = CharacterState.normal;
   final Timer _ghostsScaredTimer = Timer(_kGhostScaredTimeMillis / 1000);
-  SpawnComponent? ghostSpawner;
+  SpawnComponent? _ghostSpawner;
   async.Timer? _sirenTimer;
 
   double _averageGhostSpeed() {
@@ -102,16 +102,16 @@ class Ghosts extends WrapperNoEvents
     if (!isMounted) {
       return; //else cant use game references
     }
-    ghostSpawner ??= SpawnComponent(
+    _ghostSpawner ??= SpawnComponent(
       factory: (int i) =>
           Ghost(ghostID: <int>[3, 4, 5][game.random.nextInt(3)]),
       selfPositioning: true,
       period: game.level.ghostSpawnTimerLength.toDouble(),
     );
     if (game.level.multipleSpawningGhosts &&
-        !ghostSpawner!.isMounted &&
+        !_ghostSpawner!.isMounted &&
         !world.gameWonOrLost) {
-      add(ghostSpawner!);
+      add(_ghostSpawner!);
     }
   }
 
@@ -119,9 +119,8 @@ class Ghosts extends WrapperNoEvents
     if (!isMounted) {
       return; //else cant use game references
     }
-    if (game.level.multipleSpawningGhosts) {
-      ghostSpawner?.removeFromParent();
-    }
+    _ghostSpawner?.removeFromParent();
+    _ghostSpawner = null; //so will reflect new level parameters
   }
 
   void _removeAllGhosts() {
