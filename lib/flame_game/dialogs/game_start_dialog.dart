@@ -74,13 +74,15 @@ Widget levelSelector(BuildContext context, PacmanGame game) {
       });
 }
 
+const int _cols = 5;
+const int _negativeRows = 1;
 Widget levelSelectorReal(BuildContext context, PacmanGame game) {
   final int maxLevelToShowCache = maxLevelToShow(game);
   return bodyWidget(
     child: Column(
         spacing: 8,
         children: List<Widget>.generate(
-            maxLevelToShowCache ~/ 5 + 1 + 1,
+            maxLevelToShowCache ~/ _cols + 1 + _negativeRows,
             (int rowIndex) => levelSelectorRow(
                 context, game, maxLevelToShowCache, rowIndex))),
   );
@@ -94,9 +96,15 @@ Widget levelSelectorRow(BuildContext context, PacmanGame game,
         ? resetWidget(context, game)
         : const SizedBox.shrink(),
     ...List<Widget>.generate(
-        max(0, min(5, maxLevelToShowCache - rowIndex * 5 + 5)),
-        (int colIndex) =>
-            levelButtonSingle(context, game, rowIndex * 5 + colIndex + 1 - 5))
+        max(
+            0,
+            min(
+                _cols,
+                maxLevelToShowCache -
+                    rowIndex * _cols +
+                    _cols * _negativeRows)),
+        (int colIndex) => levelButtonSingle(context, game,
+            rowIndex * _cols + colIndex + 1 - _cols * _negativeRows))
   ]);
 }
 
