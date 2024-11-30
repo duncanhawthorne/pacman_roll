@@ -43,6 +43,10 @@ class PhysicsBall extends BodyComponent with IgnoreEvents {
         _instantSetPosition ? _setPositionNow(pos) : _setPositionNextFrame(pos)
       };
 
+  bool get _outsideMazeBounds =>
+      position.x.abs() > maze.mazeWidth / 2 ||
+          (_kVerticalPortalsEnabled && position.y.abs() > maze.mazeHeight / 2);
+
   final Vector2 _oneTimeManualPosition = Vector2(0, 0);
   bool _oneTimeManualPositionSet = false;
 
@@ -77,18 +81,19 @@ class PhysicsBall extends BodyComponent with IgnoreEvents {
   }
 
   final Vector2 _oneTimeManualPortalPosition = Vector2.zero();
+
+  Vector2 _teleportedPosition() {
+    _oneTimeManualPortalPosition.setValues(
+        _smallMod(position.x, maze.mazeWidth),
+        !_kVerticalPortalsEnabled
+            ? position.y
+            : _smallMod(position.y, maze.mazeHeight));
+    return _oneTimeManualPortalPosition;
+  }
+
   void _moveThroughPipePortal() {
-    if (_subConnectedBall) {
-      if (position.x.abs() > maze.mazeWidth / 2 ||
-          (_kVerticalPortalsEnabled &&
-              position.y.abs() > maze.mazeHeight / 2)) {
-        _oneTimeManualPortalPosition.setValues(
-            _smallMod(position.x, maze.mazeWidth),
-            !_kVerticalPortalsEnabled
-                ? position.y
-                : _smallMod(position.y, maze.mazeHeight));
-        position = _oneTimeManualPortalPosition;
-      }
+    if (_subConnectedBall && _outsideMazeBounds) {
+      position = _teleportedPosition();
     }
   }
 

@@ -40,7 +40,8 @@ class MazeWallCircleVisual extends CircleComponent with IgnoreEvents {
 // ignore: always_specify_types
 class MazeWallRectangleGround extends BodyComponent with IgnoreEvents {
   MazeWallRectangleGround(
-      {required this.position, required this.width, required this.height});
+      {required this.position, required this.width, required this.height})
+      : super(paint: _wallGroundPaint);
   @override
   final Vector2 position;
   final double width;
@@ -55,9 +56,8 @@ class MazeWallRectangleGround extends BodyComponent with IgnoreEvents {
 
   @override
   Body createBody() {
-    final PolygonShape shape = PolygonShape();
-    paint = _wallGroundPaint;
-    shape.setAsBoxXY(width / 2, height / 2);
+    final PolygonShape shape = PolygonShape()
+      ..setAsBoxXY(width / 2, height / 2);
     final FixtureDef fixtureDef = FixtureDef(shape);
     final BodyDef bodyDef = BodyDef(type: BodyType.static, position: position);
     return world.createBody(bodyDef)..createFixture(fixtureDef);
@@ -66,7 +66,8 @@ class MazeWallRectangleGround extends BodyComponent with IgnoreEvents {
 
 // ignore: always_specify_types
 class MazeWallCircleGround extends BodyComponent with IgnoreEvents {
-  MazeWallCircleGround({required this.position, required this.radius});
+  MazeWallCircleGround({required this.position, required this.radius})
+      : super(paint: _wallGroundPaint);
   @override
   final Vector2 position;
   final double radius;
@@ -80,12 +81,9 @@ class MazeWallCircleGround extends BodyComponent with IgnoreEvents {
 
   @override
   Body createBody() {
-    final CircleShape shape = CircleShape();
-    paint = _wallGroundPaint;
-
-    shape.radius = radius;
+    final CircleShape shape = CircleShape()
+      ..radius = radius;
     final FixtureDef fixtureDef = FixtureDef(shape);
-
     final BodyDef bodyDef = BodyDef(type: BodyType.static, position: position);
     return world.createBody(bodyDef)..createFixture(fixtureDef);
   }
