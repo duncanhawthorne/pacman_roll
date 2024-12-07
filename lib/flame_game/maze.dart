@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flame/components.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
+import 'package:flutter/foundation.dart';
 
 import 'components/mini_pellet.dart';
 import 'components/pellet.dart';
@@ -171,7 +172,8 @@ class Maze {
         _pelletCodeAtCell(i + 1, j + 1);
   }
 
-  List<Pellet> pellets(bool superPelletsEnabled) {
+  List<Pellet> pellets(
+      bool superPelletsEnabled, ValueNotifier<int> pelletsRemainingNotifier) {
     final List<Pellet> result = <Pellet>[];
     for (int i = 0; i < _mazeLayout.length; i++) {
       for (int j = 0; j < _mazeLayout[i].length; j++) {
@@ -180,9 +182,13 @@ class Maze {
             joffset: _largeSprites ? 1 / 2 : 0);
         if (_pelletAt(i, j)) {
           if (_mazeLayout[i][j] == _kSuperPellet && superPelletsEnabled) {
-            result.add(SuperPellet(position: center));
+            result.add(SuperPellet(
+                position: center,
+                pelletsRemainingNotifier: pelletsRemainingNotifier));
           } else {
-            result.add(MiniPellet(position: center));
+            result.add(MiniPellet(
+                position: center,
+                pelletsRemainingNotifier: pelletsRemainingNotifier));
           }
         }
       }

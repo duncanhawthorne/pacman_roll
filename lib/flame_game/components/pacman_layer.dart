@@ -1,14 +1,12 @@
-import 'package:flame/components.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../maze.dart';
-import '../pacman_world.dart';
 import 'game_character.dart';
 import 'pacman.dart';
 import 'wrapper_no_events.dart';
 
-class Pacmans extends WrapperNoEvents with HasWorldReference<PacmanWorld> {
+class Pacmans extends WrapperNoEvents {
   @override
   final int priority = 2;
 

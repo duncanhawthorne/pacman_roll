@@ -12,13 +12,10 @@ const bool _kVerticalPortalsEnabled = false;
 class PhysicsBall extends BodyComponent with IgnoreEvents {
   PhysicsBall({
     required Vector2 position,
-    double? radius,
   }) : super(
             fixtureDefs: <FixtureDef>[
               FixtureDef(
-                CircleShape()
-                  ..radius =
-                      radius ?? maze.spriteWidth / 2 * _radiusScaleFactor,
+                CircleShape(radius: maze.spriteWidth / 2 * _radiusScaleFactor),
                 restitution: 0.0,
                 friction: _useForgePhysicsBallRotation ? 1 : 0,
                 userData: PhysicsBall,

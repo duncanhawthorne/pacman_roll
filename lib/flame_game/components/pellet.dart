@@ -1,13 +1,13 @@
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
+import 'package:flutter/foundation.dart';
 
 import '../maze.dart';
-import '../pacman_world.dart';
 
-class Pellet extends CircleComponent
-    with HasWorldReference<PacmanWorld>, IgnoreEvents {
+class Pellet extends CircleComponent with IgnoreEvents {
   Pellet(
       {required super.position,
+      required this.pelletsRemainingNotifier,
       double radiusFactor = 1,
       this.hitBoxRadiusFactor = 1})
       : super(
@@ -15,7 +15,8 @@ class Pellet extends CircleComponent
                 maze.spriteWidth / 2 * Maze.pelletScaleFactor * radiusFactor,
             anchor: Anchor.center);
 
-  double hitBoxRadiusFactor;
+  final double hitBoxRadiusFactor;
+  final ValueNotifier<int> pelletsRemainingNotifier;
 
   @override
   Future<void> onLoad() async {
@@ -28,12 +29,12 @@ class Pellet extends CircleComponent
       anchor: Anchor.center,
     ));
     //debugMode = true;
-    world.pellets.pelletsRemainingNotifier.value += 1;
+    pelletsRemainingNotifier.value += 1;
   }
 
   @override
   Future<void> onRemove() async {
-    world.pellets.pelletsRemainingNotifier.value -= 1;
+    pelletsRemainingNotifier.value -= 1;
     super.onRemove();
   }
 }

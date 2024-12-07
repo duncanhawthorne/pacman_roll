@@ -5,11 +5,10 @@ import 'package:flame/components.dart';
 import '../../level_selection/levels.dart';
 import '../game_screen.dart';
 import '../pacman_game.dart';
-import '../pacman_world.dart';
 import 'wrapper_no_events.dart';
 
 class TutorialWrapper extends WrapperNoEvents
-    with HasWorldReference<PacmanWorld>, HasGameReference<PacmanGame> {
+    with HasGameReference<PacmanGame> {
   @override
   final int priority = 100;
 
