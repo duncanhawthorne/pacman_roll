@@ -32,7 +32,7 @@ mixin Clone on GameCharacter {
 
   @override
   void update(double dt) {
-    assert(clone == null); //i.e. no cascade of clones
+    assert(isClone); //i.e. no cascade of clones
     updateCloneFrom(original!);
     super.update(dt); // must call to have sprite animations
   }

@@ -56,8 +56,8 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
 
   late final bool isClone = this is PacmanClone || this is GhostClone;
 
-  GameCharacter? clone;
-  GameCharacter? original;
+  late final GameCharacter? clone;
+  late final GameCharacter? original;
   late final CircleHitbox hitbox =
       CircleHitbox(isSolid: true, collisionType: _collisionType);
 
@@ -149,18 +149,19 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     super.onRemove();
   }
 
-  void _addRemoveClone(GameCharacter? clone) {
-    if (!isClone && clone != null) {
+  void _addRemoveClone() {
+    if (!isClone) {
       //i.e. no cascade of clones
-      assert(clone.isClone);
+      assert(clone != null);
+      assert(clone!.isClone);
       assert(!isClone);
       if (position.x.abs() > maze.cloneThreshold) {
-        if (!clone.isMounted) {
-          parent!.add(clone);
+        if (!clone!.isMounted) {
+          parent!.add(clone!);
         }
       } else {
-        if (clone.isMounted) {
-          clone.removeFromParent();
+        if (clone!.isMounted) {
+          clone!.removeFromParent();
         }
       }
     }
@@ -170,7 +171,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   void update(double dt) {
     //note, this function is also run for clones
     _oneFrameOfPhysics(dt);
-    _addRemoveClone(clone);
+    _addRemoveClone();
     super.update(dt);
   }
 }
