@@ -137,16 +137,8 @@ class Ghost extends GameCharacter {
         _setSpawning();
       }
       clone = GhostClone(ghostID: ghostID, original: this);
-      animations = await getAnimations();
     }
-  }
-
-  @override
-  Future<void> onGameResize(Vector2 size) async {
-    //load animations here too, for clone, which doesn't run onLoad
-    //can't just run it here, as runs slower than onLoad, so causes a flash here
-    animations ??= await getAnimations();
-    super.onGameResize(size);
+    animations = await getAnimations(); //load for clone too
   }
 
   @override
