@@ -42,8 +42,8 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
 
   double get _spinParity =>
       _ball.body.linearVelocity.x.abs() > _ball.body.linearVelocity.y.abs()
-          ? world.gravity.y.sign * _ball.body.linearVelocity.x.sign
-          : -world.gravity.x.sign * _ball.body.linearVelocity.y.sign;
+          ? world.gravityYSign * _ball.body.linearVelocity.x.sign
+          : -world.gravityXSign * _ball.body.linearVelocity.y.sign;
 
   bool get typical =>
       connectedToBall &&
@@ -60,6 +60,8 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   GameCharacter? original;
   late final CircleHitbox hitbox =
       CircleHitbox(isSolid: true, collisionType: _collisionType);
+
+  late final double radius = size.x / 2;
 
   void loadStubAnimationsOnDebugMode() {
     // works around changes made in flame 1.19
@@ -113,7 +115,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   void _oneFrameOfPhysics(double dt) {
     if (connectedToBall) {
       position.setFrom(_ball.position);
-      angle += speed * dt / (size.x / 2) * _spinParity;
+      angle += speed * dt / radius * _spinParity;
     }
   }
 
