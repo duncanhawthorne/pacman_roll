@@ -44,8 +44,8 @@ class PhysicsBall extends BodyComponent with IgnoreEvents {
       };
 
   bool get _outsideMazeBounds =>
-      position.x.abs() > maze.mazeWidth / 2 ||
-          (_kVerticalPortalsEnabled && position.y.abs() > maze.mazeHeight / 2);
+      position.x.abs() > maze.mazeHalfWidth ||
+      (_kVerticalPortalsEnabled && position.y.abs() > maze.mazeHalfHeight);
 
   final Vector2 _oneTimeManualPosition = Vector2(0, 0);
   bool _oneTimeManualPositionSet = false;

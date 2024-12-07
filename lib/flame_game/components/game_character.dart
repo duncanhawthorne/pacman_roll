@@ -50,16 +50,16 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
       current != CharacterState.dead &&
       current != CharacterState.spawning;
 
-  CollisionType get collisionType => this is Pacman || this is PacmanClone
+  CollisionType get _collisionType => this is Pacman || this is PacmanClone
       ? CollisionType.active
       : CollisionType.passive;
 
-  bool get isClone => this is PacmanClone || this is GhostClone;
+  late final bool isClone = this is PacmanClone || this is GhostClone;
 
   GameCharacter? clone;
   GameCharacter? original;
   late final CircleHitbox hitbox =
-      CircleHitbox(isSolid: true, collisionType: collisionType);
+      CircleHitbox(isSolid: true, collisionType: _collisionType);
 
   void loadStubAnimationsOnDebugMode() {
     // works around changes made in flame 1.19
@@ -107,7 +107,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     connectedToBall = true;
     _ball.setDynamic();
     assert(!isClone); //not called on clones
-    hitbox.collisionType = collisionType;
+    hitbox.collisionType = _collisionType;
   }
 
   void _oneFrameOfPhysics(double dt) {
@@ -148,11 +148,11 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   }
 
   void _addRemoveClone(GameCharacter? clone) {
-    if (clone != null) {
+    if (!isClone && clone != null) {
       //i.e. no cascade of clones
       assert(clone.isClone);
       assert(!isClone);
-      if (position.x.abs() > maze.mazeWidth / 2 - maze.spriteWidth / 2) {
+      if (position.x.abs() > maze.cloneThreshold) {
         if (!clone.isMounted) {
           parent!.add(clone);
         }

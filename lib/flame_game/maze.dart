@@ -40,6 +40,9 @@ class Maze {
       mazeWidth = blockWidth * _mazeLayoutHorizontalLength();
       mazeHeight = blockWidth * _mazeLayoutVerticalLength();
       spriteSize.setAll(spriteWidth);
+      cloneThreshold = mazeWidth / 2 - spriteWidth / 2;
+      mazeHalfWidth = mazeWidth / 2;
+      mazeHalfHeight = mazeHeight / 2;
       //item below used regularly
       ghostStartForIdMap[0] = _ghostStartForId(0);
       ghostStartForIdMap[1] = _ghostStartForId(1);
@@ -72,6 +75,9 @@ class Maze {
   double mazeHeight = 0; //set properly in initializer
   double blockWidth = 0; //set properly in initializer
   double spriteWidth = 0; //set properly in initializer
+  double cloneThreshold = 0; //set properly in initializer
+  double mazeHalfWidth = 0; //set properly in initializer
+  double mazeHalfHeight = 0; //set properly in initializer
   final Vector2 spriteSize = Vector2.zero(); //set properly in initializer
   Map<int, Vector2> ghostStartForIdMap =
       <int, Vector2>{}; //set properly in initializer

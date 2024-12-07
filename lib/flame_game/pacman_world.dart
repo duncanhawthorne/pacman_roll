@@ -173,22 +173,22 @@ class PacmanWorld extends Forge2DWorld
     }
   }
 
+  final Vector2 _eventOffset = Vector2.zero();
   @override
   void onDragUpdate(DragUpdateEvent event) {
     super.onDragUpdate(event);
     game.resumeGame();
-    final double eventVectorLengthProportion =
-        (event.canvasStartPosition - game.canvasSize / 2).length /
-            (min(game.canvasSize.x, game.canvasSize.y) / 2);
-    final double fingerCurrentDragAngle = atan2(
-        event.canvasStartPosition.x - game.canvasSize.x / 2,
+    _eventOffset.setValues(event.canvasStartPosition.x - game.canvasSize.x / 2,
         event.canvasStartPosition.y - game.canvasSize.y / 2);
+    final double eventVectorLengthProportion =
+        _eventOffset.length / (min(game.canvasSize.x, game.canvasSize.y) / 2);
+    final double fingerCurrentDragAngle = atan2(_eventOffset.x, _eventOffset.y);
     if (_fingersLastDragAngle.containsKey(event.pointerId)) {
       if (_fingersLastDragAngle[event.pointerId] != null) {
         final double angleDelta = smallAngle(
             fingerCurrentDragAngle - _fingersLastDragAngle[event.pointerId]!);
         const double maxSpinMultiplierRadius = 0.75;
-        final num spinMultiplier =
+        final double spinMultiplier =
             4 * min(1, eventVectorLengthProportion / maxSpinMultiplierRadius);
 
         _tutorial.hide();
