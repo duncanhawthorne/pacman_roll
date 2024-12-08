@@ -14,12 +14,12 @@ import 'clones.dart';
 import 'pacman.dart';
 import 'physics_ball.dart';
 
-final Paint highQualityPaint = Paint()
+final Paint _highQualityPaint = Paint()
   ..filterQuality = FilterQuality.high
 //..color = const Color.fromARGB(255, 255, 255, 255)
   ..isAntiAlias = true;
 
-final Vector2 kVector2Zero = Vector2.zero();
+final Vector2 _kVector2Zero = Vector2.zero();
 
 /// The [GameCharacter] is the generic object that is linked to a [PhysicsBall]
 class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
@@ -28,10 +28,10 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
         IgnoreEvents,
         HasWorldReference<PacmanWorld>,
         HasGameReference<PacmanGame> {
-  GameCharacter({super.position, super.priority = 1, this.original})
+  GameCharacter({super.position, this.original})
       : super(
             size: maze.spriteSize,
-            paint: highQualityPaint,
+            paint: _highQualityPaint,
             anchor: Anchor.center);
 
   late final PhysicsBall _ball = PhysicsBall(position: position);
@@ -90,7 +90,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   void setPositionStill(Vector2 targetLoc) {
     _ball
       ..position = targetLoc
-      ..velocity = kVector2Zero;
+      ..velocity = _kVector2Zero;
     position.setFrom(targetLoc);
     _connectToBall();
   }

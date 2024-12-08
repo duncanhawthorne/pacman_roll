@@ -16,8 +16,8 @@ final Paint _wallGroundPaint = Paint()
 //..isAntiAlias = false
   ..color = Palette.seed.color;
 
-class MazeWallRectangleVisual extends RectangleComponent with IgnoreEvents {
-  MazeWallRectangleVisual(
+class WallRectangleVisual extends RectangleComponent with IgnoreEvents {
+  WallRectangleVisual(
       {required super.position, required double width, required double height})
       : super(
             size: Vector2(width, height),
@@ -25,27 +25,16 @@ class MazeWallRectangleVisual extends RectangleComponent with IgnoreEvents {
             paint: _wallVisualPaint);
 }
 
-class MazeVisualBlockingBar extends MazeWallRectangleVisual {
-  MazeVisualBlockingBar(
-      {required super.position, required super.width, required super.height});
-  @override
-  final int priority = 1000;
-}
-
-class MazeWallCircleVisual extends CircleComponent with IgnoreEvents {
-  MazeWallCircleVisual({required super.radius, required super.position})
+class WallCircleVisual extends CircleComponent with IgnoreEvents {
+  WallCircleVisual({required super.radius, required super.position})
       : super(anchor: Anchor.center, paint: _wallVisualPaint);
 }
 
 // ignore: always_specify_types
-class MazeWallGround extends BodyComponent with IgnoreEvents {
-  MazeWallGround({required super.fixtureDefs})
+class WallGround extends BodyComponent with IgnoreEvents {
+  WallGround({required super.fixtureDefs})
       : super(paint: _wallGroundPaint, bodyDef: BodyDef(type: BodyType.static));
 
   @override
-  // ignore: overridden_fields
-  final bool renderBody = true;
-
-  @override
-  final int priority = -2;
+  final int priority = -3;
 }

@@ -43,7 +43,6 @@ class Ghosts extends WrapperNoEvents
   }
 
   async.Future<void> sirenVolumeUpdatedTimer() async {
-    // ignore: prefer_conditional_assignment
     if (_sirenEnabled) {
       if (_sirenTimer == null &&
           isMounted &&

@@ -23,7 +23,7 @@ const bool _multipleSpawningPacmans = false;
 /// The [GameCharacter] is the component that the physical player of the game is
 /// controlling.
 class Pacman extends GameCharacter with CollisionCallbacks {
-  Pacman({required super.position, super.original}) : super(priority: 2);
+  Pacman({required super.position, super.original});
 
   final Vector2 _screenSizeLast = Vector2(0, 0);
   final Timer _eatTimer = Timer(_kPacmanHalfEatingResetTimeMillis * 2 / 1000);

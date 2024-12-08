@@ -210,7 +210,7 @@ class Maze {
           if (_circleAt(i, j)) {
             fixtureDefs.add(
                 FixtureDef(CircleShape(radius: scale / 2, position: center)));
-            result.add(MazeWallCircleVisual(
+            result.add(WallCircleVisual(
                 position: center,
                 radius: scale / 2 * _mazeInnerWallWidthFactor));
           }
@@ -224,7 +224,7 @@ class Maze {
               fixtureDefs.add(FixtureDef(PolygonShape()
                 ..setAsBox(scale * (k + _pixelationBuffer) / 2, scale / 2,
                     newCentre, 0)));
-              result.add(MazeWallRectangleVisual(
+              result.add(WallRectangleVisual(
                   position: newCentre,
                   width: scale * (k + _pixelationBuffer),
                   height: scale * _mazeInnerWallWidthFactor));
@@ -241,7 +241,7 @@ class Maze {
               fixtureDefs.add(FixtureDef(PolygonShape()
                 ..setAsBox(scale / 2, scale * (k + _pixelationBuffer) / 2,
                     newCentre, 0)));
-              result.add(MazeWallRectangleVisual(
+              result.add(WallRectangleVisual(
                   position: newCentre,
                   width: scale * _mazeInnerWallWidthFactor,
                   height: scale * (k + _pixelationBuffer)));
@@ -267,7 +267,7 @@ class Maze {
               l++;
             }
             if (k > 0 && l > 0) {
-              result.add(MazeWallRectangleVisual(
+              result.add(WallRectangleVisual(
                   position: center + Vector2(scale * k / 2, scale * l / 2),
                   width: scale * k,
                   height: scale * l));
@@ -276,7 +276,7 @@ class Maze {
         }
       }
     }
-    result.add(MazeWallGround(fixtureDefs: fixtureDefs));
+    result.add(WallGround(fixtureDefs: fixtureDefs));
     return result;
   }
 
@@ -286,14 +286,14 @@ class Maze {
     const int width = 7;
     result
       ..add(
-        MazeVisualBlockingBar(
+        WallRectangleVisual(
             position: Vector2(
                 scale * (_mazeLayoutHorizontalLength() / 2 + width / 2), 0),
             width: scale * width,
             height: scale * _mazeLayoutVerticalLength()),
       )
       ..add(
-        MazeVisualBlockingBar(
+        WallRectangleVisual(
             position: Vector2(
                 -scale * (_mazeLayoutHorizontalLength() / 2 + width / 2), 0),
             width: scale * width,
