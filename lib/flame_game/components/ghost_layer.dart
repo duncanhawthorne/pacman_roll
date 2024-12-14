@@ -126,6 +126,7 @@ class Ghosts extends WrapperNoEvents
       return; //else cant use game references
     }
     _ghostSpawner?.removeFromParent();
+    _ghostSpawner = null; //FIXME shouldn't be necessary
     _ghostSpawner?.timer.reset(); //so next spawn based on time of reset
   }
 
