@@ -30,10 +30,9 @@ class Ghosts extends WrapperNoEvents
   bool get ghostsLoaded => ghostList.isNotEmpty && ghostList[0].isLoaded;
 
   double _averageGhostSpeed() {
-    assert(game.isGameLive); //only call if this passes, else build if test
-    assert(world
-        .pacmans.anyAlivePacman); //only call if this passes, else build if test
-    assert(!world.gameWonOrLost); //only call if this passes, else build if test
+    assert(game.isLive); //test before call, else test here
+    assert(world.pacmans.anyAlivePacman); //test before call, else test here
+    assert(!game.isWonOrLost); //test before call, else test here
     if (ghostList.isEmpty) {
       return 0;
     } else {
@@ -50,14 +49,13 @@ class Ghosts extends WrapperNoEvents
       if (!isMounted) {
         return;
       }
-      assert(
-          !world.gameWonOrLost); //only call if this passes, else build if test
-      assert(game.isGameLive); //only call if this passes, else build if test
+      assert(!game.isWonOrLost); //test before call, else test here
+      assert(game.isLive); //test before call, else test here
       _sirenTimer ??= async.Timer.periodic(const Duration(milliseconds: 250),
           (async.Timer timer) {
         if (!world.doingLevelResetFlourish &&
-            game.isGameLive &&
-            !world.gameWonOrLost &&
+            game.isLive &&
+            !game.isWonOrLost &&
             world.pacmans.anyAlivePacman) {
           game.audioController.setSirenVolume(
               _averageGhostSpeed() * flameGameZoom / 30,
@@ -106,7 +104,7 @@ class Ghosts extends WrapperNoEvents
     if (!isMounted) {
       return; //else cant use game references
     }
-    assert(!world.gameWonOrLost); //only call if this passes, else build if test
+    assert(!game.isWonOrLost); //test before call, else test here
     if (game.level.multipleSpawningGhosts) {
       _ghostSpawner ??= SpawnComponent(
         factory: (int i) =>

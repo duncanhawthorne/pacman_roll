@@ -46,10 +46,6 @@ class PacmanWorld extends Forge2DWorld
   final BlockingBarWrapper _blocking = BlockingBarWrapper();
   final List<WrapperNoEvents> wrappers = <WrapperNoEvents>[];
 
-  bool get gameWonOrLost =>
-      pellets.pelletsRemainingNotifier.value <= 0 ||
-      pacmans.numberOfDeathsNotifier.value >= game.level.maxAllowedDeaths;
-
   final Map<int, double?> _fingersLastDragAngle = <int, double?>{};
 
   bool doingLevelResetFlourish = false;
@@ -80,7 +76,7 @@ class PacmanWorld extends Forge2DWorld
   void _resetSlideAfterPacmanDeath(Pacman dyingPacman) {
     //reset ghost scared status. Shouldn't be relevant as just died
     game.audioController.stopSfx(SfxType.ghostsScared);
-    if (!gameWonOrLost) {
+    if (!game.isWonOrLost) {
       if (_slideCharactersAfterPacmanDeath) {
         _cameraRotatableOnPacmanDeathFlourish = false;
         dyingPacman.resetSlideAfterDeath();
@@ -98,7 +94,7 @@ class PacmanWorld extends Forge2DWorld
   void _resetInstantAfterPacmanDeath() {
     // ignore: dead_code
     if (true || doingLevelResetFlourish) {
-      // must test doingLevelResetFlourish
+      // originally thought must test doingLevelResetFlourish
       // as could have been removed by reset during delay x 2
       // but this code is only run from resetSlide,
       // so if we have got here (accidentally) then resetSlide has run
@@ -207,9 +203,9 @@ class PacmanWorld extends Forge2DWorld
   }
 
   void _moveMazeAngleByDelta(double angleDelta) {
-    if (_cameraRotatableOnPacmanDeathFlourish && game.isGameLive) {
+    if (_cameraRotatableOnPacmanDeathFlourish && game.isLive) {
       _setMazeAngle(game.camera.viewfinder.angle + angleDelta);
-      if (!doingLevelResetFlourish && !gameWonOrLost) {
+      if (!doingLevelResetFlourish && !game.isWonOrLost) {
         game.stopwatch.resume();
         game.stopwatchStarted = true;
         ghosts

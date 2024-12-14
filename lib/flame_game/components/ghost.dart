@@ -53,7 +53,7 @@ class Ghost extends GameCharacter {
   }
 
   void setScared() {
-    if (!world.gameWonOrLost) {
+    if (!game.isWonOrLost) {
       if (current != CharacterState.dead &&
           current != CharacterState.spawning) {
         // if dead, need to continue dead animation without physics applying,
@@ -64,7 +64,7 @@ class Ghost extends GameCharacter {
   }
 
   void setScaredToScaredIsh() {
-    if (!world.gameWonOrLost) {
+    if (!game.isWonOrLost) {
       if (current == CharacterState.scared) {
         current = CharacterState.scaredIsh;
       }
@@ -72,7 +72,7 @@ class Ghost extends GameCharacter {
   }
 
   void setScaredIshToNormal() {
-    if (!world.gameWonOrLost) {
+    if (!game.isWonOrLost) {
       if (current == CharacterState.scaredIsh) {
         current = CharacterState.normal;
       }
@@ -80,7 +80,7 @@ class Ghost extends GameCharacter {
   }
 
   void setDead() {
-    if (!world.gameWonOrLost) {
+    if (!game.isWonOrLost) {
       current = CharacterState.dead; //stops further interactions
       if (game.level.multipleSpawningGhosts) {
         removeFromParent();
@@ -95,7 +95,7 @@ class Ghost extends GameCharacter {
   }
 
   void _setSpawning() {
-    if (!world.gameWonOrLost) {
+    if (!game.isWonOrLost) {
       current = CharacterState.spawning; //stops further interactions
       disconnectFromBall(spawning: true);
       add(MoveToPositionEffect(

@@ -77,18 +77,23 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   final Timer stopwatch = Timer(double.infinity);
   int get stopwatchMilliSeconds =>
       (stopwatch.current * 1000).toInt() +
-      min(level.maxAllowedDeaths - 1,
-              world.pacmans.numberOfDeathsNotifier.value) *
-          _deathPenaltyMillis *
-          (level.isTutorial ? 0 : 1);
+      (level.isTutorial
+          ? 0
+          : min(level.maxAllowedDeaths - 1,
+                  world.pacmans.numberOfDeathsNotifier.value) *
+              _deathPenaltyMillis);
 
   bool stopwatchStarted = false;
 
-  bool get isGameLive =>
+  bool get isLive =>
       !paused &&
       isLoaded &&
       isMounted &&
       !(!stopwatchStarted && overlays.isActive(GameScreen.startDialogKey));
+
+  bool get isWonOrLost =>
+      world.pellets.pelletsRemainingNotifier.value <= 0 ||
+      world.pacmans.numberOfDeathsNotifier.value >= level.maxAllowedDeaths;
 
   final Random random = Random();
 
@@ -125,8 +130,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   }
 
   void _winOrLoseGameListener() {
-    assert(
-        world.pellets.pelletsRemainingNotifier.value > 0 || !stopwatchStarted);
+    assert(!stopwatchStarted); //so no instant trigger of listeners
     world.pacmans.numberOfDeathsNotifier.addListener(() {
       if (world.pacmans.numberOfDeathsNotifier.value >=
               level.maxAllowedDeaths &&
@@ -143,21 +147,21 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   }
 
   void _handleWinGame() {
-    if (isGameLive) {
-      if (world.pellets.pelletsRemainingNotifier.value == 0) {
-        world.resetAfterGameWin();
-        stopwatch.pause();
-        if (stopwatchMilliSeconds > 10 * 1000 && !level.isTutorial) {
-          fBase.firebasePushSingleScore(_userString, _getCurrentGameState());
-        }
-        playerProgress.saveLevelComplete(_getCurrentGameState());
-        cleanDialogs();
-        overlays.add(GameScreen.wonDialogKey);
+    assert(stopwatchStarted);
+    if (world.pellets.pelletsRemainingNotifier.value == 0) {
+      world.resetAfterGameWin();
+      stopwatch.pause();
+      if (stopwatchMilliSeconds > 10 * 1000 && !level.isTutorial) {
+        fBase.firebasePushSingleScore(_userString, _getCurrentGameState());
       }
+      playerProgress.saveLevelComplete(_getCurrentGameState());
+      cleanDialogs();
+      overlays.add(GameScreen.wonDialogKey);
     }
   }
 
   void _handleLoseGame() {
+    assert(stopwatchStarted);
     audioController.stopAllSfx();
     cleanDialogs();
     overlays.add(GameScreen.loseDialogKey);

@@ -141,7 +141,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   }
 
   void _dieFromGhostActionAfterDeathAnimation() {
-    if (current == CharacterState.dead && !world.gameWonOrLost) {
+    if (current == CharacterState.dead && !game.isWonOrLost) {
       if (world.pacmans.pacmanDeathIsFinalPacman) {
         if (world.doingLevelResetFlourish) {
           // must test doingLevelResetFlourish
