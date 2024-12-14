@@ -129,8 +129,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
           world.ghosts.disconnectGhostsFromBalls();
         }
         world.pacmans.pacmanDyingNotifier.value++;
-        if (world.pacmans.pacmanList.length == 1 ||
-            world.pacmans.numberAlivePacman() == 0) {
+        if (world.pacmans.pacmanDeathIsFinalPacman) {
           world.doingLevelResetFlourish = true;
           game.stopwatch.pause();
           world.ghosts.removeSpawner();
@@ -143,8 +142,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
 
   void _dieFromGhostActionAfterDeathAnimation() {
     if (current == CharacterState.dead && !world.gameWonOrLost) {
-      if (world.pacmans.pacmanList.length == 1 ||
-          world.pacmans.numberAlivePacman() == 0) {
+      if (world.pacmans.pacmanDeathIsFinalPacman) {
         if (world.doingLevelResetFlourish) {
           // must test doingLevelResetFlourish
           // as could have been removed by reset during delay

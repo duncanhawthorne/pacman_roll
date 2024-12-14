@@ -27,11 +27,14 @@ class Ghosts extends WrapperNoEvents
   SpawnComponent? _ghostSpawner;
   async.Timer? _sirenTimer;
 
+  bool get ghostsLoaded => ghostList.isNotEmpty && ghostList[0].isLoaded;
+
   double _averageGhostSpeed() {
-    if (!game.isGameLive ||
-        world.pacmans.numberAlivePacman() == 0 ||
-        world.gameWonOrLost ||
-        ghostList.isEmpty) {
+    assert(game.isGameLive); //only call if this passes, else build if test
+    assert(world
+        .pacmans.anyAlivePacman); //only call if this passes, else build if test
+    assert(!world.gameWonOrLost); //only call if this passes, else build if test
+    if (ghostList.isEmpty) {
       return 0;
     } else {
       return ghostList
@@ -44,23 +47,25 @@ class Ghosts extends WrapperNoEvents
 
   async.Future<void> sirenVolumeUpdatedTimer() async {
     if (_sirenEnabled) {
-      if (_sirenTimer == null &&
-          isMounted &&
-          game.isGameLive &&
-          !world.gameWonOrLost) {
-        _sirenTimer = async.Timer.periodic(const Duration(milliseconds: 250),
-            (async.Timer timer) {
-          if (game.isGameLive &&
-              !world.gameWonOrLost &&
-              !world.doingLevelResetFlourish) {
-            game.audioController.setSirenVolume(
-                _averageGhostSpeed() * flameGameZoom / 30,
-                gradual: true);
-          } else {
-            _cancelSirenVolumeUpdatedTimer();
-          }
-        });
+      if (!isMounted) {
+        return;
       }
+      assert(
+          !world.gameWonOrLost); //only call if this passes, else build if test
+      assert(game.isGameLive); //only call if this passes, else build if test
+      _sirenTimer ??= async.Timer.periodic(const Duration(milliseconds: 250),
+          (async.Timer timer) {
+        if (!world.doingLevelResetFlourish &&
+            game.isGameLive &&
+            !world.gameWonOrLost &&
+            world.pacmans.anyAlivePacman) {
+          game.audioController.setSirenVolume(
+              _averageGhostSpeed() * flameGameZoom / 30,
+              gradual: true);
+        } else {
+          _cancelSirenVolumeUpdatedTimer();
+        }
+      });
     }
   }
 
@@ -101,16 +106,17 @@ class Ghosts extends WrapperNoEvents
     if (!isMounted) {
       return; //else cant use game references
     }
-    _ghostSpawner ??= SpawnComponent(
-      factory: (int i) =>
-          Ghost(ghostID: <int>[3, 4, 5][game.random.nextInt(3)]),
-      selfPositioning: true,
-      period: game.level.ghostSpawnTimerLength.toDouble(),
-    );
-    if (game.level.multipleSpawningGhosts &&
-        !_ghostSpawner!.isMounted &&
-        !world.gameWonOrLost) {
-      add(_ghostSpawner!);
+    assert(!world.gameWonOrLost); //only call if this passes, else build if test
+    if (game.level.multipleSpawningGhosts) {
+      _ghostSpawner ??= SpawnComponent(
+        factory: (int i) =>
+            Ghost(ghostID: <int>[3, 4, 5][game.random.nextInt(3)]),
+        selfPositioning: true,
+        period: game.level.ghostSpawnTimerLength.toDouble(),
+      );
+      if (!_ghostSpawner!.isMounted) {
+        add(_ghostSpawner!);
+      }
     }
   }
 

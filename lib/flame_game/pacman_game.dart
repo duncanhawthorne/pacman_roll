@@ -81,7 +81,10 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
               world.pacmans.numberOfDeathsNotifier.value) *
           _deathPenaltyMillis *
           (level.isTutorial ? 0 : 1);
-  bool get levelStarted => stopwatchMilliSeconds > 0;
+
+  bool get levelStarted =>
+      stopwatch.current >
+      0; //could test stopwatchMilliSeconds but this is faster
 
   bool get isGameLive =>
       !paused &&
@@ -224,9 +227,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
       } else if (stopwatch.isRunning()) {
         //some game activity has happened, no need to pause, just cancel timer
         timer.cancel();
-      } else if (!(world.isMounted &&
-          world.ghosts.ghostList.isNotEmpty &&
-          world.ghosts.ghostList[0].isLoaded)) {
+      } else if (!world.isMounted || !world.ghosts.ghostsLoaded) {
         //core components haven't loaded yet, so wait before start frame count
         _framesRendered = 0;
       } else if (_framesRendered <= 5) {

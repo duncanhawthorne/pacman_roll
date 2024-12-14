@@ -209,11 +209,8 @@ class PacmanWorld extends Forge2DWorld
   void _moveMazeAngleByDelta(double angleDelta) {
     if (_cameraRotatableOnPacmanDeathFlourish && game.isGameLive) {
       _setMazeAngle(game.camera.viewfinder.angle + angleDelta);
-
-      if (!doingLevelResetFlourish) {
-        if (!gameWonOrLost) {
-          game.stopwatch.resume();
-        }
+      if (!doingLevelResetFlourish && !gameWonOrLost) {
+        game.stopwatch.resume();
         ghosts
           ..addSpawner()
           ..sirenVolumeUpdatedTimer();
