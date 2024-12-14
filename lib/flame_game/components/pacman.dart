@@ -131,8 +131,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
         world.pacmans.pacmanDyingNotifier.value++;
         if (world.pacmans.pacmanDeathIsFinalPacman) {
           world.doingLevelResetFlourish = true;
-          game.stopwatch.pause();
-          world.ghosts.removeSpawner();
+          game.stopRegularItems();
         }
         add(NullEffect(_kPacmanDeadResetTimeMillis,
             onComplete: _dieFromGhostActionAfterDeathAnimation));

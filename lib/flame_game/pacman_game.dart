@@ -85,10 +85,9 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
 
   bool stopwatchStarted = false;
 
-  bool get isLive =>
-      !paused &&
-      isLoaded &&
-      isMounted &&
+  bool get isLive => !paused && isLoaded && isMounted;
+
+  bool get openingScreenCleared =>
       !(!stopwatchStarted && overlays.isActive(GameScreen.startDialogKey));
 
   bool get isWonOrLost =>
@@ -121,6 +120,21 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
     resumeEngine();
   }
 
+  void startRegularItems() {
+    stopwatchStarted = true; //once per reset
+    stopwatch.resume();
+    world.ghosts
+      ..addSpawner()
+      ..sirenVolumeUpdaterTimer();
+  }
+
+  void stopRegularItems() {
+    stopwatch.pause();
+    world.ghosts
+      ..removeSpawner()
+      ..cancelSirenVolumeUpdaterTimer();
+  }
+
   void _lifecycleChangeListener() {
     appLifecycleStateNotifier.addListener(() {
       if (appLifecycleStateNotifier.value == AppLifecycleState.hidden) {
@@ -135,22 +149,27 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
       if (world.pacmans.numberOfDeathsNotifier.value >=
               level.maxAllowedDeaths &&
           stopwatchStarted) {
+        assert(isWonOrLost);
+        stopRegularItems();
         _handleLoseGame();
       }
     });
     world.pellets.pelletsRemainingNotifier.addListener(() {
       if (world.pellets.pelletsRemainingNotifier.value == 0 &&
           stopwatchStarted) {
+        assert(isWonOrLost);
+        stopRegularItems();
         _handleWinGame();
       }
     });
   }
 
   void _handleWinGame() {
+    assert(isWonOrLost);
+    assert(!stopwatch.isRunning());
     assert(stopwatchStarted);
     if (world.pellets.pelletsRemainingNotifier.value == 0) {
       world.resetAfterGameWin();
-      stopwatch.pause();
       if (stopwatchMilliSeconds > 10 * 1000 && !level.isTutorial) {
         fBase.firebasePushSingleScore(_userString, _getCurrentGameState());
       }
@@ -161,6 +180,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   }
 
   void _handleLoseGame() {
+    assert(isWonOrLost);
     assert(stopwatchStarted);
     audioController.stopAllSfx();
     cleanDialogs();

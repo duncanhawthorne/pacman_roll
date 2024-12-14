@@ -203,14 +203,12 @@ class PacmanWorld extends Forge2DWorld
   }
 
   void _moveMazeAngleByDelta(double angleDelta) {
-    if (_cameraRotatableOnPacmanDeathFlourish && game.isLive) {
+    if (_cameraRotatableOnPacmanDeathFlourish &&
+        game.isLive &&
+        game.openingScreenCleared) {
       _setMazeAngle(game.camera.viewfinder.angle + angleDelta);
       if (!doingLevelResetFlourish && !game.isWonOrLost) {
-        game.stopwatch.resume();
-        game.stopwatchStarted = true;
-        ghosts
-          ..addSpawner()
-          ..sirenVolumeUpdatedTimer();
+        game.startRegularItems();
       }
     }
   }

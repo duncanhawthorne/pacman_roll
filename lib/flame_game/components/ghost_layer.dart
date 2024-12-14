@@ -44,7 +44,7 @@ class Ghosts extends WrapperNoEvents
     }
   }
 
-  async.Future<void> sirenVolumeUpdatedTimer() async {
+  async.Future<void> sirenVolumeUpdaterTimer() async {
     if (_sirenEnabled) {
       if (!isMounted) {
         return;
@@ -53,21 +53,21 @@ class Ghosts extends WrapperNoEvents
       assert(game.isLive); //test before call, else test here
       _sirenTimer ??= async.Timer.periodic(const Duration(milliseconds: 250),
           (async.Timer timer) {
-        if (!world.doingLevelResetFlourish &&
-            game.isLive &&
-            !game.isWonOrLost &&
-            world.pacmans.anyAlivePacman) {
+        assert(!game.isWonOrLost); //timer cancelled already here
+        assert(world.pacmans.anyAlivePacman); //timer cancelled already here
+        assert(!world.doingLevelResetFlourish); //timer cancelled already here
+        if (game.isLive) {
           game.audioController.setSirenVolume(
               _averageGhostSpeed() * flameGameZoom / 30,
               gradual: true);
         } else {
-          _cancelSirenVolumeUpdatedTimer();
+          cancelSirenVolumeUpdaterTimer();
         }
       });
     }
   }
 
-  void _cancelSirenVolumeUpdatedTimer() {
+  void cancelSirenVolumeUpdaterTimer() {
     if (_sirenTimer != null) {
       game.audioController.setSirenVolume(0);
       _sirenTimer!.cancel();
@@ -194,7 +194,7 @@ class Ghosts extends WrapperNoEvents
 
   @override
   void reset({bool mazeResize = false}) {
-    _cancelSirenVolumeUpdatedTimer();
+    cancelSirenVolumeUpdaterTimer();
     current = CharacterState.normal;
     _ghostsScaredTimer.pause(); //makes update function for timer free
     _removeAllGhosts();
