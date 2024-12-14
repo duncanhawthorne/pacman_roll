@@ -125,7 +125,7 @@ class Ghosts extends WrapperNoEvents
       return; //else cant use game references
     }
     _ghostSpawner?.removeFromParent();
-    _ghostSpawner = null; //so will reflect new level parameters
+    _ghostSpawner?.timer.reset(); //so next spawn based on time of reset
   }
 
   void _removeAllGhosts() {
@@ -200,6 +200,7 @@ class Ghosts extends WrapperNoEvents
     current = CharacterState.normal;
     _ghostsScaredTimer.pause(); //makes update function for timer free
     _removeAllGhosts();
+    _ghostSpawner = null; //so will reflect new level parameters
     _addThreeGhosts();
   }
 

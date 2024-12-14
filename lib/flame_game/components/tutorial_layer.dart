@@ -15,7 +15,7 @@ class TutorialWrapper extends WrapperNoEvents
   @override
   void start() {
     Future<void>.delayed(_tutorialDelay, () {
-      if (!game.levelStarted &&
+      if (!game.stopwatchStarted &&
           !_tutorialEverManuallyHidden &&
           game.level.number == Levels.levelToShowInstructions) {
         //if user hasn't worked out how to start by now, give a prompt

@@ -82,15 +82,13 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
           _deathPenaltyMillis *
           (level.isTutorial ? 0 : 1);
 
-  bool get levelStarted =>
-      stopwatch.current >
-      0; //could test stopwatchMilliSeconds but this is faster
+  bool stopwatchStarted = false;
 
   bool get isGameLive =>
       !paused &&
       isLoaded &&
       isMounted &&
-      !(overlays.isActive(GameScreen.startDialogKey) && !levelStarted);
+      !(!stopwatchStarted && overlays.isActive(GameScreen.startDialogKey));
 
   final Random random = Random();
 
@@ -127,16 +125,18 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   }
 
   void _winOrLoseGameListener() {
-    assert(world.pellets.pelletsRemainingNotifier.value > 0 || !levelStarted);
+    assert(
+        world.pellets.pelletsRemainingNotifier.value > 0 || !stopwatchStarted);
     world.pacmans.numberOfDeathsNotifier.addListener(() {
       if (world.pacmans.numberOfDeathsNotifier.value >=
               level.maxAllowedDeaths &&
-          levelStarted) {
+          stopwatchStarted) {
         _handleLoseGame();
       }
     });
     world.pellets.pelletsRemainingNotifier.addListener(() {
-      if (world.pellets.pelletsRemainingNotifier.value == 0 && levelStarted) {
+      if (world.pellets.pelletsRemainingNotifier.value == 0 &&
+          stopwatchStarted) {
         _handleWinGame();
       }
     });
@@ -198,6 +198,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
     stopwatch
       ..pause()
       ..reset();
+    stopwatchStarted = false;
     if (!firstRun) {
       assert(world.isLoaded);
       world.reset();

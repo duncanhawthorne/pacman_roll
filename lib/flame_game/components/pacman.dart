@@ -18,7 +18,7 @@ import 'super_pellet.dart';
 
 const int _kPacmanDeadResetTimeMillis = 1700;
 const int _kPacmanHalfEatingResetTimeMillis = 180;
-const bool _multipleSpawningPacmans = false;
+const bool multipleSpawningPacmans = false;
 
 /// The [GameCharacter] is the component that the physical player of the game is
 /// controlling.
@@ -112,7 +112,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     if (typical && ghost.typical) {
       _eat(isPellet: false);
       ghost.setDead();
-      if (_multipleSpawningPacmans) {
+      if (multipleSpawningPacmans) {
         world.pacmans.add(Pacman(position: position + Vector2.random() / 100));
       }
     }
@@ -150,7 +150,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
           world.resetAfterPacmanDeath(this);
         }
       } else {
-        assert(_multipleSpawningPacmans);
+        assert(multipleSpawningPacmans);
         //possible bug here if two pacmans are removed in quick succession
         removeFromParent();
       }

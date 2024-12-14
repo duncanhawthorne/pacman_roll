@@ -211,6 +211,7 @@ class PacmanWorld extends Forge2DWorld
       _setMazeAngle(game.camera.viewfinder.angle + angleDelta);
       if (!doingLevelResetFlourish && !gameWonOrLost) {
         game.stopwatch.resume();
+        game.stopwatchStarted = true;
         ghosts
           ..addSpawner()
           ..sirenVolumeUpdatedTimer();
@@ -218,18 +219,17 @@ class PacmanWorld extends Forge2DWorld
     }
   }
 
-  final Vector2 _tmpGravity = Vector2.zero();
+  final Vector2 downDirection = Vector2.zero();
   double gravityXSign = 0;
   double gravityYSign = 0;
   void _setMazeAngle(double angle) {
-    //using tmpGravity to avoid creating a new Vector2 on each update / frame
-    //could instead directly do gravity = Vector2(calc, calc);
-    _tmpGravity
+    game.camera.viewfinder.angle = angle;
+    downDirection
       ..setValues(-sin(angle), cos(angle))
       ..scale(game.level.levelSpeed);
-    gravity = _tmpGravity;
-    gravityXSign = gravity.x.sign;
-    gravityYSign = gravity.y.sign;
-    game.camera.viewfinder.angle = angle;
+
+    gravity = downDirection;
+    gravityXSign = gravity.x.sign; //as referred to every frame
+    gravityYSign = gravity.y.sign; //as referred to every frame
   }
 }

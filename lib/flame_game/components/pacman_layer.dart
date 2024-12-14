@@ -17,7 +17,7 @@ class Pacmans extends WrapperNoEvents {
   final ValueNotifier<int> pacmanDyingNotifier = ValueNotifier<int>(0);
 
   bool get pacmanDeathIsFinalPacman =>
-      pacmanList.length == 1 || !anyAlivePacman;
+      !multipleSpawningPacmans || pacmanList.length == 1 || !anyAlivePacman;
 
   Vector2 get ghostHomingTarget => pacmanList[0].position;
 
