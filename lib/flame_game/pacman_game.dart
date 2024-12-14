@@ -219,6 +219,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
     if (showStartDialog) {
       overlays.add(GameScreen.startDialogKey);
     }
+    stopRegularItems(); //duplicates other items, belt and braces only
     stopwatch
       ..pause()
       ..reset();

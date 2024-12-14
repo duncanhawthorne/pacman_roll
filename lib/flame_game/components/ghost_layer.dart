@@ -31,6 +31,7 @@ class Ghosts extends WrapperNoEvents
 
   double _averageGhostSpeed() {
     assert(game.isLive); //test before call, else test here
+    assert(game.openingScreenCleared);
     assert(world.pacmans.anyAlivePacman); //test before call, else test here
     assert(!game.isWonOrLost); //test before call, else test here
     if (ghostList.isEmpty) {
@@ -51,11 +52,13 @@ class Ghosts extends WrapperNoEvents
       }
       assert(!game.isWonOrLost); //test before call, else test here
       assert(game.isLive); //test before call, else test here
+      assert(game.openingScreenCleared);
       _sirenTimer ??= async.Timer.periodic(const Duration(milliseconds: 250),
           (async.Timer timer) {
         assert(!game.isWonOrLost); //timer cancelled already here
         assert(world.pacmans.anyAlivePacman); //timer cancelled already here
         assert(!world.doingLevelResetFlourish); //timer cancelled already here
+        assert(game.openingScreenCleared);
         if (game.isLive) {
           game.audioController.setSirenVolume(
               _averageGhostSpeed() * flameGameZoom / 30,
