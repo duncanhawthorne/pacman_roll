@@ -70,6 +70,7 @@ class MyGame extends StatelessWidget {
           return MaterialApp.router(
             title: appTitle,
             theme: flutterNesTheme().copyWith(
+              scaffoldBackgroundColor: Palette.background.color,
               colorScheme: ColorScheme.fromSeed(
                 seedColor: Palette.seed.color,
                 surface: Palette.background.color,

@@ -8,6 +8,7 @@ import 'workarounds_stub.dart'
 void setStatusBarColor(Color color) {
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
     statusBarColor: color, // Status bar color
+    systemNavigationBarColor: color,
   ));
 }
 

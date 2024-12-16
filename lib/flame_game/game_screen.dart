@@ -68,37 +68,38 @@ class GameScreen extends StatelessWidget {
           child: Padding(
             padding: EdgeInsets.only(bottom: gestureInset()),
             child: Scaffold(
+                backgroundColor: Palette.background.color,
                 body: GameWidget<PacmanGame>(
-              key: const Key('play session'),
-              game: getGame(level: level, mazeId: mazeId, context: context),
-              overlayBuilderMap: <String, OverlayWidgetBuilder<PacmanGame>>{
-                topOverlayKey: (BuildContext context, PacmanGame game) {
-                  return topOverlayWidget(context, game);
-                },
-                loseDialogKey: (BuildContext context, PacmanGame game) {
-                  return GameLoseDialog(
-                    level: level,
-                    game: game,
-                  );
-                },
-                wonDialogKey: (BuildContext context, PacmanGame game) {
-                  return GameWonDialog(
-                      level: level,
-                      levelCompletedInMillis: game.stopwatchMilliSeconds,
-                      game: game);
-                },
-                startDialogKey: (BuildContext context, PacmanGame game) {
-                  return StartDialog(level: level, game: game);
-                },
-                tutorialDialogKey: (BuildContext context, PacmanGame game) {
-                  return TutorialDialog(game: game);
-                },
-                resetDialogKey: (BuildContext context, PacmanGame game) {
-                  return ResetDialog(game: game);
-                },
-              },
-              initialActiveOverlays: const <String>[topOverlayKey],
-            )),
+                  key: const Key('play session'),
+                  game: getGame(level: level, mazeId: mazeId, context: context),
+                  overlayBuilderMap: <String, OverlayWidgetBuilder<PacmanGame>>{
+                    topOverlayKey: (BuildContext context, PacmanGame game) {
+                      return topOverlayWidget(context, game);
+                    },
+                    loseDialogKey: (BuildContext context, PacmanGame game) {
+                      return GameLoseDialog(
+                        level: level,
+                        game: game,
+                      );
+                    },
+                    wonDialogKey: (BuildContext context, PacmanGame game) {
+                      return GameWonDialog(
+                          level: level,
+                          levelCompletedInMillis: game.stopwatchMilliSeconds,
+                          game: game);
+                    },
+                    startDialogKey: (BuildContext context, PacmanGame game) {
+                      return StartDialog(level: level, game: game);
+                    },
+                    tutorialDialogKey: (BuildContext context, PacmanGame game) {
+                      return TutorialDialog(game: game);
+                    },
+                    resetDialogKey: (BuildContext context, PacmanGame game) {
+                      return ResetDialog(game: game);
+                    },
+                  },
+                  initialActiveOverlays: const <String>[topOverlayKey],
+                )),
           ),
         ),
       ),
