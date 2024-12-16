@@ -4,6 +4,7 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:flame/camera.dart';
+import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
@@ -42,7 +43,7 @@ const double kVirtualGameSize = 1700; //determines speed of game
 class PacmanGame extends Forge2DGame<PacmanWorld>
     with
         // ignore: always_specify_types
-        HasCollisionDetection,
+        HasQuadTreeCollisionDetection,
         SingleGameInstance,
         HasTimeScale {
   PacmanGame({
@@ -213,6 +214,10 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   }
 
   void reset({bool firstRun = false, bool showStartDialog = false}) {
+    initializeCollisionDetection(
+      mapDimensions: Rect.fromLTWH(-maze.mazeWidth / 2, -maze.mazeHeight / 2,
+          maze.mazeWidth, maze.mazeHeight),
+    );
     pauseEngineIfNoActivity();
     _userString = _getRandomString(random, 15);
     cleanDialogs();
@@ -228,6 +233,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
       assert(world.isLoaded);
       world.reset();
     }
+    collisionDetection.broadphase.tree.optimize();
   }
 
   void resetAndStart() {
