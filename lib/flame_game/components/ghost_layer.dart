@@ -23,7 +23,7 @@ class Ghosts extends WrapperNoEvents
   final List<Ghost> ghostList = <Ghost>[];
 
   CharacterState current = CharacterState.normal;
-  final Timer _ghostsScaredTimer = Timer(_kGhostScaredTimeMillis / 1000);
+  Timer _ghostsScaredTimer = Timer(0); //length set in reset
   SpawnComponent? _ghostSpawner;
   async.Timer? _sirenTimer;
 
@@ -203,6 +203,8 @@ class Ghosts extends WrapperNoEvents
     _ghostsScaredTimer.pause(); //makes update function for timer free
     _removeAllGhosts();
     _ghostSpawner = null; //so will reflect new level parameters
+    _ghostsScaredTimer = Timer(
+        _kGhostScaredTimeMillis / game.level.ghostScaredTimeFactor / 1000);
     _addThreeGhosts();
   }
 

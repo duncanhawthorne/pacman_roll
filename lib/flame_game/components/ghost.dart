@@ -27,7 +27,11 @@ class Ghost extends GameCharacter {
       [int size = 1]) async {
     return <CharacterState, SpriteAnimation>{
       CharacterState.normal: SpriteAnimation.spriteList(
-        <Sprite>[await game.loadSprite(_ghostSpritePaths[ghostID % 3]!)],
+        <Sprite>[
+          await game.loadSprite(game.level.numStartingGhosts == 1
+              ? _ghostSpritePaths[0]!
+              : _ghostSpritePaths[ghostID % 3]!)
+        ],
         stepTime: double.infinity,
       ),
       CharacterState.scared: SpriteAnimation.spriteList(

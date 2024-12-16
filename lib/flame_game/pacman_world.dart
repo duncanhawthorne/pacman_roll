@@ -184,8 +184,9 @@ class PacmanWorld extends Forge2DWorld
         final double angleDelta = smallAngle(
             fingerCurrentDragAngle - _fingersLastDragAngle[event.pointerId]!);
         const double maxSpinMultiplierRadius = 0.75;
-        final double spinMultiplier =
-            4 * min(1, eventVectorLengthProportion / maxSpinMultiplierRadius);
+        final double spinMultiplier = 4 *
+            game.level.spinSpeedFactor *
+            min(1, eventVectorLengthProportion / maxSpinMultiplierRadius);
 
         _tutorial.hide();
         _moveMazeAngleByDelta(angleDelta * spinMultiplier);

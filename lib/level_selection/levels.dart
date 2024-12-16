@@ -11,6 +11,14 @@ class Levels {
 
   static const double _levelSpeedFactor = 50 * (30 / flameGameZoom);
 
+  double _tutorialFactor(int levelNum) {
+    return levelNum >= 0
+        ? 1
+        : levelNum == min
+            ? 0.5
+            : 0.75;
+  }
+
   GameLevel getLevel(int levelNum) {
     assert(levelNum <= max && levelNum >= min);
     final GameLevel result = (
@@ -25,12 +33,9 @@ class Levels {
       homingGhosts:
           levelNum <= 2 + _ghostSpawnTimerLengthPattern.length ? false : true,
       isTutorial: levelNum <= 0,
-      levelSpeed: _levelSpeedFactor *
-          (levelNum >= 0
-              ? 1
-              : levelNum == min
-                  ? 0.5
-                  : 0.75),
+      levelSpeed: _levelSpeedFactor * _tutorialFactor(levelNum),
+      ghostScaredTimeFactor: _tutorialFactor(levelNum),
+      spinSpeedFactor: _tutorialFactor(levelNum),
       numStartingGhosts: levelNum >= 0
           ? 3
           : levelNum == min
@@ -55,6 +60,8 @@ typedef GameLevel = ({
   bool homingGhosts,
   bool isTutorial,
   double levelSpeed,
+  double ghostScaredTimeFactor,
+  double spinSpeedFactor,
   int numStartingGhosts,
   String levelString,
   bool infLives,

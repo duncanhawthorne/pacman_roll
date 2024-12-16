@@ -109,7 +109,9 @@ Widget levelSelectorRow(BuildContext context, PacmanGame game,
 }
 
 Widget levelButtonSingle(BuildContext context, PacmanGame game, int levelNum) {
-  if (levelNum < Levels.min || levelNum > Levels.max) {
+  if (levelNum < Levels.min ||
+      levelNum > Levels.max ||
+      maxLevelToShow(game) == Levels.min) {
     return const SizedBox.shrink();
   }
   final GameLevel level = levels.getLevel(levelNum);
@@ -126,8 +128,7 @@ Widget levelButtonSingle(BuildContext context, PacmanGame game, int levelNum) {
         context.go(
             '/?$levelUrlKey=$levelNum&$mazeUrlKey=${mazeNames[fixedMazeId]}');
       },
-      child: Text(
-          maxLevelToShow(game) == Levels.min ? "Tutorial" : level.levelString,
+      child: Text(level.levelString,
           style: playerProgress.isComplete(levelNum)
               ? textStyleBody
               : textStyleBodyDull));
