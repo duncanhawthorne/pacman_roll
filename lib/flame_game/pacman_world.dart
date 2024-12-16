@@ -126,7 +126,7 @@ class PacmanWorld extends Forge2DWorld
 
     if (!firstRun) {
       for (final WrapperNoEvents wrapper in wrappers) {
-        assert(wrapper.isLoaded);
+        assert(wrapper.isLoaded, wrapper);
         wrapper.reset();
       }
     }

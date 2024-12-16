@@ -197,7 +197,7 @@ class Ghosts extends WrapperNoEvents
   }
 
   @override
-  void reset({bool mazeResize = false}) {
+  Future<void> reset({bool mazeResize = false}) async {
     cancelSirenVolumeUpdaterTimer();
     current = CharacterState.normal;
     _ghostsScaredTimer.pause(); //makes update function for timer free
@@ -215,6 +215,6 @@ class Ghosts extends WrapperNoEvents
   @override
   Future<void> onLoad() async {
     super.onLoad();
-    reset();
+    async.unawaited(reset());
   }
 }

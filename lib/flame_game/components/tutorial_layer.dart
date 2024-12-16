@@ -32,13 +32,13 @@ class TutorialWrapper extends WrapperNoEvents
   }
 
   @override
-  void reset() {
+  Future<void> reset() async {
     game.overlays.remove(GameScreen.tutorialDialogKey);
   }
 
   @override
   Future<void> onLoad() async {
     super.onLoad();
-    reset();
+    unawaited(reset());
   }
 }

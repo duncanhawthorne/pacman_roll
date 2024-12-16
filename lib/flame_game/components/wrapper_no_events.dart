@@ -6,7 +6,7 @@ import 'package:flame/components.dart';
 /// Also set IgnoreEvents to speed up deliverAtPoint for all components queried
 
 class WrapperNoEvents extends PositionComponent with IgnoreEvents {
-  void reset() {}
+  Future<void> reset() async {}
 
   void start() {}
 }

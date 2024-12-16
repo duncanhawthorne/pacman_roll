@@ -199,7 +199,8 @@ class Maze {
   static const double _mazeInnerWallWidthFactor = 0.7;
   static const double _pixelationBuffer = 0.03;
 
-  List<Component> mazeWalls() {
+  List<Component> mazeWalls(
+      {bool includeGround = true, bool includeVisualWalls = true}) {
     final List<FixtureDef> fixtureDefs = <FixtureDef>[];
     final List<Component> result = <Component>[];
     final double scale = blockWidth;
@@ -276,7 +277,12 @@ class Maze {
         }
       }
     }
-    result.add(WallGround(fixtureDefs: fixtureDefs));
+    if (!includeVisualWalls) {
+      result.clear();
+    }
+    if (includeGround) {
+      result.add(WallGround(fixtureDefs: fixtureDefs));
+    }
     return result;
   }
 

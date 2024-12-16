@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flame/components.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -31,7 +33,7 @@ class Pacmans extends WrapperNoEvents {
   }
 
   @override
-  void reset({bool mazeResize = false}) {
+  Future<void> reset({bool mazeResize = false}) async {
     for (final Pacman pacman in pacmanList) {
       pacman.removeFromParent();
     }
@@ -43,6 +45,6 @@ class Pacmans extends WrapperNoEvents {
   @override
   Future<void> onLoad() async {
     super.onLoad();
-    reset();
+    unawaited(reset());
   }
 }

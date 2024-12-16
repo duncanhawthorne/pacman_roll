@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flame/components.dart';
 import 'package:flutter/foundation.dart';
 
@@ -10,24 +12,29 @@ import 'wrapper_no_events.dart';
 /// Especially on drag events deliverAtPoint
 /// Also set IgnoreEvents to speed up deliverAtPoint for all components queried
 
-class PelletWrapper extends WrapperNoEvents with HasGameReference<PacmanGame> {
+class PelletWrapper extends WrapperNoEvents
+    with HasGameReference<PacmanGame>, Snapshot {
   @override
   final int priority = -2;
 
   final ValueNotifier<int> pelletsRemainingNotifier = ValueNotifier<int>(0);
 
   @override
-  void reset() {
+  Future<void> reset() async {
     if (children.isNotEmpty) {
       removeAll(children);
     }
-    addAll(
+    await addAll(
         maze.pellets(game.level.superPelletsEnabled, pelletsRemainingNotifier));
+    clearSnapshot();
   }
 
   @override
   Future<void> onLoad() async {
     super.onLoad();
-    reset();
+    pelletsRemainingNotifier.addListener(() {
+      clearSnapshot();
+    });
+    unawaited(reset());
   }
 }
