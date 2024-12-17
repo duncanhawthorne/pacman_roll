@@ -115,7 +115,7 @@ class PacmanWorld extends Forge2DWorld
     //stop any rotation effect added to camera
     //note, still leaves flourish variable hot, so fix below
     removeEffects(game.camera.viewfinder);
-    _setMazeAngle(0);
+    setMazeAngle(0);
     _cameraRotatableOnPacmanDeathFlourish = true;
     doingLevelResetFlourish = false;
   }
@@ -206,8 +206,9 @@ class PacmanWorld extends Forge2DWorld
   void _moveMazeAngleByDelta(double angleDelta) {
     if (_cameraRotatableOnPacmanDeathFlourish &&
         game.isLive &&
-        game.openingScreenCleared) {
-      _setMazeAngle(game.camera.viewfinder.angle + angleDelta);
+        game.openingScreenCleared &&
+        !game.playbackMode) {
+      setMazeAngle(game.camera.viewfinder.angle + angleDelta);
       if (!doingLevelResetFlourish && !game.isWonOrLost) {
         game.startRegularItems();
       }
@@ -217,7 +218,9 @@ class PacmanWorld extends Forge2DWorld
   final Vector2 downDirection = Vector2.zero();
   double gravityXSign = 0;
   double gravityYSign = 0;
-  void _setMazeAngle(double angle) {
+
+  void setMazeAngle(double angle) {
+    game.recordAngle(angle);
     game.camera.viewfinder.angle = angle;
     downDirection
       ..setValues(-sin(angle), cos(angle))

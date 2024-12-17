@@ -32,10 +32,14 @@ class StartDialog extends StatelessWidget {
     return popupDialog(
       children: <Widget>[
         rotatedTitle(),
-        levelSelector(context, game),
-        mazeSelector(context, game),
+        ...game.playbackMode
+            ? <Widget>[const SizedBox.shrink()]
+            : <Widget>[
+                levelSelector(context, game),
+                mazeSelector(context, game)
+              ],
         bottomRowWidget(
-          children: game.stopwatchStarted
+          children: game.stopwatchStarted && !game.playbackMode
               ? <Widget>[
                   TextButton(
                       style: buttonStyle(borderColor: Palette.warning.color),
@@ -55,10 +59,16 @@ class StartDialog extends StatelessWidget {
                   TextButton(
                       style: buttonStyle(),
                       onPressed: () {
-                        game.overlays.remove(GameScreen.startDialogKey);
-                        game.start();
+                        if (game.playbackMode) {
+                          context.go(
+                              '/?$levelUrlKey=${Levels.min}&$mazeUrlKey=${mazeNames[Maze.defaultMazeId]}');
+                        } else {
+                          game.overlays.remove(GameScreen.startDialogKey);
+                          game.start();
+                        }
                       },
-                      child: const Text('Play', style: textStyleBody)),
+                      child: Text(game.playbackMode ? 'Begin' : 'Play',
+                          style: textStyleBody)),
                 ],
         )
       ],
@@ -90,7 +100,8 @@ Widget levelSelectorReal(BuildContext context, PacmanGame game) {
 
 Widget levelSelectorRow(BuildContext context, PacmanGame game,
     int maxLevelToShowCache, int rowIndex) {
-  final bool showResetButton = maxLevelToShow(game) > Levels.firstRealLevel;
+  final bool showResetButton =
+      true; //maxLevelToShow(game) > Levels.firstRealLevel;
   return Row(spacing: 4, children: <Widget>[
     showResetButton && rowIndex == 0
         ? resetWidget(context, game)
@@ -109,9 +120,7 @@ Widget levelSelectorRow(BuildContext context, PacmanGame game,
 }
 
 Widget levelButtonSingle(BuildContext context, PacmanGame game, int levelNum) {
-  if (levelNum < Levels.min ||
-      levelNum > Levels.max ||
-      maxLevelToShow(game) == Levels.min) {
+  if (levelNum < Levels.min || levelNum > Levels.max) {
     return const SizedBox.shrink();
   }
   final GameLevel level = levels.getLevel(levelNum);

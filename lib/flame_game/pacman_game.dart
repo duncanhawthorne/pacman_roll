@@ -8,6 +8,7 @@ import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
+import 'package:flutter/foundation.dart';
 
 import '../app_lifecycle/app_lifecycle.dart';
 import '../audio/audio_controller.dart';
@@ -15,10 +16,12 @@ import '../firebase/firebase_saves.dart';
 import '../level_selection/levels.dart';
 import '../player_progress/player_progress.dart';
 import '../style/palette.dart';
+import '../utils/helper.dart';
 import '../utils/src/workarounds.dart';
 import 'game_screen.dart';
 import 'maze.dart';
 import 'pacman_world.dart';
+import 'stored_moves.dart';
 
 /// This is the base of the game which is added to the [GameWidget].
 ///
@@ -97,6 +100,38 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
 
   final Random random = Random();
 
+  late int playbackModeCounter;
+  bool playbackMode = false;
+
+  // ignore: dead_code
+  static const bool recordMode = false && kDebugMode;
+  List<List<double>> recordedMovesLive = <List<double>>[];
+
+  void recordAngle(double angle) {
+    if (recordMode && !playbackMode) {
+      recordedMovesLive
+          .add(<double>[(stopwatchMilliSeconds).toDouble(), angle]);
+      if (recordedMovesLive.length % 100 == 0) {
+        debug(recordedMovesLive);
+      }
+    }
+  }
+
+  void playbackAngles() {
+    if (playbackMode) {
+      // && isLive && overlays.isActive(GameScreen.startDialogKey)
+      if (playbackModeCounter == -1) {
+        playbackModeCounter++;
+        startRegularItems();
+      }
+      while (storedMoves.length > playbackModeCounter &&
+          stopwatchMilliSeconds > storedMoves[playbackModeCounter][0]) {
+        world.setMazeAngle(storedMoves[playbackModeCounter][1]);
+        playbackModeCounter++;
+      }
+    }
+  }
+
   @override
   Color backgroundColor() => Palette.background.color;
 
@@ -149,7 +184,8 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
     world.pacmans.numberOfDeathsNotifier.addListener(() {
       if (world.pacmans.numberOfDeathsNotifier.value >=
               level.maxAllowedDeaths &&
-          stopwatchStarted) {
+          stopwatchStarted &&
+          !playbackMode) {
         assert(isWonOrLost);
         stopRegularItems();
         _handleLoseGame();
@@ -157,7 +193,8 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
     });
     world.pellets.pelletsRemainingNotifier.addListener(() {
       if (world.pellets.pelletsRemainingNotifier.value == 0 &&
-          stopwatchStarted) {
+          stopwatchStarted &&
+          !playbackMode) {
         assert(isWonOrLost);
         stopRegularItems();
         _handleWinGame();
@@ -214,6 +251,10 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   }
 
   void reset({bool firstRun = false, bool showStartDialog = false}) {
+    playbackModeCounter = -1;
+    playbackMode = !recordMode && level.number == Levels.playbackModeLevel;
+    recordedMovesLive.clear();
+
     initializeCollisionDetection(
       mapDimensions: Rect.fromLTWH(-maze.mazeWidth / 2, -maze.mazeHeight / 2,
           maze.mazeWidth, maze.mazeHeight),
@@ -256,6 +297,9 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
       if (paused) {
         //already paused, no further action required, just cancel timer
         timer.cancel();
+      } else if (playbackMode) {
+        //want to continue playback in playbackMode
+        timer.cancel();
       } else if (stopwatch.isRunning()) {
         //some game activity has happened, no need to pause, just cancel timer
         timer.cancel();
@@ -292,6 +336,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   void update(double dt) {
     stopwatch.update(dt * timeScale); //stops stopwatch when timeScale = 0
     _framesRendered++;
+    playbackAngles();
     super.update(dt);
   }
 

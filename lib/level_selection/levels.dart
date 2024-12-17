@@ -3,9 +3,10 @@ import '../flame_game/pacman_game.dart';
 class Levels {
   static const int firstRealLevel = 1;
   static const int max = 10;
-  static const int min = -3;
+  static const int min = -2;
   static const int levelToShowInstructions = defaultLevelNum;
-  static const int defaultLevelNum = min;
+  static const int playbackModeLevel = -4;
+  static const int defaultLevelNum = playbackModeLevel;
 
   static const List<int> _ghostSpawnTimerLengthPattern = <int>[5, 3, 2, 1];
 
@@ -20,9 +21,14 @@ class Levels {
   }
 
   GameLevel getLevel(int levelNum) {
-    assert(levelNum <= max && levelNum >= min);
+    assert(levelNum <= max && levelNum >= min || levelNum == playbackModeLevel);
+    bool playbackMode = false;
+    if (levelNum == playbackModeLevel) {
+      levelNum = firstRealLevel;
+      playbackMode = true;
+    }
     final GameLevel result = (
-      number: levelNum,
+      number: playbackMode ? playbackModeLevel : levelNum,
       maxAllowedDeaths: 3,
       superPelletsEnabled: levelNum <= 1 ? true : false,
       multipleSpawningGhosts: levelNum <= 2 ? false : true,
