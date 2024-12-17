@@ -18,10 +18,10 @@ import '../player_progress/player_progress.dart';
 import '../style/palette.dart';
 import '../utils/helper.dart';
 import '../utils/src/workarounds.dart';
+import '../utils/stored_moves.dart';
 import 'game_screen.dart';
 import 'maze.dart';
 import 'pacman_world.dart';
-import 'stored_moves.dart';
 
 /// This is the base of the game which is added to the [GameWidget].
 ///
