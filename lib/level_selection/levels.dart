@@ -3,7 +3,7 @@ import '../flame_game/pacman_game.dart';
 class Levels {
   static const int firstRealLevel = 1;
   static const int maxLevel = 10;
-  static const int minLevel = -2;
+  static const int minLevel = -1;
   static const int levelToShowInstructions = defaultLevelNum;
   static const int playbackModeLevel = -4;
   static const int defaultLevelNum = playbackModeLevel;
@@ -13,7 +13,7 @@ class Levels {
   static const double _levelSpeedFactor = 50 * (30 / flameGameZoom);
 
   double _tutorialFactor(int levelNum) {
-    return levelNum >= 0
+    return levelNum >= 1
         ? 1
         : levelNum == minLevel
             ? 0.5
@@ -49,8 +49,8 @@ class Levels {
               ? 1
               : (levelNum - 1) % 3 + 1,
       levelString:
-          levelNum > 0 ? levelNum.toString() : "L${(levelNum - 1) % 4}",
-      infLives: levelNum == minLevel ? true : false,
+          levelNum > 0 ? levelNum.toString() : "L${levelNum - minLevel + 1}",
+      infLives: levelNum <= 0 ? true : false,
     );
     return result;
   }
