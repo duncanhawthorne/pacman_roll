@@ -220,6 +220,8 @@ class PacmanWorld extends Forge2DWorld
   }
 
   final Vector2 downDirection = Vector2.zero();
+
+  static const bool _updateGravityOnRotation = true;
   double gravityXSign = 0;
   double gravityYSign = 0;
 
@@ -230,8 +232,10 @@ class PacmanWorld extends Forge2DWorld
       ..setValues(-sin(angle), cos(angle))
       ..scale(game.level.levelSpeed);
 
-    gravity = downDirection;
-    gravityXSign = gravity.x.sign; //as referred to every frame
-    gravityYSign = gravity.y.sign; //as referred to every frame
+    if (_updateGravityOnRotation) {
+      gravity = downDirection;
+      gravityXSign = gravity.x.sign; //as referred to every frame
+      gravityYSign = gravity.y.sign; //as referred to every frame
+    }
   }
 }
