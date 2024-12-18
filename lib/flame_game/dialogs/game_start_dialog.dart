@@ -29,6 +29,7 @@ class StartDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    assert(!game.playbackMode);
     return popupDialog(
       children: <Widget>[
         rotatedTitle(),
@@ -61,13 +62,13 @@ class StartDialog extends StatelessWidget {
                       onPressed: () {
                         if (game.playbackMode) {
                           context.go(
-                              '/?$levelUrlKey=${Levels.min}&$mazeUrlKey=${mazeNames[Maze.defaultMazeId]}');
+                              '/?$levelUrlKey=${Levels.minLevel}&$mazeUrlKey=${mazeNames[Maze.defaultMazeId]}');
                         } else {
                           game.overlays.remove(GameScreen.startDialogKey);
                           game.start();
                         }
                       },
-                      child: Text(game.playbackMode ? 'Begin' : 'Play',
+                      child: Text(game.playbackMode ? 'Start' : 'Play',
                           style: textStyleBody)),
                 ],
         )
@@ -120,7 +121,7 @@ Widget levelSelectorRow(BuildContext context, PacmanGame game,
 }
 
 Widget levelButtonSingle(BuildContext context, PacmanGame game, int levelNum) {
-  if (levelNum < Levels.min || levelNum > Levels.max) {
+  if (levelNum < Levels.minLevel || levelNum > Levels.maxLevel) {
     return const SizedBox.shrink();
   }
   final GameLevel level = levels.getLevel(levelNum);
@@ -199,7 +200,7 @@ Widget mazeButtonSingle(BuildContext context, PacmanGame game, int mazeId) {
 int maxLevelToShow(PacmanGame game) {
   return <int>[game.level.number, playerProgress.maxLevelCompleted + 1]
       .reduce(max)
-      .clamp(Levels.min, Levels.max);
+      .clamp(Levels.minLevel, Levels.maxLevel);
 }
 
 Widget rotatedTitle() {

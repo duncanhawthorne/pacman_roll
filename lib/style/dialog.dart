@@ -3,27 +3,28 @@ import 'package:flutter/material.dart';
 import 'palette.dart';
 
 Widget popupDialog({required List<Widget> children}) {
-  return Center(
-    child: FittedBox(
-      fit: BoxFit.scaleDown,
+  return purePopup(
+    child: Container(
+      decoration: BoxDecoration(
+          border: Border.all(color: Palette.seed.color, width: 3),
+          borderRadius: BorderRadius.circular(10),
+          color: Palette.background.color),
       child: Padding(
-        padding: const EdgeInsets.all(75.0),
-        child: Container(
-          decoration: BoxDecoration(
-              border: Border.all(color: Palette.seed.color, width: 3),
-              borderRadius: BorderRadius.circular(10),
-              color: Palette.background.color),
-          child: Padding(
-              padding: const EdgeInsets.fromLTRB(40.0, 12, 40, 12),
-              child: Column(
-                  spacing: 16,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: children)),
-        ),
-      ),
+          padding: const EdgeInsets.fromLTRB(40.0, 12, 40, 12),
+          child: Column(
+              spacing: 16,
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: children)),
     ),
   );
+}
+
+Widget purePopup({required Widget child}) {
+  return Center(
+      child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Padding(padding: const EdgeInsets.all(75.0), child: child)));
 }
 
 Widget titleWidget({required Widget child}) {
@@ -70,6 +71,7 @@ ButtonStyle buttonStyle(
     {Color? borderColor = _defaultButtonStyleBorderColor, bool small = false}) {
   final Color borderColorReal = borderColor ?? _defaultButtonStyleBorderColor;
   return TextButton.styleFrom(
+    backgroundColor: Palette.background.color,
     minimumSize: Size.zero,
     padding: EdgeInsets.all(small ? 16 : 24),
     shape: RoundedRectangleBorder(

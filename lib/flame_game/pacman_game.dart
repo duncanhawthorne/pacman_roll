@@ -118,7 +118,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   }
 
   void playbackAngles() {
-    if (playbackMode) {
+    if (playbackMode && isLive && _framesRendered > 15) {
       // && isLive && overlays.isActive(GameScreen.startDialogKey)
       if (playbackModeCounter == -1) {
         playbackModeCounter++;
@@ -254,16 +254,13 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
     playbackModeCounter = -1;
     playbackMode = !recordMode && level.number == Levels.playbackModeLevel;
     recordedMovesLive.clear();
-
-    initializeCollisionDetection(
-      mapDimensions: Rect.fromLTWH(-maze.mazeWidth / 2, -maze.mazeHeight / 2,
-          maze.mazeWidth, maze.mazeHeight),
-    );
     pauseEngineIfNoActivity();
     _userString = _getRandomString(random, 15);
     cleanDialogs();
     if (showStartDialog) {
-      overlays.add(GameScreen.startDialogKey);
+      playbackMode
+          ? overlays.add(GameScreen.beginDialogKey)
+          : overlays.add(GameScreen.startDialogKey);
     }
     stopRegularItems(); //duplicates other items, belt and braces only
     stopwatch
@@ -326,8 +323,14 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   Future<void> onLoad() async {
     super.onLoad();
     _bugFixes();
+    initializeCollisionDetection(
+      mapDimensions: Rect.fromLTWH(-maze.mazeWidth / 2, -maze.mazeHeight / 2,
+          maze.mazeWidth, maze.mazeHeight),
+    );
     reset(firstRun: true);
-    overlays.add(GameScreen.startDialogKey);
+    playbackMode
+        ? overlays.add(GameScreen.beginDialogKey)
+        : overlays.add(GameScreen.startDialogKey);
     _winOrLoseGameListener(); //isn't disposed so run once, not on start()
     _lifecycleChangeListener(); //isn't disposed so run once, not on start()
   }

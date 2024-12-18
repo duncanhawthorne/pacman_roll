@@ -8,6 +8,7 @@ import '../level_selection/levels.dart';
 import '../player_progress/player_progress.dart';
 import '../style/palette.dart';
 import '../utils/src/workarounds.dart';
+import 'dialogs/begin_dialog.dart';
 import 'dialogs/game_lose_dialog.dart';
 import 'dialogs/game_overlays.dart';
 import 'dialogs/game_start_dialog.dart';
@@ -56,6 +57,7 @@ class GameScreen extends StatelessWidget {
   static const String startDialogKey = 'start_dialog';
   static const String tutorialDialogKey = 'tutorial_dialog';
   static const String resetDialogKey = 'reset_dialog';
+  static const String beginDialogKey = 'begin_dialog';
   static const String topOverlayKey = 'top_overlay';
 
   @override
@@ -96,6 +98,9 @@ class GameScreen extends StatelessWidget {
                     },
                     resetDialogKey: (BuildContext context, PacmanGame game) {
                       return ResetDialog(game: game);
+                    },
+                    beginDialogKey: (BuildContext context, PacmanGame game) {
+                      return BeginDialog(game: game);
                     },
                   },
                   initialActiveOverlays: const <String>[topOverlayKey],

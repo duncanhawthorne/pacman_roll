@@ -34,7 +34,7 @@ class GameWonDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool showNextButton = game.level.number + 1 <= Levels.max;
+    final bool showNextButton = game.level.number + 1 <= Levels.maxLevel;
     return popupDialog(
       children: <Widget>[
         titleText(text: 'Complete'),

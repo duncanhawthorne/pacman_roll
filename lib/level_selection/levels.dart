@@ -2,8 +2,8 @@ import '../flame_game/pacman_game.dart';
 
 class Levels {
   static const int firstRealLevel = 1;
-  static const int max = 10;
-  static const int min = -2;
+  static const int maxLevel = 10;
+  static const int minLevel = -2;
   static const int levelToShowInstructions = defaultLevelNum;
   static const int playbackModeLevel = -4;
   static const int defaultLevelNum = playbackModeLevel;
@@ -15,13 +15,14 @@ class Levels {
   double _tutorialFactor(int levelNum) {
     return levelNum >= 0
         ? 1
-        : levelNum == min
+        : levelNum == minLevel
             ? 0.5
             : 0.75;
   }
 
   GameLevel getLevel(int levelNum) {
-    assert(levelNum <= max && levelNum >= min || levelNum == playbackModeLevel);
+    assert(levelNum <= maxLevel && levelNum >= minLevel ||
+        levelNum == playbackModeLevel);
     bool playbackMode = false;
     if (levelNum == playbackModeLevel) {
       levelNum = firstRealLevel;
@@ -44,12 +45,12 @@ class Levels {
       spinSpeedFactor: _tutorialFactor(levelNum),
       numStartingGhosts: levelNum >= 0
           ? 3
-          : levelNum == min
+          : levelNum == minLevel
               ? 1
               : (levelNum - 1) % 3 + 1,
       levelString:
-          levelNum > 0 ? levelNum.toString() : "T${(levelNum - 1) % 4}",
-      infLives: levelNum == min ? true : false,
+          levelNum > 0 ? levelNum.toString() : "L${(levelNum - 1) % 4}",
+      infLives: levelNum == minLevel ? true : false,
     );
     return result;
   }
