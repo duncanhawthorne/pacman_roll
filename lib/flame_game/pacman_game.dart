@@ -118,16 +118,19 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   }
 
   void playbackAngles() {
-    if (playbackMode && isLive && _framesRendered > 15) {
+    if (playbackMode && isLive && _framesRendered > 30) {
       // && isLive && overlays.isActive(GameScreen.startDialogKey)
       if (playbackModeCounter == -1) {
         playbackModeCounter++;
         startRegularItems();
       }
-      while (storedMoves.length > playbackModeCounter &&
+      while (playbackModeCounter < storedMoves.length &&
           stopwatchMilliSeconds > storedMoves[playbackModeCounter][0]) {
         world.setMazeAngle(storedMoves[playbackModeCounter][1]);
         playbackModeCounter++;
+      }
+      if (stopwatchMilliSeconds > 20000) {
+        reset(); //if stuck, reset
       }
     }
   }
@@ -326,11 +329,8 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
     initializeCollisionDetection(
       mapDimensions: Rect.fromLTWH(-maze.mazeWidth / 2, -maze.mazeHeight / 2,
           maze.mazeWidth, maze.mazeHeight),
-    );
-    reset(firstRun: true);
-    playbackMode
-        ? overlays.add(GameScreen.beginDialogKey)
-        : overlays.add(GameScreen.startDialogKey);
+    ); //assume maze size won't change
+    reset(firstRun: true, showStartDialog: true);
     _winOrLoseGameListener(); //isn't disposed so run once, not on start()
     _lifecycleChangeListener(); //isn't disposed so run once, not on start()
   }
