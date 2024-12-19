@@ -125,12 +125,13 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
         playbackModeCounter++;
         startRegularItems();
       }
-      while (playbackModeCounter < storedMoves.length &&
+      while (!world.doingLevelResetFlourish &&
+          playbackModeCounter < storedMoves.length &&
           stopwatchMilliSeconds > storedMoves[playbackModeCounter][0]) {
         world.setMazeAngle(storedMoves[playbackModeCounter][1]);
         playbackModeCounter++;
       }
-      if (stopwatchMilliSeconds > 20000) {
+      if (!world.doingLevelResetFlourish && stopwatchMilliSeconds > 20000) {
         reset(); //if stuck, reset
       }
     }
