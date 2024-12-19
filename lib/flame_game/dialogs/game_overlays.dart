@@ -81,7 +81,7 @@ Widget _livesWidget(BuildContext context, PacmanGame game) {
     padding: const EdgeInsets.only(
         left: _pacmanOuterSpacing, right: _pacmanOuterSpacing),
     child: ValueListenableBuilder<int>(
-      valueListenable: game.world.pacmans.numberOfDeathsNotifier,
+      valueListenable: game.numberOfDeathsNotifier,
       builder: (BuildContext context, int value, Widget? child) {
         return Row(
             crossAxisAlignment: CrossAxisAlignment.center,

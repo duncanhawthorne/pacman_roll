@@ -83,8 +83,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
       (stopwatch.current * 1000).toInt() +
       (level.isTutorial
           ? 0
-          : min(level.maxAllowedDeaths - 1,
-                  world.pacmans.numberOfDeathsNotifier.value) *
+          : min(level.maxAllowedDeaths - 1, numberOfDeathsNotifier.value) *
               _deathPenaltyMillis);
 
   bool stopwatchStarted = false;
@@ -94,9 +93,11 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   bool get openingScreenCleared =>
       !(!stopwatchStarted && overlays.isActive(GameScreen.startDialogKey));
 
+  final ValueNotifier<int> numberOfDeathsNotifier = ValueNotifier<int>(0);
+
   bool get isWonOrLost =>
       world.pellets.pelletsRemainingNotifier.value <= 0 ||
-      world.pacmans.numberOfDeathsNotifier.value >= level.maxAllowedDeaths;
+      numberOfDeathsNotifier.value >= level.maxAllowedDeaths;
 
   final Random random = Random();
 
@@ -184,9 +185,8 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
 
   void _winOrLoseGameListener() {
     assert(!stopwatchStarted); //so no instant trigger of listeners
-    world.pacmans.numberOfDeathsNotifier.addListener(() {
-      if (world.pacmans.numberOfDeathsNotifier.value >=
-              level.maxAllowedDeaths &&
+    numberOfDeathsNotifier.addListener(() {
+      if (numberOfDeathsNotifier.value >= level.maxAllowedDeaths &&
           stopwatchStarted &&
           !playbackMode) {
         assert(isWonOrLost);
@@ -205,13 +205,14 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
     });
   }
 
+  static const int minAllowedTime = 10;
   void _handleWinGame() {
     assert(isWonOrLost);
     assert(!stopwatch.isRunning());
     assert(stopwatchStarted);
     if (world.pellets.pelletsRemainingNotifier.value == 0) {
       world.resetAfterGameWin();
-      if (stopwatchMilliSeconds > 10 * 1000 && !level.isTutorial) {
+      if (stopwatchMilliSeconds > minAllowedTime * 1000 && !level.isTutorial) {
         fBase.firebasePushSingleScore(_userString, _getCurrentGameState());
       }
       playerProgress.saveLevelComplete(_getCurrentGameState());

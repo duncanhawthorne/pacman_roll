@@ -145,7 +145,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
         if (world.doingLevelResetFlourish) {
           // must test doingLevelResetFlourish
           // as could have been removed by reset during delay
-          world.pacmans.numberOfDeathsNotifier.value++; //score counting deaths
+          game.numberOfDeathsNotifier.value++; //score counting deaths
           world.resetAfterPacmanDeath(this);
         }
       } else {

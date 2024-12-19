@@ -5,17 +5,17 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../maze.dart';
+import '../pacman_game.dart';
 import 'game_character.dart';
 import 'pacman.dart';
 import 'wrapper_no_events.dart';
 
-class Pacmans extends WrapperNoEvents {
+class Pacmans extends WrapperNoEvents with HasGameReference<PacmanGame> {
   @override
   final int priority = 2;
 
   final List<Pacman> pacmanList = <Pacman>[];
 
-  final ValueNotifier<int> numberOfDeathsNotifier = ValueNotifier<int>(0);
   final ValueNotifier<int> pacmanDyingNotifier = ValueNotifier<int>(0);
 
   bool get pacmanDeathIsFinalPacman =>
@@ -38,7 +38,7 @@ class Pacmans extends WrapperNoEvents {
       pacman.removeFromParent();
     }
     add(Pacman(position: maze.pacmanStart));
-    numberOfDeathsNotifier.value = 0;
+    game.numberOfDeathsNotifier.value = 0;
     pacmanDyingNotifier.value = 0;
   }
 

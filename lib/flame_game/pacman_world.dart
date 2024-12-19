@@ -101,7 +101,7 @@ class PacmanWorld extends Forge2DWorld
       // and rotation will be wrong
       // so should clean up anyway
       if (game.level.infLives) {
-        pacmans.numberOfDeathsNotifier.value = 0;
+        game.numberOfDeathsNotifier.value = 0;
         pacmans.pacmanDyingNotifier.value = 0;
       }
       pacmans.resetInstantAfterPacmanDeath();
