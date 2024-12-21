@@ -35,31 +35,32 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
             anchor: Anchor.center);
 
   late final PhysicsBall _ball = PhysicsBall(position: position);
+  late final Vector2 ballVel = _ball.body.linearVelocity;
 
   bool connectedToBall = true;
 
   double get speed => _ball.speed;
 
-  double get _spinParity =>
-      _ball.body.linearVelocity.x.abs() > _ball.body.linearVelocity.y.abs()
-          ? world.gravityYSign * _ball.body.linearVelocity.x.sign
-          : -world.gravityXSign * _ball.body.linearVelocity.y.sign;
+  double get _spinParity => ballVel.x.abs() > ballVel.y.abs()
+      ? world.gravityYSign * ballVel.x.sign
+      : -world.gravityXSign * ballVel.y.sign;
 
   bool get typical =>
       connectedToBall &&
       current != CharacterState.dead &&
       current != CharacterState.spawning;
 
-  CollisionType get _collisionType => this is Pacman || this is PacmanClone
-      ? CollisionType.active
-      : CollisionType.passive;
+  late final CollisionType _defaultCollisionType =
+      this is Pacman || this is PacmanClone
+          ? CollisionType.active
+          : CollisionType.passive;
 
   late final bool isClone = this is PacmanClone || this is GhostClone;
 
   late final GameCharacter? clone;
   late final GameCharacter? original;
   late final CircleHitbox hitbox =
-      CircleHitbox(isSolid: true, collisionType: _collisionType);
+      CircleHitbox(isSolid: true, collisionType: _defaultCollisionType);
 
   late final double radius = size.x / 2;
 
@@ -109,7 +110,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     connectedToBall = true;
     _ball.setDynamic();
     assert(!isClone); //not called on clones
-    hitbox.collisionType = _collisionType;
+    hitbox.collisionType = _defaultCollisionType;
   }
 
   void _oneFrameOfPhysics(double dt) {

@@ -206,14 +206,15 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
     });
   }
 
-  static const int minAllowedTime = 10;
+  static const int _minRecordableWinTimeMillis = 10 * 1000;
   void _handleWinGame() {
     assert(isWonOrLost);
     assert(!stopwatch.isRunning());
     assert(stopwatchStarted);
     if (world.pellets.pelletsRemainingNotifier.value == 0) {
       world.resetAfterGameWin();
-      if (stopwatchMilliSeconds > minAllowedTime * 1000 && !level.isTutorial) {
+      if (stopwatchMilliSeconds > _minRecordableWinTimeMillis &&
+          !level.isTutorial) {
         fBase.firebasePushSingleScore(_userString, _getCurrentGameState());
       }
       playerProgress.saveLevelComplete(_getCurrentGameState());

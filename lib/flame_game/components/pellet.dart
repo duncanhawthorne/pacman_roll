@@ -16,7 +16,8 @@ class Pellet extends CircleComponent with IgnoreEvents {
             anchor: Anchor.center);
 
   final double hitBoxRadiusFactor;
-  final ValueNotifier<int> pelletsRemainingNotifier;
+  final ValueNotifier<int>
+      pelletsRemainingNotifier; //passed in on creation of object rather than use slow to initialise HasGasReference for every single pellet
 
   @override
   Future<void> onLoad() async {

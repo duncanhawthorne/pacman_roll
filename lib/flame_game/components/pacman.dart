@@ -19,6 +19,7 @@ import 'super_pellet.dart';
 const int _kPacmanDeadResetTimeMillis = 1700;
 const int _kPacmanHalfEatingResetTimeMillis = 180;
 const bool multipleSpawningPacmans = false;
+const bool _freezeGhostsOnKillPacman = false;
 
 /// The [GameCharacter] is the component that the physical player of the game is
 /// controlling.
@@ -118,7 +119,6 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     }
   }
 
-  static const bool _freezeGhostsOnKillPacman = false;
   void _dieFromGhost() {
     if (typical) {
       if (world.pellets.pelletsRemainingNotifier.value != 0) {

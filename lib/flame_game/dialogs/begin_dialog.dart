@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../level_selection/levels.dart';
 import '../../router.dart';
 import '../../style/dialog.dart';
 import '../game_screen.dart';
 import '../maze.dart';
 import '../pacman_game.dart';
+import 'game_start_dialog.dart';
 
-/// This dialog is shown when a level is won.
-///
-/// It shows what time the level was completed
-/// and a comparison vs the leaderboard
+/// This first dialog shown during playback mode
 
 class BeginDialog extends StatelessWidget {
   const BeginDialog({
@@ -30,7 +27,7 @@ class BeginDialog extends StatelessWidget {
             onPressed: () {
               game.toggleOverlay(GameScreen.beginDialogKey);
               context.go(
-                  '/?$levelUrlKey=${Levels.minLevel}&$mazeUrlKey=${mazeNames[Maze.defaultMazeId]}');
+                  '/?$levelUrlKey=${maxLevelToShow(game)}&$mazeUrlKey=${mazeNames[Maze.defaultMazeId]}');
             },
             child: const Padding(
               padding: EdgeInsets.all(12.0),
