@@ -39,7 +39,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
 
   bool connectedToBall = true;
 
-  double get speed => _ball.speed;
+  double get speed => ballVel.length;
 
   double get _spinParity => ballVel.x.abs() > ballVel.y.abs()
       ? world.gravityYSign * ballVel.x.sign

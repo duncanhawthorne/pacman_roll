@@ -32,7 +32,7 @@ class PhysicsBall extends BodyComponent with IgnoreEvents {
   // ignore: overridden_fields
   final bool renderBody = false;
 
-  double get speed => body.linearVelocity.length;
+  //double get speed => body.linearVelocity.length;
 
   set velocity(Vector2 vel) => body.linearVelocity.setFrom(vel);
 
