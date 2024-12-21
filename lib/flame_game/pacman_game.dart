@@ -161,15 +161,20 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
     resumeEngine();
   }
 
+  bool _regularItemsStarted = false;
   void startRegularItems() {
-    stopwatchStarted = true; //once per reset
-    stopwatch.resume();
-    world.ghosts
-      ..addSpawner()
-      ..sirenVolumeUpdaterTimer();
+    if (!_regularItemsStarted) {
+      _regularItemsStarted = true;
+      stopwatchStarted = true; //once per reset
+      stopwatch.resume();
+      world.ghosts
+        ..addSpawner()
+        ..sirenVolumeUpdaterTimer();
+    }
   }
 
   void stopRegularItems() {
+    _regularItemsStarted = false;
     stopwatch.pause();
     world.ghosts
       ..removeSpawner()

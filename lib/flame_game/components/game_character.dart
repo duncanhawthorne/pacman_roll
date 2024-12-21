@@ -35,6 +35,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
             anchor: Anchor.center);
 
   late final PhysicsBall _ball = PhysicsBall(position: position);
+  late final Vector2 ballPos = _ball.position;
   late final Vector2 ballVel = _ball.body.linearVelocity;
 
   bool connectedToBall = true;
@@ -115,7 +116,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
 
   void _oneFrameOfPhysics(double dt) {
     if (connectedToBall) {
-      position.setFrom(_ball.position);
+      position.setFrom(ballPos);
       angle += speed * dt / radius * _spinParity;
     }
   }

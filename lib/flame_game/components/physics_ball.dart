@@ -3,7 +3,6 @@ import 'package:flame_forge2d/flame_forge2d.dart';
 
 import '../maze.dart';
 
-const bool _useForgePhysicsBallRotation = false;
 const bool _instantSetPosition = true;
 const double _radiusScaleFactor = 0.99;
 const bool _kVerticalPortalsEnabled = false;
@@ -16,16 +15,12 @@ class PhysicsBall extends BodyComponent with IgnoreEvents {
             fixtureDefs: <FixtureDef>[
               FixtureDef(
                 CircleShape(radius: maze.spriteWidth / 2 * _radiusScaleFactor),
-                restitution: 0.0,
-                friction: _useForgePhysicsBallRotation ? 1 : 0,
-                userData: PhysicsBall,
               ),
             ],
             bodyDef: BodyDef(
-              angularDamping: _useForgePhysicsBallRotation ? 0.1 : 0.1,
               position: position,
               type: BodyType.dynamic,
-              userData: PhysicsBall,
+              fixedRotation: true,
             ));
 
   @override
