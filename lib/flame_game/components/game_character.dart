@@ -37,14 +37,15 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   late final PhysicsBall _ball = PhysicsBall(position: position);
   late final Vector2 ballPos = _ball.position;
   late final Vector2 ballVel = _ball.body.linearVelocity;
+  late final Vector2 gravitySign = world.gravitySign;
 
   bool connectedToBall = true;
 
   double get speed => ballVel.length;
 
   double get _spinParity => ballVel.x.abs() > ballVel.y.abs()
-      ? world.gravityYSign * ballVel.x.sign
-      : -world.gravityXSign * ballVel.y.sign;
+      ? gravitySign.y * ballVel.x.sign
+      : -gravitySign.x * ballVel.y.sign;
 
   bool get typical =>
       connectedToBall &&
