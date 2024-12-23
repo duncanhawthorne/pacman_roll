@@ -74,12 +74,18 @@ class AudioController {
     }
   }
 
-  Future<AudioSource> getSoLoudSound(SfxType type) async {
+  String _getFilename(SfxType type) {
+    final List<String> options = soundTypeToFilename(type);
+    final String filename = options[_random.nextInt(options.length)];
+    return "sfx/$filename";
+  }
+
+  Future<AudioSource> _getSoLoudSound(SfxType type) async {
     if (_soLoudSources.containsKey(type)) {
       return _soLoudSources[type]!;
     } else {
       final Future<AudioSource> currentSound = soLoud.loadAsset(
-        'assets/${getFilename(type)}',
+        'assets/${_getFilename(type)}',
         mode: LoadMode.memory, //kIsWeb ? LoadMode.disk : LoadMode.memory,
       );
       _soLoudSources[type] = currentSound;
@@ -87,13 +93,7 @@ class AudioController {
     }
   }
 
-  String getFilename(SfxType type) {
-    final List<String> options = soundTypeToFilename(type);
-    final String filename = options[_random.nextInt(options.length)];
-    return "sfx/$filename";
-  }
-
-  bool canPlay(SfxType type) {
+  bool _canPlay(SfxType type) {
     if (!ap && !soLoud.isInitialized) {
       debug("not initialised");
       return false;
@@ -119,32 +119,24 @@ class AudioController {
   }
 
   Future<void> playSfx(SfxType type) async {
-    if (!canPlay(type)) {
+    if (!_canPlay(type)) {
       return;
     }
+    final bool looping = type == SfxType.ghostsRoamingSiren ||
+        //ghostsScared time lasts longer than track length so need to loop
+        type == SfxType.ghostsScared;
 
     if (ap) {
       final AudioPlayer currentPlayer = _apPlayers[type] ?? AudioPlayer();
-
-      //extra code
-      if (type == SfxType.ghostsRoamingSiren) {
-        // || type == SfxType.ghostsScared
-        unawaited(currentPlayer.setReleaseMode(ReleaseMode.loop));
-      } else {
-        unawaited(currentPlayer.setReleaseMode(ReleaseMode.stop));
-      }
-
-      unawaited(currentPlayer.play(AssetSource(getFilename(type)),
+      unawaited(currentPlayer
+          .setReleaseMode(looping ? ReleaseMode.loop : ReleaseMode.stop));
+      unawaited(currentPlayer.play(AssetSource(_getFilename(type)),
           volume: soundTypeToVolume(type)));
     } else {
-      final AudioSource sound = await getSoLoudSound(type);
-
-      final bool retainForStopping = type == SfxType.ghostsScared ||
-          type == SfxType.startMusic ||
-          type == SfxType.endMusic ||
-          type == SfxType.ghostsRoamingSiren;
-      final bool looping =
-          type == SfxType.ghostsRoamingSiren || type == SfxType.ghostsScared;
+      final AudioSource sound = await _getSoLoudSound(type);
+      final bool retainForStopping =
+          //long sounds that might need stopping
+          looping || type == SfxType.startMusic || type == SfxType.endMusic;
       if (retainForStopping) {
         if (_soLoudHandles.keys.contains(type)) {
           unawaited(soLoud.stop(await _soLoudHandles[type]!));
@@ -175,6 +167,23 @@ class AudioController {
     return tmpSirenVolume < 0.01 ? 0 : min(0.4 * scale, tmpSirenVolume);
   }
 
+  double _getFinalSirenVolume(
+      double normalisedAverageGhostSpeed, double unadjustedCurrentVolume,
+      {bool gradual = false}) {
+    final double calcedVolume =
+        _getTargetSirenVolume(normalisedAverageGhostSpeed);
+    final double currentVolume = unadjustedCurrentVolume / volumeScalar;
+    double targetVolume = 0;
+    if (gradual) {
+      targetVolume = (calcedVolume + currentVolume) / 2;
+    } else {
+      targetVolume = calcedVolume;
+    }
+    double finalTarget = targetVolume * volumeScalar;
+    finalTarget = finalTarget < 0.01 * volumeScalar ? 0 : finalTarget;
+    return finalTarget;
+  }
+
   Future<void> setSirenVolume(double normalisedAverageGhostSpeed,
       {bool gradual = false}) async {
     double unadjustedCurrentVolume = 0;
@@ -201,23 +210,6 @@ class AudioController {
           gradual: gradual);
       soLoud.setVolume(handle, finalTarget);
     }
-  }
-
-  double _getFinalSirenVolume(
-      double normalisedAverageGhostSpeed, double unadjustedCurrentVolume,
-      {bool gradual = false}) {
-    final double calcedVolume =
-        _getTargetSirenVolume(normalisedAverageGhostSpeed);
-    final double currentVolume = unadjustedCurrentVolume / volumeScalar;
-    double targetVolume = 0;
-    if (gradual) {
-      targetVolume = (calcedVolume + currentVolume) / 2;
-    } else {
-      targetVolume = calcedVolume;
-    }
-    double finalTarget = targetVolume * volumeScalar;
-    finalTarget = finalTarget < 0.01 * volumeScalar ? 0 : finalTarget;
-    return finalTarget;
   }
 
   void stopAllSfx() {
@@ -295,7 +287,7 @@ class AudioController {
           .toList());
     } else {
       for (SfxType type in SfxType.values) {
-        unawaited(getSoLoudSound(type)); //load everything up
+        unawaited(_getSoLoudSound(type)); //load everything up
       }
     }
   }
