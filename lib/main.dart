@@ -31,6 +31,9 @@ void main() async {
 
   fixTitlePerm();
 
+  /// Initialize the player.
+  await soLoud.init();
+
   runApp(const MyGame());
 }
 

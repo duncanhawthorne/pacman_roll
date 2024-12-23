@@ -1,6 +1,6 @@
 import 'dart:core';
 
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 
 /// This file has utilities used by other bits of code
 

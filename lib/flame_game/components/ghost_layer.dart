@@ -3,6 +3,7 @@ import 'dart:async' as async;
 import 'package:flame/components.dart';
 import 'package:flutter/foundation.dart';
 
+import '../../audio/audio_controller.dart';
 import '../../audio/sounds.dart';
 import '../effects/remove_effects.dart';
 import '../pacman_game.dart';
@@ -12,7 +13,7 @@ import 'ghost.dart';
 import 'wrapper_no_events.dart';
 
 final bool _iOSWeb = defaultTargetPlatform == TargetPlatform.iOS && kIsWeb;
-final bool _sirenEnabled = !_iOSWeb;
+final bool _sirenEnabled = !ap || !_iOSWeb;
 const int _kGhostScaredTimeMillis = 6000;
 
 class Ghosts extends WrapperNoEvents
@@ -38,8 +39,9 @@ class Ghosts extends WrapperNoEvents
       return 0;
     } else {
       return ghostList
-              .map((Ghost ghost) =>
-                  ghost.current == CharacterState.normal ? ghost.speed : 0.0)
+              .map((Ghost ghost) => ghost.current == CharacterState.normal
+                  ? ghost.speed
+                  : 0.0) //scared ghosts give zero which silences ghostsRoamingSiren
               .reduce((double value, double element) => value + element) /
           ghostList.length;
     }
