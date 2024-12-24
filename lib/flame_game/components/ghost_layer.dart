@@ -37,7 +37,7 @@ class Ghosts extends WrapperNoEvents
         ghostList.length > game.level.numStartingGhosts) {
       for (int i = 0; i < ghostList.length; i++) {
         if (!ghostList[i].isMounted) {
-          debug("tidy stray ghosts"); //FIXME
+          debug("tidy stray ghost"); //shouldn't happen
           ghostList[i].removeFromParent();
           break;
         }
