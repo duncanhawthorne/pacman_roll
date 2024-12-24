@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 
 import '../../audio/audio_controller.dart';
 import '../../audio/sounds.dart';
+import '../../utils/helper.dart';
 import '../effects/remove_effects.dart';
 import '../pacman_game.dart';
 import '../pacman_world.dart';
@@ -30,11 +31,26 @@ class Ghosts extends WrapperNoEvents
 
   bool get ghostsLoaded => ghostList.isNotEmpty && ghostList[0].isLoaded;
 
+  void tidyStrayGhosts() {
+    if (kDebugMode &&
+        !game.level.multipleSpawningGhosts &&
+        ghostList.length > game.level.numStartingGhosts) {
+      for (int i = 0; i < ghostList.length; i++) {
+        if (!ghostList[i].isMounted) {
+          debug("tidy stray ghosts"); //FIXME
+          ghostList[i].removeFromParent();
+          break;
+        }
+      }
+    }
+  }
+
   double _averageGhostSpeed() {
     assert(game.isLive); //test before call, else test here
     assert(game.openingScreenCleared);
     assert(world.pacmans.anyAlivePacman); //test before call, else test here
     assert(!game.isWonOrLost); //test before call, else test here
+    tidyStrayGhosts();
     if (ghostList.isEmpty) {
       return 0;
     } else {
@@ -47,7 +63,7 @@ class Ghosts extends WrapperNoEvents
     }
   }
 
-  async.Future<void> sirenVolumeUpdaterTimer() async {
+  async.Future<void> startSirenVolumeUpdaterTimer() async {
     if (_sirenEnabled) {
       if (!isMounted) {
         return;
@@ -77,6 +93,7 @@ class Ghosts extends WrapperNoEvents
       game.audioController.setSirenVolume(0);
       _sirenTimer!.cancel();
       _sirenTimer = null;
+      game.regularItemsStarted = false; //so that will restart later
     }
   }
 
@@ -130,6 +147,7 @@ class Ghosts extends WrapperNoEvents
     _ghostSpawner?.removeFromParent();
     _ghostSpawner = null; //FIXME shouldn't be necessary
     _ghostSpawner?.timer.reset(); //so next spawn based on time of reset
+    game.regularItemsStarted = false; //so that will restart later
   }
 
   void _removeAllGhosts() {

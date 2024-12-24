@@ -146,6 +146,15 @@ class Ghost extends GameCharacter {
   }
 
   @override
+  Future<void> removeFromParent() async {
+    if (!isMounted) {
+      //if not mounted, then flame won't call onRemove, but we still want tidying there to happen
+      onRemove();
+    }
+    super.removeFromParent();
+  }
+
+  @override
   Future<void> onRemove() async {
     if (!isClone) {
       world.ghosts.ghostList.remove(this);

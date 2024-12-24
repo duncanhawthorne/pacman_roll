@@ -96,7 +96,8 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   final ValueNotifier<int> numberOfDeathsNotifier = ValueNotifier<int>(0);
 
   bool get isWonOrLost =>
-      world.pellets.pelletsRemainingNotifier.value <= 0 ||
+      ((!kDebugMode || world.pellets.isMounted) &&
+          world.pellets.pelletsRemainingNotifier.value <= 0) ||
       numberOfDeathsNotifier.value >= level.maxAllowedDeaths;
 
   final Random random = Random();
@@ -161,20 +162,20 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
     resumeEngine();
   }
 
-  bool _regularItemsStarted = false;
+  bool regularItemsStarted = false;
   void startRegularItems() {
-    if (!_regularItemsStarted) {
-      _regularItemsStarted = true;
+    if (!regularItemsStarted) {
+      regularItemsStarted = true;
       stopwatchStarted = true; //once per reset
       stopwatch.resume();
       world.ghosts
         ..addSpawner()
-        ..sirenVolumeUpdaterTimer();
+        ..startSirenVolumeUpdaterTimer();
     }
   }
 
   void stopRegularItems() {
-    _regularItemsStarted = false;
+    regularItemsStarted = false;
     stopwatch.pause();
     world.ghosts
       ..removeSpawner()

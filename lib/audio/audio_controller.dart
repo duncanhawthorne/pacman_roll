@@ -157,58 +157,55 @@ class AudioController {
     } else {
       if (_soLoudHandles.keys.contains(type)) {
         await soLoud.stop(await _soLoudHandles[type]!);
+        unawaited(
+            _soLoudHandles.remove(type)); //remove so play from fresh after stop
       }
     }
   }
 
-  double _getTargetSirenVolume(double averageGhostSpeed) {
-    const double scale = 2.5;
-    final double tmpSirenVolume = averageGhostSpeed / 30 * scale;
-    return tmpSirenVolume < 0.01 ? 0 : min(0.4 * scale, tmpSirenVolume);
+  double _getUltimateTargetSirenVolume(double normalisedAverageGhostSpeed) {
+    final double tmpSirenVolume = normalisedAverageGhostSpeed / 30 * 2.5;
+    return min(1, tmpSirenVolume) * volumeScalar;
   }
 
-  double _getFinalSirenVolume(
-      double normalisedAverageGhostSpeed, double unadjustedCurrentVolume,
+  double _getDesiredSirenVolume(
+      double normalisedAverageGhostSpeed, double currentVolume,
       {bool gradual = false}) {
-    final double calcedVolume =
-        _getTargetSirenVolume(normalisedAverageGhostSpeed);
-    final double currentVolume = unadjustedCurrentVolume / volumeScalar;
-    double targetVolume = 0;
+    double targetVolume =
+        _getUltimateTargetSirenVolume(normalisedAverageGhostSpeed);
     if (gradual) {
-      targetVolume = (calcedVolume + currentVolume) / 2;
-    } else {
-      targetVolume = calcedVolume;
+      targetVolume = (targetVolume + currentVolume) / 2;
     }
-    double finalTarget = targetVolume * volumeScalar;
-    finalTarget = finalTarget < 0.01 * volumeScalar ? 0 : finalTarget;
-    return finalTarget;
+    targetVolume = targetVolume < 0.01 * volumeScalar ? 0 : targetVolume;
+    return targetVolume;
   }
 
   Future<void> setSirenVolume(double normalisedAverageGhostSpeed,
       {bool gradual = false}) async {
-    double unadjustedCurrentVolume = 0;
+    double currentVolume = 0;
     if (ap) {
       final AudioPlayer sirenPlayer = _apPlayers[SfxType.ghostsRoamingSiren]!;
       if (sirenPlayer.state != PlayerState.playing) {
         unawaited(playSfx(SfxType.ghostsRoamingSiren));
         unawaited(sirenPlayer.setVolume(0));
       }
-      unadjustedCurrentVolume = sirenPlayer.volume;
-      final double finalTarget = _getFinalSirenVolume(
-          normalisedAverageGhostSpeed, unadjustedCurrentVolume,
+      currentVolume = sirenPlayer.volume;
+      final double desiredSirenVolume = _getDesiredSirenVolume(
+          normalisedAverageGhostSpeed, currentVolume,
           gradual: gradual);
-      unawaited(sirenPlayer.setVolume(finalTarget));
+      unawaited(sirenPlayer.setVolume(desiredSirenVolume));
     } else {
-      if (!_soLoudHandles.containsKey(SfxType.ghostsRoamingSiren)) {
+      if (!_soLoudHandles.containsKey(SfxType.ghostsRoamingSiren) ||
+          soLoud.getPause(await _soLoudHandles[SfxType.ghostsRoamingSiren]!)) {
         await playSfx(SfxType.ghostsRoamingSiren);
       }
       final SoundHandle handle =
           await _soLoudHandles[SfxType.ghostsRoamingSiren]!;
-      unadjustedCurrentVolume = soLoud.getVolume(handle);
-      final double finalTarget = _getFinalSirenVolume(
-          normalisedAverageGhostSpeed, unadjustedCurrentVolume,
+      currentVolume = soLoud.getVolume(handle);
+      final double desiredSirenVolume = _getDesiredSirenVolume(
+          normalisedAverageGhostSpeed, currentVolume,
           gradual: gradual);
-      soLoud.setVolume(handle, finalTarget);
+      soLoud.setVolume(handle, desiredSirenVolume);
     }
   }
 
