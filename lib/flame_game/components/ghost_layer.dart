@@ -32,6 +32,11 @@ class Ghosts extends WrapperNoEvents
   bool get ghostsLoaded => ghostList.isNotEmpty && ghostList[0].isLoaded;
 
   void tidyStrayGhosts() {
+    const bool testStrayGhosts = false;
+    if (!testStrayGhosts) {
+      return;
+    }
+    // ignore: dead_code
     if (kDebugMode && !game.level.multipleSpawningGhosts) {
       if (ghostList.length > game.level.numStartingGhosts) {
         //create a new list toList so can iterate and remove simultaneously

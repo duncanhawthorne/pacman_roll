@@ -34,7 +34,8 @@ class Pacmans extends WrapperNoEvents with HasGameReference<PacmanGame> {
 
   @override
   Future<void> reset({bool mazeResize = false}) async {
-    for (final Pacman pacman in pacmanList) {
+    //create a new list toList so can iterate and remove simultaneously
+    for (final Pacman pacman in pacmanList.toList()) {
       pacman.removeFromParent();
     }
     add(Pacman(position: maze.pacmanStart));
