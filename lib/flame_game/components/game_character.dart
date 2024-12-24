@@ -123,19 +123,6 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   }
 
   @override
-  void removeFromParent() {
-    if (!isMounted) {
-      //if not mounted, then flame won't call onRemove, but we still want tidying there to happen
-      onRemove();
-    }
-    if (!isClone) {
-      disconnectFromBall(); //sync
-      removeEffects(this); //sync and async
-    }
-    super.removeFromParent(); //async
-  }
-
-  @override
   Future<void> onLoad() async {
     loadStubAnimationsOnDebugMode();
     if (!isClone) {
@@ -145,14 +132,30 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     add(hitbox);
   }
 
-  @override
-  Future<void> onRemove() async {
+  @mustCallSuper
+  void removalActions() {
     if (!isClone) {
       //removeEffects(this); //dont run this, runs async code which will execute after the item has already been removed and cause a crash
       disconnectFromBall(); //sync but within async function
       _ball.removeFromParent();
+      world.destroyBody(_ball.body);
       clone?.removeFromParent();
+      removeEffects(this); //sync and async
     }
+  }
+
+  @override
+  void removeFromParent() {
+    if (!isMounted) {
+      //if not mounted, then flame won't call onRemove, but we still want tidying there to happen
+      removalActions();
+    }
+    super.removeFromParent(); //async
+  }
+
+  @override
+  Future<void> onRemove() async {
+    removalActions();
     super.onRemove();
   }
 

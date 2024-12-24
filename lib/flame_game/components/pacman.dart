@@ -204,19 +204,25 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   }
 
   @override
+  void removalActions() {
+    if (!isClone) {
+      world.pacmans.pacmanList.remove(this);
+    }
+    super.removalActions();
+  }
+
+  @override
   void removeFromParent() {
     if (!isMounted) {
       //if not mounted, then flame won't call onRemove, but we still want tidying there to happen
-      onRemove();
+      removalActions();
     }
     super.removeFromParent();
   }
 
   @override
   Future<void> onRemove() async {
-    if (!isClone) {
-      world.pacmans.pacmanList.remove(this);
-    }
+    removalActions();
     unawaited(super.onRemove());
   }
 
