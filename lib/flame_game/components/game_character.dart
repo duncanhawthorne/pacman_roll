@@ -124,6 +124,10 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
 
   @override
   void removeFromParent() {
+    if (!isMounted) {
+      //if not mounted, then flame won't call onRemove, but we still want tidying there to happen
+      onRemove();
+    }
     if (!isClone) {
       disconnectFromBall(); //sync
       removeEffects(this); //sync and async
