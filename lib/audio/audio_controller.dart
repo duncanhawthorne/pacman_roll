@@ -182,6 +182,9 @@ class AudioController {
 
   Future<void> setSirenVolume(double normalisedAverageGhostSpeed,
       {bool gradual = false}) async {
+    if (!_canPlay(SfxType.ghostsRoamingSiren)) {
+      return;
+    }
     double currentVolume = 0;
     if (ap) {
       final AudioPlayer sirenPlayer = _apPlayers[SfxType.ghostsRoamingSiren]!;
