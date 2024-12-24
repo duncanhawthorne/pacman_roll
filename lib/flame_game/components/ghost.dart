@@ -155,10 +155,7 @@ class Ghost extends GameCharacter {
 
   @override
   void removeFromParent() {
-    if (!isMounted) {
-      //if not mounted, then flame won't call onRemove, but we still want tidying there to happen
-      removalActions();
-    }
+    removalActions();
     super.removeFromParent();
   }
 

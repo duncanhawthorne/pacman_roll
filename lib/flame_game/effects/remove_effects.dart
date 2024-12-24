@@ -4,8 +4,13 @@ import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 
 void removeEffects(Component component) {
-  component.children.whereType<Effect>().forEach((Effect item) {
-    item.pause(); //sync
+  component.children
+      .whereType<Effect>()
+      //create a new list toList so can iterate and remove simultaneously
+      .toList(growable: false)
+      .forEach((Effect item) {
+    item
+      ..pause() //sync
+      ..removeFromParent();
   });
-  component.removeWhere((Component item) => item is Effect); //async
 }

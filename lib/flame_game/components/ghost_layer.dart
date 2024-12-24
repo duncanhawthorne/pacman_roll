@@ -32,14 +32,25 @@ class Ghosts extends WrapperNoEvents
   bool get ghostsLoaded => ghostList.isNotEmpty && ghostList[0].isLoaded;
 
   void tidyStrayGhosts() {
-    if (kDebugMode &&
-        !game.level.multipleSpawningGhosts &&
-        ghostList.length > game.level.numStartingGhosts) {
-      for (int i = 0; i < ghostList.length; i++) {
-        if (!ghostList[i].isMounted) {
-          debug("tidy stray ghost"); //shouldn't happen
-          ghostList[i].removeFromParent();
-          break;
+    if (kDebugMode && !game.level.multipleSpawningGhosts) {
+      if (ghostList.length > game.level.numStartingGhosts) {
+        //create a new list toList so can iterate and remove simultaneously
+        final List<Ghost> tmpList = ghostList.toList();
+        for (Ghost ghost in tmpList) {
+          if (!ghost.isMounted) {
+            debug("tidy stray ghost 1"); //shouldn't happen
+            ghost.removeFromParent();
+          }
+        }
+      }
+      if (children.whereType<Ghost>().length != ghostList.length) {
+        //create a new list toList so can iterate and remove simultaneously
+        final List<Component> tmpList = children.whereType<Ghost>().toList();
+        for (Component child in tmpList) {
+          if (!ghostList.contains(child)) {
+            debug("tidy stray ghost 2"); //shouldn't happen
+            child.removeFromParent();
+          }
         }
       }
     }
@@ -98,6 +109,7 @@ class Ghosts extends WrapperNoEvents
   }
 
   void _addThreeGhosts() {
+    assert(ghostList.isEmpty);
     final List<int> positions = game.level.numStartingGhosts == 3
         ? <int>[0, 1, 2]
         : game.level.numStartingGhosts == 2
@@ -151,7 +163,8 @@ class Ghosts extends WrapperNoEvents
   }
 
   void _removeAllGhosts() {
-    for (final Ghost ghost in ghostList) {
+    //create a new list toList so can iterate and remove simultaneously
+    for (final Ghost ghost in ghostList.toList()) {
       ghost.removeFromParent();
     }
     removeSpawner();
