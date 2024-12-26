@@ -49,7 +49,7 @@ class Levels {
               ? 1
               : (levelNum - 1) % 3 + 1,
       levelString:
-          levelNum > 0 ? levelNum.toString() : "L${levelNum - minLevel + 1}",
+          levelNum > 0 ? levelNum.toString() : "T${levelNum - minLevel + 1}",
       infLives: levelNum <= 0 ? true : false,
     );
     return result;

@@ -27,7 +27,7 @@ class BeginDialog extends StatelessWidget {
             onPressed: () {
               game.toggleOverlay(GameScreen.beginDialogKey);
               context.go(
-                  '/?$levelUrlKey=${maxLevelToShow(game)}&$mazeUrlKey=${mazeNames[Maze.defaultMazeId]}');
+                  '/?$levelUrlKey=${levelAfterPlaybackScreen(game)}&$mazeUrlKey=${mazeNames[Maze.defaultMazeId]}');
             },
             child: const Padding(
               padding: EdgeInsets.all(12.0),

@@ -88,7 +88,7 @@ Widget levelSelector(BuildContext context, PacmanGame game) {
 const int _cols = 5;
 const int _negativeRows = 1;
 Widget levelSelectorReal(BuildContext context, PacmanGame game) {
-  final int maxLevelToShowCache = maxLevelToShow(game);
+  final int maxLevelToShowCache = _maxLevelToShow(game);
   return bodyWidget(
     child: Column(
         spacing: 8,
@@ -154,7 +154,7 @@ Widget mazeSelector(BuildContext context, PacmanGame game) {
 
 Widget mazeSelectorReal(BuildContext context, PacmanGame game) {
   const bool enableMazeSelector = true;
-  final int maxLevelToShowCache = maxLevelToShow(game);
+  final int maxLevelToShowCache = _maxLevelToShow(game);
   // ignore: dead_code
   final bool showText = false && maxLevelToShowCache <= 2;
   return !enableMazeSelector ||
@@ -197,7 +197,11 @@ Widget mazeButtonSingle(BuildContext context, PacmanGame game, int mazeId) {
       child: Text(mazeNames[mazeId] ?? "X", style: textStyleBody));
 }
 
-int maxLevelToShow(PacmanGame game) {
+int _maxLevelToShow(PacmanGame game) {
+  return max(1, levelAfterPlaybackScreen(game));
+}
+
+int levelAfterPlaybackScreen(PacmanGame game) {
   return <int>[game.level.number, playerProgress.maxLevelCompleted + 1]
       .reduce(max)
       .clamp(Levels.minLevel, Levels.maxLevel);
