@@ -1,4 +1,4 @@
-String soundTypeToFilename(SfxType type) => switch (type) {
+String _soundTypeToFilename(SfxType type) => switch (type) {
       SfxType.ghostsScared => 'ghosts_runaway.mp3',
       SfxType.endMusic => 'win.mp3',
       SfxType.eatGhost => 'eat_ghost.mp3',
@@ -12,7 +12,7 @@ String soundTypeToFilename(SfxType type) => switch (type) {
 const double volumeScalar = 0.5;
 
 /// Allows control over loudness of different SFX types.
-double soundTypeToVolume(SfxType type) {
+double _soundTypeToVolume(SfxType type) {
   switch (type) {
     case SfxType.waka:
     case SfxType.startMusic:
@@ -37,4 +37,11 @@ enum SfxType {
   pacmanDeath,
   ghostsRoamingSiren,
   silence,
+}
+
+/// Extension to provide helper functions for SfxType
+extension SfxTypeExtension on SfxType {
+  String get filename => "sfx/${_soundTypeToFilename(this)}";
+
+  double get targetVolume => _soundTypeToVolume(this);
 }

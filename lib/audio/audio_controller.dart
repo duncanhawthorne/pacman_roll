@@ -32,16 +32,12 @@ class AudioController {
       <SfxType, Future<SoundHandle>>{};
   final Map<SfxType, AudioPlayer> _apPlayers = <SfxType, AudioPlayer>{};
 
-  String _getFilename(SfxType type) {
-    return "sfx/${soundTypeToFilename(type)}";
-  }
-
   Future<AudioSource> _getSoLoudSound(SfxType type) async {
     if (_soLoudSources.containsKey(type)) {
       return _soLoudSources[type]!;
     } else {
       final Future<AudioSource> currentSound = soLoud.loadAsset(
-        'assets/${_getFilename(type)}',
+        'assets/${type.filename}',
         mode: LoadMode.memory, //kIsWeb ? LoadMode.disk : LoadMode.memory,
       );
       _soLoudSources[type] = currentSound;
@@ -104,8 +100,8 @@ class AudioController {
       final AudioPlayer currentPlayer = _apPlayers[type]!;
       unawaited(currentPlayer
           .setReleaseMode(looping ? ReleaseMode.loop : ReleaseMode.stop));
-      unawaited(currentPlayer.play(AssetSource(_getFilename(type)),
-          volume: soundTypeToVolume(type)));
+      unawaited(currentPlayer.play(AssetSource(type.filename),
+          volume: type.targetVolume));
     } else {
       assert(type != SfxType.silence);
       final AudioSource sound = await _getSoLoudSound(type);
@@ -118,7 +114,7 @@ class AudioController {
         }
       }
       final Future<SoundHandle> fHandle = soLoud.play(sound,
-          paused: false, looping: looping, volume: soundTypeToVolume(type));
+          paused: false, looping: looping, volume: type.targetVolume);
       if (retainForStopping) {
         _soLoudHandles[type] = fHandle;
       }
@@ -323,7 +319,7 @@ class AudioController {
       // If there are hundreds of long sound effect files, it's better
       // to be more selective when preloading.
       await AudioCache.instance.loadAll(
-          SfxType.values.map((SfxType type) => _getFilename(type)).toList());
+          SfxType.values.map((SfxType type) => type.filename).toList());
       for (SfxType type in SfxType.values) {
         if (!_apPlayers.containsKey(type)) {
           _apPlayers[type] = AudioPlayer(playerId: 'sfxPlayer#$type');
