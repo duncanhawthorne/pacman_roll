@@ -229,7 +229,7 @@ class Ghosts extends WrapperNoEvents
           ghost.setScaredIshToNormal();
         }
         _ghostsScaredTimer.pause(); //makes update function for timer free
-        game.audioController.stopSfx(SfxType.ghostsScared);
+        game.audioController.stopSound(SfxType.ghostsScared);
       }
     }
   }

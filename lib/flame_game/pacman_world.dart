@@ -60,7 +60,7 @@ class PacmanWorld extends Forge2DWorld
   }
 
   void resetAfterGameWin() {
-    game.audioController.stopSfx(SfxType.ghostsScared);
+    game.audioController.stopSound(SfxType.ghostsScared);
     play(SfxType.endMusic);
     ghosts.resetAfterGameWin();
   }
@@ -73,7 +73,7 @@ class PacmanWorld extends Forge2DWorld
 
   void _resetSlideAfterPacmanDeath(Pacman dyingPacman) {
     //reset ghost scared status. Shouldn't be relevant as just died
-    game.audioController.stopSfx(SfxType.ghostsScared);
+    game.audioController.stopSound(SfxType.ghostsScared);
     if (!game.isWonOrLost) {
       if (_slideCharactersAfterPacmanDeath) {
         _cameraRotatableOnPacmanDeathFlourish = false;
@@ -124,7 +124,7 @@ class PacmanWorld extends Forge2DWorld
 
   void reset({bool firstRun = false}) {
     _cameraAndTimersReset();
-    game.audioController.stopSfx(SfxType.ghostsScared);
+    game.audioController.stopSound(SfxType.ghostsScared);
 
     if (!firstRun) {
       for (final WrapperNoEvents wrapper in wrappers) {

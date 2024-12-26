@@ -13,6 +13,8 @@ import '../utils/helper.dart';
 import 'sounds.dart';
 
 final SoLoud soLoud = SoLoud.instance;
+final bool _iOSWeb = defaultTargetPlatform == TargetPlatform.iOS && kIsWeb;
+final bool ap = !kDebugMode && !_iOSWeb;
 
 /// Allows playing music and sound. A facade to `package:audioplayers`.
 class AudioController {
@@ -58,38 +60,12 @@ class AudioController {
       <SfxType, Future<SoundHandle>>{};
   final Map<SfxType, AudioPlayer> _apPlayers;
 
-  final Random _random = Random();
-
   SettingsController? _settings;
 
   ValueNotifier<AppLifecycleState>? _lifecycleNotifier;
 
-  /// Makes sure the audio controller is listening to changes
-  /// of both the app lifecycle (e.g. suspended app) and to changes
-  /// of settings (e.g. muted sound).
-  void attachDependencies(AppLifecycleStateNotifier lifecycleNotifier,
-      SettingsController settingsController) {
-    _attachLifecycleNotifier(lifecycleNotifier);
-    _attachSettings(settingsController);
-  }
-
-  void dispose() {
-    _log.info("Dispose - just stop sound");
-    _lifecycleNotifier?.removeListener(_handleAppLifecycle);
-    _stopAllSound();
-    if (ap) {
-      for (final AudioPlayer player in _apPlayers.values) {
-        player.dispose();
-      }
-    } else {
-      return;
-    }
-  }
-
   String _getFilename(SfxType type) {
-    final List<String> options = soundTypeToFilename(type);
-    final String filename = options[_random.nextInt(options.length)];
-    return "sfx/$filename";
+    return "sfx/${soundTypeToFilename(type)}";
   }
 
   Future<AudioSource> _getSoLoudSound(SfxType type) async {
@@ -181,16 +157,10 @@ class AudioController {
     }
   }
 
-  Future<void> stopSfx(SfxType type) async {
-    _log.fine(<Object>["stopSfx", type]);
-    if (ap) {
-      unawaited(_apPlayers[type]!.stop());
-    } else {
-      if (_soLoudHandles.keys.contains(type)) {
-        await soLoud.stop(await _soLoudHandles[type]!);
-        unawaited(
-            _soLoudHandles.remove(type)); //remove so play from fresh after stop
-      }
+  void playSilence() {
+    _log.fine("playSilence");
+    if (!ap && (_iOSWeb || kDebugMode)) {
+      playSfx(SfxType.silence, forceApPlayer: true);
     }
   }
 
@@ -251,15 +221,43 @@ class AudioController {
     }
   }
 
-  void stopAllSfx() {
-    _stopAllSound();
+  Future<void> stopSound(SfxType type) async {
+    _log.fine(<Object>["stopSfx", type]);
+    if (ap) {
+      unawaited(_apPlayers[type]!.stop());
+    } else {
+      if (_soLoudHandles.keys.contains(type)) {
+        await soLoud.stop(await _soLoudHandles[type]!);
+        unawaited(
+            _soLoudHandles.remove(type)); //remove so play from fresh after stop
+      }
+    }
   }
 
-  void playSilence() {
-    _log.fine("playSilence");
-    if (!ap && (_iOSWeb || kDebugMode)) {
-      playSfx(SfxType.silence, forceApPlayer: true);
+  void stopAllSounds() {
+    _log.info(<Object>['Stop all sound', _soLoudHandles]);
+    if (ap) {
+      for (final AudioPlayer player in _apPlayers.values) {
+        player.stop();
+      }
+    } else {
+      for (SfxType type in _soLoudHandles.keys) {
+        stopSound(type);
+      }
+      if (_apPlayers.containsKey(SfxType.silence)) {
+        _apPlayers[SfxType.silence]!.stop();
+        _log.info(<Object>['Stop silence', _apPlayers[SfxType.silence]!.state]);
+      }
     }
+  }
+
+  /// Makes sure the audio controller is listening to changes
+  /// of both the app lifecycle (e.g. suspended app) and to changes
+  /// of settings (e.g. muted sound).
+  void attachDependencies(AppLifecycleStateNotifier lifecycleNotifier,
+      SettingsController settingsController) {
+    _attachLifecycleNotifier(lifecycleNotifier);
+    _attachSettings(settingsController);
   }
 
   /// Enables the [AudioController] to listen to [AppLifecycleState] events,
@@ -267,7 +265,6 @@ class AudioController {
   /// goes into the background.
   void _attachLifecycleNotifier(AppLifecycleStateNotifier lifecycleNotifier) {
     _lifecycleNotifier?.removeListener(_handleAppLifecycle);
-
     lifecycleNotifier.addListener(_handleAppLifecycle);
     _lifecycleNotifier = lifecycleNotifier;
   }
@@ -296,16 +293,6 @@ class AudioController {
     settingsController.soundsOn.addListener(_soundsOnHandler);
   }
 
-  void _audioOnHandler() {
-    _log.fine('audioOn changed to ${_settings!.audioOn.value}');
-    if (_settings!.audioOn.value) {
-      // All sound just got un-muted. Audio is on.
-    } else {
-      // All sound just got muted. Audio is off.
-      _stopAllSound();
-    }
-  }
-
   Future<void> _resume() async {
     _log.info(<String>["Resume"]);
     if (!ap) {
@@ -315,12 +302,22 @@ class AudioController {
     }
   }
 
+  void _audioOnHandler() {
+    _log.fine('audioOn changed to ${_settings!.audioOn.value}');
+    if (_settings!.audioOn.value) {
+      // All sound just got un-muted. Audio is on.
+    } else {
+      // All sound just got muted. Audio is off.
+      stopAllSounds();
+    }
+  }
+
   void _handleAppLifecycle() {
     switch (_lifecycleNotifier!.value) {
       case AppLifecycleState.paused:
       case AppLifecycleState.detached:
       case AppLifecycleState.hidden:
-        _stopAllSound();
+        stopAllSounds();
       case AppLifecycleState.resumed:
       case AppLifecycleState.inactive:
         // No need to react to this state change.
@@ -335,10 +332,8 @@ class AudioController {
       // This assumes there is only a limited number of sound effects in the game.
       // If there are hundreds of long sound effect files, it's better
       // to be more selective when preloading.
-      await AudioCache.instance.loadAll(SfxType.values
-          .expand(soundTypeToFilename)
-          .map((String path) => 'sfx/$path')
-          .toList());
+      await AudioCache.instance.loadAll(
+          SfxType.values.map((SfxType type) => _getFilename(type)).toList());
     } else {
       for (SfxType type in SfxType.values) {
         unawaited(_getSoLoudSound(type)); //load everything up
@@ -354,27 +349,20 @@ class AudioController {
         }
       }
     } else {
-      _stopAllSound();
+      stopAllSounds();
     }
   }
 
-  void _stopAllSound() {
-    _log.info(<Object>['Stop all sound', _soLoudHandles]);
+  void dispose() {
+    _log.info("Dispose - just stop sound");
+    _lifecycleNotifier?.removeListener(_handleAppLifecycle);
+    stopAllSounds();
     if (ap) {
       for (final AudioPlayer player in _apPlayers.values) {
-        player.stop();
+        player.dispose();
       }
     } else {
-      for (SfxType type in _soLoudHandles.keys) {
-        stopSfx(type);
-      }
-      if (_apPlayers.containsKey(SfxType.silence)) {
-        _apPlayers[SfxType.silence]!.stop();
-        _log.info(<Object>['Stop silence', _apPlayers[SfxType.silence]!.state]);
-      }
+      return;
     }
   }
 }
-
-final bool _iOSWeb = defaultTargetPlatform == TargetPlatform.iOS && kIsWeb;
-final bool ap = !kDebugMode && !_iOSWeb;

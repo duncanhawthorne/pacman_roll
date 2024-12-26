@@ -192,7 +192,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
     appLifecycleStateNotifier.addListener(() {
       if (appLifecycleStateNotifier.value == AppLifecycleState.hidden) {
         pauseGame();
-        audioController.stopAllSfx();
+        audioController.stopAllSounds();
       }
     });
   }
@@ -239,7 +239,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   void _handleLoseGame() {
     assert(isWonOrLost);
     assert(stopwatchStarted);
-    audioController.stopAllSfx();
+    audioController.stopAllSounds();
     cleanDialogs();
     overlays.add(GameScreen.loseDialogKey);
   }
@@ -363,7 +363,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   @override
   Future<void> onRemove() async {
     cleanDialogs();
-    audioController.stopAllSfx();
+    audioController.stopAllSounds();
     super.onRemove();
   }
 }
