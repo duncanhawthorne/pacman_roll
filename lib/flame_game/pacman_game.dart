@@ -154,17 +154,23 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   void pauseGame() {
     pause(); //timeScale = 0;
     pauseEngine();
+    regularItemsStarted = false; //so restart things next time
     //stopwatch.pause(); //shouldn't be necessary given timeScale = 0
   }
 
   void resumeGame() {
-    resume(); //timeScale = 1.0;
-    resumeEngine();
+    if (paused) {
+      regularItemsStarted = false; //so restart things next time
+      audioController.playSilence();
+      resume(); //timeScale = 1.0;
+      resumeEngine();
+    }
   }
 
   bool regularItemsStarted = false;
   void startRegularItems() {
     if (!regularItemsStarted) {
+      audioController.playSilence();
       regularItemsStarted = true;
       stopwatchStarted = true; //once per reset
       stopwatch.resume();
@@ -186,6 +192,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
     appLifecycleStateNotifier.addListener(() {
       if (appLifecycleStateNotifier.value == AppLifecycleState.hidden) {
         pauseGame();
+        audioController.stopAllSfx();
       }
     });
   }
@@ -292,6 +299,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   }
 
   void start() {
+    audioController.playSilence();
     //resumeEngine();
     pauseEngineIfNoActivity();
     world.start();

@@ -124,7 +124,12 @@ Widget _audioOnOffButtonWidget(BuildContext context, PacmanGame game) {
     valueListenable: settingsController.audioOn,
     builder: (BuildContext context, bool audioOn, Widget? child) {
       return IconButton(
-        onPressed: () => settingsController.toggleAudioOn(),
+        onPressed: () {
+          settingsController.toggleAudioOn();
+          if (settingsController.audioOn.value) {
+            game.audioController.playSilence();
+          }
+        },
         icon: Icon(audioOn ? Icons.volume_up : Icons.volume_off, color: color),
       );
     },
