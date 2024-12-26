@@ -16,29 +16,8 @@ final SoLoud soLoud = SoLoud.instance;
 final bool _iOSWeb = defaultTargetPlatform == TargetPlatform.iOS && kIsWeb;
 final bool ap = !kDebugMode && !_iOSWeb;
 
-/// Allows playing music and sound. A facade to `package:audioplayers`.
 class AudioController {
-  //AudioLogger.logLevel = AudioLogLevel.info;
-
-  /// Creates an instance that plays music and sound.
-  ///
-  /// Use [polyphony] to configure the number of sound effects (SFX) that can
-  /// play at the same time. A [polyphony] of `1` will always only play one
-  /// sound (a new sound will stop the previous one). See discussion
-  /// of [_apPlayers] to learn why this is the case.
-  ///
-  /// Background music does not count into the [polyphony] limit. Music will
-  /// never be overridden by sound effects because that would be silly.
-  AudioController({int polyphony = 10})
-      : assert(polyphony >= 1),
-        _apPlayers = !ap
-            ? <SfxType, AudioPlayer>{}
-            : <SfxType, AudioPlayer>{
-                for (int item
-                    in List<int>.generate(SfxType.values.length, (int i) => i))
-                  SfxType.values[item]:
-                      AudioPlayer(playerId: 'sfxPlayer#${SfxType.values[item]}')
-              } {
+  AudioController() {
     unawaited(_preloadSfx());
     _setupLogger();
   }
@@ -52,13 +31,11 @@ class AudioController {
 
   static final Logger _log = Logger('AudioController');
 
-  /// This is a list of [AudioPlayer] instances which are rotated to play
-  /// sound effects.
   final Map<SfxType, Future<AudioSource>> _soLoudSources =
       <SfxType, Future<AudioSource>>{};
   final Map<SfxType, Future<SoundHandle>> _soLoudHandles =
       <SfxType, Future<SoundHandle>>{};
-  final Map<SfxType, AudioPlayer> _apPlayers;
+  final Map<SfxType, AudioPlayer> _apPlayers = <SfxType, AudioPlayer>{};
 
   SettingsController? _settings;
 
@@ -334,6 +311,11 @@ class AudioController {
       // to be more selective when preloading.
       await AudioCache.instance.loadAll(
           SfxType.values.map((SfxType type) => _getFilename(type)).toList());
+      for (SfxType type in SfxType.values) {
+        if (!_apPlayers.containsKey(type)) {
+          _apPlayers[type] = AudioPlayer(playerId: 'sfxPlayer#$type');
+        }
+      }
     } else {
       for (SfxType type in SfxType.values) {
         unawaited(_getSoLoudSound(type)); //load everything up
