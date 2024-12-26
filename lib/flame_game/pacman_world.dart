@@ -5,9 +5,9 @@ import 'package:flame/camera.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
-import 'package:flutter/foundation.dart';
 
 import '../../audio/sounds.dart';
+import '../utils/constants.dart';
 import 'components/blocking_bar_layer.dart';
 import 'components/ghost_layer.dart';
 import 'components/pacman.dart';
@@ -31,8 +31,6 @@ import 'pacman_game.dart';
 ///  - The [HasGameReference] that gives the world access to a variable called
 ///  `game`, which is a reference to the game class that the world is attached
 ///  to.
-
-final bool _iOSWeb = defaultTargetPlatform == TargetPlatform.iOS && kIsWeb;
 
 class PacmanWorld extends Forge2DWorld
     with HasGameReference<PacmanGame>, DragCallbacks {
@@ -156,7 +154,7 @@ class PacmanWorld extends Forge2DWorld
   @override
   void onDragStart(DragStartEvent event) {
     super.onDragStart(event);
-    if (_iOSWeb) {
+    if (isiOSWeb) {
       _fingersLastDragAngle[event.pointerId] = null;
     } else {
       _fingersLastDragAngle[event.pointerId] = atan2(

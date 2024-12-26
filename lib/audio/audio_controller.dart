@@ -9,12 +9,12 @@ import 'package:logging/logging.dart';
 
 import '../app_lifecycle/app_lifecycle.dart';
 import '../settings/settings.dart';
+import '../utils/constants.dart';
 import '../utils/helper.dart';
 import 'sounds.dart';
 
 final SoLoud soLoud = SoLoud.instance;
-final bool _iOSWeb = defaultTargetPlatform == TargetPlatform.iOS && kIsWeb;
-final bool ap = !kDebugMode && !_iOSWeb;
+final bool useAudioPlayers = !kDebugMode && !isiOSWeb;
 
 class AudioController {
   AudioController() {
@@ -22,24 +22,15 @@ class AudioController {
     _setupLogger();
   }
 
-  void _setupLogger() {
-    //Logger.root.level = Level.ALL;
-    _log.onRecord.listen((LogRecord record) {
-      debug('AC ${record.message}');
-    });
-  }
-
   static final Logger _log = Logger('AudioController');
+  SettingsController? _settings;
+  ValueNotifier<AppLifecycleState>? _lifecycleNotifier;
 
   final Map<SfxType, Future<AudioSource>> _soLoudSources =
       <SfxType, Future<AudioSource>>{};
   final Map<SfxType, Future<SoundHandle>> _soLoudHandles =
       <SfxType, Future<SoundHandle>>{};
   final Map<SfxType, AudioPlayer> _apPlayers = <SfxType, AudioPlayer>{};
-
-  SettingsController? _settings;
-
-  ValueNotifier<AppLifecycleState>? _lifecycleNotifier;
 
   String _getFilename(SfxType type) {
     return "sfx/${soundTypeToFilename(type)}";
@@ -59,7 +50,7 @@ class AudioController {
   }
 
   Future<bool> _canPlay(SfxType type) async {
-    if (!ap && !soLoud.isInitialized) {
+    if (!useAudioPlayers && !soLoud.isInitialized) {
       _log.info("SoLoud not initialised");
       await _resume();
       _log.info(<Object>["SoLoud initialised", soLoud.isInitialized]);
@@ -88,7 +79,8 @@ class AudioController {
     return true;
   }
 
-  Future<void> playSfx(SfxType type, {bool forceApPlayer = false}) async {
+  Future<void> playSfx(SfxType type,
+      {bool forceUseAudioPlayersOnce = false}) async {
     _log.fine(<Object>['Playing $type', soLoud.getGlobalVolume()]);
     if (!(await _canPlay(type))) {
       return;
@@ -97,7 +89,8 @@ class AudioController {
         //ghostsScared time lasts longer than track length so need to loop
         type == SfxType.ghostsScared ||
         type == SfxType.silence;
-    if (ap || forceApPlayer) {
+    if (useAudioPlayers || forceUseAudioPlayersOnce) {
+      assert(!forceUseAudioPlayersOnce || type == SfxType.silence);
       if (type == SfxType.silence &&
           _apPlayers.containsKey(type) &&
           _apPlayers[type]!.state == PlayerState.playing) {
@@ -136,8 +129,8 @@ class AudioController {
 
   void playSilence() {
     _log.fine("playSilence");
-    if (!ap && (_iOSWeb || kDebugMode)) {
-      playSfx(SfxType.silence, forceApPlayer: true);
+    if (!useAudioPlayers && (isiOSWeb || kDebugMode)) {
+      playSfx(SfxType.silence, forceUseAudioPlayersOnce: true);
     }
   }
 
@@ -164,7 +157,7 @@ class AudioController {
       return;
     }
     double currentVolume = 0;
-    if (ap) {
+    if (useAudioPlayers) {
       final AudioPlayer sirenPlayer = _apPlayers[SfxType.ghostsRoamingSiren]!;
       if (sirenPlayer.state != PlayerState.playing) {
         unawaited(playSfx(SfxType.ghostsRoamingSiren));
@@ -200,7 +193,7 @@ class AudioController {
 
   Future<void> stopSound(SfxType type) async {
     _log.fine(<Object>["stopSfx", type]);
-    if (ap) {
+    if (useAudioPlayers) {
       unawaited(_apPlayers[type]!.stop());
     } else {
       if (_soLoudHandles.keys.contains(type)) {
@@ -213,7 +206,7 @@ class AudioController {
 
   void stopAllSounds() {
     _log.info(<Object>['Stop all sound', _soLoudHandles]);
-    if (ap) {
+    if (useAudioPlayers) {
       for (final AudioPlayer player in _apPlayers.values) {
         player.stop();
       }
@@ -226,6 +219,13 @@ class AudioController {
         _log.info(<Object>['Stop silence', _apPlayers[SfxType.silence]!.state]);
       }
     }
+  }
+
+  void _setupLogger() {
+    //Logger.root.level = Level.ALL;
+    _log.onRecord.listen((LogRecord record) {
+      debug('AC ${record.message}');
+    });
   }
 
   /// Makes sure the audio controller is listening to changes
@@ -281,7 +281,7 @@ class AudioController {
   }
 
   void _soundsOnHandler() {
-    if (ap) {
+    if (useAudioPlayers) {
       for (final AudioPlayer player in _apPlayers.values) {
         if (player.state == PlayerState.playing) {
           player.stop();
@@ -299,6 +299,7 @@ class AudioController {
       case AppLifecycleState.hidden:
         stopAllSounds();
       case AppLifecycleState.resumed:
+        _resume();
       case AppLifecycleState.inactive:
         // No need to react to this state change.
         break;
@@ -307,7 +308,7 @@ class AudioController {
 
   Future<void> _resume() async {
     _log.info(<String>["Resume"]);
-    if (!ap) {
+    if (!useAudioPlayers) {
       if (!soLoud.isInitialized) {
         await soLoud.init();
       }
@@ -317,7 +318,7 @@ class AudioController {
   /// Preloads all sound effects.
   Future<void> _preloadSfx() async {
     _log.info('Preloading sound effects');
-    if (ap) {
+    if (useAudioPlayers) {
       // This assumes there is only a limited number of sound effects in the game.
       // If there are hundreds of long sound effect files, it's better
       // to be more selective when preloading.
@@ -336,15 +337,16 @@ class AudioController {
   }
 
   void dispose() {
-    _log.info("Dispose - just stop sound");
+    //don't call manually
+    _log.info("Dispose");
     _lifecycleNotifier?.removeListener(_handleAppLifecycle);
     stopAllSounds();
-    if (ap) {
+    if (useAudioPlayers) {
       for (final AudioPlayer player in _apPlayers.values) {
         player.dispose();
       }
     } else {
-      return;
+      soLoud.disposeAllSources();
     }
   }
 }
