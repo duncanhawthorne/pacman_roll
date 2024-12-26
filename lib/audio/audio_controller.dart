@@ -270,21 +270,24 @@ class AudioController {
     settingsController.soundsOn.addListener(_soundsOnHandler);
   }
 
-  Future<void> _resume() async {
-    _log.info(<String>["Resume"]);
-    if (!ap) {
-      if (!soLoud.isInitialized) {
-        await soLoud.init();
-      }
-    }
-  }
-
   void _audioOnHandler() {
     _log.fine('audioOn changed to ${_settings!.audioOn.value}');
     if (_settings!.audioOn.value) {
       // All sound just got un-muted. Audio is on.
     } else {
       // All sound just got muted. Audio is off.
+      stopAllSounds();
+    }
+  }
+
+  void _soundsOnHandler() {
+    if (ap) {
+      for (final AudioPlayer player in _apPlayers.values) {
+        if (player.state == PlayerState.playing) {
+          player.stop();
+        }
+      }
+    } else {
       stopAllSounds();
     }
   }
@@ -299,6 +302,15 @@ class AudioController {
       case AppLifecycleState.inactive:
         // No need to react to this state change.
         break;
+    }
+  }
+
+  Future<void> _resume() async {
+    _log.info(<String>["Resume"]);
+    if (!ap) {
+      if (!soLoud.isInitialized) {
+        await soLoud.init();
+      }
     }
   }
 
@@ -320,18 +332,6 @@ class AudioController {
       for (SfxType type in SfxType.values) {
         unawaited(_getSoLoudSound(type)); //load everything up
       }
-    }
-  }
-
-  void _soundsOnHandler() {
-    if (ap) {
-      for (final AudioPlayer player in _apPlayers.values) {
-        if (player.state == PlayerState.playing) {
-          player.stop();
-        }
-      }
-    } else {
-      stopAllSounds();
     }
   }
 
