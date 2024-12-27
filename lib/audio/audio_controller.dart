@@ -14,8 +14,10 @@ import '../utils/helper.dart';
 import 'sounds.dart';
 
 final SoLoud soLoud = SoLoud.instance;
-final bool useAudioPlayers = !kDebugMode && !isiOSWeb;
-final bool detailedAudioLog = isiOSWeb || kDebugMode;
+const bool useSoLoudInDebug = false;
+final bool useSoLoud = (kDebugMode && useSoLoudInDebug) || isiOSWeb;
+final bool useAudioPlayers = !useSoLoud;
+final bool detailedAudioLog = useSoLoud;
 
 class AudioController {
   AudioController() {
@@ -109,10 +111,11 @@ class AudioController {
               volume: type.targetVolume);
         } catch (e) {
           _log
-            ..severe(<Object>['Mini crash'])
+            ..severe(<Object>['Mini crash', type])
             ..severe(<Object?>[e]);
           unawaited(currentPlayer.play(AssetSource(type.filename),
               volume: type.targetVolume));
+          rethrow;
         }
         _log.fine(<Object?>["player state", type, currentPlayer.state]);
       } else {
@@ -135,9 +138,10 @@ class AudioController {
       }
     } catch (e) {
       _log
-        ..severe(<Object>['Crash'])
+        ..severe(<Object>['Crash', type])
         ..severe(e);
       await dispose();
+      rethrow;
     }
   }
 
@@ -179,6 +183,9 @@ class AudioController {
     }
     double currentVolume = 0;
     if (useAudioPlayers) {
+      if (!_apPlayers.containsKey(SfxType.ghostsRoamingSiren)) {
+        await playSfx(SfxType.ghostsRoamingSiren);
+      }
       final AudioPlayer sirenPlayer = _apPlayers[SfxType.ghostsRoamingSiren]!;
       if (sirenPlayer.state != PlayerState.playing) {
         unawaited(playSfx(SfxType.ghostsRoamingSiren));
@@ -222,7 +229,9 @@ class AudioController {
   Future<void> stopSound(SfxType type) async {
     _log.fine(<Object>["stopSfx", type]);
     if (useAudioPlayers) {
-      unawaited(_apPlayers[type]!.stop());
+      if (_apPlayers.containsKey(type)) {
+        unawaited(_apPlayers[type]!.stop());
+      }
     } else {
       if (_soLoudHandles.keys.contains(type)) {
         await soLoud.stop(await _soLoudHandles[type]!);
@@ -395,6 +404,7 @@ class AudioController {
       for (final AudioPlayer player in _apPlayers.values) {
         unawaited(player.dispose());
       }
+      _apPlayers.clear();
     } else {
       if (soLoud.isInitialized) {
         try {
