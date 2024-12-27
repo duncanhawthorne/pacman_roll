@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../audio/audio_controller.dart';
 import '../../google/google.dart';
 import '../../settings/settings.dart';
 import '../../style/dialog.dart';
@@ -103,7 +104,9 @@ Widget _infintyWidget(BuildContext context, PacmanGame game) {
 Widget _clockWidget(PacmanGame game) {
   return GestureDetector(
     onLongPress: () {
-      game.toggleOverlay(GameScreen.debugDialogKey);
+      if (detailedAudioLog) {
+        game.toggleOverlay(GameScreen.debugDialogKey);
+      }
     },
     child: Padding(
       padding: const EdgeInsets.only(left: _clockSpacing, right: _clockSpacing),

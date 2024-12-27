@@ -8,7 +8,6 @@ import 'package:flutter_soloud/flutter_soloud.dart';
 import 'package:logging/logging.dart';
 
 import '../app_lifecycle/app_lifecycle.dart';
-import '../flame_game/dialogs/debug_dialog.dart';
 import '../settings/settings.dart';
 import '../utils/constants.dart';
 import '../utils/helper.dart';
@@ -16,6 +15,7 @@ import 'sounds.dart';
 
 final SoLoud soLoud = SoLoud.instance;
 final bool useAudioPlayers = !kDebugMode && !isiOSWeb;
+final bool detailedAudioLog = isiOSWeb || kDebugMode;
 
 class AudioController {
   AudioController() {
@@ -50,7 +50,7 @@ class AudioController {
     if (!useAudioPlayers && !soLoud.isInitialized) {
       _log.info("SoLoud not initialised");
       await _resume();
-      _log.info(<Object>["SoLoud initialised", soLoud.isInitialized]);
+      _log.info(<Object>["SoLoud initialised?", soLoud.isInitialized]);
       if (!soLoud.isInitialized) {
         return false;
       }
@@ -131,9 +131,6 @@ class AudioController {
         if (retainForStopping) {
           _soLoudHandles[type] = fHandle;
         }
-        _log
-          ..fine(<Object?>[type, "handle = ", await fHandle])
-          ..fine(<Object?>[_soLoudHandles]);
         await fHandle;
       }
     } catch (e) {
@@ -200,9 +197,11 @@ class AudioController {
             'Restarting ghostsRoamingSiren',
           ])
           ..info(<Object>[
+            "handle?",
             _soLoudHandles.containsKey(SfxType.ghostsRoamingSiren),
           ])
           ..info(<Object>[
+            "paused?",
             _soLoudHandles.containsKey(SfxType.ghostsRoamingSiren)
                 ? soLoud
                     .getPause(await _soLoudHandles[SfxType.ghostsRoamingSiren]!)
@@ -232,7 +231,7 @@ class AudioController {
       }
       if (type == SfxType.silence && _apPlayers.containsKey(SfxType.silence)) {
         await _apPlayers[SfxType.silence]!.stop();
-        _log.info(<Object>[
+        _log.fine(<Object>[
           'Stop silence direct',
           _apPlayers[SfxType.silence]!.state
         ]);
@@ -241,7 +240,7 @@ class AudioController {
   }
 
   void stopAllSounds() {
-    _log.info(<Object>['Stop all sound', _soLoudHandles]);
+    _log.fine(<Object>['Stop all sound', _soLoudHandles]);
     if (useAudioPlayers) {
       for (final AudioPlayer player in _apPlayers.values) {
         player.stop();
@@ -252,7 +251,7 @@ class AudioController {
       }
       if (_apPlayers.containsKey(SfxType.silence)) {
         _apPlayers[SfxType.silence]!.stop();
-        _log.info(<Object>[
+        _log.fine(<Object>[
           'Stop silence as part of all',
           _apPlayers[SfxType.silence]!.state
         ]);
@@ -260,11 +259,16 @@ class AudioController {
     }
   }
 
+  final List<String> debugLogList = <String>[""];
+  final ValueNotifier<int> debugLogListIterator = ValueNotifier<int>(0);
   void _setupLogger() {
-    Logger.root.level = Level.ALL;
+    if (detailedAudioLog) {
+      Logger.root.level = Level.ALL;
+    }
     _log.onRecord.listen((LogRecord record) {
       debug('AC ${record.message}');
-      debugLog.value += ("\n${record.message}");
+      debugLogList.add(record.message);
+      debugLogListIterator.value += 1;
     });
   }
 
@@ -342,7 +346,7 @@ class AudioController {
         _log.fine(<String>["Lifecycle hidden - no op"]);
       //stopAllSounds();
       case AppLifecycleState.resumed:
-        _log.info(<String>["Lifecycle resumed - no op"]);
+        _log.fine(<String>["Lifecycle resumed - no op"]);
       //dispose();
       //_resume();
       case AppLifecycleState.inactive:
@@ -353,7 +357,7 @@ class AudioController {
   }
 
   Future<void> _resume() async {
-    _log.info(<String>["Resume"]);
+    _log.fine(<String>["Resume"]);
     if (!useAudioPlayers) {
       if (!soLoud.isInitialized) {
         await soLoud.init();
@@ -363,7 +367,7 @@ class AudioController {
 
   /// Preloads all sound effects.
   Future<void> _preloadSfx() async {
-    _log.info('Preloading sound effects');
+    _log.fine('Preloading sound effects');
     if (useAudioPlayers) {
       // This assumes there is only a limited number of sound effects in the game.
       // If there are hundreds of long sound effect files, it's better
@@ -384,7 +388,7 @@ class AudioController {
 
   Future<void> dispose() async {
     //don't call manually
-    _log.info("Dispose");
+    _log.fine("Dispose");
     //_lifecycleNotifier?.removeListener(_handleAppLifecycle);
     stopAllSounds();
     if (useAudioPlayers) {
@@ -395,7 +399,7 @@ class AudioController {
       if (soLoud.isInitialized) {
         try {
           await soLoud.disposeAllSources();
-          _log.info("SoLoud sound sources disposed");
+          _log.fine("SoLoud sound sources disposed");
         } catch (e) {
           _log
             ..severe("Crash on disposeAllSources")
@@ -405,7 +409,7 @@ class AudioController {
       soLoud.deinit();
       _soLoudHandles.clear();
       _soLoudSources.clear();
-      _log.info("SoLoud deinit and cleared");
+      _log.fine("SoLoud deinit and cleared");
     }
   }
 }

@@ -9,8 +9,6 @@ import '../pacman_game.dart';
 
 /// This first dialog shown during playback mode
 
-ValueNotifier<String> debugLog = ValueNotifier<String>("");
-
 class DebugDialog extends StatelessWidget {
   const DebugDialog({
     super.key,
@@ -101,13 +99,22 @@ class DebugDialog extends StatelessWidget {
       ),
       SizedBox(
         width: 800,
-        child: ValueListenableBuilder<String>(
-            valueListenable: debugLog,
-            builder: (BuildContext context, String value, Widget? child) {
-              final List<String> x = debugLog.value.split("\n");
-              final List<String> y = x.sublist(max(0, x.length - 30), x.length);
-              final String z = y.join("\n");
-              return Text(z, softWrap: true);
+        child: ValueListenableBuilder<int>(
+            valueListenable: game.audioController.debugLogListIterator,
+            builder: (BuildContext context, int value, Widget? child) {
+              final List<String> debugLogList =
+                  game.audioController.debugLogList;
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: List<Widget>.generate(
+                    min(30, debugLogList.length),
+                    (int index) => Text(
+                        debugLogList[debugLogList.length -
+                            min(30, debugLogList.length).toInt() +
+                            index],
+                        softWrap: true),
+                    growable: false),
+              );
             }),
       ),
     ]);
