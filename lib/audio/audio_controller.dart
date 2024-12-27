@@ -108,8 +108,9 @@ class AudioController {
           await currentPlayer.play(AssetSource(type.filename),
               volume: type.targetVolume);
         } catch (e) {
-          _log.severe(<Object>['Mini crash']);
-          _log.severe(<Object?>[e]);
+          _log
+            ..severe(<Object>['Mini crash'])
+            ..severe(<Object?>[e]);
           unawaited(currentPlayer.play(AssetSource(type.filename),
               volume: type.targetVolume));
         }
@@ -130,13 +131,15 @@ class AudioController {
         if (retainForStopping) {
           _soLoudHandles[type] = fHandle;
         }
-        _log.fine(<Object?>[type, "handle = ", await fHandle]);
-        _log.fine(<Object?>[_soLoudHandles]);
+        _log
+          ..fine(<Object?>[type, "handle = ", await fHandle])
+          ..fine(<Object?>[_soLoudHandles]);
         await fHandle;
       }
     } catch (e) {
-      _log.severe(<Object>['Crash']);
-      _log.severe(e);
+      _log
+        ..severe(<Object>['Crash'])
+        ..severe(e);
       await dispose();
     }
   }
@@ -192,18 +195,19 @@ class AudioController {
     } else {
       if (!_soLoudHandles.containsKey(SfxType.ghostsRoamingSiren) ||
           soLoud.getPause(await _soLoudHandles[SfxType.ghostsRoamingSiren]!)) {
-        _log.info(<Object>[
-          'Restarting ghostsRoamingSiren',
-        ]);
-        _log.info(<Object>[
-          _soLoudHandles.containsKey(SfxType.ghostsRoamingSiren),
-        ]);
-        _log.info(<Object>[
-          _soLoudHandles.containsKey(SfxType.ghostsRoamingSiren)
-              ? soLoud
-                  .getPause(await _soLoudHandles[SfxType.ghostsRoamingSiren]!)
-              : "n/a"
-        ]);
+        _log
+          ..info(<Object>[
+            'Restarting ghostsRoamingSiren',
+          ])
+          ..info(<Object>[
+            _soLoudHandles.containsKey(SfxType.ghostsRoamingSiren),
+          ])
+          ..info(<Object>[
+            _soLoudHandles.containsKey(SfxType.ghostsRoamingSiren)
+                ? soLoud
+                    .getPause(await _soLoudHandles[SfxType.ghostsRoamingSiren]!)
+                : "n/a"
+          ]);
         await playSfx(SfxType.ghostsRoamingSiren);
       }
       final SoundHandle handle =
@@ -393,8 +397,9 @@ class AudioController {
           await soLoud.disposeAllSources();
           _log.info("SoLoud sound sources disposed");
         } catch (e) {
-          _log.severe("Crash on disposeAllSources");
-          _log.severe(e);
+          _log
+            ..severe("Crash on disposeAllSources")
+            ..severe(e);
         }
       }
       soLoud.deinit();
