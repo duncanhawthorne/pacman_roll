@@ -101,17 +101,22 @@ Widget _infintyWidget(BuildContext context, PacmanGame game) {
 }
 
 Widget _clockWidget(PacmanGame game) {
-  return Padding(
-    padding: const EdgeInsets.only(left: _clockSpacing, right: _clockSpacing),
-    child: StreamBuilder<dynamic>(
-      stream: Stream<dynamic>.periodic(const Duration(milliseconds: 100)),
-      builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-        return Text(
-            (game.stopwatchMilliSeconds / 1000)
-                .toStringAsFixed(1)
-                .padLeft(4, " "),
-            style: textStyleBody);
-      },
+  return GestureDetector(
+    onLongPress: () {
+      game.toggleOverlay(GameScreen.debugDialogKey);
+    },
+    child: Padding(
+      padding: const EdgeInsets.only(left: _clockSpacing, right: _clockSpacing),
+      child: StreamBuilder<dynamic>(
+        stream: Stream<dynamic>.periodic(const Duration(milliseconds: 100)),
+        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+          return Text(
+              (game.stopwatchMilliSeconds / 1000)
+                  .toStringAsFixed(1)
+                  .padLeft(4, " "),
+              style: textStyleBody);
+        },
+      ),
     ),
   );
 }

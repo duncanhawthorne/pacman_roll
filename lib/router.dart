@@ -41,8 +41,8 @@ GameLevel _parseGameLevel(String? levelString) {
   return levels.getLevel(levelNumberRaw);
 }
 
-int _parseMazeId(String? levelString) {
-  final String? mazeIdRaw = levelString ?? mazeNames[Maze.defaultMazeId];
+int _parseMazeId(String? mazeString) {
+  final String? mazeIdRaw = mazeString ?? mazeNames[Maze.defaultMazeId];
   return !mazeNames.containsValue(mazeIdRaw)
       ? Maze.defaultMazeId
       : _reverseMap(mazeNames)[mazeIdRaw] as int;

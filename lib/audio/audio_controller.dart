@@ -8,6 +8,7 @@ import 'package:flutter_soloud/flutter_soloud.dart';
 import 'package:logging/logging.dart';
 
 import '../app_lifecycle/app_lifecycle.dart';
+import '../flame_game/dialogs/debug_dialog.dart';
 import '../settings/settings.dart';
 import '../utils/constants.dart';
 import '../utils/helper.dart';
@@ -77,49 +78,66 @@ class AudioController {
 
   Future<void> playSfx(SfxType type,
       {bool forceUseAudioPlayersOnce = false}) async {
-    _log.fine(<Object>['Playing $type', soLoud.getGlobalVolume()]);
-    if (!(await _canPlay(type))) {
-      return;
-    }
-    final bool looping = type == SfxType.ghostsRoamingSiren ||
-        //ghostsScared time lasts longer than track length so need to loop
-        type == SfxType.ghostsScared ||
-        type == SfxType.silence;
-    if (useAudioPlayers || forceUseAudioPlayersOnce) {
-      assert(!forceUseAudioPlayersOnce || type == SfxType.silence);
-      if (type == SfxType.silence &&
-          _apPlayers.containsKey(type) &&
-          _apPlayers[type]!.state == PlayerState.playing) {
-        //leave silence repeating
-        _log.fine(<Object>['Silence already playing']);
+    try {
+      _log.fine(<Object>['Playing $type']);
+      if (!(await _canPlay(type))) {
         return;
       }
-      if (!_apPlayers.containsKey(type)) {
-        _apPlayers[type] = AudioPlayer(playerId: 'sfxPlayer#$type');
-      }
-      final AudioPlayer currentPlayer = _apPlayers[type]!;
-      unawaited(currentPlayer
-          .setReleaseMode(looping ? ReleaseMode.loop : ReleaseMode.stop));
-      unawaited(currentPlayer.play(AssetSource(type.filename),
-          volume: type.targetVolume));
-    } else {
-      assert(type != SfxType.silence);
-      final AudioSource sound = await _getSoLoudSound(type);
-      final bool retainForStopping =
-          //long sounds that might need stopping
-          looping || type == SfxType.startMusic || type == SfxType.endMusic;
-      if (retainForStopping) {
-        if (_soLoudHandles.keys.contains(type)) {
-          unawaited(soLoud.stop(await _soLoudHandles[type]!));
+      final bool looping = type == SfxType.ghostsRoamingSiren ||
+          //ghostsScared time lasts longer than track length so need to loop
+          type == SfxType.ghostsScared ||
+          type == SfxType.silence;
+      if (useAudioPlayers || forceUseAudioPlayersOnce) {
+        assert(!forceUseAudioPlayersOnce ||
+            type == SfxType.silence ||
+            type == SfxType.eatGhost);
+        if (type == SfxType.silence &&
+            _apPlayers.containsKey(type) &&
+            _apPlayers[type]!.state == PlayerState.playing) {
+          //leave silence repeating
+          _log.fine(<Object>['Silence already playing']);
+          return;
         }
+        if (!_apPlayers.containsKey(type)) {
+          _apPlayers[type] = AudioPlayer(playerId: 'sfxPlayer#$type');
+        }
+        final AudioPlayer currentPlayer = _apPlayers[type]!;
+        await currentPlayer
+            .setReleaseMode(looping ? ReleaseMode.loop : ReleaseMode.stop);
+        try {
+          await currentPlayer.play(AssetSource(type.filename),
+              volume: type.targetVolume);
+        } catch (e) {
+          _log.severe(<Object>['Mini crash']);
+          _log.severe(<Object?>[e]);
+          unawaited(currentPlayer.play(AssetSource(type.filename),
+              volume: type.targetVolume));
+        }
+        _log.fine(<Object?>["player state", type, currentPlayer.state]);
+      } else {
+        assert(type != SfxType.silence);
+        final AudioSource sound = await _getSoLoudSound(type);
+        final bool retainForStopping =
+            //long sounds that might need stopping
+            looping || type == SfxType.startMusic || type == SfxType.endMusic;
+        if (retainForStopping) {
+          if (_soLoudHandles.keys.contains(type)) {
+            unawaited(soLoud.stop(await _soLoudHandles[type]!));
+          }
+        }
+        final Future<SoundHandle> fHandle = soLoud.play(sound,
+            paused: false, looping: looping, volume: type.targetVolume);
+        if (retainForStopping) {
+          _soLoudHandles[type] = fHandle;
+        }
+        _log.fine(<Object?>[type, "handle = ", await fHandle]);
+        _log.fine(<Object?>[_soLoudHandles]);
+        await fHandle;
       }
-      final Future<SoundHandle> fHandle = soLoud.play(sound,
-          paused: false, looping: looping, volume: type.targetVolume);
-      if (retainForStopping) {
-        _soLoudHandles[type] = fHandle;
-      }
-      _log.fine(<Object?>[type, "handle = ", await fHandle, _soLoudHandles]);
-      await fHandle;
+    } catch (e) {
+      _log.severe(<Object>['Crash']);
+      _log.severe(e);
+      await dispose();
     }
   }
 
@@ -127,6 +145,13 @@ class AudioController {
     _log.fine("playSilence");
     if (!useAudioPlayers && (isiOSWeb || kDebugMode)) {
       playSfx(SfxType.silence, forceUseAudioPlayersOnce: true);
+    }
+  }
+
+  void playEatGhostAP() {
+    _log.fine("playEatGhostAP");
+    if (!useAudioPlayers && (isiOSWeb || kDebugMode)) {
+      playSfx(SfxType.eatGhost, forceUseAudioPlayersOnce: true);
     }
   }
 
@@ -169,7 +194,11 @@ class AudioController {
           soLoud.getPause(await _soLoudHandles[SfxType.ghostsRoamingSiren]!)) {
         _log.info(<Object>[
           'Restarting ghostsRoamingSiren',
+        ]);
+        _log.info(<Object>[
           _soLoudHandles.containsKey(SfxType.ghostsRoamingSiren),
+        ]);
+        _log.info(<Object>[
           _soLoudHandles.containsKey(SfxType.ghostsRoamingSiren)
               ? soLoud
                   .getPause(await _soLoudHandles[SfxType.ghostsRoamingSiren]!)
@@ -197,6 +226,13 @@ class AudioController {
         unawaited(
             _soLoudHandles.remove(type)); //remove so play from fresh after stop
       }
+      if (type == SfxType.silence && _apPlayers.containsKey(SfxType.silence)) {
+        await _apPlayers[SfxType.silence]!.stop();
+        _log.info(<Object>[
+          'Stop silence direct',
+          _apPlayers[SfxType.silence]!.state
+        ]);
+      }
     }
   }
 
@@ -212,15 +248,19 @@ class AudioController {
       }
       if (_apPlayers.containsKey(SfxType.silence)) {
         _apPlayers[SfxType.silence]!.stop();
-        _log.info(<Object>['Stop silence', _apPlayers[SfxType.silence]!.state]);
+        _log.info(<Object>[
+          'Stop silence as part of all',
+          _apPlayers[SfxType.silence]!.state
+        ]);
       }
     }
   }
 
   void _setupLogger() {
-    //Logger.root.level = Level.ALL;
+    Logger.root.level = Level.ALL;
     _log.onRecord.listen((LogRecord record) {
       debug('AC ${record.message}');
+      debugLog.value += ("\n${record.message}");
     });
   }
 
@@ -291,12 +331,18 @@ class AudioController {
   void _handleAppLifecycle() {
     switch (_lifecycleNotifier!.value) {
       case AppLifecycleState.paused:
+        _log.fine(<String>["Lifecycle paused - no op"]);
       case AppLifecycleState.detached:
+        _log.fine(<String>["Lifecycle detached - no op"]);
       case AppLifecycleState.hidden:
-        stopAllSounds();
+        _log.fine(<String>["Lifecycle hidden - no op"]);
+      //stopAllSounds();
       case AppLifecycleState.resumed:
-        _resume();
+        _log.info(<String>["Lifecycle resumed - no op"]);
+      //dispose();
+      //_resume();
       case AppLifecycleState.inactive:
+        _log.fine(<String>["Lifecycle inactive - no op"]);
         // No need to react to this state change.
         break;
     }
@@ -332,17 +378,29 @@ class AudioController {
     }
   }
 
-  void dispose() {
+  Future<void> dispose() async {
     //don't call manually
     _log.info("Dispose");
-    _lifecycleNotifier?.removeListener(_handleAppLifecycle);
+    //_lifecycleNotifier?.removeListener(_handleAppLifecycle);
     stopAllSounds();
     if (useAudioPlayers) {
       for (final AudioPlayer player in _apPlayers.values) {
-        player.dispose();
+        unawaited(player.dispose());
       }
     } else {
-      soLoud.disposeAllSources();
+      if (soLoud.isInitialized) {
+        try {
+          await soLoud.disposeAllSources();
+          _log.info("SoLoud sound sources disposed");
+        } catch (e) {
+          _log.severe("Crash on disposeAllSources");
+          _log.severe(e);
+        }
+      }
+      soLoud.deinit();
+      _soLoudHandles.clear();
+      _soLoudSources.clear();
+      _log.info("SoLoud deinit and cleared");
     }
   }
 }

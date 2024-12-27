@@ -6,7 +6,7 @@ String _soundTypeToFilename(SfxType type) => switch (type) {
       SfxType.waka => 'pacman_waka_waka.mp3',
       SfxType.startMusic => 'pacman_beginning.mp3',
       SfxType.ghostsRoamingSiren => 'ghosts_siren.mp3',
-      SfxType.silence => 'silence.mp3',
+      SfxType.silence => 'quiet.mp3',
     };
 
 const double volumeScalar = 0.5;
@@ -22,9 +22,9 @@ double _soundTypeToVolume(SfxType type) {
     case SfxType.eatGhost:
       return 1 * volumeScalar;
     case SfxType.ghostsRoamingSiren:
-      return 0;
+      return 1 * volumeScalar; //FIXME zero?
     case SfxType.silence:
-      return 0.3;
+      return 0.01 * volumeScalar;
   }
 }
 

@@ -191,8 +191,13 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   void _lifecycleChangeListener() {
     appLifecycleStateNotifier.addListener(() {
       if (appLifecycleStateNotifier.value == AppLifecycleState.hidden) {
+        debug("game hidden");
         pauseGame();
         audioController.stopAllSounds();
+      }
+      if (appLifecycleStateNotifier.value == AppLifecycleState.resumed) {
+        debug("game resumed");
+        audioController.dispose();
       }
     });
   }
@@ -250,7 +255,8 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
       ..remove(GameScreen.loseDialogKey)
       ..remove(GameScreen.wonDialogKey)
       ..remove(GameScreen.tutorialDialogKey)
-      ..remove(GameScreen.resetDialogKey);
+      ..remove(GameScreen.resetDialogKey)
+      ..remove(GameScreen.debugDialogKey);
   }
 
   void toggleOverlay(String overlayKey) {
@@ -270,6 +276,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   }
 
   void reset({bool firstRun = false, bool showStartDialog = false}) {
+    audioController.dispose(); //reset
     playbackModeCounter = -1;
     playbackMode = !recordMode && level.number == Levels.playbackModeLevel;
     recordedMovesLive.clear();
