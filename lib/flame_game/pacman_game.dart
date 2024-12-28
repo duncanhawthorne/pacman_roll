@@ -197,7 +197,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
       }
       if (appLifecycleStateNotifier.value == AppLifecycleState.resumed) {
         debug("game resumed");
-        audioController.dispose();
+        audioController.soLoudReset();
       }
     });
   }
@@ -276,7 +276,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   }
 
   void reset({bool firstRun = false, bool showStartDialog = false}) {
-    audioController.dispose(); //reset
+    audioController.soLoudReset();
     playbackModeCounter = -1;
     playbackMode = !recordMode && level.number == Levels.playbackModeLevel;
     recordedMovesLive.clear();

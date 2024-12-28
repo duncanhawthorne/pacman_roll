@@ -14,10 +14,10 @@ import '../utils/helper.dart';
 import 'sounds.dart';
 
 final SoLoud soLoud = SoLoud.instance;
-const bool useSoLoudInDebug = false;
-final bool useSoLoud = (kDebugMode && useSoLoudInDebug) || isiOSWeb;
-final bool useAudioPlayers = !useSoLoud;
-final bool detailedAudioLog = useSoLoud;
+const bool _useSoLoudInDebug = false;
+final bool _useSoLoud = (kDebugMode && _useSoLoudInDebug) || isiOSWeb;
+final bool useAudioPlayers = !_useSoLoud;
+final bool detailedAudioLog = _useSoLoud;
 
 class AudioController {
   AudioController() {
@@ -49,7 +49,7 @@ class AudioController {
   }
 
   Future<bool> _canPlay(SfxType type) async {
-    if (!useAudioPlayers && !soLoud.isInitialized) {
+    if (_useSoLoud && !soLoud.isInitialized) {
       _log.info("SoLoud not initialised");
       await _resume();
       _log.info(<Object>["SoLoud initialised?", soLoud.isInitialized]);
@@ -147,14 +147,14 @@ class AudioController {
 
   void playSilence() {
     _log.fine("playSilence");
-    if (!useAudioPlayers && (isiOSWeb || kDebugMode)) {
+    if (_useSoLoud) {
       playSfx(SfxType.silence, forceUseAudioPlayersOnce: true);
     }
   }
 
   void playEatGhostAP() {
     _log.fine("playEatGhostAP");
-    if (!useAudioPlayers && (isiOSWeb || kDebugMode)) {
+    if (_useSoLoud) {
       playSfx(SfxType.eatGhost, forceUseAudioPlayersOnce: true);
     }
   }
@@ -197,6 +197,7 @@ class AudioController {
           gradual: gradual);
       unawaited(sirenPlayer.setVolume(desiredSirenVolume));
     } else {
+      assert(_useSoLoud);
       if (!_soLoudHandles.containsKey(SfxType.ghostsRoamingSiren) ||
           soLoud.getPause(await _soLoudHandles[SfxType.ghostsRoamingSiren]!)) {
         _log
@@ -233,6 +234,7 @@ class AudioController {
         unawaited(_apPlayers[type]!.stop());
       }
     } else {
+      assert(_useSoLoud);
       if (_soLoudHandles.keys.contains(type)) {
         await soLoud.stop(await _soLoudHandles[type]!);
         unawaited(
@@ -255,6 +257,7 @@ class AudioController {
         player.stop();
       }
     } else {
+      assert(_useSoLoud);
       for (SfxType type in _soLoudHandles.keys) {
         stopSound(type);
       }
@@ -341,6 +344,7 @@ class AudioController {
         }
       }
     } else {
+      assert(_useSoLoud);
       stopAllSounds();
     }
   }
@@ -367,7 +371,7 @@ class AudioController {
 
   Future<void> _resume() async {
     _log.fine(<String>["Resume"]);
-    if (!useAudioPlayers) {
+    if (_useSoLoud) {
       if (!soLoud.isInitialized) {
         await soLoud.init();
       }
@@ -389,6 +393,7 @@ class AudioController {
         }
       }
     } else {
+      assert(_useSoLoud);
       for (SfxType type in SfxType.values) {
         unawaited(_getSoLoudSound(type)); //load everything up
       }
@@ -399,27 +404,37 @@ class AudioController {
     //don't call manually
     _log.fine("Dispose");
     //_lifecycleNotifier?.removeListener(_handleAppLifecycle);
-    stopAllSounds();
+
     if (useAudioPlayers) {
+      stopAllSounds();
       for (final AudioPlayer player in _apPlayers.values) {
         unawaited(player.dispose());
       }
       _apPlayers.clear();
     } else {
-      if (soLoud.isInitialized) {
-        try {
-          await soLoud.disposeAllSources();
-          _log.fine("SoLoud sound sources disposed");
-        } catch (e) {
-          _log
-            ..severe("Crash on disposeAllSources")
-            ..severe(e);
-        }
-      }
-      soLoud.deinit();
-      _soLoudHandles.clear();
-      _soLoudSources.clear();
-      _log.fine("SoLoud deinit and cleared");
+      assert(_useSoLoud);
+      soLoudReset();
     }
+  }
+
+  Future<void> soLoudReset() async {
+    if (!_useSoLoud) {
+      return;
+    }
+    stopAllSounds();
+    if (soLoud.isInitialized) {
+      try {
+        await soLoud.disposeAllSources();
+        _log.fine("SoLoud sound sources disposed");
+      } catch (e) {
+        _log
+          ..severe("Crash on disposeAllSources")
+          ..severe(e);
+      }
+    }
+    soLoud.deinit();
+    _soLoudHandles.clear();
+    _soLoudSources.clear();
+    _log.fine("SoLoud deinit and cleared");
   }
 }
