@@ -36,6 +36,8 @@ class AudioController {
   final Map<SfxType, AudioPlayer> _apPlayers = <SfxType, AudioPlayer>{};
 
   Future<AudioSource> _getSoLoudSound(SfxType type) async {
+    await soLoud.initialized;
+    assert(soLoud.isInitialized);
     if (_soLoudSources.containsKey(type)) {
       return _soLoudSources[type]!;
     } else {
@@ -119,6 +121,8 @@ class AudioController {
         }
         _log.fine(<Object?>["player state", type, currentPlayer.state]);
       } else {
+        assert(_useSoLoud);
+        await soLoud.initialized;
         assert(type != SfxType.silence);
         final AudioSource sound = await _getSoLoudSound(type);
         final bool retainForStopping =
@@ -198,6 +202,7 @@ class AudioController {
       unawaited(sirenPlayer.setVolume(desiredSirenVolume));
     } else {
       assert(_useSoLoud);
+      await soLoud.initialized;
       if (!_soLoudHandles.containsKey(SfxType.ghostsRoamingSiren) ||
           soLoud.getPause(await _soLoudHandles[SfxType.ghostsRoamingSiren]!)) {
         _log
@@ -228,7 +233,7 @@ class AudioController {
   }
 
   Future<void> stopSound(SfxType type) async {
-    _log.fine(<Object>["stopSfx", type]);
+    _log.fine(<Object>["stopSfx", type, soLoud.isInitialized]);
     if (useAudioPlayers) {
       if (_apPlayers.containsKey(type)) {
         unawaited(_apPlayers[type]!.stop());
@@ -236,7 +241,9 @@ class AudioController {
     } else {
       assert(_useSoLoud);
       if (_soLoudHandles.keys.contains(type)) {
-        await soLoud.stop(await _soLoudHandles[type]!);
+        if (soLoud.isInitialized) {
+          await soLoud.stop(await _soLoudHandles[type]!);
+        }
         unawaited(
             _soLoudHandles.remove(type)); //remove so play from fresh after stop
       }
@@ -422,6 +429,7 @@ class AudioController {
     if (!_useSoLoud) {
       return;
     }
+    _log.fine("soLoudReset");
     stopAllSounds();
     if (soLoud.isInitialized) {
       try {
@@ -432,8 +440,8 @@ class AudioController {
           ..severe("Crash on disposeAllSources")
           ..severe(e);
       }
+      soLoud.deinit();
     }
-    soLoud.deinit();
     _soLoudHandles.clear();
     _soLoudSources.clear();
     _log.fine("SoLoud deinit and cleared");
