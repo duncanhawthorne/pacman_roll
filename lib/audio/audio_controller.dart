@@ -10,7 +10,6 @@ import 'package:logging/logging.dart';
 import '../app_lifecycle/app_lifecycle.dart';
 import '../settings/settings.dart';
 import '../utils/constants.dart';
-import '../utils/helper.dart';
 import 'sounds.dart';
 
 final SoLoud soLoud = SoLoud.instance;
@@ -22,10 +21,9 @@ final bool detailedAudioLog = _useSoLoud;
 class AudioController {
   AudioController() {
     unawaited(_preloadSfx());
-    _setupLogger();
   }
 
-  static final Logger _log = Logger('AudioController');
+  static final Logger _log = Logger('AC');
   SettingsController? _settings;
   ValueNotifier<AppLifecycleState>? _lifecycleNotifier;
 
@@ -66,12 +64,14 @@ class AudioController {
 
     final bool audioOn = _settings?.audioOn.value ?? true;
     if (!audioOn) {
-      _log.fine('Ignoring playing ($type) because audio is muted.');
+      if (type != SfxType.ghostsRoamingSiren) {
+        _log.fine('Cant play $type: muted.');
+      }
       return false;
     }
     final bool soundsOn = _settings?.soundsOn.value ?? true;
     if (!soundsOn) {
-      _log.fine('Ignoring playing ($type) because sounds are turned off.');
+      _log.fine('Cant play $type: sounds off');
       return false;
     }
     if (type != SfxType.ghostsRoamingSiren) {
@@ -278,19 +278,6 @@ class AudioController {
     }
   }
 
-  final List<String> debugLogList = <String>[""];
-  final ValueNotifier<int> debugLogListIterator = ValueNotifier<int>(0);
-  void _setupLogger() {
-    if (detailedAudioLog) {
-      Logger.root.level = Level.ALL;
-    }
-    _log.onRecord.listen((LogRecord record) {
-      debug('AC ${record.message}');
-      debugLogList.add(record.message);
-      debugLogListIterator.value += 1;
-    });
-  }
-
   /// Makes sure the audio controller is listening to changes
   /// of both the app lifecycle (e.g. suspended app) and to changes
   /// of settings (e.g. muted sound).
@@ -364,12 +351,11 @@ class AudioController {
       case AppLifecycleState.detached:
         _log.fine(<String>["Lifecycle detached - no op"]);
       case AppLifecycleState.hidden:
-        _log.fine(<String>["Lifecycle hidden - no op"]);
-      //stopAllSounds();
+        _log.fine(<String>["Lifecycle hidden"]);
+        stopAllSounds();
       case AppLifecycleState.resumed:
-        _log.fine(<String>["Lifecycle resumed - no op"]);
-      //dispose();
-      //_resume();
+        _log.fine(<String>["Lifecycle resumed"]);
+        soLoudReset();
       case AppLifecycleState.inactive:
         _log.fine(<String>["Lifecycle inactive - no op"]);
         // No need to react to this state change.
@@ -421,7 +407,7 @@ class AudioController {
       _apPlayers.clear();
     } else {
       assert(_useSoLoud);
-      soLoudReset();
+      await soLoudReset();
     }
   }
 

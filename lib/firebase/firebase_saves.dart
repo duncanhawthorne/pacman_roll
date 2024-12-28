@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
+import 'package:logging/logging.dart';
 
 import '../firebase_options.dart';
 import '../google/google.dart';
-import '../utils/helper.dart';
 
 /// This file has utilities for loading and saving the leaderboard in firebase
 
@@ -17,6 +17,8 @@ class FBase {
   static const String mainDB = "records";
   static const String userSaves = "userSaves";
 
+  static final Logger _log = Logger('FB');
+
   FirebaseFirestore? db;
 
   Future<void> initialize() async {
@@ -26,7 +28,7 @@ class FBase {
       );
       db = FirebaseFirestore.instance;
     } else {
-      debug("fb off");
+      _log.info("Off");
     }
   }
 
@@ -39,14 +41,11 @@ class FBase {
       //debug("firebase push");
       try {
         if (firebaseOn) {
-          unawaited(db!
-              .collection(mainDB)
-              .doc(recordID)
-              .set(state)
-              .onError((Object? e, _) => debug("Error writing document: $e")));
+          unawaited(db!.collection(mainDB).doc(recordID).set(state).onError(
+              (Object? e, _) => _log.severe("Error writing document: $e")));
         }
       } catch (e) {
-        debug(<Object>["firebasePushSingleScore", e]);
+        _log.severe(<Object>["firebasePushSingleScore", e]);
       }
     }
   }
@@ -79,28 +78,25 @@ class FBase {
           return (fasterCount + 1 - 1) / (allCount == 1 ? 100 : allCount - 1);
         }
       } catch (e) {
-        debug(<Object>["firebasePercentile error", e]);
+        _log.severe(<Object>["firebasePercentile error", e]);
       }
     }
     return 1.0;
   }
 
   Future<void> firebasePushPlayerProgress(G g, String state) async {
-    debug(<String>["firebasePush", g.gUser]);
+    _log.info(<String>["Push", g.gUser]);
     if (firebaseOn && g.signedIn) {
       final Map<String, dynamic> dhState = <String, dynamic>{"data": state};
-      unawaited(db!
-          .collection("userSaves")
-          .doc(g.gUser)
-          .set(dhState)
-          .onError((Object? e, _) => debug("Error writing document: $e")));
+      unawaited(db!.collection("userSaves").doc(g.gUser).set(dhState).onError(
+          (Object? e, _) => _log.severe("Error writing document: $e")));
     }
   }
 
   Future<String> firebasePullPlayerProgress(G g) async {
     await initialize();
     String gameEncoded = "";
-    debug(<String>["firebasePull"]);
+    _log.info(<String>["Pull"]);
     if (firebaseOn && g.signedIn) {
       final DocumentReference<Map<String, dynamic>> docRef =
           db!.collection("userSaves").doc(g.gUser);
@@ -110,7 +106,7 @@ class FBase {
               doc.data() as Map<String, dynamic>;
           gameEncoded = gameEncodedTmp["data"] as String;
         },
-        onError: (dynamic e) => debug("Error getting document: $e"),
+        onError: (dynamic e) => _log.severe("Error getting document: $e"),
       );
     }
     return gameEncoded;

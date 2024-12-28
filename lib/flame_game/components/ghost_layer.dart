@@ -43,7 +43,7 @@ class Ghosts extends WrapperNoEvents
         final List<Ghost> tmpList = ghostList.toList();
         for (Ghost ghost in tmpList) {
           if (!ghost.isMounted) {
-            debug("tidy stray ghost 1"); //shouldn't happen
+            logGlobal("tidy stray ghost 1"); //shouldn't happen
             ghost.removeFromParent();
           }
         }
@@ -53,7 +53,7 @@ class Ghosts extends WrapperNoEvents
         final List<Component> tmpList = children.whereType<Ghost>().toList();
         for (Component child in tmpList) {
           if (!ghostList.contains(child)) {
-            debug("tidy stray ghost 2"); //shouldn't happen
+            logGlobal("tidy stray ghost 2"); //shouldn't happen
             child.removeFromParent();
           }
         }

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../audio/audio_controller.dart';
 import '../../audio/sounds.dart';
 import '../../style/dialog.dart';
+import '../../utils/helper.dart';
 import '../pacman_game.dart';
 
 /// This first dialog shown during playback mode
@@ -99,18 +100,18 @@ class DebugDialog extends StatelessWidget {
       ),
       SizedBox(
         width: 800,
+        height: 800,
         child: ValueListenableBuilder<int>(
-            valueListenable: game.audioController.debugLogListIterator,
+            valueListenable: debugLogListNotifier,
             builder: (BuildContext context, int value, Widget? child) {
-              final List<String> debugLogList =
-                  game.audioController.debugLogList;
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: List<Widget>.generate(
-                    min(30, debugLogList.length),
+                    min(debugLogListMaxLength, debugLogList.length),
                     (int index) => Text(
                         debugLogList[debugLogList.length -
-                            min(30, debugLogList.length).toInt() +
+                            min(debugLogListMaxLength, debugLogList.length)
+                                .toInt() +
                             index],
                         softWrap: true),
                     growable: false),

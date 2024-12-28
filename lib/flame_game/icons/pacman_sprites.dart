@@ -22,7 +22,7 @@ const bool _loadFromFile = false;
 class PacmanSprites {
   // ignore: unused_element
   Future<void> _savePictureAtFrac(int size, int mouthWidthAsInt) async {
-    debug("save picture");
+    logGlobal("save picture");
     final Picture picture = _pacmanRecorderAtFrac(size, mouthWidthAsInt);
     final Image image = await picture.toImage(size, size);
     final ByteData? imageBytes =

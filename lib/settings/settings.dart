@@ -21,7 +21,7 @@ class SettingsController {
     _loadStateFromPersistence();
   }
 
-  static final Logger _log = Logger('SettingsController');
+  static final Logger _log = Logger('SC');
 
   /// The persistence store that is used to save settings.
   final SettingsPersistence _store;

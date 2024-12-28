@@ -30,13 +30,14 @@ void main() async {
   FlutterNativeSplash.remove();
   await Flame.device.fullScreen();
 
+  setupGlobalLogger();
   fixTitlePerm();
 
   try {
     /// Initialize the player.
     await soLoud.init();
   } catch (e) {
-    debug(["soLoud main init crash", e]);
+    logGlobal(<Object>["soLoud main init crash", e]);
   }
 
   runApp(const MyGame());

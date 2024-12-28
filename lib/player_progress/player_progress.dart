@@ -3,17 +3,19 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
+import 'package:logging/logging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../firebase/firebase_saves.dart';
 import '../google/google.dart';
 import '../level_selection/levels.dart';
-import '../utils/helper.dart';
 
 class PlayerProgress extends ChangeNotifier {
   PlayerProgress() {
     _userChangeListener();
   }
+
+  static final Logger _log = Logger('PP');
 
   void _userChangeListener() {
     _loadFromFirebaseOrFilesystem(); //initial
@@ -39,7 +41,7 @@ class PlayerProgress extends ChangeNotifier {
   }
 
   void saveLevelComplete(Map<String, dynamic> currentGameState) {
-    debug(<String>["saveWin"]);
+    _log.info(<String>["saveWin"]);
     final Map<String, int> win = _cleanupWin(currentGameState);
     playerProgress
       .._addWin(win)
@@ -66,7 +68,7 @@ class PlayerProgress extends ChangeNotifier {
   }
 
   Future<void> _loadFromFirebaseOrFilesystem() async {
-    debug(<String>["loadKeys"]);
+    _log.info(<String>["loadKeys"]);
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String gameEncoded = "";
 
@@ -82,17 +84,17 @@ class PlayerProgress extends ChangeNotifier {
 
   Future<void> _saveToFirebaseAndFilesystem() async {
     final String gameEncoded = _getEncodeCurrent();
-    debug(<String>["saveKeys", gameEncoded]);
+    _log.info(<String>["saveKeys", gameEncoded]);
     // save locally
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('game', gameEncoded);
 
     // if possible save to firebase
     if (FBase.firebaseOn && g.signedIn) {
-      debug(<String>["saveKeys gUser", g.gUser]);
+      _log.info(<String>["saveKeys gUser", g.gUser]);
       unawaited(fBase.firebasePushPlayerProgress(g, gameEncoded));
     } else {
-      debug(<String>["not signed in", g.gUser]);
+      _log.info(<String>["not signed in", g.gUser]);
     }
   }
 
@@ -102,7 +104,7 @@ class PlayerProgress extends ChangeNotifier {
 
   void _loadFromEncoded(String gameEncoded, bool sync) {
     if (gameEncoded == "") {
-      debug("blank gameEncoded");
+      _log.info("blank load");
     } else {
       try {
         final dynamic jsonGameTmp = json.decode(gameEncoded);
@@ -114,7 +116,7 @@ class PlayerProgress extends ChangeNotifier {
           }
         }
       } catch (e) {
-        debug(<Object>["malformed load", e]);
+        _log.severe(<Object>["malformed load", e]);
       }
     }
   }

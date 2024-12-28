@@ -114,7 +114,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
       recordedMovesLive
           .add(<double>[(stopwatchMilliSeconds).toDouble(), angle]);
       if (recordedMovesLive.length % 100 == 0) {
-        debug(recordedMovesLive);
+        logGlobal(recordedMovesLive);
       }
     }
   }
@@ -191,13 +191,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   void _lifecycleChangeListener() {
     appLifecycleStateNotifier.addListener(() {
       if (appLifecycleStateNotifier.value == AppLifecycleState.hidden) {
-        debug("game hidden");
         pauseGame();
-        audioController.stopAllSounds();
-      }
-      if (appLifecycleStateNotifier.value == AppLifecycleState.resumed) {
-        debug("game resumed");
-        audioController.soLoudReset();
       }
     });
   }
