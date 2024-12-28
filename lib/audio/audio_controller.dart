@@ -14,7 +14,7 @@ import '../utils/helper.dart';
 import 'sounds.dart';
 
 final SoLoud soLoud = SoLoud.instance;
-const bool _useSoLoudInDebug = false;
+const bool _useSoLoudInDebug = true;
 final bool _useSoLoud = (kDebugMode && _useSoLoudInDebug) || isiOSWeb;
 final bool useAudioPlayers = !_useSoLoud;
 final bool detailedAudioLog = _useSoLoud;
@@ -330,6 +330,7 @@ class AudioController {
     _log.fine('audioOn changed to ${_settings!.audioOn.value}');
     if (_settings!.audioOn.value) {
       // All sound just got un-muted. Audio is on.
+      playSilence();
     } else {
       // All sound just got muted. Audio is off.
       stopAllSounds();
