@@ -344,18 +344,25 @@ class AudioController {
     }
   }
 
+  bool _soLoudNeedsReset = false;
   void _handleAppLifecycle() {
     switch (_lifecycleNotifier!.value) {
       case AppLifecycleState.paused:
-        _log.fine(<String>["Lifecycle paused - no op"]);
+        _soLoudNeedsReset = true;
+        _log.fine(<String>["Lifecycle paused"]);
       case AppLifecycleState.detached:
-        _log.fine(<String>["Lifecycle detached - no op"]);
+        _soLoudNeedsReset = true;
+        _log.fine(<String>["Lifecycle detached"]);
       case AppLifecycleState.hidden:
+        _soLoudNeedsReset = true;
         _log.fine(<String>["Lifecycle hidden"]);
         stopAllSounds();
       case AppLifecycleState.resumed:
         _log.fine(<String>["Lifecycle resumed"]);
-        soLoudReset();
+        if (_soLoudNeedsReset) {
+          soLoudReset();
+          _soLoudNeedsReset = false;
+        }
       case AppLifecycleState.inactive:
         _log.fine(<String>["Lifecycle inactive - no op"]);
         // No need to react to this state change.

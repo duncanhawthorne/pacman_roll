@@ -22,7 +22,7 @@ double _soundTypeToVolume(SfxType type) {
     case SfxType.eatGhost:
       return 1 * volumeScalar;
     case SfxType.ghostsRoamingSiren:
-      return 1 * volumeScalar; //FIXME zero?
+      return 0 * volumeScalar;
     case SfxType.silence:
       return 0.01 * volumeScalar;
   }
