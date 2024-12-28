@@ -3,6 +3,8 @@ import 'dart:core';
 import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
 
+import '../audio/audio_controller.dart';
+
 /// This file has utilities used by other bits of code
 
 final Logger _globalLog = Logger('GL');
@@ -16,7 +18,8 @@ const int debugLogListMaxLength = 30;
 final ValueNotifier<int> debugLogListNotifier = ValueNotifier<int>(0);
 
 void setupGlobalLogger() {
-  Logger.root.level = kDebugMode ? Level.FINE : Level.INFO;
+  Logger.root.level =
+      (kDebugMode || detailedAudioLog) ? Level.FINE : Level.INFO;
   //logging.hierarchicalLoggingEnabled = true;
   Logger.root.onRecord.listen((LogRecord record) {
     final String time =
