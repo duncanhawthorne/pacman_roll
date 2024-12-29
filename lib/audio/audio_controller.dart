@@ -64,14 +64,11 @@ class AudioController {
       return false;
     }
     await soLoudEnsureInitialised();
-    if (!soLoud.isInitialized) {
+    if (_useSoLoud && !soLoud.isInitialized) {
       _log.severe("canPlay SoLoud not initialised, after ensureInitialised");
       return false;
     }
 
-    /// The controller will ignore this call when the attached settings'
-    /// [SettingsController.audioOn] is `true` or if its
-    /// [SettingsController.soundsOn] is `false`.
     final bool audioOn = _settings?.audioOn.value ?? true;
     if (!audioOn) {
       if (type != SfxType.ghostsRoamingSiren) {
@@ -79,11 +76,7 @@ class AudioController {
       }
       return false;
     }
-    final bool soundsOn = _settings?.soundsOn.value ?? true;
-    if (!soundsOn) {
-      _log.fine('Cant play $type: sounds off');
-      return false;
-    }
+
     if (type != SfxType.ghostsRoamingSiren) {
       _log.finest('Can play: $type');
     }
@@ -304,8 +297,7 @@ class AudioController {
   }
 
   /// Enables the [AudioController] to track changes to settings.
-  /// Namely, when any of [SettingsController.audioOn],
-  /// [SettingsController.musicOn] or [SettingsController.soundsOn] changes,
+  /// Namely, when [SettingsController.audioOn] changes,
   /// the audio controller will act accordingly.
   void _attachSettings(SettingsController settingsController) {
     if (_settings == settingsController) {
@@ -316,37 +308,22 @@ class AudioController {
     // Remove handlers from the old settings controller if present
     final SettingsController? oldSettings = _settings;
     if (oldSettings != null) {
-      oldSettings.audioOn.removeListener(_audioOnHandler);
-      oldSettings.soundsOn.removeListener(_soundsOnHandler);
+      oldSettings.audioOn.removeListener(_audioOnOffHandler);
     }
 
     _settings = settingsController;
 
     // Add handlers to the new settings controller
-    settingsController.audioOn.addListener(_audioOnHandler);
-    settingsController.soundsOn.addListener(_soundsOnHandler);
+    settingsController.audioOn.addListener(_audioOnOffHandler);
   }
 
-  void _audioOnHandler() {
+  void _audioOnOffHandler() {
     _log.fine('audioOn changed to ${_settings!.audioOn.value}');
     if (_settings!.audioOn.value) {
       // All sound just got un-muted. Audio is on.
       playSilence();
     } else {
       // All sound just got muted. Audio is off.
-      stopAllSounds();
-    }
-  }
-
-  void _soundsOnHandler() {
-    if (_useAudioPlayers) {
-      for (final AudioPlayer player in _apPlayers.values) {
-        if (player.state == PlayerState.playing) {
-          player.stop();
-        }
-      }
-    } else {
-      assert(_useSoLoud);
       stopAllSounds();
     }
   }
