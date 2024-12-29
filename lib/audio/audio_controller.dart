@@ -38,6 +38,7 @@ class AudioController {
   Future<AudioSource> _getSoLoudSound(SfxType type,
       {bool preload = false}) async {
     await soLoudEnsureInitialised();
+    assert(type != SfxType.silence);
     if (await _soLoudSourceValid(type)) {
       return _soLoudSources[type]!;
     } else {
@@ -91,45 +92,38 @@ class AudioController {
 
   Future<void> playSfx(SfxType type,
       {bool forceUseAudioPlayersOnce = false}) async {
-    try {
-      _log.fine(<Object>['Playing $type']);
-      if (!(await _canPlay(type))) {
+    _log.fine(<Object>['Playing $type']);
+    if (!(await _canPlay(type))) {
+      return;
+    }
+    final bool looping = type == SfxType.ghostsRoamingSiren ||
+        //ghostsScared time lasts longer than track length so need to loop
+        type == SfxType.ghostsScared ||
+        type == SfxType.silence;
+    if (_useAudioPlayers || forceUseAudioPlayersOnce) {
+      assert(!forceUseAudioPlayersOnce ||
+          type == SfxType.silence ||
+          type == SfxType.eatGhost);
+      if (type == SfxType.silence &&
+          _apPlayers.containsKey(type) &&
+          _apPlayers[type]!.state == PlayerState.playing) {
+        //leave silence repeating
+        _log.fine(<Object>['Silence already playing']);
         return;
       }
-      final bool looping = type == SfxType.ghostsRoamingSiren ||
-          //ghostsScared time lasts longer than track length so need to loop
-          type == SfxType.ghostsScared ||
-          type == SfxType.silence;
-      if (_useAudioPlayers || forceUseAudioPlayersOnce) {
-        assert(!forceUseAudioPlayersOnce ||
-            type == SfxType.silence ||
-            type == SfxType.eatGhost);
-        if (type == SfxType.silence &&
-            _apPlayers.containsKey(type) &&
-            _apPlayers[type]!.state == PlayerState.playing) {
-          //leave silence repeating
-          _log.fine(<Object>['Silence already playing']);
-          return;
-        }
-        if (!_apPlayers.containsKey(type)) {
-          _apPlayers[type] = AudioPlayer(playerId: 'sfxPlayer#$type');
-        }
-        final AudioPlayer currentPlayer = _apPlayers[type]!;
-        await currentPlayer
-            .setReleaseMode(looping ? ReleaseMode.loop : ReleaseMode.stop);
-        try {
-          await currentPlayer.play(AssetSource(type.filename),
-              volume: type.targetVolume);
-        } catch (e) {
-          _log
-            ..severe(<Object>['Mini crash on AP', type])
-            ..severe(<Object?>[e]);
-          unawaited(currentPlayer.play(AssetSource(type.filename),
-              volume: type.targetVolume));
-          //rethrow;
-        }
-        _log.fine(<Object?>["player state", type, currentPlayer.state]);
-      } else {
+      if (!_apPlayers.containsKey(type)) {
+        _apPlayers[type] = AudioPlayer(playerId: 'sfxPlayer#$type');
+      }
+      final AudioPlayer currentPlayer = _apPlayers[type]!;
+      await currentPlayer
+          .setReleaseMode(looping ? ReleaseMode.loop : ReleaseMode.stop);
+      await currentPlayer.play(AssetSource(type.filename),
+          volume: type.targetVolume);
+      await currentPlayer.play(AssetSource(type.filename),
+          volume: type.targetVolume);
+      _log.finest(<Object?>["Player state", type, currentPlayer.state]);
+    } else {
+      try {
         assert(_useSoLoud);
         await soLoudEnsureInitialised();
         assert(type != SfxType.silence);
@@ -148,17 +142,12 @@ class AudioController {
           _soLoudHandles[type] = fHandle;
         }
         await fHandle;
-      }
-    } catch (e) {
-      _log
-        ..severe(<Object>['Crash', type])
-        ..severe(e);
-      if (_useSoLoud && !forceUseAudioPlayersOnce) {
+      } catch (e) {
+        _log
+          ..severe(<Object>['SoLoud play crash, reset', type])
+          ..severe(e);
         await soLoudPowerDownForReset();
-      } else {
-        //await dispose();
       }
-      //rethrow;
     }
   }
 
@@ -171,8 +160,8 @@ class AudioController {
   }
 
   void playEatGhostAP() {
-    _log.fine("playEatGhostAP");
     if (_useSoLoud) {
+      _log.fine("playEatGhostAP");
       playSfx(SfxType.eatGhost, forceUseAudioPlayersOnce: true);
     }
   }
@@ -252,9 +241,9 @@ class AudioController {
       }
       if (type == SfxType.silence && _apPlayers.containsKey(SfxType.silence)) {
         await _apPlayers[SfxType.silence]!.stop();
-        _log.fine(<Object>[
+        _log.fine(<Object?>[
           'Stop silence direct',
-          _apPlayers[SfxType.silence]!.state
+          _apPlayers[SfxType.silence]?.state
         ]);
       }
     }
@@ -276,9 +265,9 @@ class AudioController {
       }
       if (_apPlayers.containsKey(SfxType.silence)) {
         unawaited(_apPlayers[SfxType.silence]!.stop());
-        _log.fine(<Object>[
+        _log.fine(<Object?>[
           'Stop silence as part of all',
-          _apPlayers[SfxType.silence]!.state
+          _apPlayers[SfxType.silence]?.state
         ]);
       }
     }
@@ -379,6 +368,10 @@ class AudioController {
         }
       case AppLifecycleState.resumed:
         _log.fine(<String>["Lifecycle resumed"]);
+        if (_useSoLoud && _soLoudIsUnreliable) {
+          //not essential to preload here, but stops pre-load coinciding with user interaction
+          unawaited(_preloadSfx());
+        }
       case AppLifecycleState.inactive:
         _log.fine(<String>["Lifecycle inactive"]);
         break;
@@ -388,7 +381,7 @@ class AudioController {
   Future<void> soLoudEnsureInitialised() async {
     if (_useSoLoud) {
       if (!soLoud.isInitialized) {
-        _log.fine(<String>["soLoudInitialise wrapper"]);
+        _log.fine(<String>["soLoudInitialise wrapper action"]);
         //don't soLoud.disposeAllSources here as soLoud not initialised
         assert(!_hiddenBlockPlay());
         clearSources();
@@ -420,7 +413,10 @@ class AudioController {
     } else {
       assert(_useSoLoud);
       for (SfxType type in SfxType.values) {
-        unawaited(_getSoLoudSound(type, preload: true)); //load everything up
+        if (type != SfxType.silence) {
+          //load everything up, but silence doesn't go through soLoud
+          unawaited(_getSoLoudSound(type, preload: true));
+        }
       }
     }
   }
