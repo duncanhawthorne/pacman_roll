@@ -23,8 +23,8 @@ void setupGlobalLogger() {
   //logging.hierarchicalLoggingEnabled = true;
   Logger.root.onRecord.listen((LogRecord record) {
     final String time =
-        "${DateTime.now().minute}:${DateTime.now().second}:${DateTime.now().millisecond}";
-    final String message = '${record.loggerName} $time ${record.message}';
+        "${DateTime.now().minute}:${DateTime.now().second}.${DateTime.now().millisecond.toStringAsFixed(2)}";
+    final String message = '$time ${record.loggerName} ${record.message}';
     debugPrint(message);
     debugLogList.add(message);
     if (debugLogList.length > debugLogListMaxLength) {

@@ -270,7 +270,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   }
 
   void reset({bool firstRun = false, bool showStartDialog = false}) {
-    audioController.soLoudReset();
+    //audioController.soLoudReset();
     playbackModeCounter = -1;
     playbackMode = !recordMode && level.number == Levels.playbackModeLevel;
     recordedMovesLive.clear();
@@ -364,7 +364,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   @override
   Future<void> onRemove() async {
     cleanDialogs();
-    audioController.stopAllSounds();
+    async.unawaited(audioController.stopAllSounds());
     super.onRemove();
   }
 }

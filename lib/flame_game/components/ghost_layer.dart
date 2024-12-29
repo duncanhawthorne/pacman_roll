@@ -5,7 +5,6 @@ import 'package:flutter/foundation.dart';
 
 import '../../audio/audio_controller.dart';
 import '../../audio/sounds.dart';
-import '../../utils/constants.dart';
 import '../../utils/helper.dart';
 import '../effects/remove_effects.dart';
 import '../pacman_game.dart';
@@ -14,7 +13,7 @@ import 'game_character.dart';
 import 'ghost.dart';
 import 'wrapper_no_events.dart';
 
-final bool _sirenEnabled = !useAudioPlayers || !isiOSWeb;
+final bool _sirenEnabled = canDoVariableVolume;
 const int _kGhostScaredTimeMillis = 6000;
 
 class Ghosts extends WrapperNoEvents

@@ -21,7 +21,7 @@ class DebugDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     //assert(game.debugModeManual);
-    return popupDialog(children: <Widget>[
+    return popupDialog(spacing: 8, children: <Widget>[
       TextButton(
         child: const Text("play siren"),
         onPressed: () {
@@ -71,13 +71,20 @@ class DebugDialog extends StatelessWidget {
       TextButton(
         child: const Text("soLoud deinit manual"),
         onPressed: () {
-          soLoud.deinit();
+          game.audioController.soLoudDeInit();
         },
       ),
       TextButton(
         child: const Text("soLoud init manual"),
         onPressed: () {
+          logGlobal("soLoud init pure manual");
           soLoud.init();
+        },
+      ),
+      TextButton(
+        child: const Text("soLoud init wrapper"),
+        onPressed: () {
+          game.audioController.soLoudEnsureInitialised();
         },
       ),
       TextButton(
@@ -93,6 +100,30 @@ class DebugDialog extends StatelessWidget {
         },
       ),
       TextButton(
+        child: const Text("soLoudDisposeAllSources()"),
+        onPressed: () {
+          game.audioController.soLoudDisposeAllSources();
+        },
+      ),
+      TextButton(
+        child: const Text("clearSources()"),
+        onPressed: () {
+          game.audioController.clearSources();
+        },
+      ),
+      TextButton(
+        child: const Text("clearHandles()"),
+        onPressed: () {
+          game.audioController.clearHandles();
+        },
+      ),
+      TextButton(
+        child: const Text("soLoudReset"),
+        onPressed: () {
+          game.audioController.soLoudPowerDownForReset();
+        },
+      ),
+      TextButton(
         child: const Text("dispose"),
         onPressed: () {
           game.audioController.dispose();
@@ -100,7 +131,7 @@ class DebugDialog extends StatelessWidget {
       ),
       SizedBox(
         width: 800,
-        height: 800,
+        height: 600,
         child: ValueListenableBuilder<int>(
             valueListenable: debugLogListNotifier,
             builder: (BuildContext context, int value, Widget? child) {

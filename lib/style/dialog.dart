@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'palette.dart';
 
-Widget popupDialog({required List<Widget> children}) {
+Widget popupDialog({required List<Widget> children, double spacing = 16}) {
   return purePopup(
     child: Container(
       decoration: BoxDecoration(
@@ -12,7 +12,7 @@ Widget popupDialog({required List<Widget> children}) {
       child: Padding(
           padding: const EdgeInsets.fromLTRB(40.0, 12, 40, 12),
           child: Column(
-              spacing: 16,
+              spacing: spacing,
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
               children: children)),
