@@ -369,8 +369,9 @@ class AudioController {
       case AppLifecycleState.resumed:
         _log.fine(<String>["Lifecycle resumed"]);
         if (_useSoLoud && _soLoudIsUnreliable) {
-          //not essential to preload here, but stops pre-load coinciding with user interaction
-          unawaited(_preloadSfx());
+          //ideally would preload here to stop preload coinciding with user interaction
+          //but soLoudUnreliable workaround fails if so preload here
+          //unawaited(_preloadSfx());
         }
       case AppLifecycleState.inactive:
         _log.fine(<String>["Lifecycle inactive"]);
