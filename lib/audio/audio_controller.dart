@@ -370,11 +370,12 @@ class AudioController {
         _log.fine(<String>["Lifecycle detached"]);
       case AppLifecycleState.hidden:
         _log.fine(<String>["Lifecycle hidden"]);
-        await stopAllSounds();
         if (_useSoLoud && _soLoudIsUnreliable) {
           _log.info("soLoudReset due to unreliable soLoud");
           //else silently stop working
           await soLoudPowerDownForReset();
+        } else {
+          await stopAllSounds();
         }
       case AppLifecycleState.resumed:
         _log.fine(<String>["Lifecycle resumed"]);
@@ -479,6 +480,7 @@ class AudioController {
     if (!_useSoLoud) {
       return;
     }
+    assert(_soLoudIsUnreliable);
     _log.fine("soLoudPowerDownForReset");
     unawaited(stopAllSounds());
     await soLoudDisposeAllSources();

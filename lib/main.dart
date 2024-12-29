@@ -32,13 +32,7 @@ void main() async {
 
   setupGlobalLogger();
   fixTitlePerm();
-
-  try {
-    /// Initialize the player.
-    await soLoud.init();
-  } catch (e) {
-    logGlobal(<Object>["soLoud main init crash", e]);
-  }
+  await soLoud.init();
 
   runApp(const MyGame());
 }
