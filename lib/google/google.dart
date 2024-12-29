@@ -30,10 +30,8 @@ class G {
 
   String get gUser => gUserNotifier.value;
 
-  set _gUser(String g) => <void>{
-        _log.info(<dynamic>["gUserChanged", g]),
-        gUserNotifier.value = g
-      };
+  set _gUser(String g) =>
+      <void>{_log.info("gUserChanged $g"), gUserNotifier.value = g};
 
   double _iconWidth = 1;
   Color _color = Colors.white;
@@ -104,7 +102,7 @@ class G {
     final String gUser = prefs.getString('gUser') ?? G._gUserDefault;
     final String gUserIcon =
         prefs.getString('gUserIcon') ?? G._gUserIconDefault;
-    _log.fine(<String>["loadUser", gUser, gUserIcon]);
+    _log.fine("loadUser $gUser");
     return <String>[gUser, gUserIcon];
   }
 
@@ -112,7 +110,7 @@ class G {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('gUser', gUser);
     await prefs.setString('gUserIcon', gUserIcon);
-    _log.fine(<String>["saveUser", gUser, gUserIcon]);
+    _log.fine("saveUser $gUser");
   }
 
   static const String _gUserDefault = "JoeBloggs";
@@ -136,10 +134,10 @@ class G {
         _log.info("gUser changed");
         _user = account;
         if (_user != null) {
-          _log.fine(<Object?>["login successful", _user]);
+          _log.fine("login successful $_user");
           unawaited(_successfulLoginExtractDetails());
         } else {
-          _log.fine(<String>["logout"]);
+          _log.fine("logout");
           unawaited(_logoutExtractDetails());
         }
       });
@@ -165,7 +163,7 @@ class G {
           unawaited(_successfulLoginExtractDetails());
         }
       } catch (e) {
-        _log.severe(<Object>["signInDirectly", e]);
+        _log.severe("signInDirectly $e");
       }
     }
   }
@@ -178,7 +176,7 @@ class G {
           await googleSignIn.disconnect();
           unawaited(_logoutExtractDetails());
         } catch (e) {
-          _log.severe(<Object>["signOut", e]);
+          _log.severe("signOut $e");
         }
       }
       //logoutExtractDetails(); //now handled by listener
@@ -212,7 +210,7 @@ class G {
         _gUserIcon = _user!.photoUrl ?? _gUserIconDefault;
       }
       await _saveUserToFilesystem(gUser, _gUserIcon);
-      _log.fine(<String>["gUser", gUser]);
+      _log.fine("gUser = $gUser");
     }
   }
 
@@ -221,7 +219,7 @@ class G {
     assert(_debugFakeLogin);
     _gUser = _gUserFakeLogin;
     await _saveUserToFilesystem(gUser, _gUserIcon);
-    _log.fine(<String>["gUser", gUser]);
+    _log.fine("gUser = $gUser");
   }
 
   Future<void> _logoutExtractDetails() async {
@@ -229,7 +227,7 @@ class G {
     _gUser = _gUserDefault;
     assert(!signedIn);
     await _saveUserToFilesystem(gUser, _gUserIcon);
-    _log.fine(<String>["gUser", gUser]);
+    _log.fine("gUser =$gUser");
   }
 
   Future<void> _signOutAndExtractDetails() async {

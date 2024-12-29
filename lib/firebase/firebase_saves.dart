@@ -45,7 +45,7 @@ class FBase {
               (Object? e, _) => _log.severe("Error writing document: $e")));
         }
       } catch (e) {
-        _log.severe(<Object>["firebasePushSingleScore", e]);
+        _log.severe("firebasePushSingleScore $e");
       }
     }
   }
@@ -78,14 +78,14 @@ class FBase {
           return (fasterCount + 1 - 1) / (allCount == 1 ? 100 : allCount - 1);
         }
       } catch (e) {
-        _log.severe(<Object>["firebasePercentile error", e]);
+        _log.severe("firebasePercentile error $e");
       }
     }
     return 1.0;
   }
 
   Future<void> firebasePushPlayerProgress(G g, String state) async {
-    _log.info(<String>["Push", g.gUser]);
+    _log.info("Push ${g.gUser}");
     if (firebaseOn && g.signedIn) {
       final Map<String, dynamic> dhState = <String, dynamic>{"data": state};
       unawaited(db!.collection("userSaves").doc(g.gUser).set(dhState).onError(
@@ -96,7 +96,7 @@ class FBase {
   Future<String> firebasePullPlayerProgress(G g) async {
     await initialize();
     String gameEncoded = "";
-    _log.info(<String>["Pull"]);
+    _log.info("Pull");
     if (firebaseOn && g.signedIn) {
       final DocumentReference<Map<String, dynamic>> docRef =
           db!.collection("userSaves").doc(g.gUser);

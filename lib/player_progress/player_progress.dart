@@ -41,7 +41,7 @@ class PlayerProgress extends ChangeNotifier {
   }
 
   void saveLevelComplete(Map<String, dynamic> currentGameState) {
-    _log.info(<String>["saveWin"]);
+    _log.info("saveWin");
     final Map<String, int> win = _cleanupWin(currentGameState);
     playerProgress
       .._addWin(win)
@@ -68,7 +68,7 @@ class PlayerProgress extends ChangeNotifier {
   }
 
   Future<void> _loadFromFirebaseOrFilesystem() async {
-    _log.info(<String>["loadKeys"]);
+    _log.info("loadKeys");
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String gameEncoded = "";
 
@@ -91,10 +91,10 @@ class PlayerProgress extends ChangeNotifier {
 
     // if possible save to firebase
     if (FBase.firebaseOn && g.signedIn) {
-      _log.info(<String>["saveKeys gUser", g.gUser]);
+      _log.info("saveKeys gUser ${g.gUser}");
       unawaited(fBase.firebasePushPlayerProgress(g, gameEncoded));
     } else {
-      _log.info(<String>["not signed in", g.gUser]);
+      _log.info("not signed in ${g.gUser}");
     }
   }
 
@@ -116,7 +116,7 @@ class PlayerProgress extends ChangeNotifier {
           }
         }
       } catch (e) {
-        _log.severe(<Object>["malformed load", e]);
+        _log.severe("Malformed load $e");
       }
     }
   }

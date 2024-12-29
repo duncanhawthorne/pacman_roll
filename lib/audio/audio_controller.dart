@@ -46,7 +46,7 @@ class AudioController {
         await _soLoudSources.remove(type);
       }
       if (!preload) {
-        _log.fine(<Object>["New audio source", type]);
+        _log.fine("New audio source $type");
       }
       final Future<AudioSource> currentSound = soLoud.loadAsset(
         'assets/${type.filename}',
@@ -59,7 +59,7 @@ class AudioController {
 
   Future<bool> _canPlay(SfxType type) async {
     if (_hiddenBlockPlay()) {
-      _log.info(<Object>["App hidden can't play", type]);
+      _log.info("App hidden can't play $type");
       //and don't initialise soLoud
       return false;
     }
@@ -92,7 +92,7 @@ class AudioController {
 
   Future<void> playSfx(SfxType type,
       {bool forceUseAudioPlayersOnce = false}) async {
-    _log.fine(<Object>['Playing $type']);
+    _log.fine('Playing $type');
     if (!(await _canPlay(type))) {
       return;
     }
@@ -108,7 +108,7 @@ class AudioController {
           _apPlayers.containsKey(type) &&
           _apPlayers[type]!.state == PlayerState.playing) {
         //leave silence repeating
-        _log.fine(<Object>['Silence already playing']);
+        _log.fine('Silence already playing');
         return;
       }
       if (!_apPlayers.containsKey(type)) {
@@ -121,7 +121,7 @@ class AudioController {
           volume: type.targetVolume);
       await currentPlayer.play(AssetSource(type.filename),
           volume: type.targetVolume);
-      _log.finest(<Object?>["Player state", type, currentPlayer.state]);
+      _log.finest(() => "Player state $type ${currentPlayer.state}");
     } else {
       try {
         assert(_useSoLoud);
@@ -144,7 +144,7 @@ class AudioController {
         await fHandle;
       } catch (e) {
         _log
-          ..severe(<Object>['SoLoud play crash, reset', type])
+          ..severe('SoLoud play crash, reset $type')
           ..severe(e);
         await soLoudPowerDownForReset();
       }
@@ -214,7 +214,7 @@ class AudioController {
       await soLoudEnsureInitialised();
       if (!(await _soLoudHandleValid(siren)) ||
           soLoud.getPause(await _soLoudHandles[siren]!)) {
-        _log.info(<Object>['Restarting ghostsRoamingSiren']);
+        _log.info('Restarting ghostsRoamingSiren');
         await playSfx(siren);
       }
       final SoundHandle handle = await _soLoudHandles[siren]!;
@@ -227,7 +227,7 @@ class AudioController {
   }
 
   Future<void> stopSound(SfxType type) async {
-    _log.fine(<Object>["stopSfx", type]);
+    _log.fine("stopSfx $type");
     if (_useAudioPlayers) {
       if (_apPlayers.containsKey(type)) {
         unawaited(_apPlayers[type]!.stop());
@@ -241,16 +241,16 @@ class AudioController {
       }
       if (type == SfxType.silence && _apPlayers.containsKey(SfxType.silence)) {
         await _apPlayers[SfxType.silence]!.stop();
-        _log.fine(<Object?>[
-          'Stop silence direct',
-          _apPlayers[SfxType.silence]?.state
-        ]);
+        _log.fine(() => <Object?>[
+              'Stop silence direct',
+              _apPlayers[SfxType.silence]?.state
+            ]);
       }
     }
   }
 
   Future<void> stopAllSounds() async {
-    _log.fine(<Object>['Stop all sound', _soLoudHandles.keys]);
+    _log.fine(() => <Object>['Stop all sound', _soLoudHandles.keys]);
     if (_useAudioPlayers) {
       for (final AudioPlayer player in _apPlayers.values) {
         unawaited(player.stop());
@@ -265,10 +265,10 @@ class AudioController {
       }
       if (_apPlayers.containsKey(SfxType.silence)) {
         unawaited(_apPlayers[SfxType.silence]!.stop());
-        _log.fine(<Object?>[
-          'Stop silence as part of all',
-          _apPlayers[SfxType.silence]?.state
-        ]);
+        _log.fine(() => <Object?>[
+              'Stop silence as part of all',
+              _apPlayers[SfxType.silence]?.state
+            ]);
       }
     }
   }
@@ -354,11 +354,11 @@ class AudioController {
   Future<void> _handleAppLifecycle() async {
     switch (_lifecycleNotifier!.value) {
       case AppLifecycleState.paused:
-        _log.fine(<String>["Lifecycle paused"]);
+        _log.fine("Lifecycle paused");
       case AppLifecycleState.detached:
-        _log.fine(<String>["Lifecycle detached"]);
+        _log.fine("Lifecycle detached");
       case AppLifecycleState.hidden:
-        _log.fine(<String>["Lifecycle hidden"]);
+        _log.fine("Lifecycle hidden");
         if (_useSoLoud && _soLoudIsUnreliable) {
           _log.info("soLoudReset due to unreliable soLoud");
           //else silently stop working
@@ -367,14 +367,14 @@ class AudioController {
           await stopAllSounds();
         }
       case AppLifecycleState.resumed:
-        _log.fine(<String>["Lifecycle resumed"]);
+        _log.fine("Lifecycle resumed");
         if (_useSoLoud && _soLoudIsUnreliable) {
           //ideally would preload here to stop preload coinciding with user interaction
           //but soLoudUnreliable workaround fails if so preload here
           //unawaited(_preloadSfx());
         }
       case AppLifecycleState.inactive:
-        _log.fine(<String>["Lifecycle inactive"]);
+        _log.fine("Lifecycle inactive");
         break;
     }
   }
@@ -382,7 +382,7 @@ class AudioController {
   Future<void> soLoudEnsureInitialised() async {
     if (_useSoLoud) {
       if (!soLoud.isInitialized) {
-        _log.fine(<String>["soLoudInitialise wrapper action"]);
+        _log.fine("soLoudInitialise wrapper action");
         //don't soLoud.disposeAllSources here as soLoud not initialised
         assert(!_hiddenBlockPlay());
         clearSources();
