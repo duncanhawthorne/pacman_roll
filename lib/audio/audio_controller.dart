@@ -268,9 +268,11 @@ class AudioController {
       }
     } else {
       assert(_useSoLoud);
-      await soLoudEnsureInitialised();
-      for (SfxType type in _soLoudHandles.keys) {
-        unawaited(stopSound(type));
+      if (_soLoudHandles.isNotEmpty) {
+        await soLoudEnsureInitialised();
+        for (SfxType type in _soLoudHandles.keys) {
+          unawaited(stopSound(type));
+        }
       }
       if (_apPlayers.containsKey(SfxType.silence)) {
         unawaited(_apPlayers[SfxType.silence]!.stop());
@@ -387,6 +389,7 @@ class AudioController {
       if (!soLoud.isInitialized) {
         _log.fine(<String>["soLoudInitialise wrapper"]);
         //don't soLoud.disposeAllSources here as soLoud not initialised
+        assert(!_hiddenBlockPlay());
         clearSources();
         clearHandles();
         await soLoud.init();
@@ -439,10 +442,11 @@ class AudioController {
   }
 
   Future<void> soLoudDisposeAllSources() async {
+    _log.fine("soLoudDisposeAllSources and clear");
+    clearSources();
     if (soLoud.isInitialized) {
-      clearSources();
       try {
-        _log.fine("soLoud.disposeAllSources");
+        _log.fine("soLoud.disposeAllSources real");
         await soLoud.disposeAllSources();
       } catch (e) {
         _log
@@ -475,11 +479,11 @@ class AudioController {
     if (!_useSoLoud) {
       return;
     }
-    _log.fine("soLoudReset");
+    _log.fine("soLoudPowerDownForReset");
     unawaited(stopAllSounds());
     await soLoudDisposeAllSources();
     soLoudDeInitOnly();
-    clearSources();
+    //clearSources();
     _log.fine("soLoudReset complete");
   }
 }
