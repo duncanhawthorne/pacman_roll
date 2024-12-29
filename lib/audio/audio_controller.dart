@@ -34,16 +34,17 @@ class AudioController {
       <SfxType, Future<SoundHandle>>{};
   final Map<SfxType, AudioPlayer> _apPlayers = <SfxType, AudioPlayer>{};
 
-  Future<AudioSource> _getSoLoudSound(SfxType type) async {
+  Future<AudioSource> _getSoLoudSound(SfxType type, {preload = false}) async {
     await soLoudEnsureInitialised();
-    if (_soLoudSources.containsKey(type) &&
-        soLoud.activeSounds.contains(await _soLoudSources[type])) {
+    if (await _soLoudSourceValid(type)) {
       return _soLoudSources[type]!;
     } else {
       if (_soLoudSources.containsKey(type)) {
         await _soLoudSources.remove(type);
       }
-      _log.fine(<Object>["New audio source", type]);
+      if (!preload) {
+        _log.fine(<Object>["New audio source", type]);
+      }
       final Future<AudioSource> currentSound = soLoud.loadAsset(
         'assets/${type.filename}',
         mode: LoadMode.memory, //kIsWeb ? LoadMode.disk : LoadMode.memory,
@@ -54,10 +55,16 @@ class AudioController {
   }
 
   Future<bool> _canPlay(SfxType type) async {
+    if (_lifecycleNotifier!.value == AppLifecycleState.hidden) {
+      _log.info(["App hidden can't play", type]);
+      //and don't initialise soLoud
+      return false;
+    }
+
     await soLoudEnsureInitialised();
 
     if (!soLoud.isInitialized) {
-      _log.severe("canPlay SoLoud not initialised");
+      _log.severe("canPlay SoLoud not initialised, after ensureInitialised");
       return false;
     }
 
@@ -132,8 +139,7 @@ class AudioController {
             //long sounds that might need stopping
             looping || type == SfxType.startMusic || type == SfxType.endMusic;
         if (retainForStopping) {
-          if (_soLoudHandles.keys.contains(type) &&
-              soLoud.getIsValidVoiceHandle(await _soLoudHandles[type]!)) {
+          if (await _soLoudHandleValid(type)) {
             unawaited(soLoud.stop(await _soLoudHandles[type]!));
           }
         }
@@ -212,8 +218,7 @@ class AudioController {
     } else {
       assert(_useSoLoud);
       await soLoudEnsureInitialised();
-      if (!_soLoudHandles.containsKey(siren) ||
-          !soLoud.getIsValidVoiceHandle(await _soLoudHandles[siren]!) ||
+      if (!(await _soLoudHandleValid(siren)) ||
           soLoud.getPause(await _soLoudHandles[siren]!)) {
         _log.info(<Object>['Restarting ghostsRoamingSiren']);
         await playSfx(siren);
@@ -228,7 +233,7 @@ class AudioController {
   }
 
   Future<void> stopSound(SfxType type) async {
-    _log.fine(<Object>["stopSfx", type, soLoud.isInitialized]);
+    _log.fine(<Object>["stopSfx", type]);
     if (_useAudioPlayers) {
       if (_apPlayers.containsKey(type)) {
         unawaited(_apPlayers[type]!.stop());
@@ -236,14 +241,9 @@ class AudioController {
     } else {
       assert(_useSoLoud);
       await soLoudEnsureInitialised();
-      if (_soLoudHandles.keys.contains(type)) {
-        if (soLoud.isInitialized) {
-          if (soLoud.getIsValidVoiceHandle(await _soLoudHandles[type]!)) {
-            await soLoud.stop(await _soLoudHandles[type]!);
-          }
-        }
-        unawaited(
-            _soLoudHandles.remove(type)); //remove so play from fresh after stop
+      if (await _soLoudHandleValid(type)) {
+        await soLoud.stop(await _soLoudHandles[type]!);
+        unawaited(_soLoudHandles.remove(type)); //so play from fresh
       }
       if (type == SfxType.silence && _apPlayers.containsKey(SfxType.silence)) {
         await _apPlayers[SfxType.silence]!.stop();
@@ -256,7 +256,7 @@ class AudioController {
   }
 
   Future<void> stopAllSounds() async {
-    _log.fine(<Object>['Stop all sound', _soLoudHandles]);
+    _log.fine(<Object>['Stop all sound', _soLoudHandles.keys]);
     if (_useAudioPlayers) {
       for (final AudioPlayer player in _apPlayers.values) {
         unawaited(player.stop());
@@ -275,6 +275,18 @@ class AudioController {
         ]);
       }
     }
+  }
+
+  Future<bool> _soLoudHandleValid(SfxType type) async {
+    await soLoudEnsureInitialised();
+    return _soLoudHandles.keys.contains(type) &&
+        soLoud.getIsValidVoiceHandle(await _soLoudHandles[type]!);
+  }
+
+  Future<bool> _soLoudSourceValid(SfxType type) async {
+    await soLoudEnsureInitialised();
+    return _soLoudSources.containsKey(type) &&
+        soLoud.activeSounds.contains(await _soLoudSources[type]);
   }
 
   /// Makes sure the audio controller is listening to changes
@@ -343,32 +355,24 @@ class AudioController {
     }
   }
 
-  bool _soLoudNeedsReset = false;
   void _handleAppLifecycle() {
     switch (_lifecycleNotifier!.value) {
       case AppLifecycleState.paused:
-        _soLoudNeedsReset = true;
         _log.fine(<String>["Lifecycle paused"]);
       case AppLifecycleState.detached:
-        _soLoudNeedsReset = true;
         _log.fine(<String>["Lifecycle detached"]);
       case AppLifecycleState.hidden:
-        _soLoudNeedsReset = true;
         _log.fine(<String>["Lifecycle hidden"]);
         stopAllSounds();
+        if (_useSoLoud) {
+          _log.info("soLoudReset on iOSWeb on hidden");
+          //else silently stop working
+          soLoudPowerDownForReset();
+        }
       case AppLifecycleState.resumed:
         _log.fine(<String>["Lifecycle resumed"]);
-        if (_soLoudNeedsReset) {
-          if (isiOSWeb) {
-            _log.info("soLoudReset on iOSWeb lifecycle resume");
-            //else soLoud silent stop working
-            soLoudPowerDownForReset();
-          }
-          _soLoudNeedsReset = false;
-        }
       case AppLifecycleState.inactive:
-        _log.fine(<String>["Lifecycle inactive - no op"]);
-        // No need to react to this state change.
+        _log.fine(<String>["Lifecycle inactive"]);
         break;
     }
   }
@@ -389,7 +393,7 @@ class AudioController {
 
   /// Preloads all sound effects.
   Future<void> _preloadSfx() async {
-    _log.fine('Preloading sound effects');
+    _log.fine('Preloading sounds');
     if (_useAudioPlayers) {
       // This assumes there is only a limited number of sound effects in the game.
       // If there are hundreds of long sound effect files, it's better
@@ -404,14 +408,14 @@ class AudioController {
     } else {
       assert(_useSoLoud);
       for (SfxType type in SfxType.values) {
-        unawaited(_getSoLoudSound(type)); //load everything up
+        unawaited(_getSoLoudSound(type, preload: true)); //load everything up
       }
     }
   }
 
   Future<void> dispose() async {
     //don't call manually
-    _log.fine("Dispose");
+    _log.info("Dispose - don't call manually");
     //_lifecycleNotifier?.removeListener(_handleAppLifecycle);
 
     if (_useAudioPlayers) {
@@ -428,10 +432,10 @@ class AudioController {
 
   Future<void> soLoudDisposeAllSources() async {
     if (soLoud.isInitialized) {
+      clearSources();
       try {
         _log.fine("soLoud.disposeAllSources");
         await soLoud.disposeAllSources();
-        clearSources();
       } catch (e) {
         _log
           ..severe("Crash on disposeAllSources")
@@ -464,17 +468,8 @@ class AudioController {
     }
     _log.fine("soLoudReset");
     unawaited(stopAllSounds());
-    if (soLoud.isInitialized) {
-      try {
-        _log.fine("soLoud.disposeAllSources1");
-        await soLoud.disposeAllSources();
-      } catch (e) {
-        _log
-          ..severe("Crash on disposeAllSources")
-          ..severe(e);
-      }
-      soLoudDeInit();
-    }
+    await soLoudDisposeAllSources();
+    soLoudDeInit();
     clearHandles();
     clearSources();
     _log.fine("soLoudReset complete");
