@@ -18,6 +18,7 @@ final bool _useSoLoud = (kDebugMode && _useSoLoudInDebug) || isiOSWeb;
 final bool _useAudioPlayers = !_useSoLoud;
 final bool detailedAudioLog = _useSoLoud;
 final bool canDoVariableVolume = !_useAudioPlayers || !isiOSWeb; //i.e. true
+final bool _soLoudIsUnreliable = isiOSWeb || (_useSoLoudInDebug && kDebugMode);
 
 class AudioController {
   AudioController() {
@@ -34,7 +35,8 @@ class AudioController {
       <SfxType, Future<SoundHandle>>{};
   final Map<SfxType, AudioPlayer> _apPlayers = <SfxType, AudioPlayer>{};
 
-  Future<AudioSource> _getSoLoudSound(SfxType type, {preload = false}) async {
+  Future<AudioSource> _getSoLoudSound(SfxType type,
+      {bool preload = false}) async {
     await soLoudEnsureInitialised();
     if (await _soLoudSourceValid(type)) {
       return _soLoudSources[type]!;
@@ -55,14 +57,12 @@ class AudioController {
   }
 
   Future<bool> _canPlay(SfxType type) async {
-    if (_lifecycleNotifier!.value == AppLifecycleState.hidden) {
-      _log.info(["App hidden can't play", type]);
+    if (_hiddenBlockPlay()) {
+      _log.info(<Object>["App hidden can't play", type]);
       //and don't initialise soLoud
       return false;
     }
-
     await soLoudEnsureInitialised();
-
     if (!soLoud.isInitialized) {
       _log.severe("canPlay SoLoud not initialised, after ensureInitialised");
       return false;
@@ -71,7 +71,6 @@ class AudioController {
     /// The controller will ignore this call when the attached settings'
     /// [SettingsController.audioOn] is `true` or if its
     /// [SettingsController.soundsOn] is `false`.
-
     final bool audioOn = _settings?.audioOn.value ?? true;
     if (!audioOn) {
       if (type != SfxType.ghostsRoamingSiren) {
@@ -164,8 +163,9 @@ class AudioController {
   }
 
   void playSilence() {
-    _log.fine("playSilence");
-    if (_useSoLoud) {
+    //holds open sound channel where soLoud is unreliable
+    if (_useSoLoud && _soLoudIsUnreliable) {
+      _log.fine("playSilence");
       playSfx(SfxType.silence, forceUseAudioPlayersOnce: true);
     }
   }
@@ -175,6 +175,11 @@ class AudioController {
     if (_useSoLoud) {
       playSfx(SfxType.eatGhost, forceUseAudioPlayersOnce: true);
     }
+  }
+
+  bool _hiddenBlockPlay() {
+    return _lifecycleNotifier == null ||
+        _lifecycleNotifier!.value == AppLifecycleState.hidden;
   }
 
   double _getUltimateTargetSirenVolume(double normalisedAverageGhostSpeed) {
@@ -355,7 +360,7 @@ class AudioController {
     }
   }
 
-  void _handleAppLifecycle() {
+  Future<void> _handleAppLifecycle() async {
     switch (_lifecycleNotifier!.value) {
       case AppLifecycleState.paused:
         _log.fine(<String>["Lifecycle paused"]);
@@ -363,11 +368,11 @@ class AudioController {
         _log.fine(<String>["Lifecycle detached"]);
       case AppLifecycleState.hidden:
         _log.fine(<String>["Lifecycle hidden"]);
-        stopAllSounds();
-        if (_useSoLoud) {
-          _log.info("soLoudReset on iOSWeb on hidden");
+        await stopAllSounds();
+        if (_useSoLoud && _soLoudIsUnreliable) {
+          _log.info("soLoudReset due to unreliable soLoud");
           //else silently stop working
-          soLoudPowerDownForReset();
+          await soLoudPowerDownForReset();
         }
       case AppLifecycleState.resumed:
         _log.fine(<String>["Lifecycle resumed"]);
@@ -394,6 +399,9 @@ class AudioController {
   /// Preloads all sound effects.
   Future<void> _preloadSfx() async {
     _log.fine('Preloading sounds');
+    if (_hiddenBlockPlay()) {
+      return;
+    }
     if (_useAudioPlayers) {
       // This assumes there is only a limited number of sound effects in the game.
       // If there are hundreds of long sound effect files, it's better
@@ -446,14 +454,15 @@ class AudioController {
     }
   }
 
-  void soLoudDeInit() {
+  void soLoudDeInitOnly() {
     //don't call directly
-    _log.fine("soLoudDeInit");
+    _log.fine("soLoudDeInitOnly");
     soLoud.deinit();
   }
 
   void clearSources() {
     _log.fine("clearSources");
+    clearHandles();
     _soLoudSources.clear();
   }
 
@@ -469,8 +478,7 @@ class AudioController {
     _log.fine("soLoudReset");
     unawaited(stopAllSounds());
     await soLoudDisposeAllSources();
-    soLoudDeInit();
-    clearHandles();
+    soLoudDeInitOnly();
     clearSources();
     _log.fine("soLoudReset complete");
   }

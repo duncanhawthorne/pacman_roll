@@ -71,7 +71,7 @@ class DebugDialog extends StatelessWidget {
       TextButton(
         child: const Text("soLoud deinit manual"),
         onPressed: () {
-          game.audioController.soLoudDeInit();
+          game.audioController.soLoudDeInitOnly();
         },
       ),
       TextButton(
