@@ -68,7 +68,8 @@ class AudioController {
       return false;
     }
 
-    if (!playWithAudioPlayers) {
+    if (true || !playWithAudioPlayers) {
+      //FIXME requires testing
       await soLoudEnsureInitialised();
       if (_useSoLoud && !soLoud.isInitialized) {
         _log.severe("canPlay SoLoud not initialised, after ensureInitialised");
