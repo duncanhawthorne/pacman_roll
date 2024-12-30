@@ -91,13 +91,10 @@ class AudioController {
   }
 
   Future<void> playSfx(SfxType type,
-      {bool forceUseAudioPlayersOnce = false,
-      bool skipSilenceLog = false}) async {
+      {bool forceUseAudioPlayersOnce = false}) async {
     final bool playWithAudioPlayers =
         _useAudioPlayers || forceUseAudioPlayersOnce;
-    if (!skipSilenceLog) {
-      _log.fine('Playing $type');
-    }
+    _log.fine('Playing $type');
     if (!(await _canPlay(type,
         forceUseAudioPlayersOnce: forceUseAudioPlayersOnce))) {
       return;
@@ -112,9 +109,7 @@ class AudioController {
           type == SfxType.eatGhost);
       if (type == SfxType.silence && silencePlayingOnAp()) {
         //leave silence repeating
-        if (!skipSilenceLog) {
-          _log.fine('Silence already playing');
-        }
+        _log.fine('Silence already playing');
         return;
       }
       if (!_apPlayers.containsKey(type)) {
@@ -160,8 +155,8 @@ class AudioController {
   }
 
   void soLoudWorkaround() {
-    //now replaced by ensureSilencePlaying
-    //playSilence();
+    //ideally replaced by ensureSilencePlaying
+    playSilence();
   }
 
   bool silencePlayingOnAp() {
@@ -170,14 +165,11 @@ class AudioController {
         _apPlayers[type]!.state == PlayerState.playing;
   }
 
-  Future<void> playSilence({bool skipSilenceLog = false}) async {
+  Future<void> playSilence() async {
     //holds open sound channel where soLoud is unreliable
     if (_useSoLoud && _soLoudIsUnreliable) {
-      if (!skipSilenceLog) {
-        _log.fine("playSilence");
-      }
-      await playSfx(SfxType.silence,
-          forceUseAudioPlayersOnce: true, skipSilenceLog: skipSilenceLog);
+      _log.fine("playSilence");
+      await playSfx(SfxType.silence, forceUseAudioPlayersOnce: true);
     }
   }
 
@@ -391,7 +383,7 @@ class AudioController {
     if (_useSoLoud) {
       if (_soLoudIsUnreliable && !silencePlayingOnAp()) {
         _log.fine("silence not playing, reinitialise");
-        await playSilence(skipSilenceLog: true);
+        await playSilence();
       }
       if (!soLoud.isInitialized) {
         _log.fine("soLoud not initialised, re-initialise");
@@ -400,6 +392,7 @@ class AudioController {
         clearSources();
         await soLoud.init();
         await soLoud.initialized;
+        _log.fine("soLoud now initialised");
         unawaited(_preloadSfx());
       }
     }
@@ -424,6 +417,7 @@ class AudioController {
       }
     } else {
       assert(_useSoLoud);
+      await soLoudEnsureInitialised();
       await Future.wait(<Future<AudioSource>>[
         for (SfxType type in SfxType.values)
           if (type != SfxType.silence)

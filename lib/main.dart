@@ -27,6 +27,7 @@ void main() async {
 
   setupGlobalLogger();
   fixTitlePerm();
+  await soLoud.init();
 
   runApp(const MyGame());
 }
