@@ -11,22 +11,25 @@ import '../google/google.dart';
 /// This file has utilities for loading and saving the leaderboard in firebase
 
 class FBase {
+  FBase() {
+    unawaited(fBase._initialize());
+  }
   static const bool firebaseOn =
       true && firebaseOnReal; //!(windows && !kIsWeb);
 
-  static const String mainDB = "records";
-  static const String userSaves = "userSaves";
+  static const String _mainDB = "records";
+  static const String _userSaves = "userSaves";
 
   static final Logger _log = Logger('FB');
 
-  FirebaseFirestore? db;
+  FirebaseFirestore? _db;
 
-  Future<void> initialize() async {
+  Future<void> _initialize() async {
     if (firebaseOn) {
       await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
       );
-      db = FirebaseFirestore.instance;
+      _db = FirebaseFirestore.instance;
     } else {
       _log.info("Off");
     }
@@ -37,12 +40,13 @@ class FBase {
     if (kDebugMode) {
       return;
     }
+    await _initialize();
     if (firebaseOn) {
       //debug("firebase push");
       try {
         if (firebaseOn) {
-          unawaited(db!.collection(mainDB).doc(recordID).set(state).onError(
-              (Object? e, _) => _log.severe("Error writing document: $e")));
+          await _db!.collection(_mainDB).doc(recordID).set(state).onError(
+              (Object? e, _) => _log.severe("Error writing document: $e"));
         }
       } catch (e) {
         _log.severe("firebasePushSingleScore $e");
@@ -54,11 +58,13 @@ class FBase {
       {required int levelNum,
       required int levelCompletedInMillis,
       required int mazeId}) async {
+    await _initialize();
+
     if (firebaseOn) {
       try {
         if (firebaseOn) {
           final CollectionReference<Map<String, dynamic>> collectionRef =
-              db!.collection(mainDB);
+              _db!.collection(_mainDB);
           final AggregateQuerySnapshot fasterSnapshot = await collectionRef
               .where("levelCompleteTime", isLessThan: levelCompletedInMillis)
               .where("levelNum", isEqualTo: levelNum)
@@ -85,21 +91,27 @@ class FBase {
   }
 
   Future<void> firebasePushPlayerProgress(G g, String state) async {
+    await _initialize();
+
     _log.info("Push ${g.gUser}");
     if (firebaseOn && g.signedIn) {
       final Map<String, dynamic> dhState = <String, dynamic>{"data": state};
-      unawaited(db!.collection("userSaves").doc(g.gUser).set(dhState).onError(
-          (Object? e, _) => _log.severe("Error writing document: $e")));
+      await _db!
+          .collection(_userSaves)
+          .doc(g.gUser)
+          .set(dhState)
+          .onError((Object? e, _) => _log.severe("Error writing document: $e"));
     }
   }
 
   Future<String> firebasePullPlayerProgress(G g) async {
-    await initialize();
+    await _initialize();
+
     String gameEncoded = "";
     _log.info("Pull");
     if (firebaseOn && g.signedIn) {
       final DocumentReference<Map<String, dynamic>> docRef =
-          db!.collection("userSaves").doc(g.gUser);
+          _db!.collection(_userSaves).doc(g.gUser);
       await docRef.get().then(
         (DocumentSnapshot<dynamic> doc) {
           final Map<String, dynamic> gameEncodedTmp =

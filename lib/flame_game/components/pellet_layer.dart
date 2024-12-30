@@ -35,7 +35,7 @@ class PelletWrapper extends WrapperNoEvents
     pelletsRemainingNotifier.addListener(() {
       clearSnapshot();
     });
-    unawaited(reset());
+    await reset();
   }
 
   @override

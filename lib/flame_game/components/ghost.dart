@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:core';
 
 import 'package:flame/components.dart';
@@ -162,6 +161,6 @@ class Ghost extends GameCharacter {
   @override
   Future<void> onRemove() async {
     removalActions();
-    unawaited(super.onRemove());
+    await super.onRemove();
   }
 }

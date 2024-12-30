@@ -92,7 +92,7 @@ class PlayerProgress extends ChangeNotifier {
     // if possible save to firebase
     if (FBase.firebaseOn && g.signedIn) {
       _log.info("saveKeys gUser ${g.gUser}");
-      unawaited(fBase.firebasePushPlayerProgress(g, gameEncoded));
+      await fBase.firebasePushPlayerProgress(g, gameEncoded);
     } else {
       _log.info("not signed in ${g.gUser}");
     }

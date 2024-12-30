@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:core';
 import 'dart:io';
 import 'dart:typed_data';
@@ -98,7 +97,7 @@ class PacmanSprites {
     return _lf2fl(lf);
   }
 
-  Future<void> _precacheAllPacmanAtFrac(int size) async {
+  void _precacheAllPacmanAtFrac(int size) {
     if (_pacmanSpriteAtFracCache.isEmpty || _pacmanSpriteCacheSize != size) {
       //call first time, later times no effect
       _pacmanSpriteCacheSize = size;
@@ -114,8 +113,7 @@ class PacmanSprites {
   }
 
   Future<Sprite> _pacmanAtFrac(int size, int mouthWidth) async {
-    unawaited(_precacheAllPacmanAtFrac(
-        size)); //call first time, later times no effect
+    _precacheAllPacmanAtFrac(size);
     mouthWidth = mouthWidth.clamp(0, pacmanCircleIncrements);
     return _pacmanSpriteAtFracCache[mouthWidth]!;
   }

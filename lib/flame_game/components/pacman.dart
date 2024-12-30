@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:core';
 
 import 'package:flame/collisions.dart';
@@ -220,7 +219,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   @override
   Future<void> onRemove() async {
     removalActions();
-    unawaited(super.onRemove());
+    await super.onRemove();
   }
 
   @override

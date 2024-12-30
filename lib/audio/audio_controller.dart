@@ -144,18 +144,18 @@ class AudioController {
     }
   }
 
-  void playSilence() {
+  Future<void> playSilence() async {
     //holds open sound channel where soLoud is unreliable
     if (_useSoLoud && _soLoudIsUnreliable) {
       _log.fine("playSilence");
-      playSfx(SfxType.silence, forceUseAudioPlayersOnce: true);
+      await playSfx(SfxType.silence, forceUseAudioPlayersOnce: true);
     }
   }
 
-  void playEatGhostAP() {
+  Future<void> playEatGhostAP() async {
     if (_useSoLoud) {
       _log.fine("playEatGhostAP");
-      playSfx(SfxType.eatGhost, forceUseAudioPlayersOnce: true);
+      await playSfx(SfxType.eatGhost, forceUseAudioPlayersOnce: true);
     }
   }
 
@@ -194,14 +194,14 @@ class AudioController {
       }
       final AudioPlayer sirenPlayer = _apPlayers[siren]!;
       if (sirenPlayer.state != PlayerState.playing) {
-        unawaited(playSfx(siren));
-        unawaited(sirenPlayer.setVolume(0));
+        await playSfx(siren);
+        //unawaited(sirenPlayer.setVolume(0)); already done in play
       }
       currentVolume = sirenPlayer.volume;
       final double desiredSirenVolume = _getDesiredSirenVolume(
           normalisedAverageGhostSpeed, currentVolume,
           gradual: gradual);
-      unawaited(sirenPlayer.setVolume(desiredSirenVolume));
+      await sirenPlayer.setVolume(desiredSirenVolume);
     } else {
       assert(_useSoLoud);
       await soLoudEnsureInitialised();
@@ -223,7 +223,7 @@ class AudioController {
     _log.fine("stopSfx $type");
     if (_useAudioPlayers) {
       if (_apPlayers.containsKey(type)) {
-        unawaited(_apPlayers[type]!.stop());
+        await _apPlayers[type]!.stop();
       }
     } else {
       assert(_useSoLoud);
@@ -245,19 +245,19 @@ class AudioController {
   Future<void> stopAllSounds() async {
     _log.fine(() => <Object>['Stop all sound', _soLoudHandles.keys]);
     if (_useAudioPlayers) {
-      for (final AudioPlayer player in _apPlayers.values) {
-        unawaited(player.stop());
-      }
+      await Future.wait(<Future<void>>[
+        for (final AudioPlayer player in _apPlayers.values) player.stop(),
+      ]);
     } else {
       assert(_useSoLoud);
       if (_soLoudHandles.isNotEmpty) {
         await soLoudEnsureInitialised();
-        for (SfxType type in _soLoudHandles.keys) {
-          unawaited(stopSound(type));
-        }
+        await Future.wait(<Future<void>>[
+          for (SfxType type in _soLoudHandles.keys) stopSound(type),
+        ]);
       }
       if (_apPlayers.containsKey(SfxType.silence)) {
-        unawaited(_apPlayers[SfxType.silence]!.stop());
+        await _apPlayers[SfxType.silence]!.stop();
         _log.fine(() => <Object?>[
               'Stop silence as part of all',
               _apPlayers[SfxType.silence]?.state
@@ -348,7 +348,6 @@ class AudioController {
         if (_useSoLoud && _soLoudIsUnreliable) {
           //ideally would preload here to stop preload coinciding with user interaction
           //but soLoudUnreliable workaround fails if so preload here
-          //unawaited(_preloadSfx());
         }
       case AppLifecycleState.inactive:
         _log.fine("Lifecycle inactive");

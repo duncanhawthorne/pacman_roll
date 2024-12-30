@@ -135,10 +135,10 @@ class G {
         _user = account;
         if (_user != null) {
           _log.fine("login successful $_user");
-          unawaited(_successfulLoginExtractDetails());
+          await _successfulLoginExtractDetails();
         } else {
           _log.fine("logout");
-          unawaited(_logoutExtractDetails());
+          await _logoutExtractDetails();
         }
       });
     }
@@ -148,7 +148,7 @@ class G {
   Future<void> _signInSilently() async {
     if (gOn) {
       await googleSignIn.signInSilently();
-      unawaited(_successfulLoginExtractDetails());
+      await _successfulLoginExtractDetails();
     }
   }
 
@@ -157,10 +157,10 @@ class G {
     if (gOn) {
       try {
         if (_debugFakeLogin) {
-          unawaited(_debugLoginExtractDetails());
+          await _debugLoginExtractDetails();
         } else {
           await googleSignIn.signIn();
-          unawaited(_successfulLoginExtractDetails());
+          await _successfulLoginExtractDetails();
         }
       } catch (e) {
         _log.severe("signInDirectly $e");
@@ -174,7 +174,7 @@ class G {
       } else {
         try {
           await googleSignIn.disconnect();
-          unawaited(_logoutExtractDetails());
+          await _logoutExtractDetails();
         } catch (e) {
           _log.severe("signOut $e");
         }
@@ -187,7 +187,7 @@ class G {
     _log.fine("mobileSignIn()");
     if (gOn) {
       if (_debugFakeLogin) {
-        unawaited(_debugLoginExtractDetails());
+        await _debugLoginExtractDetails();
       } else {
         await googleSignIn.signInSilently();
         _user = googleSignIn.currentUser;
@@ -197,7 +197,7 @@ class G {
           await googleSignIn.signIn();
           _user = googleSignIn.currentUser;
         }
-        unawaited(_successfulLoginExtractDetails());
+        await _successfulLoginExtractDetails();
       }
     }
   }
@@ -234,7 +234,7 @@ class G {
     _log.fine("sign out and extract details");
     if (gOn) {
       await _signOut();
-      unawaited(_logoutExtractDetails());
+      await _logoutExtractDetails();
     }
   }
 }

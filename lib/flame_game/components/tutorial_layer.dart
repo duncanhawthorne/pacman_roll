@@ -39,6 +39,6 @@ class TutorialWrapper extends WrapperNoEvents
   @override
   Future<void> onLoad() async {
     super.onLoad();
-    unawaited(reset());
+    await reset();
   }
 }

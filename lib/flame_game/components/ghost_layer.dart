@@ -254,6 +254,6 @@ class Ghosts extends WrapperNoEvents
   @override
   Future<void> onLoad() async {
     super.onLoad();
-    async.unawaited(reset());
+    await reset();
   }
 }

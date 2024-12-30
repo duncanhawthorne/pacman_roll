@@ -18,7 +18,7 @@ class WallWrapper extends WrapperNoEvents with Snapshot {
   @override
   Future<void> onLoad() async {
     super.onLoad();
-    unawaited(reset());
+    await reset();
   }
 
   @override

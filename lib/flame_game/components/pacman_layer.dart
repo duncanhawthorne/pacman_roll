@@ -46,6 +46,6 @@ class Pacmans extends WrapperNoEvents with HasGameReference<PacmanGame> {
   @override
   Future<void> onLoad() async {
     super.onLoad();
-    unawaited(reset());
+    await reset();
   }
 }
