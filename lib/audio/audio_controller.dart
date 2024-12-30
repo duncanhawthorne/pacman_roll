@@ -126,6 +126,8 @@ class AudioController {
             looping || type == SfxType.startMusic || type == SfxType.endMusic;
         if (retainForStopping) {
           if (await _soLoudHandleValid(type)) {
+            _log.info(() => "Retained handle, stopping to replay");
+            //FIXME is this necessary to stop and then replay with different handle?
             unawaited(soLoud.stop(await _soLoudHandles[type]!));
           }
         }
@@ -229,8 +231,9 @@ class AudioController {
       assert(_useSoLoud);
       await soLoudEnsureInitialised();
       if (await _soLoudHandleValid(type)) {
-        await soLoud.stop(await _soLoudHandles[type]!);
-        unawaited(_soLoudHandles.remove(type)); //so play from fresh
+        final Future<SoundHandle> fHandle = _soLoudHandles[type]!;
+        await _soLoudHandles.remove(type); //so play from fresh
+        await soLoud.stop(await fHandle);
       }
       if (type == SfxType.silence && _apPlayers.containsKey(SfxType.silence)) {
         await _apPlayers[SfxType.silence]!.stop();
@@ -348,6 +351,8 @@ class AudioController {
         if (_useSoLoud && _soLoudIsUnreliable) {
           //ideally would preload here to stop preload coinciding with user interaction
           //but soLoudUnreliable workaround fails if so preload here
+          //await playSilence(); //FIXME requires testing
+          //await _preloadSfx(); //FIXME requires testing
         }
       case AppLifecycleState.inactive:
         _log.fine("Lifecycle inactive");
@@ -362,7 +367,6 @@ class AudioController {
         //don't soLoud.disposeAllSources here as soLoud not initialised
         assert(!_hiddenBlockPlay());
         clearSources();
-        clearHandles();
         await soLoud.init();
         await soLoud.initialized;
         unawaited(_preloadSfx());
@@ -389,12 +393,12 @@ class AudioController {
       }
     } else {
       assert(_useSoLoud);
-      for (SfxType type in SfxType.values) {
-        if (type != SfxType.silence) {
-          //load everything up, but silence doesn't go through soLoud
-          unawaited(_getSoLoudSound(type, preload: true));
-        }
-      }
+      await Future.wait(<Future<AudioSource>>[
+        for (SfxType type in SfxType.values)
+          if (type != SfxType.silence)
+            //load everything up, but silence doesn't go through soLoud
+            _getSoLoudSound(type, preload: true)
+      ]);
     }
   }
 
@@ -404,10 +408,12 @@ class AudioController {
     //_lifecycleNotifier?.removeListener(_handleAppLifecycle);
 
     if (_useAudioPlayers) {
-      unawaited(stopAllSounds());
-      for (final AudioPlayer player in _apPlayers.values) {
-        unawaited(player.dispose());
-      }
+      await Future.wait(<Future<void>>[
+        stopAllSounds(),
+        Future.wait(<Future<void>>[
+          for (final AudioPlayer player in _apPlayers.values) player.dispose(),
+        ]),
+      ]); //run all tasks, but ensure all are finished
       _apPlayers.clear();
     } else {
       assert(_useSoLoud);
@@ -455,8 +461,8 @@ class AudioController {
     }
     assert(_soLoudIsUnreliable);
     _log.fine("soLoudPowerDownForReset");
-    unawaited(stopAllSounds());
-    await soLoudDisposeAllSources();
+    await stopAllSounds(); //FIXME is this necessary with disposeAllSources next line
+    await soLoudDisposeAllSources(); //FIXME is this necessary with deinit next line
     soLoudDeInitOnly();
     //clearSources();
     _log.fine("soLoudReset complete");
