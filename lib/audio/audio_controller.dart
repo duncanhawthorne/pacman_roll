@@ -57,16 +57,23 @@ class AudioController {
     }
   }
 
-  Future<bool> _canPlay(SfxType type) async {
+  Future<bool> _canPlay(SfxType type,
+      {bool forceUseAudioPlayersOnce = false}) async {
+    final bool playWithAudioPlayers =
+        _useAudioPlayers || forceUseAudioPlayersOnce;
+
     if (_hiddenBlockPlay()) {
       _log.info("App hidden can't play $type");
       //and don't initialise soLoud
       return false;
     }
-    await soLoudEnsureInitialised();
-    if (_useSoLoud && !soLoud.isInitialized) {
-      _log.severe("canPlay SoLoud not initialised, after ensureInitialised");
-      return false;
+
+    if (!playWithAudioPlayers) {
+      await soLoudEnsureInitialised();
+      if (_useSoLoud && !soLoud.isInitialized) {
+        _log.severe("canPlay SoLoud not initialised, after ensureInitialised");
+        return false;
+      }
     }
 
     final bool audioOn = _settings?.audioOn.value ?? true;
@@ -84,24 +91,30 @@ class AudioController {
   }
 
   Future<void> playSfx(SfxType type,
-      {bool forceUseAudioPlayersOnce = false}) async {
-    _log.fine('Playing $type');
-    if (!(await _canPlay(type))) {
+      {bool forceUseAudioPlayersOnce = false,
+      bool skipSilenceLog = false}) async {
+    final bool playWithAudioPlayers =
+        _useAudioPlayers || forceUseAudioPlayersOnce;
+    if (!skipSilenceLog) {
+      _log.fine('Playing $type');
+    }
+    if (!(await _canPlay(type,
+        forceUseAudioPlayersOnce: forceUseAudioPlayersOnce))) {
       return;
     }
     final bool looping = type == SfxType.ghostsRoamingSiren ||
         //ghostsScared time lasts longer than track length so need to loop
         type == SfxType.ghostsScared ||
         type == SfxType.silence;
-    if (_useAudioPlayers || forceUseAudioPlayersOnce) {
+    if (playWithAudioPlayers) {
       assert(!forceUseAudioPlayersOnce ||
           type == SfxType.silence ||
           type == SfxType.eatGhost);
-      if (type == SfxType.silence &&
-          _apPlayers.containsKey(type) &&
-          _apPlayers[type]!.state == PlayerState.playing) {
+      if (type == SfxType.silence && silencePlayingOnAp()) {
         //leave silence repeating
-        _log.fine('Silence already playing');
+        if (!skipSilenceLog) {
+          _log.fine('Silence already playing');
+        }
         return;
       }
       if (!_apPlayers.containsKey(type)) {
@@ -146,11 +159,25 @@ class AudioController {
     }
   }
 
-  Future<void> playSilence() async {
+  void soLoudWorkaround() {
+    //now replaced by ensureSilencePlaying
+    //playSilence();
+  }
+
+  bool silencePlayingOnAp() {
+    final SfxType type = SfxType.silence;
+    return _apPlayers.containsKey(type) &&
+        _apPlayers[type]!.state == PlayerState.playing;
+  }
+
+  Future<void> playSilence({bool skipSilenceLog = false}) async {
     //holds open sound channel where soLoud is unreliable
     if (_useSoLoud && _soLoudIsUnreliable) {
-      _log.fine("playSilence");
-      await playSfx(SfxType.silence, forceUseAudioPlayersOnce: true);
+      if (!skipSilenceLog) {
+        _log.fine("playSilence");
+      }
+      await playSfx(SfxType.silence,
+          forceUseAudioPlayersOnce: true, skipSilenceLog: skipSilenceLog);
     }
   }
 
@@ -324,7 +351,7 @@ class AudioController {
     _log.fine('audioOn changed to ${_settings!.audioOn.value}');
     if (_settings!.audioOn.value) {
       // All sound just got un-muted. Audio is on.
-      playSilence();
+      soLoudWorkaround();
     } else {
       // All sound just got muted. Audio is off.
       stopAllSounds();
@@ -362,8 +389,12 @@ class AudioController {
 
   Future<void> soLoudEnsureInitialised() async {
     if (_useSoLoud) {
+      if (_soLoudIsUnreliable && !silencePlayingOnAp()) {
+        _log.fine("silence not playing, reinitialise");
+        await playSilence(skipSilenceLog: true);
+      }
       if (!soLoud.isInitialized) {
-        _log.fine("soLoudInitialise wrapper action");
+        _log.fine("soLoud not initialised, re-initialise");
         //don't soLoud.disposeAllSources here as soLoud not initialised
         assert(!_hiddenBlockPlay());
         clearSources();
