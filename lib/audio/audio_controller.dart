@@ -156,6 +156,7 @@ class AudioController {
 
   void soLoudWorkaround() {
     //ideally replaced by ensureSilencePlaying
+    //FIXME requires testing
     playSilence();
   }
 
@@ -381,10 +382,12 @@ class AudioController {
 
   Future<void> soLoudEnsureInitialised() async {
     if (_useSoLoud) {
+      /* //FIXME requires testing
       if (_soLoudIsUnreliable && !silencePlayingOnAp()) {
         _log.fine("silence not playing, reinitialise");
         await playSilence();
       }
+       */
       if (!soLoud.isInitialized) {
         _log.fine("soLoud not initialised, re-initialise");
         //don't soLoud.disposeAllSources here as soLoud not initialised
