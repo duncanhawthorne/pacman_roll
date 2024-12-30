@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flame/flame.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
@@ -8,6 +10,7 @@ import 'package:provider/single_child_widget.dart';
 
 import 'app_lifecycle/app_lifecycle.dart';
 import 'audio/audio_controller.dart';
+import 'firebase/firebase_saves.dart';
 import 'player_progress/player_progress.dart';
 import 'router.dart';
 import 'settings/settings.dart';
@@ -19,16 +22,13 @@ import 'utils/src/workarounds.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  unawaited(fBase.initialize());
   GoogleFonts.config.allowRuntimeFetching = false;
-
   FlutterNativeSplash.remove();
   await Flame.device.fullScreen();
-
   setupGlobalLogger();
   fixTitlePerm();
   await soLoud.init();
-
   runApp(const MyGame());
 }
 

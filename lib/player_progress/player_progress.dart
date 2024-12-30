@@ -43,14 +43,13 @@ class PlayerProgress extends ChangeNotifier {
   void saveLevelComplete(Map<String, dynamic> currentGameState) {
     _log.info("saveWin");
     final Map<String, int> win = _cleanupWin(currentGameState);
-    playerProgress
-      .._addWin(win)
-      .._saveToFirebaseAndFilesystem();
+    _addWin(win);
+    _saveToFirebaseAndFilesystem();
   }
 
   void reset() {
     _playerProgressLevels.clear();
-    playerProgress._saveToFirebaseAndFilesystem();
+    _saveToFirebaseAndFilesystem();
   }
 
   void _addWin(Map<String, int> win) {
@@ -112,7 +111,7 @@ class PlayerProgress extends ChangeNotifier {
         if (jsonLevels != null) {
           for (dynamic jsonLevel in jsonLevels) {
             final Map<String, int> win = _cleanupWin(jsonLevel);
-            playerProgress._addWin(win);
+            _addWin(win);
           }
         }
       } catch (e) {

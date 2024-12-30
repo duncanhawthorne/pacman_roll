@@ -12,7 +12,7 @@ import '../google/google.dart';
 
 class FBase {
   FBase() {
-    unawaited(fBase._initialize());
+    //unawaited(fBase.initialize());
   }
   static const bool firebaseOn =
       true && firebaseOnReal; //!(windows && !kIsWeb);
@@ -24,7 +24,7 @@ class FBase {
 
   FirebaseFirestore? _db;
 
-  Future<void> _initialize() async {
+  Future<void> initialize() async {
     if (firebaseOn) {
       await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
@@ -38,9 +38,11 @@ class FBase {
   Future<void> firebasePushSingleScore(
       String recordID, Map<String, dynamic> state) async {
     if (kDebugMode) {
+      _log.info("firebasePushSingleScore not called as debug");
       return;
     }
-    await _initialize();
+    _log.fine("firebasePushSingleScore");
+    await initialize();
     if (firebaseOn) {
       //debug("firebase push");
       try {
@@ -58,31 +60,27 @@ class FBase {
       {required int levelNum,
       required int levelCompletedInMillis,
       required int mazeId}) async {
-    await _initialize();
-
+    await initialize();
     if (firebaseOn) {
       try {
-        if (firebaseOn) {
-          final CollectionReference<Map<String, dynamic>> collectionRef =
-              _db!.collection(_mainDB);
-          final AggregateQuerySnapshot fasterSnapshot = await collectionRef
-              .where("levelCompleteTime", isLessThan: levelCompletedInMillis)
-              .where("levelNum", isEqualTo: levelNum)
-              .where("mazeId", isEqualTo: mazeId)
-              .count()
-              .get();
-          final int fasterCount = fasterSnapshot.count ?? 0;
-          final AggregateQuerySnapshot slowerSnapshot = await collectionRef
-              .where("levelCompleteTime", isGreaterThan: levelCompletedInMillis)
-              .where("levelNum", isEqualTo: levelNum)
-              .where("mazeId", isEqualTo: mazeId)
-              .count()
-              .get();
-          final int slowerCount = slowerSnapshot.count ?? 100;
-          final int allCount =
-              fasterCount + slowerCount + 1; //ignore equal times
-          return (fasterCount + 1 - 1) / (allCount == 1 ? 100 : allCount - 1);
-        }
+        final CollectionReference<Map<String, dynamic>> collectionRef =
+            _db!.collection(_mainDB);
+        final AggregateQuerySnapshot fasterSnapshot = await collectionRef
+            .where("levelCompleteTime", isLessThan: levelCompletedInMillis)
+            .where("levelNum", isEqualTo: levelNum)
+            .where("mazeId", isEqualTo: mazeId)
+            .count()
+            .get();
+        final int fasterCount = fasterSnapshot.count ?? 0;
+        final AggregateQuerySnapshot slowerSnapshot = await collectionRef
+            .where("levelCompleteTime", isGreaterThan: levelCompletedInMillis)
+            .where("levelNum", isEqualTo: levelNum)
+            .where("mazeId", isEqualTo: mazeId)
+            .count()
+            .get();
+        final int slowerCount = slowerSnapshot.count ?? 100;
+        final int allCount = fasterCount + slowerCount + 1; //ignore equal times
+        return (fasterCount + 1 - 1) / (allCount == 1 ? 100 : allCount - 1);
       } catch (e) {
         _log.severe("firebasePercentile error $e");
       }
@@ -91,7 +89,7 @@ class FBase {
   }
 
   Future<void> firebasePushPlayerProgress(G g, String state) async {
-    await _initialize();
+    await initialize();
 
     _log.info("Push ${g.gUser}");
     if (firebaseOn && g.signedIn) {
@@ -105,7 +103,7 @@ class FBase {
   }
 
   Future<String> firebasePullPlayerProgress(G g) async {
-    await _initialize();
+    await initialize();
 
     String gameEncoded = "";
     _log.info("Pull");
