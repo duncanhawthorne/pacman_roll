@@ -60,10 +60,13 @@ class Pacman extends GameCharacter with CollisionCallbacks {
         current = CharacterState.eating;
         _eatTimer.start();
         if (isPellet) {
+          //only play waka if not recently played waka
           world.play(SfxType.waka);
-        } else {
-          world.play(SfxType.eatGhost);
         }
+      }
+      if (!isPellet) {
+        //play eatGhost irrespective of current state
+        world.play(SfxType.eatGhost);
       }
       //if in eating state, just let that sequence complete normally
     }

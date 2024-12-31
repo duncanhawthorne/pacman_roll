@@ -68,6 +68,7 @@ class AudioController {
       return false;
     }
 
+    // ignore: dead_code
     if (true || !playWithAudioPlayers) {
       //FIXME requires testing
       await soLoudEnsureInitialised();
