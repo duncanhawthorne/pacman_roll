@@ -448,12 +448,16 @@ class AudioController {
     } else {
       assert(_useSoLoud);
       await soLoudPowerDownForReset();
+      assert(_soLoudSources.isEmpty);
+      assert(_soLoudHandles.isEmpty);
     }
   }
 
   Future<void> soLoudDisposeAllSources() async {
     _log.fine("soLoudDisposeAllSources and clear");
     clearSources();
+    assert(_soLoudSources.isEmpty);
+    assert(_soLoudHandles.isEmpty);
     if (soLoud.isInitialized) {
       try {
         _log.fine("soLoud.disposeAllSources real");
@@ -471,6 +475,8 @@ class AudioController {
   void soLoudDeInitOnly() {
     //don't call directly
     _log.fine("soLoudDeInitOnly");
+    assert(_soLoudSources.isEmpty);
+    assert(_soLoudHandles.isEmpty);
     soLoud.deinit();
   }
 
@@ -478,11 +484,15 @@ class AudioController {
     _log.fine("clearSources");
     clearHandles();
     _soLoudSources.clear();
+    assert(_soLoudSources.isEmpty);
+    assert(_soLoudHandles.isEmpty);
   }
 
   void clearHandles() {
     _log.fine("clearHandles");
     _soLoudHandles.clear();
+    //assert(_soLoudSources.isEmpty);
+    assert(_soLoudHandles.isEmpty);
   }
 
   Future<void> soLoudPowerDownForReset() async {
@@ -492,9 +502,11 @@ class AudioController {
     assert(_soLoudIsUnreliable);
     _log.fine("soLoudPowerDownForReset");
     await stopAllSounds(); //FIXME is this necessary with disposeAllSources next line
-    await soLoudDisposeAllSources(); //FIXME is this necessary with deinit next line
-    soLoudDeInitOnly();
+    await soLoudDisposeAllSources(); //FIXME is this necessary with deinit next line (if switch to just deinit, must clear sources separately)
     //clearSources();
+    assert(_soLoudSources.isEmpty);
+    assert(_soLoudHandles.isEmpty);
+    soLoudDeInitOnly();
     _log.fine("soLoudReset complete");
   }
 }
