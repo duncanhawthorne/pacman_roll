@@ -156,7 +156,7 @@ class AudioController {
     }
   }
 
-  void soLoudWorkaround() {
+  void workaroundiOSSafariAudioOnUserInteraction() {
     //ideally replaced by ensureSilencePlaying
     //FIXME requires testing
     playSilence();
@@ -346,7 +346,7 @@ class AudioController {
     _log.fine('audioOn changed to ${_settings!.audioOn.value}');
     if (_settings!.audioOn.value) {
       // All sound just got un-muted. Audio is on.
-      soLoudWorkaround();
+      workaroundiOSSafariAudioOnUserInteraction();
     } else {
       // All sound just got muted. Audio is off.
       stopAllSounds();

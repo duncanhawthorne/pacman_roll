@@ -161,7 +161,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   void resumeGame() {
     if (paused) {
       regularItemsStarted = false; //so restart things next time
-      audioController.soLoudWorkaround();
+      audioController.workaroundiOSSafariAudioOnUserInteraction();
       resume(); //timeScale = 1.0;
       resumeEngine();
     }
@@ -170,7 +170,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   bool regularItemsStarted = false;
   void startRegularItems() {
     if (!regularItemsStarted) {
-      audioController.soLoudWorkaround();
+      audioController.workaroundiOSSafariAudioOnUserInteraction();
       regularItemsStarted = true;
       stopwatchStarted = true; //once per reset
       stopwatch.resume();
@@ -300,7 +300,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   }
 
   void start() {
-    audioController.soLoudWorkaround();
+    audioController.workaroundiOSSafariAudioOnUserInteraction();
     //resumeEngine();
     pauseEngineIfNoActivity();
     world.start();
