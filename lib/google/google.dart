@@ -75,15 +75,21 @@ class G {
         g: this);
   }
 
+  static const bool _requireLogoutConfirm = false;
   Widget _logoutButton(BuildContext context) {
     return IconButton(
-      icon: _gUserIcon == G._gUserIconDefault
+      icon: _gUserIcon == _gUserIconDefault
           ? Icon(Icons.face_outlined, color: _color)
           : CircleAvatar(
               radius: _iconWidth / 2,
               backgroundImage: NetworkImage(_gUserIcon)),
       onPressed: () {
-        _signOutAndExtractDetails();
+        if (_requireLogoutConfirm) {
+          //add additional logic here
+          _signOutAndExtractDetails();
+        } else {
+          _signOutAndExtractDetails();
+        }
       },
     );
   }
@@ -99,9 +105,8 @@ class G {
 
   Future<List<String>> _loadUserFromFilesystem() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final String gUser = prefs.getString('gUser') ?? G._gUserDefault;
-    final String gUserIcon =
-        prefs.getString('gUserIcon') ?? G._gUserIconDefault;
+    final String gUser = prefs.getString('gUser') ?? _gUserDefault;
+    final String gUserIcon = prefs.getString('gUserIcon') ?? _gUserIconDefault;
     _log.fine("loadUser $gUser");
     return <String>[gUser, gUserIcon];
   }

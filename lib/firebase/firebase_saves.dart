@@ -19,6 +19,7 @@ class FBase {
 
   static const String _mainDB = "records";
   static const String _userSaves = "userSaves";
+  static const String _data = "data";
 
   static final Logger _log = Logger('FB');
 
@@ -90,10 +91,9 @@ class FBase {
 
   Future<void> firebasePushPlayerProgress(G g, String state) async {
     await initialize();
-
     _log.info("Push ${g.gUser}");
     if (firebaseOn && g.signedIn) {
-      final Map<String, dynamic> dhState = <String, dynamic>{"data": state};
+      final Map<String, dynamic> dhState = <String, dynamic>{_data: state};
       await _db!
           .collection(_userSaves)
           .doc(g.gUser)
@@ -104,7 +104,6 @@ class FBase {
 
   Future<String> firebasePullPlayerProgress(G g) async {
     await initialize();
-
     String gameEncoded = "";
     _log.info("Pull");
     if (firebaseOn && g.signedIn) {
@@ -114,7 +113,7 @@ class FBase {
         (DocumentSnapshot<dynamic> doc) {
           final Map<String, dynamic> gameEncodedTmp =
               doc.data() as Map<String, dynamic>;
-          gameEncoded = gameEncodedTmp["data"] as String;
+          gameEncoded = gameEncodedTmp[_data] as String;
         },
         onError: (dynamic e) => _log.severe("Error getting document: $e"),
       );
