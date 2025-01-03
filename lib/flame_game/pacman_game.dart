@@ -102,19 +102,19 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
 
   final Random random = Random();
 
-  late int playbackModeCounter;
+  late int _playbackModeCounter;
   bool playbackMode = false;
 
   // ignore: dead_code
-  static const bool recordMode = false && kDebugMode;
-  List<List<double>> recordedMovesLive = <List<double>>[];
+  static const bool _recordMode = false && kDebugMode;
+  final List<List<double>> _recordedMovesLive = <List<double>>[];
 
   void recordAngle(double angle) {
-    if (recordMode && !playbackMode) {
-      recordedMovesLive
+    if (_recordMode && !playbackMode) {
+      _recordedMovesLive
           .add(<double>[(stopwatchMilliSeconds).toDouble(), angle]);
-      if (recordedMovesLive.length % 100 == 0) {
-        logGlobal(recordedMovesLive);
+      if (_recordedMovesLive.length % 100 == 0) {
+        logGlobal(_recordedMovesLive);
       }
     }
   }
@@ -122,15 +122,15 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   void playbackAngles() {
     if (playbackMode && isLive && _framesRendered > 30) {
       // && isLive && overlays.isActive(GameScreen.startDialogKey)
-      if (playbackModeCounter == -1) {
-        playbackModeCounter++;
+      if (_playbackModeCounter == -1) {
+        _playbackModeCounter++;
         startRegularItems();
       }
       while (!world.doingLevelResetFlourish &&
-          playbackModeCounter < storedMoves.length &&
-          stopwatchMilliSeconds > storedMoves[playbackModeCounter][0]) {
-        world.setMazeAngle(storedMoves[playbackModeCounter][1]);
-        playbackModeCounter++;
+          _playbackModeCounter < storedMoves.length &&
+          stopwatchMilliSeconds > storedMoves[_playbackModeCounter][0]) {
+        world.setMazeAngle(storedMoves[_playbackModeCounter][1]);
+        _playbackModeCounter++;
       }
       if (!world.doingLevelResetFlourish && stopwatchMilliSeconds > 20000) {
         reset(); //if stuck, reset
@@ -271,9 +271,9 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
 
   void reset({bool firstRun = false, bool showStartDialog = false}) {
     //audioController.soLoudReset();
-    playbackModeCounter = -1;
-    playbackMode = !recordMode && level.number == Levels.playbackModeLevel;
-    recordedMovesLive.clear();
+    _playbackModeCounter = -1;
+    playbackMode = !_recordMode && level.number == Levels.playbackModeLevel;
+    _recordedMovesLive.clear();
     pauseEngineIfNoActivity();
     _userString = _getRandomString(random, 15);
     cleanDialogs();
