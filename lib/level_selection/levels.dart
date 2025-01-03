@@ -3,7 +3,7 @@ import '../flame_game/pacman_game.dart';
 class Levels {
   static const int firstRealLevel = 1;
   static const int maxLevel = 10;
-  static const int minLevel = -1;
+  static const int minLevel = 0;
   static const int levelToShowInstructions = defaultLevelNum;
   static const int playbackModeLevel = -4;
   static const int defaultLevelNum = playbackModeLevel;
@@ -16,8 +16,8 @@ class Levels {
     return levelNum >= 1
         ? 1
         : levelNum == minLevel
-            ? 0.5
-            : 0.75;
+            ? 0.75
+            : 0.75; //not possible
   }
 
   GameLevel getLevel(int levelNum) {
@@ -46,10 +46,11 @@ class Levels {
       numStartingGhosts: levelNum >= 0
           ? 3
           : levelNum == minLevel
-              ? 1
-              : (levelNum - 1) % 3 + 1,
-      levelString:
-          levelNum > 0 ? levelNum.toString() : "T${levelNum - minLevel + 1}",
+              ? 3
+              : (levelNum - 1) % 3 + 1, //not possible
+      levelString: levelNum > 0
+          ? "L$levelNum"
+          : "Tutorial", //${levelNum - minLevel + 1}",
       infLives: levelNum <= 0 ? true : false,
     );
     return result;
