@@ -121,8 +121,6 @@ class PlayerProgress extends ChangeNotifier {
   }
 }
 
-PlayerProgress playerProgress = PlayerProgress();
-
 Map<String, int> _cleanupWin(Map<String, dynamic> winRaw) {
   final Map<String, int> result = <String, int>{
     "levelNum": -1,

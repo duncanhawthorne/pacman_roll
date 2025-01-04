@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../player_progress/player_progress.dart';
 import '../../style/dialog.dart';
 import '../../style/palette.dart';
 import '../../utils/constants.dart';
@@ -36,7 +35,7 @@ class ResetDialog extends StatelessWidget {
           TextButton(
               style: buttonStyle(borderColor: Palette.warning.color),
               onPressed: () {
-                playerProgress.reset();
+                game.playerProgress.reset();
                 game.overlays.remove(GameScreen.resetDialogKey);
                 context.go('/');
               },
