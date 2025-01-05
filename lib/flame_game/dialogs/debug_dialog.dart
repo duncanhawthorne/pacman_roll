@@ -20,20 +20,7 @@ class DebugDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //assert(game.debugModeManual);
     return popupDialog(spacing: 8, children: <Widget>[
-      TextButton(
-        child: const Text("play siren"),
-        onPressed: () {
-          game.audioController.playSfx(SfxType.ghostsRoamingSiren);
-        },
-      ),
-      TextButton(
-        child: const Text("play pacmanDeath"),
-        onPressed: () {
-          game.audioController.playSfx(SfxType.pacmanDeath);
-        },
-      ),
       TextButton(
         child: const Text("play eatGhost"),
         onPressed: () {
@@ -50,22 +37,6 @@ class DebugDialog extends StatelessWidget {
         child: const Text("play eatGhostAp"),
         onPressed: () {
           game.audioController.playEatGhostAP();
-        },
-      ),
-      TextButton(
-        child: const Text("ASYNC play eatGhost"),
-        onPressed: () {
-          Future<void>.delayed(const Duration(seconds: 1), () {
-            game.audioController.playSfx(SfxType.eatGhost);
-          });
-        },
-      ),
-      TextButton(
-        child: const Text("ASYNC play silence"),
-        onPressed: () {
-          Future<void>.delayed(const Duration(seconds: 1), () {
-            game.audioController.playSilence();
-          });
         },
       ),
       TextButton(
@@ -106,29 +77,13 @@ class DebugDialog extends StatelessWidget {
         },
       ),
       TextButton(
-        child: const Text("clearSources()"),
-        onPressed: () {
-          game.audioController.clearSources();
-        },
-      ),
-      TextButton(
-        child: const Text("clearHandles()"),
-        onPressed: () {
-          game.audioController.clearHandles();
-        },
-      ),
-      TextButton(
         child: const Text("soLoudReset"),
         onPressed: () {
           game.audioController.soLoudPowerDownForReset();
         },
       ),
-      TextButton(
-        child: const Text("dispose"),
-        onPressed: () {
-          game.audioController.dispose();
-        },
-      ),
+      ...List<Widget>.generate(checkboxes.length,
+          (int i) => _checkboxRow(checkboxes.keys.toList()[i])),
       SizedBox(
         width: 800,
         height: 600,
@@ -151,4 +106,20 @@ class DebugDialog extends StatelessWidget {
       ),
     ]);
   }
+}
+
+Widget _checkboxRow(String key) {
+  return Row(children: <Widget>[Text(key), _checkbox(checkboxes[key]!)]);
+}
+
+Widget _checkbox(ValueNotifier<bool> x) {
+  return ValueListenableBuilder<bool>(
+      valueListenable: x,
+      builder: (BuildContext context, bool value, Widget? child) {
+        return Checkbox(
+            value: x.value,
+            onChanged: (bool? newValue) {
+              x.value = !x.value;
+            });
+      });
 }
