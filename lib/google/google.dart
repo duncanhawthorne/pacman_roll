@@ -19,10 +19,19 @@ final bool gOn = googleOnReal &&
     !(defaultTargetPlatform == TargetPlatform.windows && !kIsWeb);
 
 class G {
-  G() {
+  G._() {
     _startGoogleAccountChangeListener();
     _loadUser();
   }
+
+  factory G() {
+    assert(_instance == null);
+    _instance ??= G._();
+    return _instance!;
+  }
+
+  ///ensures singleton [G]
+  static G? _instance;
 
   static final Logger _log = Logger('GG');
 

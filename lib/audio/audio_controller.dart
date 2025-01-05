@@ -46,9 +46,18 @@ Map<String, ValueNotifier<bool>> checkboxes = <String, ValueNotifier<bool>>{
 };
 
 class AudioController {
-  AudioController() {
+  AudioController._() {
     unawaited(_preloadSfx());
   }
+
+  factory AudioController() {
+    assert(_instance == null);
+    _instance ??= AudioController._();
+    return _instance!;
+  }
+
+  ///ensures singleton [AudioController]
+  static AudioController? _instance;
 
   static final Logger _log = Logger('AC');
   SettingsController? _settings;

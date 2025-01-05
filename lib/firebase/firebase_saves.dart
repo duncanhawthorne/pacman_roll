@@ -11,9 +11,19 @@ import '../google/google.dart';
 /// This file has utilities for loading and saving the leaderboard in firebase
 
 class FBase {
-  FBase() {
+  FBase._() {
     //unawaited(fBase.initialize());
   }
+
+  factory FBase() {
+    assert(_instance == null);
+    _instance ??= FBase._();
+    return _instance!;
+  }
+
+  ///ensures singleton [FBase]
+  static FBase? _instance;
+
   static const bool firebaseOn =
       true && firebaseOnReal; //!(windows && !kIsWeb);
 
