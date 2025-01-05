@@ -24,29 +24,6 @@ import 'pacman_game.dart';
 /// the gets the [AudioController] from the context and passes it in to the
 /// [PacmanGame] class so that it can play audio.
 
-PacmanGame? _game;
-
-PacmanGame getGame(
-    {required GameLevel level,
-    required int mazeId,
-    required BuildContext context}) {
-  if (_game == null) {
-    _game ??= PacmanGame(
-      level: level,
-      mazeId: mazeId,
-      playerProgress: context.read<PlayerProgress>(),
-      audioController: context.read<AudioController>(),
-      appLifecycleStateNotifier: context.read<AppLifecycleStateNotifier>(),
-    );
-  } else {
-    _game!
-      ..level = level
-      ..mazeId = mazeId
-      ..reset(firstRun: false, showStartDialog: true);
-  }
-  return _game!;
-}
-
 class GameScreen extends StatelessWidget {
   const GameScreen({required this.level, required this.mazeId, super.key});
 
@@ -75,7 +52,13 @@ class GameScreen extends StatelessWidget {
                 backgroundColor: Palette.background.color,
                 body: GameWidget<PacmanGame>(
                   key: const Key('play session'),
-                  game: getGame(level: level, mazeId: mazeId, context: context),
+                  game: PacmanGame(
+                      level: level,
+                      mazeId: mazeId,
+                      playerProgress: context.read<PlayerProgress>(),
+                      audioController: context.read<AudioController>(),
+                      appLifecycleStateNotifier:
+                          context.read<AppLifecycleStateNotifier>()),
                   overlayBuilderMap: <String, OverlayWidgetBuilder<PacmanGame>>{
                     topOverlayKey: (BuildContext context, PacmanGame game) {
                       return topOverlayWidget(context, game);

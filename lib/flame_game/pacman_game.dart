@@ -49,7 +49,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
         HasQuadTreeCollisionDetection,
         SingleGameInstance,
         HasTimeScale {
-  PacmanGame({
+  PacmanGame._({
     required this.level,
     required int mazeId,
     required this.playerProgress,
@@ -63,6 +63,32 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
         ) {
     this.mazeId = mazeId;
   }
+
+  factory PacmanGame({
+    required GameLevel level,
+    required int mazeId,
+    required PlayerProgress playerProgress,
+    required AudioController audioController,
+    required AppLifecycleStateNotifier appLifecycleStateNotifier,
+  }) {
+    if (_instance == null) {
+      _instance = PacmanGame._(
+          level: level,
+          mazeId: mazeId,
+          playerProgress: playerProgress,
+          audioController: audioController,
+          appLifecycleStateNotifier: appLifecycleStateNotifier);
+    } else {
+      _instance!
+        ..level = level
+        ..mazeId = mazeId
+        ..reset(firstRun: false, showStartDialog: true);
+    }
+    return _instance!;
+  }
+
+  ///ensures singleton [PacmanGame]
+  static PacmanGame? _instance;
 
   /// What the properties of the level that is played has.
   GameLevel level;
