@@ -10,15 +10,25 @@ import 'package:logging/logging.dart';
 import '../app_lifecycle/app_lifecycle.dart';
 import '../settings/settings.dart';
 import '../utils/constants.dart';
+import '../utils/helper.dart';
 import 'sounds.dart';
 
-final SoLoud soLoud = SoLoud.instance;
 const bool _useSoLoudInDebug = true;
-final bool _useSoLoud = (kDebugMode && _useSoLoudInDebug) || isiOSWeb;
-final bool _useAudioPlayers = !_useSoLoud;
-final bool detailedAudioLog = _useSoLoud;
-final bool canDoVariableVolume = !_useAudioPlayers || !isiOSWeb; //i.e. true
-final bool _soLoudIsUnreliable = isiOSWeb || (_useSoLoudInDebug && kDebugMode);
+final bool _platformForSoLoud = ((kDebugMode && _useSoLoudInDebug) || isiOSWeb);
+final bool detailedAudioLog = _platformForSoLoud;
+
+bool _soLoudCrashedOnLoad = false;
+
+Future<void> firstInitialiseSoLoud() async {
+  try {
+    await soLoud.init();
+  } catch (e) {
+    logGlobal("SoLoud crash, use AP");
+    _soLoudCrashedOnLoad = true;
+  }
+}
+
+final SoLoud soLoud = SoLoud.instance;
 
 final ValueNotifier<bool> flagOnUserInteractionPlaySilence =
     ValueNotifier<bool>(true);
@@ -59,6 +69,11 @@ class AudioController {
   ///ensures singleton [AudioController]
   static AudioController? _instance;
 
+  final bool _useSoLoud = _platformForSoLoud && !_soLoudCrashedOnLoad;
+  late final bool _useAudioPlayers = !_useSoLoud;
+  late final bool canDoVariableVolume = !(isiOSWeb && _useAudioPlayers);
+  late final bool _soLoudIsUnreliable = _useSoLoud;
+
   static final Logger _log = Logger('AC');
   SettingsController? _settings;
   ValueNotifier<AppLifecycleState>? _lifecycleNotifier;
@@ -72,6 +87,7 @@ class AudioController {
   Future<AudioSource> _getSoLoudSound(SfxType type,
       {bool preload = false}) async {
     await soLoudEnsureInitialised();
+    assert(_useSoLoud);
     assert(type != SfxType.silence);
     if (await _soLoudSourceValid(type)) {
       return _soLoudSources[type]!;

@@ -28,7 +28,7 @@ void main() async {
   await Flame.device.fullScreen();
   setupGlobalLogger();
   fixTitlePerm();
-  await soLoud.init();
+  await firstInitialiseSoLoud();
   runApp(const MyGame());
 }
 

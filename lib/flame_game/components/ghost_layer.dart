@@ -3,7 +3,6 @@ import 'dart:async' as async;
 import 'package:flame/components.dart';
 import 'package:flutter/foundation.dart';
 
-import '../../audio/audio_controller.dart';
 import '../../audio/sounds.dart';
 import '../../utils/helper.dart';
 import '../effects/remove_effects.dart';
@@ -13,7 +12,6 @@ import 'game_character.dart';
 import 'ghost.dart';
 import 'wrapper_no_events.dart';
 
-final bool _sirenEnabled = canDoVariableVolume;
 const int _kGhostScaredTimeMillis = 6000;
 
 class Ghosts extends WrapperNoEvents
@@ -79,7 +77,8 @@ class Ghosts extends WrapperNoEvents
   }
 
   async.Future<void> startSirenVolumeUpdaterTimer() async {
-    if (_sirenEnabled) {
+    final bool sirenEnabled = game.audioController.canDoVariableVolume;
+    if (sirenEnabled) {
       if (!isMounted) {
         return;
       }
