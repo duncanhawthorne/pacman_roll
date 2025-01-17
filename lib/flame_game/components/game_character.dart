@@ -120,6 +120,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
 
   void _oneFrameOfPhysics(double dt) {
     if (connectedToBall) {
+      assert(!isClone);
       position.setFrom(ballPos);
       angle += speed * dt / radius * _spinParity;
     }

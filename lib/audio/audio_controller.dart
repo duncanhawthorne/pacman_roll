@@ -74,6 +74,8 @@ class AudioController {
   late final bool canDoVariableVolume = !(isiOSWeb && _useAudioPlayers);
   late final bool _soLoudIsUnreliable = _useSoLoud;
 
+  bool get isAudioOn => _settings?.audioOn.value ?? true;
+
   static final Logger _log = Logger('AC');
   SettingsController? _settings;
   ValueNotifier<AppLifecycleState>? _lifecycleNotifier;
@@ -129,10 +131,10 @@ class AudioController {
       }
     }
 
-    final bool audioOn = _settings?.audioOn.value ?? true;
+    final bool audioOn = isAudioOn;
     if (!audioOn) {
       if (type != SfxType.ghostsRoamingSiren) {
-        _log.fine('Cant play $type: muted.');
+        //_log.fine('Cant play $type: muted.');
       }
       return false;
     }
@@ -147,7 +149,7 @@ class AudioController {
       {bool forceUseAudioPlayersOnce = false}) async {
     final bool playWithAudioPlayers =
         _useAudioPlayers || forceUseAudioPlayersOnce;
-    _log.fine('Playing $type');
+    isAudioOn ? _log.fine('Playing $type') : null;
     if (!(await _canPlay(type,
         forceUseAudioPlayersOnce: forceUseAudioPlayersOnce))) {
       return;
