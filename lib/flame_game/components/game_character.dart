@@ -11,6 +11,7 @@ import '../maze.dart';
 import '../pacman_game.dart';
 import '../pacman_world.dart';
 import 'clones.dart';
+import 'ghost.dart';
 import 'pacman.dart';
 import 'physics_ball.dart';
 
@@ -34,7 +35,8 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
             paint: _highQualityPaint,
             anchor: Anchor.center);
 
-  late final PhysicsBall _ball = PhysicsBall(position: position);
+  late final PhysicsBall _ball =
+      PhysicsBall(position: position); //never created for clone
   late final Vector2 ballPos = _ball.position;
   late final Vector2 ballVel = _ball.body.linearVelocity;
   late final Vector2 gravitySign = world.gravitySign;
@@ -77,7 +79,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     }
   }
 
-  Future<Map<CharacterState, SpriteAnimation>?> getAnimations(
+  Future<Map<CharacterState, SpriteAnimation>> getAnimations(
       [int size = 1]) async {
     return <CharacterState, SpriteAnimation>{};
   }
@@ -139,7 +141,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
       disconnectFromBall(); //sync but within async function
       _ball.removeFromParent();
       world.destroyBody(_ball.body);
-      clone?.removeFromParent();
+      _cloneEverMade ? clone?.removeFromParent() : null;
       removeEffects(this); //sync and async
     }
   }
@@ -156,20 +158,32 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     super.onRemove();
   }
 
+  bool _cloneEverMade = false;
   void _addRemoveClone() {
-    if (!isClone) {
-      //i.e. no cascade of clones
+    if (isClone) {
+      return;
+    }
+    assert(!isClone); //i.e. no cascade of clones
+    if (position.x.abs() > maze.cloneThreshold) {
+      if (!_cloneEverMade) {
+        _cloneEverMade = true;
+        if (this is Pacman) {
+          clone = PacmanClone(position: position, original: this as Pacman);
+        }
+        if (this is Ghost) {
+          clone = GhostClone(
+              ghostID: (this as Ghost).ghostID, original: this as Ghost);
+        }
+      }
       assert(clone != null);
       assert(clone!.isClone);
       assert(!isClone);
-      if (position.x.abs() > maze.cloneThreshold) {
-        if (!clone!.isMounted) {
-          parent!.add(clone!);
-        }
-      } else {
-        if (clone!.isMounted) {
-          clone!.removeFromParent();
-        }
+      if (!clone!.isMounted) {
+        parent?.add(clone!);
+      }
+    } else {
+      if (_cloneEverMade && clone!.isMounted) {
+        clone?.removeFromParent();
       }
     }
   }

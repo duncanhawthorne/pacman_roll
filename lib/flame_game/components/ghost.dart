@@ -6,7 +6,6 @@ import '../effects/move_to_effect.dart';
 import '../effects/remove_effects.dart';
 import '../effects/rotate_effect.dart';
 import '../maze.dart';
-import 'clones.dart';
 import 'game_character.dart';
 
 const Map<int, String> _ghostSpritePaths = <int, String>{
@@ -144,7 +143,6 @@ class Ghost extends GameCharacter {
       if (ghostID >= 3) {
         _setSpawning();
       }
-      clone = GhostClone(ghostID: ghostID, original: this);
     }
     animations = await getAnimations(); //load for clone too
   }

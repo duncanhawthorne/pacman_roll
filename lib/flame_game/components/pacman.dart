@@ -192,7 +192,6 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     if (!isClone) {
       world.pacmans.pacmanList.add(this);
       current = CharacterState.normal;
-      clone = PacmanClone(position: position, original: this);
     }
   }
 
