@@ -29,7 +29,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   final Timer _eatTimer = Timer(_kPacmanHalfEatingResetTimeMillis * 2 / 1000);
 
   @override
-  Future<Map<CharacterState, SpriteAnimation>?> getAnimations(
+  Future<Map<CharacterState, SpriteAnimation>> getAnimations(
       [int size = 1]) async {
     return <CharacterState, SpriteAnimation>{
       CharacterState.normal: SpriteAnimation.spriteList(

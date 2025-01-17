@@ -15,6 +15,9 @@ const Map<int, String> _ghostSpritePaths = <int, String>{
   2: 'ghost2.png'
 };
 
+final Map<int, Map<CharacterState, SpriteAnimation>>
+    _ghostSpriteAnimationCache = <int, Map<CharacterState, SpriteAnimation>>{};
+
 class Ghost extends GameCharacter {
   Ghost({required this.ghostID, super.original})
       : super(position: maze.ghostSpawnForId(ghostID));
@@ -22,37 +25,39 @@ class Ghost extends GameCharacter {
   int ghostID;
 
   @override
-  Future<Map<CharacterState, SpriteAnimation>?> getAnimations(
+  Future<Map<CharacterState, SpriteAnimation>> getAnimations(
       [int size = 1]) async {
-    return <CharacterState, SpriteAnimation>{
-      CharacterState.normal: SpriteAnimation.spriteList(
-        <Sprite>[
-          await game.loadSprite(game.level.numStartingGhosts == 1
-              ? _ghostSpritePaths[0]!
-              : _ghostSpritePaths[ghostID % 3]!)
-        ],
-        stepTime: double.infinity,
-      ),
-      CharacterState.scared: SpriteAnimation.spriteList(
-        <Sprite>[await game.loadSprite('ghostscared1.png')],
-        stepTime: double.infinity,
-      ),
-      CharacterState.scaredIsh: SpriteAnimation.spriteList(
-        <Sprite>[
-          await game.loadSprite('ghostscared1.png'),
-          await game.loadSprite('ghostscared2.png')
-        ],
-        stepTime: 0.1,
-      ),
-      CharacterState.dead: SpriteAnimation.spriteList(
-        <Sprite>[await game.loadSprite('eyes.png')],
-        stepTime: double.infinity,
-      ),
-      CharacterState.spawning: SpriteAnimation.spriteList(
-        <Sprite>[await game.loadSprite('eyes.png')],
-        stepTime: double.infinity,
-      ),
-    };
+    final int ghostIconNumber =
+        game.level.numStartingGhosts == 1 ? 0 : ghostID % 3;
+    if (!_ghostSpriteAnimationCache.containsKey(ghostIconNumber)) {
+      _ghostSpriteAnimationCache[ghostIconNumber] =
+          <CharacterState, SpriteAnimation>{
+        CharacterState.normal: SpriteAnimation.spriteList(
+          <Sprite>[await game.loadSprite(_ghostSpritePaths[ghostIconNumber]!)],
+          stepTime: double.infinity,
+        ),
+        CharacterState.scared: SpriteAnimation.spriteList(
+          <Sprite>[await game.loadSprite('ghostscared1.png')],
+          stepTime: double.infinity,
+        ),
+        CharacterState.scaredIsh: SpriteAnimation.spriteList(
+          <Sprite>[
+            await game.loadSprite('ghostscared1.png'),
+            await game.loadSprite('ghostscared2.png')
+          ],
+          stepTime: 0.1,
+        ),
+        CharacterState.dead: SpriteAnimation.spriteList(
+          <Sprite>[await game.loadSprite('eyes.png')],
+          stepTime: double.infinity,
+        ),
+        CharacterState.spawning: SpriteAnimation.spriteList(
+          <Sprite>[await game.loadSprite('eyes.png')],
+          stepTime: double.infinity,
+        ),
+      };
+    }
+    return _ghostSpriteAnimationCache[ghostIconNumber]!;
   }
 
   void setScared() {
