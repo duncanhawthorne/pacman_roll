@@ -61,8 +61,9 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
 
   late final bool isClone = this is PacmanClone || this is GhostClone;
 
-  late final GameCharacter? clone;
+  GameCharacter? clone;
   late final GameCharacter? original;
+
   late final CircleHitbox hitbox =
       CircleHitbox(isSolid: true, collisionType: _defaultCollisionType);
 
@@ -166,6 +167,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     assert(!isClone); //i.e. no cascade of clones
     if (position.x.abs() > maze.cloneThreshold) {
       if (!_cloneEverMade) {
+        assert(clone == null);
         _cloneEverMade = true;
         if (this is Pacman) {
           clone = PacmanClone(position: position, original: this as Pacman);
@@ -183,6 +185,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
       }
     } else {
       if (_cloneEverMade && clone!.isMounted) {
+        assert(clone != null);
         clone?.removeFromParent();
       }
     }
