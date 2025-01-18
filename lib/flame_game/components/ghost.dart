@@ -21,7 +21,7 @@ class Ghost extends GameCharacter {
   Ghost({required this.ghostID, super.original})
       : super(position: maze.ghostSpawnForId(ghostID));
 
-  int ghostID;
+  final int ghostID;
 
   @override
   Future<Map<CharacterState, SpriteAnimation>> getAnimations(

@@ -37,17 +37,18 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
 
   late final PhysicsBall _ball =
       PhysicsBall(position: position); //never created for clone
-  late final Vector2 ballPos = _ball.position;
-  late final Vector2 ballVel = _ball.body.linearVelocity;
-  late final Vector2 gravitySign = world.gravitySign;
+  late final Vector2 _ballPos = _ball.position;
+  late final Vector2 _ballVel = _ball.body.linearVelocity;
+  late final Vector2 _gravitySign = world.gravitySign;
 
-  bool connectedToBall = true;
+  bool connectedToBall =
+      true; //can't rename to be private variable as overridden in clone
 
-  double get speed => ballVel.length;
+  double get speed => _ballVel.length;
 
-  double get _spinParity => ballVel.x.abs() > ballVel.y.abs()
-      ? gravitySign.y * ballVel.x.sign
-      : -gravitySign.x * ballVel.y.sign;
+  double get _spinParity => _ballVel.x.abs() > _ballVel.y.abs()
+      ? _gravitySign.y * _ballVel.x.sign
+      : -_gravitySign.x * _ballVel.y.sign;
 
   bool get typical =>
       connectedToBall &&
@@ -61,15 +62,16 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
 
   late final bool isClone = this is PacmanClone || this is GhostClone;
 
-  GameCharacter? clone;
+  bool _cloneEverMade = false; //could just test clone is null
+  GameCharacter? _clone;
   late final GameCharacter? original;
 
-  late final CircleHitbox hitbox =
+  late final CircleHitbox _hitbox =
       CircleHitbox(isSolid: true, collisionType: _defaultCollisionType);
 
-  late final double radius = size.x / 2;
+  late final double _radius = size.x / 2;
 
-  void loadStubAnimationsOnDebugMode() {
+  void _loadStubAnimationsOnDebugMode() {
     // works around changes made in flame 1.19
     // where animations have to be loaded before can set current
     // only fails due to assert, which is only tested in debug mode
@@ -108,32 +110,32 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
       _ball.setStatic();
     }
     connectedToBall = false;
-    hitbox.collisionType = CollisionType.inactive;
+    _hitbox.collisionType = CollisionType.inactive;
   }
 
   void _connectToBall() {
     connectedToBall = true;
     _ball.setDynamic();
     assert(!isClone); //not called on clones
-    hitbox.collisionType = _defaultCollisionType;
+    _hitbox.collisionType = _defaultCollisionType;
   }
 
   void _oneFrameOfPhysics(double dt) {
     if (connectedToBall) {
       assert(!isClone);
-      position.setFrom(ballPos);
-      angle += speed * dt / radius * _spinParity;
+      position.setFrom(_ballPos);
+      angle += speed * dt / _radius * _spinParity;
     }
   }
 
   @override
   Future<void> onLoad() async {
-    loadStubAnimationsOnDebugMode();
+    _loadStubAnimationsOnDebugMode();
     if (!isClone) {
       parent!
           .add(_ball); //should be added to static parent but risks going stray
     }
-    add(hitbox);
+    add(_hitbox);
   }
 
   @mustCallSuper
@@ -143,7 +145,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
       disconnectFromBall(); //sync but within async function
       _ball.removeFromParent();
       world.destroyBody(_ball.body);
-      _cloneEverMade ? clone?.removeFromParent() : null;
+      _cloneEverMade ? _clone?.removeFromParent() : null;
       removeEffects(this); //sync and async
     }
   }
@@ -160,7 +162,6 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     super.onRemove();
   }
 
-  bool _cloneEverMade = false;
   void _addRemoveClone() {
     if (isClone) {
       return;
@@ -168,26 +169,25 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     assert(!isClone); //i.e. no cascade of clones
     if (position.x.abs() > maze.cloneThreshold) {
       if (!_cloneEverMade) {
-        assert(clone == null);
+        assert(_clone == null);
         _cloneEverMade = true;
         if (this is Pacman) {
-          clone = PacmanClone(position: position, original: this as Pacman);
-        }
-        if (this is Ghost) {
-          clone = GhostClone(
+          _clone = PacmanClone(position: position, original: this as Pacman);
+        } else if (this is Ghost) {
+          _clone = GhostClone(
               ghostID: (this as Ghost).ghostID, original: this as Ghost);
         }
       }
-      assert(clone != null);
-      assert(clone!.isClone);
+      assert(_clone != null);
+      assert(_clone!.isClone);
       assert(!isClone);
-      if (!clone!.isMounted) {
-        parent?.add(clone!);
+      if (!_clone!.isMounted) {
+        parent?.add(_clone!);
       }
     } else {
-      if (_cloneEverMade && clone!.isMounted) {
-        assert(clone != null);
-        clone?.removeFromParent();
+      if (_cloneEverMade && _clone!.isMounted) {
+        assert(_clone != null);
+        _clone?.removeFromParent();
       }
     }
   }
