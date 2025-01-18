@@ -3,9 +3,10 @@ import 'package:flame_forge2d/flame_forge2d.dart';
 
 import '../maze.dart';
 
-const bool _instantSetPosition = true;
 const double _radiusScaleFactor = 0.99;
 const bool _kVerticalPortalsEnabled = false;
+final Vector2 _volatileInstantConsumeVector2 =
+    Vector2.zero(); //shared across all balls
 
 // ignore: always_specify_types
 class PhysicsBall extends BodyComponent with IgnoreEvents {
@@ -27,32 +28,19 @@ class PhysicsBall extends BodyComponent with IgnoreEvents {
   // ignore: overridden_fields
   final bool renderBody = false;
 
-  //double get speed => body.linearVelocity.length;
+  bool _subConnectedBall = true;
 
   set velocity(Vector2 vel) => body.linearVelocity.setFrom(vel);
 
-  set position(Vector2 pos) => <void>{
-        _instantSetPosition ? _setPositionNow(pos) : _setPositionNextFrame(pos)
-      };
+  set position(Vector2 pos) => _setPositionNow(pos);
 
   bool get _outsideMazeBounds =>
       position.x.abs() > maze.mazeHalfWidth ||
       (_kVerticalPortalsEnabled && position.y.abs() > maze.mazeHalfHeight);
 
-  final Vector2 _oneTimeManualPosition = Vector2(0, 0);
-  bool _oneTimeManualPositionSet = false;
-
-  void _setPositionNextFrame(Vector2 pos) {
-    assert(!_instantSetPosition);
-    _oneTimeManualPosition.setFrom(pos);
-    _oneTimeManualPositionSet = true;
-  }
-
   void _setPositionNow(Vector2 pos) {
-    body.setTransform(pos, 0); //realCharacter.angle
+    body.setTransform(pos, 0);
   }
-
-  bool _subConnectedBall = true;
 
   void setDynamic() {
     body
@@ -72,15 +60,13 @@ class PhysicsBall extends BodyComponent with IgnoreEvents {
     _subConnectedBall = false;
   }
 
-  final Vector2 _oneTimeManualPortalPosition = Vector2.zero();
-
   Vector2 _teleportedPosition() {
-    _oneTimeManualPortalPosition.setValues(
+    _volatileInstantConsumeVector2.setValues(
         _smallMod(position.x, maze.mazeWidth),
         !_kVerticalPortalsEnabled
             ? position.y
             : _smallMod(position.y, maze.mazeHeight));
-    return _oneTimeManualPortalPosition;
+    return _volatileInstantConsumeVector2;
   }
 
   void _moveThroughPipePortal() {
@@ -92,10 +78,6 @@ class PhysicsBall extends BodyComponent with IgnoreEvents {
   @override
   void update(double dt) {
     _moveThroughPipePortal();
-    if (!_instantSetPosition && _oneTimeManualPositionSet) {
-      _setPositionNow(_oneTimeManualPosition);
-      _oneTimeManualPositionSet = false;
-    }
     super.update(dt);
   }
 }
