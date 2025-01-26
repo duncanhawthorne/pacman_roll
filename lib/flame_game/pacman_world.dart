@@ -13,6 +13,7 @@ import 'components/ghost_layer.dart';
 import 'components/pacman.dart';
 import 'components/pacman_layer.dart';
 import 'components/pellet_layer.dart';
+import 'components/wall_dynamic_layer.dart';
 import 'components/wall_layer.dart';
 import 'components/wrapper_no_events.dart';
 import 'effects/remove_effects.dart';
@@ -51,6 +52,7 @@ class PacmanWorld extends Forge2DWorld
   final PelletWrapper pellets = PelletWrapper();
   final WallWrapper _walls = WallWrapper();
   final BlockingBarWrapper _blocking = BlockingBarWrapper();
+  final MovingWallWrapper _movingWalls = MovingWallWrapper();
   final List<WrapperNoEvents> wrappers = <WrapperNoEvents>[];
 
   final Map<int, double?> _fingersLastDragAngle = <int, double?>{};
@@ -150,12 +152,16 @@ class PacmanWorld extends Forge2DWorld
     }
   }
 
+  static const bool _enableMovingWalls = false;
   @override
   Future<void> onLoad() async {
     super.onLoad();
     add(noEventsWrapper);
     wrappers
         .addAll(<WrapperNoEvents>[pacmans, ghosts, pellets, _walls, _blocking]);
+    if (_enableMovingWalls) {
+      wrappers.add(_movingWalls);
+    }
     for (final WrapperNoEvents wrapper in wrappers) {
       noEventsWrapper.add(wrapper);
     }
