@@ -3,11 +3,19 @@ import 'dart:async';
 import 'package:flame/components.dart';
 
 import '../maze.dart';
+import '../pacman_game.dart';
 import 'wrapper_no_events.dart';
 
-class WallWrapper extends WrapperNoEvents with Snapshot {
+class WallWrapper extends WrapperNoEvents
+    with HasGameReference<PacmanGame>, Snapshot {
+  int _mazeIdLast = -100;
+
   @override
   Future<void> reset() async {
+    if (game.mazeId == _mazeIdLast) {
+      return;
+    }
+    _mazeIdLast = game.mazeId;
     if (children.isNotEmpty) {
       removeAll(children);
     }
