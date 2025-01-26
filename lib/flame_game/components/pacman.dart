@@ -123,7 +123,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
 
   void _dieFromGhost() {
     if (typical) {
-      if (world.pellets.pelletsRemainingNotifier.value != 0) {
+      if (!game.isWonOrLost) {
         world.play(SfxType.pacmanDeath);
         current = CharacterState.dead;
         disconnectFromBall();

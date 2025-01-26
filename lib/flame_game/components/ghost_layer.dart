@@ -128,7 +128,7 @@ class Ghosts extends WrapperNoEvents
       return;
     }
     current = CharacterState.scared;
-    if (world.pellets.pelletsRemainingNotifier.value != 0) {
+    if (!game.isWonOrLost) {
       world.play(SfxType.ghostsScared);
       for (final Ghost ghost in ghostList) {
         ghost.setScared();
