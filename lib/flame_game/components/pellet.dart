@@ -5,6 +5,8 @@ import 'package:flutter/foundation.dart';
 import '../maze.dart';
 
 const double _pelletScaleFactor = 0.4;
+final Vector2 _volatileInstantConsumeVector2 =
+    Vector2.zero(); //shared across all pellets
 
 class Pellet extends CircleComponent with IgnoreEvents {
   Pellet(
@@ -15,11 +17,12 @@ class Pellet extends CircleComponent with IgnoreEvents {
       : super(
             radius: maze.spriteWidth / 2 * _pelletScaleFactor * radiusFactor,
             anchor: Anchor.center) {
+    _volatileInstantConsumeVector2.setAll(radius);
     _hitbox = CircleHitbox(
       isSolid: true,
       collisionType: CollisionType.passive,
       radius: radius * hitBoxRadiusFactor,
-      position: Vector2.all(radius),
+      position: _volatileInstantConsumeVector2,
       anchor: Anchor.center,
     );
   }
