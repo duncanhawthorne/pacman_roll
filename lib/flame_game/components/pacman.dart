@@ -15,7 +15,7 @@ import 'ghost.dart';
 import 'pellet.dart';
 import 'super_pellet.dart';
 
-const int _kPacmanDeadResetTimeMillis = 1700;
+const int _kPacmanDeadResetTimeMillis = 1550;
 const int _kPacmanHalfEatingResetTimeMillis = 180;
 const bool multipleSpawningPacmans = false;
 const bool _freezeGhostsOnKillPacman = false;

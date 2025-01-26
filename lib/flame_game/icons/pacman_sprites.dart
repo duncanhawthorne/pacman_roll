@@ -10,7 +10,7 @@ import 'package:flame/geometry.dart';
 import '../../style/palette.dart';
 import '../../utils/helper.dart';
 
-const int kPacmanDeadResetTimeAnimationMillis = 1250;
+const int kPacmanDeadResetTimeAnimationMillis = 1100;
 const int pacmanCircleIncrements = 64;
 const int pacmanMouthWidthDefault = pacmanCircleIncrements ~/ 4;
 const int pacmanDeadIncrements = (pacmanCircleIncrements * 3) ~/ 4;
