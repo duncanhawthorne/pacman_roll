@@ -11,25 +11,27 @@ class Pellet extends CircleComponent with IgnoreEvents {
       {required super.position,
       required this.pelletsRemainingNotifier,
       double radiusFactor = 1,
-      this.hitBoxRadiusFactor = 1})
+      double hitBoxRadiusFactor = 1})
       : super(
             radius: maze.spriteWidth / 2 * _pelletScaleFactor * radiusFactor,
-            anchor: Anchor.center);
+            anchor: Anchor.center) {
+    _hitbox = CircleHitbox(
+      isSolid: true,
+      collisionType: CollisionType.passive,
+      radius: radius * hitBoxRadiusFactor,
+      position: Vector2.all(radius),
+      anchor: Anchor.center,
+    );
+  }
 
-  final double hitBoxRadiusFactor;
+  late final CircleHitbox _hitbox;
   final ValueNotifier<int>
       pelletsRemainingNotifier; //passed in on creation of object rather than use slow to initialise HasGameReference for every single pellet
 
   @override
   Future<void> onLoad() async {
     await super.onLoad();
-    add(CircleHitbox(
-      isSolid: true,
-      collisionType: CollisionType.passive,
-      radius: radius * hitBoxRadiusFactor,
-      position: Vector2.all(radius),
-      anchor: Anchor.center,
-    ));
+    add(_hitbox);
     //debugMode = true;
     pelletsRemainingNotifier.value += 1;
   }
