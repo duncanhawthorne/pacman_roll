@@ -3,7 +3,7 @@ import 'package:flame_forge2d/flame_forge2d.dart';
 
 import '../maze.dart';
 
-const double _radiusScaleFactor = 0.99;
+const double _lubricationScaleFactor = 0.99;
 const bool _kVerticalPortalsEnabled = false;
 final Vector2 _volatileInstantConsumeVector2 =
     Vector2.zero(); //shared across all balls
@@ -15,7 +15,8 @@ class PhysicsBall extends BodyComponent with IgnoreEvents {
   }) : super(
             fixtureDefs: <FixtureDef>[
               FixtureDef(
-                CircleShape(radius: maze.spriteWidth / 2 * _radiusScaleFactor),
+                CircleShape(
+                    radius: maze.spriteWidth / 2 * _lubricationScaleFactor),
               ),
             ],
             bodyDef: BodyDef(
