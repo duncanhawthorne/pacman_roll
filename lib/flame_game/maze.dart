@@ -96,9 +96,6 @@ class Maze {
   Map<int, Vector2> ghostStartForIdMap =
       <int, Vector2>{}; //set properly in initializer
 
-  static const bool _largeSprites = true;
-  static const double pelletScaleFactor = _largeSprites ? 0.4 : 0.46;
-
   Vector2 ghostStartForId(int idNum) {
     return ghostStartForIdMap[idNum % 3]!;
   }
@@ -125,7 +122,7 @@ class Maze {
   }
 
   double _spriteWidth() {
-    return blockWidth * (_largeSprites ? 2 : 1);
+    return blockWidth * 2;
   }
 
   int _mazeLayoutHorizontalLength() {
@@ -170,7 +167,7 @@ class Maze {
     for (int i = 0; i < _mazeLayout.length; i++) {
       for (int j = 0; j < _mazeLayout[i].length; j++) {
         if (_mazeLayout[i][j] == code) {
-          return _vectorOfMazeListIndex(i, j, ioffset: _largeSprites ? 0.5 : 0);
+          return _vectorOfMazeListIndex(i, j, ioffset: 0.5);
         }
       }
     }
@@ -199,9 +196,8 @@ class Maze {
     final List<Pellet> result = <Pellet>[];
     for (int i = 0; i < _mazeLayout.length; i++) {
       for (int j = 0; j < _mazeLayout[i].length; j++) {
-        final Vector2 center = _vectorOfMazeListIndex(i, j,
-            ioffset: _largeSprites ? 1 / 2 : 0,
-            joffset: _largeSprites ? 1 / 2 : 0);
+        final Vector2 center =
+            _vectorOfMazeListIndex(i, j, ioffset: 0.5, joffset: 0.5);
         if (_pelletAt(i, j)) {
           if (_mazeLayout[i][j] == _kSuperPellet && superPelletsEnabled) {
             result.add(SuperPellet(

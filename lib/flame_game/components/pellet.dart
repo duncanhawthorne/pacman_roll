@@ -4,6 +4,8 @@ import 'package:flutter/foundation.dart';
 
 import '../maze.dart';
 
+const double _pelletScaleFactor = 0.4;
+
 class Pellet extends CircleComponent with IgnoreEvents {
   Pellet(
       {required super.position,
@@ -11,8 +13,7 @@ class Pellet extends CircleComponent with IgnoreEvents {
       double radiusFactor = 1,
       this.hitBoxRadiusFactor = 1})
       : super(
-            radius:
-                maze.spriteWidth / 2 * Maze.pelletScaleFactor * radiusFactor,
+            radius: maze.spriteWidth / 2 * _pelletScaleFactor * radiusFactor,
             anchor: Anchor.center);
 
   final double hitBoxRadiusFactor;
