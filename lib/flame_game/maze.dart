@@ -283,6 +283,7 @@ class Maze {
     final double scale = blockWidth;
     final Vector2 center = Vector2.zero();
     final Vector2 bigBlockCenter = Vector2.zero();
+    final Vector2 bigBlockSize = Vector2.zero();
     for (int i = 0; i < _mazeLayout.length; i++) {
       for (int j = 0; j < _mazeLayout[i].length; j++) {
         center.setFrom(_volatileVectorOfMazeListIndex(i, j));
@@ -300,14 +301,14 @@ class Maze {
               bigBlockCenter
                 ..setFrom(center)
                 ..x += scale * width / 2;
+              bigBlockSize.setValues(scale * (width + _pixelationBuffer),
+                  scale * _mazeInnerWallWidthFactor);
               fixtureDefs.add(_fixtureDefBlock(
                   position: bigBlockCenter,
                   width: scale * (width + _pixelationBuffer),
                   height: scale));
               result.add(WallRectangleVisual(
-                  position: bigBlockCenter,
-                  width: scale * (width + _pixelationBuffer),
-                  height: scale * _mazeInnerWallWidthFactor));
+                  position: bigBlockCenter, size: bigBlockSize));
             }
           }
 
@@ -317,14 +318,14 @@ class Maze {
               bigBlockCenter
                 ..setFrom(center)
                 ..y += scale * height / 2;
+              bigBlockSize.setValues(scale * _mazeInnerWallWidthFactor,
+                  scale * (height + _pixelationBuffer));
               fixtureDefs.add(_fixtureDefBlock(
                   position: bigBlockCenter,
                   width: scale,
                   height: scale * (height + _pixelationBuffer)));
               result.add(WallRectangleVisual(
-                  position: bigBlockCenter,
-                  width: scale * _mazeInnerWallWidthFactor,
-                  height: scale * (height + _pixelationBuffer)));
+                  position: bigBlockCenter, size: bigBlockSize));
             }
           }
           if (_topLeftOfBigBlock(i, j)) {
@@ -335,10 +336,9 @@ class Maze {
                 ..setFrom(center)
                 ..x += scale * width / 2
                 ..y += scale * height / 2;
+              bigBlockSize.setValues(scale * width, scale * height);
               result.add(WallRectangleVisual(
-                  position: bigBlockCenter,
-                  width: scale * width,
-                  height: scale * height));
+                  position: bigBlockCenter, size: bigBlockSize));
             }
           }
         }
@@ -362,15 +362,13 @@ class Maze {
         WallRectangleVisual(
             position: Vector2(
                 scale * (_mazeLayoutHorizontalLength() / 2 + width / 2), 0),
-            width: scale * width,
-            height: scale * _mazeLayoutVerticalLength()),
+            size: Vector2(scale * width, scale * _mazeLayoutVerticalLength())),
       )
       ..add(
         WallRectangleVisual(
             position: Vector2(
                 -scale * (_mazeLayoutHorizontalLength() / 2 + width / 2), 0),
-            width: scale * width,
-            height: scale * _mazeLayoutVerticalLength()),
+            size: Vector2(scale * width, scale * _mazeLayoutVerticalLength())),
       );
     return result;
   }

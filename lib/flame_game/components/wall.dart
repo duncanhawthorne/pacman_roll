@@ -22,12 +22,8 @@ final Paint _movingWallPaint = Paint()
   ..color = Palette.text.color;
 
 class WallRectangleVisual extends RectangleComponent with IgnoreEvents {
-  WallRectangleVisual(
-      {required super.position, required double width, required double height})
-      : super(
-            size: Vector2(width, height),
-            anchor: Anchor.center,
-            paint: _wallVisualPaint);
+  WallRectangleVisual({required super.position, required super.size})
+      : super(anchor: Anchor.center, paint: _wallVisualPaint);
 }
 
 class WallCircleVisual extends CircleComponent with IgnoreEvents {
@@ -44,6 +40,8 @@ class WallGround extends BodyComponent with IgnoreEvents {
   final int priority = -3;
 }
 
+final Vector2 _dynamicWallGravityScale = Vector2(-1, -1);
+
 // ignore: always_specify_types
 class WallDynamic extends BodyComponent with IgnoreEvents {
   WallDynamic({required super.fixtureDefs})
@@ -52,7 +50,7 @@ class WallDynamic extends BodyComponent with IgnoreEvents {
             bodyDef: BodyDef(
                 type: BodyType.dynamic,
                 fixedRotation: true,
-                gravityScale: Vector2(-1, -1)));
+                gravityScale: _dynamicWallGravityScale));
 
   @override
   final int priority = -3;
