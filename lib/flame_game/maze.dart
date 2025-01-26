@@ -45,9 +45,9 @@ class Maze {
   void setMazeId(int id) {
     {
       _mazeId = id;
-      ghostStart.setFrom(_vectorOfMazeListCode(_kGhostStart));
-      pacmanStart.setFrom(_vectorOfMazeListCode(_kPacmanStart));
-      _cage.setFrom(_vectorOfMazeListCode(_kCage));
+      ghostStart.setFrom(_volatileVectorOfMazeListCode(_kGhostStart));
+      pacmanStart.setFrom(_volatileVectorOfMazeListCode(_kPacmanStart));
+      _cage.setFrom(_volatileVectorOfMazeListCode(_kCage));
       //items below used every frame so calculate once here
       blockWidth = _blockWidth();
       spriteWidth = _spriteWidth();
@@ -58,9 +58,9 @@ class Maze {
       mazeHalfWidth = mazeWidth / 2;
       mazeHalfHeight = mazeHeight / 2;
       //item below used regularly
-      ghostStartForIdMap[0] = _ghostStartForId(0);
-      ghostStartForIdMap[1] = _ghostStartForId(1);
-      ghostStartForIdMap[2] = _ghostStartForId(2);
+      _ghostStartForIdMap[0] = _ghostStartForId(0);
+      _ghostStartForIdMap[1] = _ghostStartForId(1);
+      _ghostStartForIdMap[2] = _ghostStartForId(2);
     }
   }
 
@@ -93,11 +93,11 @@ class Maze {
   double mazeHalfWidth = 0; //set properly in initializer
   double mazeHalfHeight = 0; //set properly in initializer
   final Vector2 spriteSize = Vector2.zero(); //set properly in initializer
-  Map<int, Vector2> ghostStartForIdMap =
+  final Map<int, Vector2> _ghostStartForIdMap =
       <int, Vector2>{}; //set properly in initializer
 
   Vector2 ghostStartForId(int idNum) {
-    return ghostStartForIdMap[idNum % 3]!;
+    return _ghostStartForIdMap[idNum % 3]!;
   }
 
   Vector2 _ghostStartForId(int idNum) {
@@ -155,23 +155,31 @@ class Maze {
         _mazeLayout[i][j] == _kMovingWall;
   }
 
-  Vector2 _vectorOfMazeListIndex(int icore, int jcore,
+  final Vector2 _volatileInstantConsumeVector2 = Vector2.zero();
+
+  Vector2 _volatileVectorOfMazeListIndex(int icore, int jcore,
       {double ioffset = 0, double joffset = 0}) {
     final double i = ioffset + icore;
     final double j = joffset + jcore;
-    return Vector2((j + 1 / 2 - _mazeLayout[0].length / 2) * blockWidth,
+
+    /// using [_volatileInstantConsumeVector2]
+    /// so we don't have to make new Vector2 every time called
+    /// but therefore must instantly consume the output as it may change
+    _volatileInstantConsumeVector2.setValues(
+        (j + 1 / 2 - _mazeLayout[0].length / 2) * blockWidth,
         (i + 1 / 2 - _mazeLayout.length / 2) * blockWidth);
+    return _volatileInstantConsumeVector2;
   }
 
-  Vector2 _vectorOfMazeListCode(String code) {
+  Vector2 _volatileVectorOfMazeListCode(String code) {
     for (int i = 0; i < _mazeLayout.length; i++) {
       for (int j = 0; j < _mazeLayout[i].length; j++) {
         if (_mazeLayout[i][j] == code) {
-          return _vectorOfMazeListIndex(i, j, ioffset: 0.5);
+          return _volatileVectorOfMazeListIndex(i, j, ioffset: 0.5);
         }
       }
     }
-    return Vector2.zero();
+    throw 'Missing maze code';
   }
 
   bool _pelletCodeAtCell(int i, int j) {
@@ -194,10 +202,11 @@ class Maze {
   List<Pellet> pellets(
       bool superPelletsEnabled, ValueNotifier<int> pelletsRemainingNotifier) {
     final List<Pellet> result = <Pellet>[];
+    final Vector2 center = Vector2.zero();
     for (int i = 0; i < _mazeLayout.length; i++) {
       for (int j = 0; j < _mazeLayout[i].length; j++) {
-        final Vector2 center =
-            _vectorOfMazeListIndex(i, j, ioffset: 0.5, joffset: 0.5);
+        center.setFrom(
+            _volatileVectorOfMazeListIndex(i, j, ioffset: 0.5, joffset: 0.5));
         if (_pelletAt(i, j)) {
           if (_mazeLayout[i][j] == _kSuperPellet && superPelletsEnabled) {
             result.add(SuperPellet(
@@ -272,9 +281,11 @@ class Maze {
     final List<FixtureDef> fixtureDefs = <FixtureDef>[];
     final List<Component> result = <Component>[];
     final double scale = blockWidth;
+    final Vector2 center = Vector2.zero();
+    final Vector2 bigBlockCenter = Vector2.zero();
     for (int i = 0; i < _mazeLayout.length; i++) {
       for (int j = 0; j < _mazeLayout[i].length; j++) {
-        final Vector2 center = _vectorOfMazeListIndex(i, j);
+        center.setFrom(_volatileVectorOfMazeListIndex(i, j));
         if (_wallAt(i, j)) {
           if (_circleAt(i, j)) {
             fixtureDefs.add(
@@ -286,8 +297,9 @@ class Maze {
           if (!_wallAt(i, j - 1)) {
             final int width = _bigBlockWidth(i, j);
             if (width > 0) {
-              final Vector2 bigBlockCenter =
-                  center + Vector2(scale * width / 2, 0);
+              bigBlockCenter
+                ..setFrom(center)
+                ..x += scale * width / 2;
               fixtureDefs.add(_fixtureDefBlock(
                   position: bigBlockCenter,
                   width: scale * (width + _pixelationBuffer),
@@ -302,8 +314,9 @@ class Maze {
           if (!_wallAt(i - 1, j)) {
             final int height = _bigBlockHeight(i, j);
             if (height > 0) {
-              final Vector2 bigBlockCenter =
-                  center + Vector2(0, scale * height / 2);
+              bigBlockCenter
+                ..setFrom(center)
+                ..y += scale * height / 2;
               fixtureDefs.add(_fixtureDefBlock(
                   position: bigBlockCenter,
                   width: scale,
@@ -318,8 +331,10 @@ class Maze {
             final int width = _bigBlockWidth(i, j, singleHeight: false);
             final int height = _bigBlockHeight(i, j, singleWidth: false);
             if (width > 0 && height > 0) {
-              final Vector2 bigBlockCenter =
-                  center + Vector2(scale * width / 2, scale * height / 2);
+              bigBlockCenter
+                ..setFrom(center)
+                ..x += scale * width / 2
+                ..y += scale * height / 2;
               result.add(WallRectangleVisual(
                   position: bigBlockCenter,
                   width: scale * width,
@@ -365,16 +380,20 @@ class Maze {
     const double lubricationScaleFactor = 0.98;
     final List<Component> result = <Component>[];
     final double scale = blockWidth;
+    final Vector2 center = Vector2.zero();
+    final Vector2 bigBlockCenter = Vector2.zero();
     for (int i = 0; i < _mazeLayout.length; i++) {
       for (int j = 0; j < _mazeLayout[i].length; j++) {
-        final Vector2 center = _vectorOfMazeListIndex(i, j);
+        center.setFrom(_volatileVectorOfMazeListIndex(i, j));
         if (_movingWallAt(i, j)) {
           if (_topLeftOfBigBlock(i, j, moving: true)) {
             final int width = _bigBlockWidth(i, j, moving: true);
             final int height = _bigBlockHeight(i, j, moving: true);
             if (width > 0 && height > 0) {
-              final Vector2 bigBlockCenter =
-                  center + Vector2(scale * width / 2, scale * height / 2);
+              bigBlockCenter
+                ..setFrom(center)
+                ..x += scale * width / 2
+                ..y += scale * height / 2;
               result.add((WallDynamic(fixtureDefs: <FixtureDef>[
                 _fixtureDefBlock(
                     position: bigBlockCenter,
