@@ -228,7 +228,7 @@ class PacmanWorld extends Forge2DWorld
   final Vector2 downDirection = Vector2.zero();
 
   static const bool _updateGravityOnRotation = true;
-  Vector2 gravitySign = Vector2(0, 0);
+  final Vector2 gravitySign = Vector2(0, 0);
 
   void setMazeAngle(double angle) {
     game.recordAngle(angle);

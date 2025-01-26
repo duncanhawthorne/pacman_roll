@@ -17,12 +17,11 @@ class Pellet extends CircleComponent with IgnoreEvents {
       : super(
             radius: maze.spriteWidth / 2 * _pelletScaleFactor * radiusFactor,
             anchor: Anchor.center) {
-    _volatileInstantConsumeVector2.setAll(radius);
     _hitbox = CircleHitbox(
       isSolid: true,
       collisionType: CollisionType.passive,
       radius: radius * hitBoxRadiusFactor,
-      position: _volatileInstantConsumeVector2,
+      position: _volatileInstantConsumeVector2..setAll(radius),
       anchor: Anchor.center,
     );
   }
@@ -35,7 +34,7 @@ class Pellet extends CircleComponent with IgnoreEvents {
   Future<void> onLoad() async {
     await super.onLoad();
     add(_hitbox);
-    //debugMode = true;
+    //_hitbox.debugMode = true;
     pelletsRemainingNotifier.value += 1;
   }
 

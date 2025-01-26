@@ -357,18 +357,16 @@ class Maze {
     final List<Component> result = <Component>[];
     final double scale = blockWidth;
     const int width = 7;
+    final Vector2 size =
+        Vector2(scale * width, scale * _mazeLayoutVerticalLength());
+    final Vector2 position =
+        Vector2(scale * (_mazeLayoutHorizontalLength() / 2 + width / 2), 0);
     result
       ..add(
-        WallRectangleVisual(
-            position: Vector2(
-                scale * (_mazeLayoutHorizontalLength() / 2 + width / 2), 0),
-            size: Vector2(scale * width, scale * _mazeLayoutVerticalLength())),
+        WallRectangleVisual(position: position, size: size),
       )
       ..add(
-        WallRectangleVisual(
-            position: Vector2(
-                -scale * (_mazeLayoutHorizontalLength() / 2 + width / 2), 0),
-            size: Vector2(scale * width, scale * _mazeLayoutVerticalLength())),
+        WallRectangleVisual(position: position..x *= -1, size: size),
       );
     return result;
   }
