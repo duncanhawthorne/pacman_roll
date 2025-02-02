@@ -44,10 +44,11 @@ final Vector2 _dynamicWallGravityScale = Vector2(-1, -1);
 
 // ignore: always_specify_types
 class WallDynamic extends BodyComponent with IgnoreEvents {
-  WallDynamic({required super.fixtureDefs})
+  WallDynamic({required super.fixtureDefs, required Vector2 position})
       : super(
             paint: _movingWallPaint,
             bodyDef: BodyDef(
+                position: Vector2.zero()..setFrom(position),
                 type: BodyType.dynamic,
                 fixedRotation: true,
                 gravityScale: _dynamicWallGravityScale));
