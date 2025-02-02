@@ -28,7 +28,7 @@ class Ghosts extends WrapperNoEvents
 
   bool get ghostsLoaded => ghostList.isNotEmpty && ghostList[0].isLoaded;
 
-  void tidyStrayGhosts() {
+  void _tidyStrayGhosts() {
     const bool testStrayGhosts = false;
     if (!testStrayGhosts) {
       return;
@@ -63,7 +63,7 @@ class Ghosts extends WrapperNoEvents
     assert(game.openingScreenCleared);
     assert(world.pacmans.anyAlivePacman); //test before call, else test here
     assert(!game.isWonOrLost); //test before call, else test here
-    tidyStrayGhosts();
+    _tidyStrayGhosts();
     if (ghostList.isEmpty) {
       return 0;
     } else {

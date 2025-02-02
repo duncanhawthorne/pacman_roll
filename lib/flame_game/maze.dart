@@ -311,7 +311,6 @@ class Maze {
                   position: bigBlockCenter, size: bigBlockSize));
             }
           }
-
           if (!_wallAt(i - 1, j)) {
             final int height = _bigBlockHeight(i, j);
             if (height > 0) {
@@ -390,13 +389,17 @@ class Maze {
                 ..setFrom(center)
                 ..x += scale * width / 2
                 ..y += scale * height / 2;
-              result.add((WallDynamic(fixtureDefs: <FixtureDef>[
-                _fixtureDefBlock(
-                    position: bigBlockCenter,
-                    width: scale * (width + 1) * lubricationScaleFactor,
-                    height: scale * (height + 1) * lubricationScaleFactor,
-                    density: 10),
-              ])));
+              result.add((WallDynamic(
+                position: bigBlockCenter,
+                fixtureDefs: <FixtureDef>[
+                  _fixtureDefBlock(
+                      position: Vector2(0, 0),
+                      width: scale * (width + 1) * lubricationScaleFactor,
+                      height: scale * (height + 1) * lubricationScaleFactor,
+                      density: 10),
+                ],
+                //bigBlockCenter, //
+              )));
             }
           }
         }
