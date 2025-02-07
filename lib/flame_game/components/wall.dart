@@ -21,6 +21,8 @@ final Paint _movingWallPaint = Paint()
 //..isAntiAlias = false
   ..color = Palette.text.color;
 
+final BodyDef _staticBodyDef = BodyDef(type: BodyType.static);
+
 class WallRectangleVisual extends RectangleComponent with IgnoreEvents {
   WallRectangleVisual({required super.position, required super.size})
       : super(anchor: Anchor.center, paint: _wallVisualPaint);
@@ -34,7 +36,7 @@ class WallCircleVisual extends CircleComponent with IgnoreEvents {
 // ignore: always_specify_types
 class WallGround extends BodyComponent with IgnoreEvents {
   WallGround({required super.fixtureDefs})
-      : super(paint: _wallGroundPaint, bodyDef: BodyDef(type: BodyType.static));
+      : super(paint: _wallGroundPaint, bodyDef: _staticBodyDef);
 
   @override
   final int priority = -3;
