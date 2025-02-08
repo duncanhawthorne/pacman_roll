@@ -83,8 +83,8 @@ class PhysicsBall extends BodyComponent with IgnoreEvents {
   }
 }
 
-double _smallMod(double position, double mod) {
+double _smallMod(double value, double mod) {
   //produces number between -mod / 2 and +mod / 2
-  position = position % mod;
-  return position > mod / 2 ? position - mod : position;
+  value = value % mod;
+  return value > mod / 2 ? value - mod : value;
 }
