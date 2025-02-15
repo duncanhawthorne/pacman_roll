@@ -13,6 +13,8 @@ import '../utils/constants.dart';
 import '../utils/helper.dart';
 import 'sounds.dart';
 
+const bool _isAudioSystemEnabled = true;
+
 const bool _useSoLoudInDebug = true;
 final bool _platformForSoLoud = ((kDebugMode && _useSoLoudInDebug) || isiOSWeb);
 final bool detailedAudioLog = _platformForSoLoud;
@@ -20,6 +22,9 @@ final bool detailedAudioLog = _platformForSoLoud;
 bool _soLoudCrashedOnLoad = false;
 
 Future<void> firstInitialiseSoLoud() async {
+  if (!_isAudioSystemEnabled) {
+    return;
+  }
   try {
     await soLoud.init();
   } catch (e) {
@@ -74,7 +79,8 @@ class AudioController {
   late final bool canDoVariableVolume = !(isiOSWeb && _useAudioPlayers);
   late final bool _soLoudIsUnreliable = _useSoLoud;
 
-  bool get isAudioOn => _settings?.audioOn.value ?? true;
+  bool get isAudioOn =>
+      _isAudioSystemEnabled && (_settings?.audioOn.value ?? true);
 
   static final Logger _log = Logger('AC');
   SettingsController? _settings;
@@ -111,6 +117,10 @@ class AudioController {
 
   Future<bool> _canPlay(SfxType type,
       {bool forceUseAudioPlayersOnce = false}) async {
+    if (!_isAudioSystemEnabled) {
+      return false;
+    }
+
     final bool playWithAudioPlayers =
         _useAudioPlayers || forceUseAudioPlayersOnce;
 
@@ -147,9 +157,13 @@ class AudioController {
 
   Future<void> playSfx(SfxType type,
       {bool forceUseAudioPlayersOnce = false}) async {
+    if (!_isAudioSystemEnabled) {
+      return;
+    }
+
     final bool playWithAudioPlayers =
         _useAudioPlayers || forceUseAudioPlayersOnce;
-    isAudioOn ? _log.fine('Playing $type') : null;
+    !isAudioOn ? null : _log.fine('Playing $type');
     if (!(await _canPlay(type,
         forceUseAudioPlayersOnce: forceUseAudioPlayersOnce))) {
       return;
@@ -227,9 +241,12 @@ class AudioController {
   }
 
   Future<void> playSilence() async {
+    if (!_isAudioSystemEnabled) {
+      return;
+    }
     //holds open sound channel where soLoud is unreliable
     if (_useSoLoud && _soLoudIsUnreliable) {
-      _log.fine("playSilence");
+      !isAudioOn ? null : _log.fine("playSilence");
       await playSfx(SfxType.silence, forceUseAudioPlayersOnce: true);
     }
   }
@@ -302,6 +319,9 @@ class AudioController {
   }
 
   Future<void> stopSound(SfxType type) async {
+    if (!_isAudioSystemEnabled) {
+      return;
+    }
     _log.fine("stopSfx $type");
     if (_useAudioPlayers) {
       if (_apPlayers.containsKey(type)) {
@@ -326,6 +346,9 @@ class AudioController {
   }
 
   Future<void> stopAllSounds() async {
+    if (!_isAudioSystemEnabled) {
+      return;
+    }
     _log.fine(() => <Object>['Stop all sound', _soLoudHandles.keys]);
     if (_useAudioPlayers) {
       await Future.wait(<Future<void>>[
@@ -412,6 +435,9 @@ class AudioController {
   }
 
   Future<void> _handleAppLifecycle() async {
+    if (!_isAudioSystemEnabled) {
+      return;
+    }
     switch (_lifecycleNotifier!.value) {
       case AppLifecycleState.paused:
         _log.fine("Lifecycle paused");
@@ -447,6 +473,9 @@ class AudioController {
   }
 
   Future<void> soLoudEnsureInitialised() async {
+    if (!_isAudioSystemEnabled) {
+      return;
+    }
     if (_useSoLoud) {
       if (flagPlaySilenceOnSoLoudEnsureInitialised.value) {
         //FIXME requires testing
@@ -461,7 +490,7 @@ class AudioController {
         assert(!_hiddenBlockPlay());
         clearSources();
         await soLoud.init();
-        await soLoud.initialized;
+        assert(soLoud.isInitialized);
         _log.fine("soLoud now initialised");
         unawaited(_preloadSfx());
       }
@@ -561,6 +590,9 @@ class AudioController {
   }
 
   Future<void> soLoudPowerDownForReset() async {
+    if (!_isAudioSystemEnabled) {
+      return;
+    }
     if (!_useSoLoud) {
       return;
     }
