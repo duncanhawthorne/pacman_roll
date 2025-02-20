@@ -61,17 +61,19 @@ class Ghosts extends WrapperNoEvents
   double _averageGhostSpeed() {
     assert(game.isLive); //test before call, else test here
     assert(game.openingScreenCleared);
-    assert(!world.pacmans.isMounted ||
-        world.pacmans.anyAlivePacman); //test before call, else test here
+    assert(
+      !world.pacmans.isMounted || world.pacmans.anyAlivePacman,
+    ); //test before call, else test here
     assert(!game.isWonOrLost); //test before call, else test here
     _tidyStrayGhosts();
     if (ghostList.isEmpty) {
       return 0;
     } else {
       return ghostList
-              .map((Ghost ghost) => ghost.current == CharacterState.normal
-                  ? ghost.speed
-                  : 0.0) //scared ghosts give zero which silences ghostsRoamingSiren
+              .map(
+                (Ghost ghost) =>
+                    ghost.current == CharacterState.normal ? ghost.speed : 0.0,
+              ) //scared ghosts give zero which silences ghostsRoamingSiren
               .reduce((double value, double element) => value + element) /
           ghostList.length;
     }
@@ -86,17 +88,20 @@ class Ghosts extends WrapperNoEvents
       assert(!game.isWonOrLost); //test before call, else test here
       assert(game.isLive); //test before call, else test here
       assert(game.openingScreenCleared);
-      _sirenTimer ??= async.Timer.periodic(const Duration(milliseconds: 250),
-          (async.Timer timer) {
+      _sirenTimer ??= async.Timer.periodic(const Duration(milliseconds: 250), (
+        async.Timer timer,
+      ) {
         assert(!game.isWonOrLost); //timer cancelled already here
-        assert(!world.pacmans.isMounted ||
-            world.pacmans.anyAlivePacman); //timer cancelled already here
+        assert(
+          !world.pacmans.isMounted || world.pacmans.anyAlivePacman,
+        ); //timer cancelled already here
         assert(!world.doingLevelResetFlourish); //timer cancelled already here
         assert(game.openingScreenCleared);
         if (game.isLive) {
           game.audioController.setSirenVolume(
-              _averageGhostSpeed() * flameGameZoom / 30,
-              gradual: true);
+            _averageGhostSpeed() * flameGameZoom / 30,
+            gradual: true,
+          );
         } else {
           cancelSirenVolumeUpdaterTimer();
         }
@@ -115,9 +120,10 @@ class Ghosts extends WrapperNoEvents
 
   void _addThreeGhosts() {
     assert(ghostList.isEmpty);
-    final List<int> positions = game.level.numStartingGhosts == 3
-        ? <int>[0, 1, 2]
-        : game.level.numStartingGhosts == 2
+    final List<int> positions =
+        game.level.numStartingGhosts == 3
+            ? <int>[0, 1, 2]
+            : game.level.numStartingGhosts == 2
             ? <int>[0, 2]
             : <int>[1];
     for (int i = 0; i < game.level.numStartingGhosts; i++) {
@@ -146,8 +152,8 @@ class Ghosts extends WrapperNoEvents
     assert(!game.isWonOrLost); //test before call, else test here
     if (game.level.multipleSpawningGhosts) {
       _ghostSpawner ??= SpawnComponent(
-        factory: (int i) =>
-            Ghost(ghostID: <int>[3, 4, 5][game.random.nextInt(3)]),
+        factory:
+            (int i) => Ghost(ghostID: <int>[3, 4, 5][game.random.nextInt(3)]),
         selfPositioning: true,
         period: game.level.ghostSpawnTimerLength.toDouble(),
       );
@@ -242,7 +248,8 @@ class Ghosts extends WrapperNoEvents
     _removeAllGhosts();
     _ghostSpawner = null; //so will reflect new level parameters
     _ghostsScaredTimer = Timer(
-        _kGhostScaredTimeMillis / game.level.ghostScaredTimeFactor / 1000);
+      _kGhostScaredTimeMillis / game.level.ghostScaredTimeFactor / 1000,
+    );
     _addThreeGhosts();
   }
 

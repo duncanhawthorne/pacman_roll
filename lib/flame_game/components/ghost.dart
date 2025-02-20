@@ -11,50 +11,44 @@ import 'game_character.dart';
 const Map<int, String> _ghostSpritePaths = <int, String>{
   0: 'ghost1.png',
   1: 'ghost3.png',
-  2: 'ghost2.png'
+  2: 'ghost2.png',
 };
 
 final Map<int, Map<CharacterState, SpriteAnimation>>
-    _ghostSpriteAnimationCache = <int, Map<CharacterState, SpriteAnimation>>{};
+_ghostSpriteAnimationCache = <int, Map<CharacterState, SpriteAnimation>>{};
 
 class Ghost extends GameCharacter {
   Ghost({required this.ghostID, super.original})
-      : super(position: maze.ghostSpawnForId(ghostID));
+    : super(position: maze.ghostSpawnForId(ghostID));
 
   final int ghostID;
 
   @override
-  Future<Map<CharacterState, SpriteAnimation>> getAnimations(
-      [int size = 1]) async {
+  Future<Map<CharacterState, SpriteAnimation>> getAnimations([
+    int size = 1,
+  ]) async {
     final int ghostIconNumber =
         game.level.numStartingGhosts == 1 ? 0 : ghostID % 3;
     if (!_ghostSpriteAnimationCache.containsKey(ghostIconNumber)) {
       _ghostSpriteAnimationCache[ghostIconNumber] =
           <CharacterState, SpriteAnimation>{
-        CharacterState.normal: SpriteAnimation.spriteList(
-          <Sprite>[await game.loadSprite(_ghostSpritePaths[ghostIconNumber]!)],
-          stepTime: double.infinity,
-        ),
-        CharacterState.scared: SpriteAnimation.spriteList(
-          <Sprite>[await game.loadSprite('ghostscared1.png')],
-          stepTime: double.infinity,
-        ),
-        CharacterState.scaredIsh: SpriteAnimation.spriteList(
-          <Sprite>[
-            await game.loadSprite('ghostscared1.png'),
-            await game.loadSprite('ghostscared2.png')
-          ],
-          stepTime: 0.1,
-        ),
-        CharacterState.dead: SpriteAnimation.spriteList(
-          <Sprite>[await game.loadSprite('eyes.png')],
-          stepTime: double.infinity,
-        ),
-        CharacterState.spawning: SpriteAnimation.spriteList(
-          <Sprite>[await game.loadSprite('eyes.png')],
-          stepTime: double.infinity,
-        ),
-      };
+            CharacterState.normal: SpriteAnimation.spriteList(<Sprite>[
+              await game.loadSprite(_ghostSpritePaths[ghostIconNumber]!),
+            ], stepTime: double.infinity),
+            CharacterState.scared: SpriteAnimation.spriteList(<Sprite>[
+              await game.loadSprite('ghostscared1.png'),
+            ], stepTime: double.infinity),
+            CharacterState.scaredIsh: SpriteAnimation.spriteList(<Sprite>[
+              await game.loadSprite('ghostscared1.png'),
+              await game.loadSprite('ghostscared2.png'),
+            ], stepTime: 0.1),
+            CharacterState.dead: SpriteAnimation.spriteList(<Sprite>[
+              await game.loadSprite('eyes.png'),
+            ], stepTime: double.infinity),
+            CharacterState.spawning: SpriteAnimation.spriteList(<Sprite>[
+              await game.loadSprite('eyes.png'),
+            ], stepTime: double.infinity),
+          };
     }
     return _ghostSpriteAnimationCache[ghostIconNumber]!;
   }
@@ -93,9 +87,16 @@ class Ghost extends GameCharacter {
         removeFromParent();
       } else {
         disconnectFromBall();
-        add(MoveToPositionEffect(maze.ghostStart,
-            onComplete: () =>
-                <void>{bringBallToSprite(), current = world.ghosts.current}));
+        add(
+          MoveToPositionEffect(
+            maze.ghostStart,
+            onComplete:
+                () => <void>{
+                  bringBallToSprite(),
+                  current = world.ghosts.current,
+                },
+          ),
+        );
         resetSlideAngle(this);
       }
     }
@@ -105,12 +106,15 @@ class Ghost extends GameCharacter {
     if (!game.isWonOrLost) {
       current = CharacterState.spawning; //stops further interactions
       disconnectFromBall(spawning: true);
-      add(MoveToPositionEffect(
+      add(
+        MoveToPositionEffect(
           game.level.homingGhosts
               ? world.pacmans.ghostHomingTarget
               : maze.ghostStart,
-          onComplete: () =>
-              <void>{bringBallToSprite(), current = world.ghosts.current}));
+          onComplete:
+              () => <void>{bringBallToSprite(), current = world.ghosts.current},
+        ),
+      );
     }
   }
 
@@ -118,12 +122,17 @@ class Ghost extends GameCharacter {
     current = CharacterState.normal;
     removeEffects(this);
     disconnectFromBall();
-    add(MoveToPositionEffect(maze.ghostStartForId(ghostID),
-        onComplete: () => <void>{
+    add(
+      MoveToPositionEffect(
+        maze.ghostStartForId(ghostID),
+        onComplete:
+            () => <void>{
               //bringBallToSprite()
               //Calling bringBallToSprite here creates a crash
               //also would be a race condition
-            }));
+            },
+      ),
+    );
     resetSlideAngle(this);
   }
 

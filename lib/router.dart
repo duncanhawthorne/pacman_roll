@@ -16,8 +16,9 @@ final GoRouter router = GoRouter(
     GoRoute(
       path: '/',
       builder: (BuildContext context, GoRouterState state) {
-        final GameLevel level =
-            _parseGameLevel(state.uri.queryParameters[levelUrlKey]);
+        final GameLevel level = _parseGameLevel(
+          state.uri.queryParameters[levelUrlKey],
+        );
         int mazeId = _parseMazeId(state.uri.queryParameters[mazeUrlKey]);
         if (level.isTutorial && !isTutorialMaze(mazeId)) {
           mazeId = Maze.tutorialMazeId;
@@ -50,5 +51,5 @@ int _parseMazeId(String? mazeString) {
 
 Map<dynamic, dynamic> _reverseMap(Map<dynamic, dynamic> map) =>
     <dynamic, dynamic>{
-      for (final MapEntry<dynamic, dynamic> e in map.entries) e.value: e.key
+      for (final MapEntry<dynamic, dynamic> e in map.entries) e.value: e.key,
     };

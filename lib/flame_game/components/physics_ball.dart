@@ -13,23 +13,22 @@ const bool openSpaceMovement = kDebugMode && enableRotationRaceMode;
 
 // ignore: always_specify_types
 class PhysicsBall extends BodyComponent with IgnoreEvents {
-  PhysicsBall({
-    required Vector2 position,
-  }) : super(
-            fixtureDefs: <FixtureDef>[
-              FixtureDef(
-                restitution: openSpaceMovement ? 0.2 : 0,
-                friction: openSpaceMovement ? 1 : 0,
-                CircleShape(
-                    radius: maze.spriteWidth / 2 * _lubricationScaleFactor),
-              ),
-            ],
-            bodyDef: BodyDef(
-              angularDamping: openSpaceMovement ? 1 : 0,
-              position: position,
-              type: BodyType.dynamic,
-              fixedRotation: !openSpaceMovement,
-            ));
+  PhysicsBall({required Vector2 position})
+    : super(
+        fixtureDefs: <FixtureDef>[
+          FixtureDef(
+            restitution: openSpaceMovement ? 0.2 : 0,
+            friction: openSpaceMovement ? 1 : 0,
+            CircleShape(radius: maze.spriteWidth / 2 * _lubricationScaleFactor),
+          ),
+        ],
+        bodyDef: BodyDef(
+          angularDamping: openSpaceMovement ? 1 : 0,
+          position: position,
+          type: BodyType.dynamic,
+          fixedRotation: !openSpaceMovement,
+        ),
+      );
 
   @override
   // ignore: overridden_fields
@@ -69,10 +68,11 @@ class PhysicsBall extends BodyComponent with IgnoreEvents {
 
   Vector2 _teleportedPosition() {
     _volatileInstantConsumeVector2.setValues(
-        _smallMod(position.x, maze.mazeWidth),
-        !_kVerticalPortalsEnabled
-            ? position.y
-            : _smallMod(position.y, maze.mazeHeight));
+      _smallMod(position.x, maze.mazeWidth),
+      !_kVerticalPortalsEnabled
+          ? position.y
+          : _smallMod(position.y, maze.mazeHeight),
+    );
     return _volatileInstantConsumeVector2;
   }
 

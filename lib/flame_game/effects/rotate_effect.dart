@@ -24,10 +24,13 @@ Effect _rotateToAngleEffect(double angle, {Function()? onComplete}) {
   //Should be able to do this by extending the class
   //would then integrate smallAngle function inside the class itself
   return RotateEffect.to(
-      angle,
-      EffectController(
-          duration: kResetPositionTimeMillis / 1000, curve: Curves.easeOut),
-      onComplete: onComplete);
+    angle,
+    EffectController(
+      duration: kResetPositionTimeMillis / 1000,
+      curve: Curves.easeOut,
+    ),
+    onComplete: onComplete,
+  );
 }
 
 double smallAngle(double angleDelta) {

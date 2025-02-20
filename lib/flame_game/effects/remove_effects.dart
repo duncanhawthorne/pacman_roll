@@ -9,8 +9,8 @@ void removeEffects(Component component) {
       //create a new list toList so can iterate and remove simultaneously
       .toList(growable: false)
       .forEach((Effect item) {
-    item
-      ..pause() //sync
-      ..removeFromParent();
-  });
+        item
+          ..pause() //sync
+          ..removeFromParent();
+      });
 }

@@ -42,47 +42,57 @@ class MyGame extends StatelessWidget {
         providers: <SingleChildWidget>[
           Provider<Palette>(create: (BuildContext context) => Palette()),
           ChangeNotifierProvider<PlayerProgress>(
-              create: (BuildContext context) => PlayerProgress()),
+            create: (BuildContext context) => PlayerProgress(),
+          ),
           Provider<SettingsController>(
-              create: (BuildContext context) => SettingsController()),
+            create: (BuildContext context) => SettingsController(),
+          ),
           // Set up audio.
-          ProxyProvider2<SettingsController, AppLifecycleStateNotifier,
-              AudioController>(
+          ProxyProvider2<
+            SettingsController,
+            AppLifecycleStateNotifier,
+            AudioController
+          >(
             // Ensures that music starts immediately.
             lazy: false,
             create: (BuildContext context) => AudioController(),
-            update: (BuildContext context,
-                SettingsController settings,
-                AppLifecycleStateNotifier lifecycleNotifier,
-                AudioController? audio) {
+            update: (
+              BuildContext context,
+              SettingsController settings,
+              AppLifecycleStateNotifier lifecycleNotifier,
+              AudioController? audio,
+            ) {
               audio!.attachDependencies(lifecycleNotifier, settings);
               return audio;
             },
-            dispose: (BuildContext context, AudioController audio) =>
-                audio.dispose(),
+            dispose:
+                (BuildContext context, AudioController audio) =>
+                    audio.dispose(),
           ),
         ],
-        child: Builder(builder: (BuildContext context) {
-          //context.watch<Palette>();
+        child: Builder(
+          builder: (BuildContext context) {
+            //context.watch<Palette>();
 
-          return MaterialApp.router(
-            title: appTitle,
-            theme: flutterNesTheme().copyWith(
-              scaffoldBackgroundColor: Palette.background.color,
-              colorScheme: ColorScheme.fromSeed(
-                seedColor: Palette.seed.color,
-                surface: Palette.background.color,
+            return MaterialApp.router(
+              title: appTitle,
+              theme: flutterNesTheme().copyWith(
+                scaffoldBackgroundColor: Palette.background.color,
+                colorScheme: ColorScheme.fromSeed(
+                  seedColor: Palette.seed.color,
+                  surface: Palette.background.color,
+                ),
+                textTheme: GoogleFonts.pressStart2pTextTheme().apply(
+                  bodyColor: Palette.text.color,
+                  displayColor: Palette.text.color,
+                ),
               ),
-              textTheme: GoogleFonts.pressStart2pTextTheme().apply(
-                bodyColor: Palette.text.color,
-                displayColor: Palette.text.color,
-              ),
-            ),
-            routeInformationProvider: router.routeInformationProvider,
-            routeInformationParser: router.routeInformationParser,
-            routerDelegate: router.routerDelegate,
-          );
-        }),
+              routeInformationProvider: router.routeInformationProvider,
+              routeInformationParser: router.routeInformationParser,
+              routerDelegate: router.routerDelegate,
+            );
+          },
+        ),
       ),
     );
   }

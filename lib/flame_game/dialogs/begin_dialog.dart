@@ -11,10 +11,7 @@ import 'game_start_dialog.dart';
 /// This first dialog shown during playback mode
 
 class BeginDialog extends StatelessWidget {
-  const BeginDialog({
-    super.key,
-    required this.game,
-  });
+  const BeginDialog({super.key, required this.game});
 
   final PacmanGame game;
 
@@ -22,16 +19,19 @@ class BeginDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     assert(game.playbackMode);
     return purePopup(
-        child: TextButton(
-            style: buttonStyle(),
-            onPressed: () {
-              game.toggleOverlay(GameScreen.beginDialogKey);
-              context.go(
-                  '/?$levelUrlKey=${levelAfterPlaybackScreen(game)}&$mazeUrlKey=${mazeNames[Maze.defaultMazeId]}');
-            },
-            child: const Padding(
-              padding: EdgeInsets.all(12.0),
-              child: Text("Start", style: textStyleBody),
-            )));
+      child: TextButton(
+        style: buttonStyle(),
+        onPressed: () {
+          game.toggleOverlay(GameScreen.beginDialogKey);
+          context.go(
+            '/?$levelUrlKey=${levelAfterPlaybackScreen(game)}&$mazeUrlKey=${mazeNames[Maze.defaultMazeId]}',
+          );
+        },
+        child: const Padding(
+          padding: EdgeInsets.all(12.0),
+          child: Text("Start", style: textStyleBody),
+        ),
+      ),
+    );
   }
 }

@@ -24,10 +24,12 @@ class PacmanSprites {
     logGlobal("save picture");
     final Picture picture = _pacmanRecorderAtFrac(size, mouthWidthAsInt);
     final Image image = await picture.toImage(size, size);
-    final ByteData? imageBytes =
-        await image.toByteData(format: ImageByteFormat.png);
-    await File('C:/tmp/$mouthWidthAsInt.png')
-        .writeAsBytes(imageBytes!.buffer.asUint8List());
+    final ByteData? imageBytes = await image.toByteData(
+      format: ImageByteFormat.png,
+    );
+    await File(
+      'C:/tmp/$mouthWidthAsInt.png',
+    ).writeAsBytes(imageBytes!.buffer.asUint8List());
   }
 
   Picture _pacmanRecorderAtFrac(int size, int mouthWidthAsInt) {
@@ -36,11 +38,17 @@ class PacmanSprites {
     final PictureRecorder recorder = PictureRecorder();
     final Canvas canvas = Canvas(recorder);
     final Rect rect = Rect.fromCenter(
-        center: Offset(size / 2, size / 2),
-        width: size.toDouble(),
-        height: size.toDouble());
-    canvas.drawArc(rect, tau / 2 + tau * ((mouthWidth / 2) + 0.5),
-        tau * (1 - mouthWidth), true, pacmanPaint);
+      center: Offset(size / 2, size / 2),
+      width: size.toDouble(),
+      height: size.toDouble(),
+    );
+    canvas.drawArc(
+      rect,
+      tau / 2 + tau * ((mouthWidth / 2) + 0.5),
+      tau * (1 - mouthWidth),
+      true,
+      pacmanPaint,
+    );
     final Picture picture = recorder.endRecording();
     return picture;
   }
@@ -49,8 +57,9 @@ class PacmanSprites {
     if (_loadFromFile) {
       return Sprite(await Flame.images.load('$mouthWidthAsInt.png'));
     } else {
-      return Sprite(await _pacmanRecorderAtFrac(size, mouthWidthAsInt)
-          .toImage(size, size));
+      return Sprite(
+        await _pacmanRecorderAtFrac(size, mouthWidthAsInt).toImage(size, size),
+      );
     }
   }
 
@@ -70,30 +79,37 @@ class PacmanSprites {
 
   Future<List<Sprite>> pacmanNormalSprites(int size) async {
     final List<Future<Sprite>> lf = List<Future<Sprite>>.generate(
-        1, (int index) => _pacmanAtFrac(size, pacmanMouthWidthDefault));
+      1,
+      (int index) => _pacmanAtFrac(size, pacmanMouthWidthDefault),
+    );
     return _lf2fl(lf);
   }
 
   Future<List<Sprite>> pacmanEatingSprites(int size) async {
     final List<Future<Sprite>> lf = List<Future<Sprite>>.generate(
-        pacmanEatingHalfIncrements * 2, //open and close
-        (int index) =>
-            _pacmanAtFrac(size, (pacmanMouthWidthDefault - (index + 1)).abs()));
+      pacmanEatingHalfIncrements * 2, //open and close
+      (int index) =>
+          _pacmanAtFrac(size, (pacmanMouthWidthDefault - (index + 1)).abs()),
+    );
     return _lf2fl(lf);
   }
 
   Future<List<Sprite>> pacmanDyingSprites(int size) async {
     final List<Future<Sprite>> lf = List<Future<Sprite>>.generate(
-        pacmanDeadIncrements + 1, //open and close
-        (int index) => _pacmanAtFrac(size, pacmanMouthWidthDefault + index));
+      pacmanDeadIncrements + 1, //open and close
+      (int index) => _pacmanAtFrac(size, pacmanMouthWidthDefault + index),
+    );
     return _lf2fl(lf);
   }
 
   Future<List<Sprite>> pacmanBirthingSprites(int size) async {
     final List<Future<Sprite>> lf = List<Future<Sprite>>.generate(
-        pacmanDeadIncrements + 1, //open and close
-        (int index) => _pacmanAtFrac(size,
-            pacmanMouthWidthDefault + (pacmanDeadIncrements + 1 - index)));
+      pacmanDeadIncrements + 1, //open and close
+      (int index) => _pacmanAtFrac(
+        size,
+        pacmanMouthWidthDefault + (pacmanDeadIncrements + 1 - index),
+      ),
+    );
     return _lf2fl(lf);
   }
 

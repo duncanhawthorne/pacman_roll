@@ -8,8 +8,10 @@ import 'ghost.dart';
 import 'pacman.dart';
 
 class PacmanClone extends Pacman with Clone {
-  PacmanClone(
-      {required Vector2 super.position, required Pacman super.original});
+  PacmanClone({
+    required Vector2 super.position,
+    required Pacman super.original,
+  });
 }
 
 class GhostClone extends Ghost with Clone {

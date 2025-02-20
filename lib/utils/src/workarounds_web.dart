@@ -38,7 +38,8 @@ class CustomPathStrategy extends PathUrlStrategy {
 final bool isPwa =
     kIsWeb && web.window.matchMedia('(display-mode: standalone)').matches;
 // Check if it's web iOS
-final bool isWebiOS = kIsWeb &&
+final bool isWebiOS =
+    kIsWeb &&
     web.window.navigator.userAgent.contains(RegExp(r'iPad|iPod|iPhone'));
 
 const double _iOSWebPWAInset = 25;

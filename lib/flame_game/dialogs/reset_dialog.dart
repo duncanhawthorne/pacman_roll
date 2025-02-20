@@ -13,10 +13,7 @@ import '../pacman_game.dart';
 /// and a comparison vs the leaderboard
 
 class ResetDialog extends StatelessWidget {
-  const ResetDialog({
-    super.key,
-    required this.game,
-  });
+  const ResetDialog({super.key, required this.game});
 
   final PacmanGame game;
 
@@ -25,22 +22,26 @@ class ResetDialog extends StatelessWidget {
     return popupDialog(
       children: <Widget>[
         titleText(text: appTitle),
-        bottomRowWidget(children: <Widget>[
-          TextButton(
+        bottomRowWidget(
+          children: <Widget>[
+            TextButton(
               style: buttonStyle(),
               onPressed: () {
                 game.overlays.remove(GameScreen.resetDialogKey);
               },
-              child: const Text("Cancel", style: textStyleBody)),
-          TextButton(
+              child: const Text("Cancel", style: textStyleBody),
+            ),
+            TextButton(
               style: buttonStyle(borderColor: Palette.warning.color),
               onPressed: () {
                 game.playerProgress.reset();
                 game.overlays.remove(GameScreen.resetDialogKey);
                 context.go('/');
               },
-              child: const Text("Reset completed levels", style: textStyleBody))
-        ]),
+              child: const Text("Reset completed levels", style: textStyleBody),
+            ),
+          ],
+        ),
       ],
     );
   }

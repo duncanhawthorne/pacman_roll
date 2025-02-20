@@ -6,10 +6,12 @@ import 'workarounds_stub.dart'
     if (dart.library.js_interop) 'workarounds_web.dart';
 
 void setStatusBarColor(Color color) {
-  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-    statusBarColor: color, // Status bar color
-    systemNavigationBarColor: color,
-  ));
+  SystemChrome.setSystemUIOverlayStyle(
+    SystemUiOverlayStyle(
+      statusBarColor: color, // Status bar color
+      systemNavigationBarColor: color,
+    ),
+  );
 }
 
 void fixTitlePerm() {

@@ -16,13 +16,15 @@ class Levels {
     return levelNum >= 1
         ? 1
         : levelNum == minLevel
-            ? 0.75
-            : 0.75; //not possible
+        ? 0.75
+        : 0.75; //not possible
   }
 
   GameLevel getLevel(int levelNum) {
-    assert(levelNum <= maxLevel && levelNum >= minLevel ||
-        levelNum == playbackModeLevel);
+    assert(
+      levelNum <= maxLevel && levelNum >= minLevel ||
+          levelNum == playbackModeLevel,
+    );
     bool playbackMode = false;
     if (levelNum == playbackModeLevel) {
       levelNum = firstRealLevel;
@@ -33,24 +35,27 @@ class Levels {
       maxAllowedDeaths: 3,
       superPelletsEnabled: levelNum <= 1 ? true : false,
       multipleSpawningGhosts: levelNum <= 2 ? false : true,
-      ghostSpawnTimerLength: levelNum <= 2
-          ? -1
-          : _ghostSpawnTimerLengthPattern[
-              (levelNum - 3) % _ghostSpawnTimerLengthPattern.length],
+      ghostSpawnTimerLength:
+          levelNum <= 2
+              ? -1
+              : _ghostSpawnTimerLengthPattern[(levelNum - 3) %
+                  _ghostSpawnTimerLengthPattern.length],
       homingGhosts:
           levelNum <= 2 + _ghostSpawnTimerLengthPattern.length ? false : true,
       isTutorial: levelNum <= 0,
       levelSpeed: _levelSpeedFactor * _tutorialFactor(levelNum),
       ghostScaredTimeFactor: _tutorialFactor(levelNum),
       spinSpeedFactor: _tutorialFactor(levelNum),
-      numStartingGhosts: levelNum >= 0
-          ? 3
-          : levelNum == minLevel
+      numStartingGhosts:
+          levelNum >= 0
+              ? 3
+              : levelNum == minLevel
               ? 3
               : (levelNum - 1) % 3 + 1, //not possible
-      levelString: levelNum > 0
-          ? "L$levelNum"
-          : "Tutorial", //${levelNum - minLevel + 1}",
+      levelString:
+          levelNum > 0
+              ? "L$levelNum"
+              : "Tutorial", //${levelNum - minLevel + 1}",
       infLives: levelNum <= 0 ? true : false,
     );
     return result;
@@ -59,18 +64,19 @@ class Levels {
 
 final Levels levels = Levels();
 
-typedef GameLevel = ({
-  int number,
-  int maxAllowedDeaths,
-  bool superPelletsEnabled,
-  bool multipleSpawningGhosts,
-  int ghostSpawnTimerLength,
-  bool homingGhosts,
-  bool isTutorial,
-  double levelSpeed,
-  double ghostScaredTimeFactor,
-  double spinSpeedFactor,
-  int numStartingGhosts,
-  String levelString,
-  bool infLives,
-});
+typedef GameLevel =
+    ({
+      int number,
+      int maxAllowedDeaths,
+      bool superPelletsEnabled,
+      bool multipleSpawningGhosts,
+      int ghostSpawnTimerLength,
+      bool homingGhosts,
+      bool isTutorial,
+      double levelSpeed,
+      double ghostScaredTimeFactor,
+      double spinSpeedFactor,
+      int numStartingGhosts,
+      String levelString,
+      bool infLives,
+    });

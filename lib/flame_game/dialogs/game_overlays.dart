@@ -32,7 +32,7 @@ Widget topOverlayWidget(BuildContext context, PacmanGame game) {
             spacing: _widgetSpacing,
             children: <Widget>[
               _topLeftWidget(context, game),
-              _topRightWidget(context, game)
+              _topRightWidget(context, game),
             ],
           ),
         ],
@@ -81,16 +81,20 @@ Widget _mainMenuButtonWidget(BuildContext context, PacmanGame game) {
 Widget _livesWidget(BuildContext context, PacmanGame game) {
   return Padding(
     padding: const EdgeInsets.only(
-        left: _pacmanOuterSpacing, right: _pacmanOuterSpacing),
+      left: _pacmanOuterSpacing,
+      right: _pacmanOuterSpacing,
+    ),
     child: ValueListenableBuilder<int>(
       valueListenable: game.numberOfDeathsNotifier,
       builder: (BuildContext context, int value, Widget? child) {
         return Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            spacing: _pacmanSpacing,
-            children: List<Widget>.generate(
-                game.level.infLives ? 1 : game.level.maxAllowedDeaths,
-                (int index) => animatedPacmanIcon(game, index)));
+          crossAxisAlignment: CrossAxisAlignment.center,
+          spacing: _pacmanSpacing,
+          children: List<Widget>.generate(
+            game.level.infLives ? 1 : game.level.maxAllowedDeaths,
+            (int index) => animatedPacmanIcon(game, index),
+          ),
+        );
       },
     ),
   );
@@ -116,10 +120,11 @@ Widget _clockWidget(PacmanGame game) {
         stream: Stream<dynamic>.periodic(const Duration(milliseconds: 100)),
         builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
           return Text(
-              (game.stopwatchMilliSeconds / 1000)
-                  .toStringAsFixed(1)
-                  .padLeft(4, " "),
-              style: textStyleBody);
+            (game.stopwatchMilliSeconds / 1000)
+                .toStringAsFixed(1)
+                .padLeft(4, " "),
+            style: textStyleBody,
+          );
         },
       ),
     ),
@@ -139,8 +144,10 @@ Widget _raceProgressWidget(PacmanGame game) {
       child: StreamBuilder<dynamic>(
         stream: Stream<dynamic>.periodic(const Duration(milliseconds: 100)),
         builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-          return Text(game.getRaceProgress().toStringAsFixed(2).padLeft(4, " "),
-              style: textStyleBody);
+          return Text(
+            game.getRaceProgress().toStringAsFixed(2).padLeft(4, " "),
+            style: textStyleBody,
+          );
         },
       ),
     ),

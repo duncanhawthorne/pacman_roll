@@ -32,28 +32,33 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   final Timer _eatTimer = Timer(_kPacmanHalfEatingResetTimeMillis * 2 / 1000);
 
   @override
-  Future<Map<CharacterState, SpriteAnimation>> getAnimations(
-      [int size = 1]) async {
+  Future<Map<CharacterState, SpriteAnimation>> getAnimations([
+    int size = 1,
+  ]) async {
     return <CharacterState, SpriteAnimation>{
       CharacterState.normal: SpriteAnimation.spriteList(
         await pacmanSprites.pacmanNormalSprites(size),
         stepTime: double.infinity,
       ),
       CharacterState.eating: SpriteAnimation.spriteList(
-          await pacmanSprites.pacmanEatingSprites(size),
-          stepTime: _kPacmanHalfEatingResetTimeMillis /
-              1000 /
-              pacmanEatingHalfIncrements,
-          loop: false),
+        await pacmanSprites.pacmanEatingSprites(size),
+        stepTime:
+            _kPacmanHalfEatingResetTimeMillis /
+            1000 /
+            pacmanEatingHalfIncrements,
+        loop: false,
+      ),
       CharacterState.dead: SpriteAnimation.spriteList(
-          await pacmanSprites.pacmanDyingSprites(size),
-          stepTime:
-              kPacmanDeadResetTimeAnimationMillis / 1000 / pacmanDeadIncrements,
-          loop: false),
+        await pacmanSprites.pacmanDyingSprites(size),
+        stepTime:
+            kPacmanDeadResetTimeAnimationMillis / 1000 / pacmanDeadIncrements,
+        loop: false,
+      ),
       CharacterState.spawning: SpriteAnimation.spriteList(
-          await pacmanSprites.pacmanBirthingSprites(size),
-          stepTime: kResetPositionTimeMillis / 1000 / pacmanDeadIncrements,
-          loop: false)
+        await pacmanSprites.pacmanBirthingSprites(size),
+        stepTime: kResetPositionTimeMillis / 1000 / pacmanDeadIncrements,
+        loop: false,
+      ),
     };
   }
 
@@ -142,8 +147,12 @@ class Pacman extends GameCharacter with CollisionCallbacks {
           world.doingLevelResetFlourish = true;
           game.stopRegularItems();
         }
-        add(NullEffect(_kPacmanDeadResetTimeMillis,
-            onComplete: _dieFromGhostActionAfterDeathAnimation));
+        add(
+          NullEffect(
+            _kPacmanDeadResetTimeMillis,
+            onComplete: _dieFromGhostActionAfterDeathAnimation,
+          ),
+        );
       }
     }
   }
@@ -232,10 +241,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   }
 
   @override
-  void onCollision(
-    Set<Vector2> intersectionPoints,
-    PositionComponent other,
-  ) {
+  void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
     onCollideWith(other);
     super.onCollision(intersectionPoints, other);
   }

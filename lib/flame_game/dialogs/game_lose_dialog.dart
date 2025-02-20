@@ -9,11 +9,7 @@ import 'game_start_dialog.dart';
 /// This dialog is shown when a level is lost.
 
 class GameLoseDialog extends StatelessWidget {
-  const GameLoseDialog({
-    super.key,
-    required this.level,
-    required this.game,
-  });
+  const GameLoseDialog({super.key, required this.level, required this.game});
 
   /// The properties of the level that was just finished.
   final GameLevel level;
@@ -35,12 +31,13 @@ class GameLoseDialog extends StatelessWidget {
         bottomRowWidget(
           children: <Widget>[
             TextButton(
-                style: buttonStyle(),
-                onPressed: () {
-                  game.overlays.remove(GameScreen.loseDialogKey);
-                  game.resetAndStart();
-                },
-                child: const Text('Retry', style: textStyleBody)),
+              style: buttonStyle(),
+              onPressed: () {
+                game.overlays.remove(GameScreen.loseDialogKey);
+                game.resetAndStart();
+              },
+              child: const Text('Retry', style: textStyleBody),
+            ),
           ],
         ),
       ],

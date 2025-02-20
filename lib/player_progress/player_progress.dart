@@ -35,15 +35,16 @@ class PlayerProgress extends ChangeNotifier {
 
   final List<Map<String, int>> _playerProgressLevels = <Map<String, int>>[];
   late final Map<String, dynamic> _playerProgress = <String, dynamic>{
-    "levels": _playerProgressLevels
+    "levels": _playerProgressLevels,
   };
 
   Iterable<int> get _levelNumsCompleted =>
       _playerProgressLevels.map((Map<String, int> item) => item["levelNum"]!);
 
-  int get maxLevelCompleted => _playerProgressLevels.isEmpty
-      ? Levels.minLevel - 1
-      : _levelNumsCompleted.reduce(max);
+  int get maxLevelCompleted =>
+      _playerProgressLevels.isEmpty
+          ? Levels.minLevel - 1
+          : _levelNumsCompleted.reduce(max);
 
   bool isComplete(int levelNum) {
     return _levelNumsCompleted.contains(levelNum);
@@ -62,9 +63,12 @@ class PlayerProgress extends ChangeNotifier {
   }
 
   void _addWin(Map<String, int> win) {
-    final Map<String, int>? relevantSave = _playerProgressLevels
-        .where((Map<String, int> item) => item["levelNum"] == win["levelNum"])
-        .firstOrNull;
+    final Map<String, int>? relevantSave =
+        _playerProgressLevels
+            .where(
+              (Map<String, int> item) => item["levelNum"] == win["levelNum"],
+            )
+            .firstOrNull;
     if (relevantSave == null) {
       _playerProgressLevels.add(win);
     } else if (win["levelCompleteTime"]! < relevantSave["levelCompleteTime"]!) {
@@ -135,7 +139,7 @@ Map<String, int> _cleanupWin(Map<String, dynamic> winRaw) {
     "levelNum": -1,
     "mazeId": -1,
     "levelCompleteTime": -1,
-    "dateTime": -1
+    "dateTime": -1,
   };
   for (final String key in result.keys) {
     result[key] = winRaw[key] as int;

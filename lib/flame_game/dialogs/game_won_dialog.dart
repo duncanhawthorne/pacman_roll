@@ -47,41 +47,43 @@ class GameWonDialog extends StatelessWidget {
         !FBase.firebaseOn || game.level.isTutorial
             ? const SizedBox.shrink()
             : bodyWidget(
-                child: FutureBuilder<String>(
-                    future: _scoreboardRankText(
-                        levelNum: level.number,
-                        levelCompletedInMillis: levelCompletedInMillis,
-                        mazeId: maze.mazeId),
-                    initialData: _scoreboardLoadingText(),
-                    builder:
-                        (BuildContext context, AsyncSnapshot<String> text) {
-                      return Text(
-                        text.data!,
-                        style: textStyleBody,
-                      );
-                    }),
+              child: FutureBuilder<String>(
+                future: _scoreboardRankText(
+                  levelNum: level.number,
+                  levelCompletedInMillis: levelCompletedInMillis,
+                  mazeId: maze.mazeId,
+                ),
+                initialData: _scoreboardLoadingText(),
+                builder: (BuildContext context, AsyncSnapshot<String> text) {
+                  return Text(text.data!, style: textStyleBody);
+                },
               ),
+            ),
         levelSelector(context, game),
         mazeSelector(context, game),
         bottomRowWidget(
           children: <Widget>[
             TextButton(
-                style: buttonStyle(
-                    borderColor: showNextButton ? Palette.transp.color : null),
-                onPressed: () {
-                  game.overlays.remove(GameScreen.wonDialogKey);
-                  game.resetAndStart();
-                },
-                child: const Text('Retry', style: textStyleBody)),
+              style: buttonStyle(
+                borderColor: showNextButton ? Palette.transp.color : null,
+              ),
+              onPressed: () {
+                game.overlays.remove(GameScreen.wonDialogKey);
+                game.resetAndStart();
+              },
+              child: const Text('Retry', style: textStyleBody),
+            ),
             !showNextButton
                 ? const SizedBox.shrink()
                 : TextButton(
-                    style: buttonStyle(),
-                    onPressed: () {
-                      context.go(
-                          '/?$levelUrlKey=${game.level.number + 1}&$mazeUrlKey=${maze.mazeId}');
-                    },
-                    child: const Text('Next', style: textStyleBody))
+                  style: buttonStyle(),
+                  onPressed: () {
+                    context.go(
+                      '/?$levelUrlKey=${game.level.number + 1}&$mazeUrlKey=${maze.mazeId}',
+                    );
+                  },
+                  child: const Text('Next', style: textStyleBody),
+                ),
           ],
         ),
       ],
@@ -97,17 +99,20 @@ String _scoreboardLoadingText() {
   return !FBase.firebaseOn ? "" : "Rank: Loading...";
 }
 
-Future<String> _scoreboardRankText(
-    {required int levelNum,
-    required int levelCompletedInMillis,
-    required int mazeId}) async {
+Future<String> _scoreboardRankText({
+  required int levelNum,
+  required int levelCompletedInMillis,
+  required int mazeId,
+}) async {
   if (!FBase.firebaseOn) {
     return "";
   }
-  final double percentile = await fBase.firebasePercentile(
-          levelNum: levelNum,
-          levelCompletedInMillis: levelCompletedInMillis,
-          mazeId: mazeId) *
+  final double percentile =
+      await fBase.firebasePercentile(
+        levelNum: levelNum,
+        levelCompletedInMillis: levelCompletedInMillis,
+        mazeId: mazeId,
+      ) *
       100.0;
   return "Rank: ${percentile == 0 ? "World Record" : "Top ${percentile.toStringAsFixed(0)}%"}";
 }

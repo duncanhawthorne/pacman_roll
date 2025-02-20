@@ -15,7 +15,8 @@ import 'secrets.dart';
 const bool _debugFakeLogin = false;
 const String _gUserFakeLogin = "joebloggs@gmail.com";
 
-final bool gOn = googleOnReal &&
+final bool gOn =
+    googleOnReal &&
     !(defaultTargetPlatform == TargetPlatform.windows && !kIsWeb);
 
 class G {
@@ -39,23 +40,29 @@ class G {
 
   String get gUser => gUserNotifier.value;
 
-  set _gUser(String g) =>
-      <void>{_log.info("gUserChanged $g"), gUserNotifier.value = g};
+  set _gUser(String g) => <void>{
+    _log.info("gUserChanged $g"),
+    gUserNotifier.value = g,
+  };
 
   double _iconWidth = 1;
   Color _color = Colors.white;
 
   Widget loginLogoutWidget(
-      BuildContext context, double iconWidth, Color color) {
+    BuildContext context,
+    double iconWidth,
+    Color color,
+  ) {
     _iconWidth = iconWidth;
     _color = color;
     return !gOn
         ? const SizedBox.shrink()
         : ValueListenableBuilder<String>(
-            valueListenable: gUserNotifier,
-            builder: (BuildContext context, String audioOn, Widget? child) {
-              return !signedIn ? _loginButton(context) : _logoutButton(context);
-            });
+          valueListenable: gUserNotifier,
+          builder: (BuildContext context, String audioOn, Widget? child) {
+            return !signedIn ? _loginButton(context) : _logoutButton(context);
+          },
+        );
   }
 
   Widget _loginButton(BuildContext context) {
@@ -78,20 +85,23 @@ class G {
   Widget _platformAdaptiveSignInButton(BuildContext context) {
     // different buttons depending on web or mobile. See sign_in_button folder
     return buildSignInButton(
-        onPressed:
-            _signInDirectly, //relevant on web only, else uses separate code
-        context: context,
-        g: this);
+      onPressed:
+          _signInDirectly, //relevant on web only, else uses separate code
+      context: context,
+      g: this,
+    );
   }
 
   static const bool _requireLogoutConfirm = false;
   Widget _logoutButton(BuildContext context) {
     return IconButton(
-      icon: _gUserIcon == _gUserIconDefault
-          ? Icon(Icons.face_outlined, color: _color)
-          : CircleAvatar(
-              radius: _iconWidth / 2,
-              backgroundImage: NetworkImage(_gUserIcon)),
+      icon:
+          _gUserIcon == _gUserIconDefault
+              ? Icon(Icons.face_outlined, color: _color)
+              : CircleAvatar(
+                radius: _iconWidth / 2,
+                backgroundImage: NetworkImage(_gUserIcon),
+              ),
       onPressed: () {
         if (_requireLogoutConfirm) {
           //add additional logic here
@@ -107,9 +117,7 @@ class G {
     //gID defined in secrets.dart, not included in repo
     //in format XXXXXX.apps.googleusercontent.com
     clientId: gID,
-    scopes: <String>[
-      'email',
-    ],
+    scopes: <String>['email'],
   );
 
   Future<List<String>> _loadUserFromFilesystem() async {
@@ -143,8 +151,9 @@ class G {
 
   void _startGoogleAccountChangeListener() {
     if (gOn) {
-      googleSignIn.onCurrentUserChanged
-          .listen((GoogleSignInAccount? account) async {
+      googleSignIn.onCurrentUserChanged.listen((
+        GoogleSignInAccount? account,
+      ) async {
         _log.info("gUser changed");
         _user = account;
         if (_user != null) {

@@ -17,10 +17,11 @@ import 'ghost.dart';
 import 'pacman.dart';
 import 'physics_ball.dart';
 
-final Paint _highQualityPaint = Paint()
-  ..filterQuality = FilterQuality.high
-//..color = const Color.fromARGB(255, 255, 255, 255)
-  ..isAntiAlias = true;
+final Paint _highQualityPaint =
+    Paint()
+      ..filterQuality = FilterQuality.high
+      //..color = const Color.fromARGB(255, 255, 255, 255)
+      ..isAntiAlias = true;
 
 final Vector2 _kVector2Zero = Vector2.zero();
 
@@ -32,13 +33,15 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
         HasWorldReference<PacmanWorld>,
         HasGameReference<PacmanGame> {
   GameCharacter({super.position, this.original})
-      : super(
-            size: maze.spriteSize,
-            paint: _highQualityPaint,
-            anchor: Anchor.center);
+    : super(
+        size: maze.spriteSize,
+        paint: _highQualityPaint,
+        anchor: Anchor.center,
+      );
 
-  late final PhysicsBall _ball =
-      PhysicsBall(position: position); //never created for clone
+  late final PhysicsBall _ball = PhysicsBall(
+    position: position,
+  ); //never created for clone
   late final Vector2 _ballPos = _ball.position;
   late final Vector2 _ballVel = _ball.body.linearVelocity;
   late final Vector2 _gravitySign = world.gravitySign;
@@ -48,18 +51,20 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
 
   double get speed => _ballVel.length;
 
-  double get _spinParity => _ballVel.x.abs() > _ballVel.y.abs()
-      ? _gravitySign.y * _ballVel.x.sign
-      : -_gravitySign.x * _ballVel.y.sign;
+  double get _spinParity =>
+      _ballVel.x.abs() > _ballVel.y.abs()
+          ? _gravitySign.y * _ballVel.x.sign
+          : -_gravitySign.x * _ballVel.y.sign;
 
   bool get typical =>
       connectedToBall &&
       current != CharacterState.dead &&
       current != CharacterState.spawning;
 
-  late final CollisionType _defaultCollisionType = enableRotationRaceMode
-      ? CollisionType.inactive
-      : this is Pacman || this is PacmanClone
+  late final CollisionType _defaultCollisionType =
+      enableRotationRaceMode
+          ? CollisionType.inactive
+          : this is Pacman || this is PacmanClone
           ? CollisionType.active
           : CollisionType.passive;
 
@@ -69,8 +74,10 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   GameCharacter? _clone;
   late final GameCharacter? original;
 
-  late final CircleHitbox _hitbox =
-      CircleHitbox(isSolid: true, collisionType: _defaultCollisionType);
+  late final CircleHitbox _hitbox = CircleHitbox(
+    isSolid: true,
+    collisionType: _defaultCollisionType,
+  );
 
   late final double _radius = size.x / 2;
 
@@ -85,8 +92,9 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     }
   }
 
-  Future<Map<CharacterState, SpriteAnimation>> getAnimations(
-      [int size = 1]) async {
+  Future<Map<CharacterState, SpriteAnimation>> getAnimations([
+    int size = 1,
+  ]) async {
     return <CharacterState, SpriteAnimation>{};
   }
 
@@ -139,8 +147,9 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   Future<void> onLoad() async {
     _loadStubAnimationsOnDebugMode();
     if (!isClone) {
-      parent!
-          .add(_ball); //should be added to static parent but risks going stray
+      parent!.add(
+        _ball,
+      ); //should be added to static parent but risks going stray
     }
     add(_hitbox);
     if (enableRotationRaceMode) {
@@ -185,7 +194,9 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
           _clone = PacmanClone(position: position, original: this as Pacman);
         } else if (this is Ghost) {
           _clone = GhostClone(
-              ghostID: (this as Ghost).ghostID, original: this as Ghost);
+            ghostID: (this as Ghost).ghostID,
+            original: this as Ghost,
+          );
         }
       }
       assert(_clone != null);
