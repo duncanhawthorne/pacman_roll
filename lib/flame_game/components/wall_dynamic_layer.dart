@@ -17,11 +17,4 @@ class MovingWallWrapper extends WrapperNoEvents {
     super.onLoad();
     await reset();
   }
-
-  @override
-  void updateTree(double dt) {
-    // no point traversing large list of children as nothing to update
-    // so cut short the updateTree here
-    //super.updateTree(dt);
-  }
 }

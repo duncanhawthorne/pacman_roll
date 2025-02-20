@@ -9,11 +9,14 @@ import '../effects/null_effect.dart';
 import '../effects/remove_effects.dart';
 import '../icons/pacman_sprites.dart';
 import '../maze.dart';
+import '../pacman_world.dart';
 import 'clones.dart';
 import 'game_character.dart';
 import 'ghost.dart';
 import 'pellet.dart';
 import 'super_pellet.dart';
+import 'wall.dart';
+import 'wall_dynamic_layer.dart';
 
 const int _kPacmanDeadResetTimeMillis = 1550;
 const int _kPacmanHalfEatingResetTimeMillis = 180;
@@ -84,6 +87,10 @@ class Pacman extends GameCharacter with CollisionCallbacks {
         _onCollideWithGhost(other);
       } else if (other is GhostClone) {
         _onCollideWithGhost(other.original! as Ghost);
+      } else if (PacmanWorld.enableMovingWalls &&
+          movingWallsDamage &&
+          other is MovingWallWrapper) {
+        _dieFromGhost();
       }
     }
   }

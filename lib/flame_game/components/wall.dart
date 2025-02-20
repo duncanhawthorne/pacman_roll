@@ -1,5 +1,7 @@
+import 'dart:math';
 import 'dart:ui';
 
+import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 
@@ -44,6 +46,8 @@ class WallGround extends BodyComponent with IgnoreEvents {
 
 final Vector2 _dynamicWallGravityScale = Vector2(-1, -1);
 
+const bool movingWallsDamage = true;
+
 // ignore: always_specify_types
 class WallDynamic extends BodyComponent with IgnoreEvents {
   WallDynamic({required super.fixtureDefs, required Vector2 position})
@@ -57,4 +61,54 @@ class WallDynamic extends BodyComponent with IgnoreEvents {
 
   @override
   final int priority = -3;
+
+  late final Vector2 _size = _getSize();
+
+  Vector2 _getSize() {
+    final List<Vector2> v =
+        (body.fixtures.first.shape as PolygonShape).vertices;
+    final Iterable<double> xs = v.map((Vector2 element) => element.x);
+    final Iterable<double> ys = v.map((Vector2 element) => element.y);
+    final double minX = xs.reduce(min);
+    final double maxX = xs.reduce(max);
+    final double minY = ys.reduce(min);
+    final double maxY = ys.reduce(max);
+    return Vector2(maxX - minX, maxY - minY);
+  }
+
+  // ignore: unused_field
+  late final RectangleHitbox _hitbox1 = RectangleHitbox(
+    isSolid: true,
+    size: _size * 0.65,
+    collisionType: CollisionType.passive,
+    anchor: Anchor.center,
+  );
+
+  late final RectangleHitbox _hitbox2 = RectangleHitbox(
+    isSolid: true,
+    size: _size * 0.65,
+    collisionType: CollisionType.passive,
+    anchor: Anchor.center,
+  );
+
+  @override
+  Future<void> onLoad() async {
+    await super.onLoad();
+    if (movingWallsDamage) {
+      //add(_hitbox1); //parent?.add(_hitbox);
+      parent?.add(_hitbox2);
+
+      //_hitbox1.debugMode = true;
+      //_hitbox1.debugColor = Colors.green;
+      //_hitbox2.debugMode = true;
+    }
+  }
+
+  @override
+  void update(double dt) {
+    super.update(dt);
+    if (movingWallsDamage) {
+      _hitbox2.position.setFrom(position);
+    }
+  }
 }
