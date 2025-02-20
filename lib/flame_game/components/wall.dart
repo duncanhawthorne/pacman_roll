@@ -4,8 +4,10 @@ import 'dart:ui';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
+import 'package:flutter/foundation.dart';
 
 import '../../style/palette.dart';
+import 'physics_ball.dart';
 
 final Paint _wallVisualPaint = Paint()
 //..filterQuality = FilterQuality.none
@@ -46,7 +48,7 @@ class WallGround extends BodyComponent with IgnoreEvents {
 
 final Vector2 _dynamicWallGravityScale = Vector2(-1, -1);
 
-const bool movingWallsDamage = true;
+const bool movingWallsDamage = kDebugMode && false;
 
 // ignore: always_specify_types
 class WallDynamic extends BodyComponent with IgnoreEvents {
@@ -56,7 +58,7 @@ class WallDynamic extends BodyComponent with IgnoreEvents {
             bodyDef: BodyDef(
                 position: Vector2.zero()..setFrom(position),
                 type: BodyType.dynamic,
-                fixedRotation: true,
+                fixedRotation: !openSpaceMovement,
                 gravityScale: _dynamicWallGravityScale));
 
   @override

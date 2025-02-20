@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 
 import 'components/mini_pellet.dart';
 import 'components/pellet.dart';
+import 'components/physics_ball.dart';
 import 'components/super_pellet.dart';
 import 'components/wall.dart';
 import 'pacman_game.dart';
@@ -278,8 +279,11 @@ class Maze {
       required double height,
       double density = 1}) {
     return FixtureDef(
-        PolygonShape()..setAsBox(width / 2, height / 2, position, 0),
-        density: density);
+      friction: openSpaceMovement ? 1 : 0,
+      restitution: openSpaceMovement ? 0.4 : 0,
+      PolygonShape()..setAsBox(width / 2, height / 2, position, 0),
+      density: density,
+    );
   }
 
   List<Component> mazeWalls(

@@ -124,7 +124,11 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     if (connectedToBall) {
       assert(!isClone);
       position.setFrom(_ballPos);
-      angle += speed * dt / _radius * _spinParity;
+      if (openSpaceMovement) {
+        angle = _ball.angle;
+      } else {
+        angle += speed * dt / _radius * _spinParity;
+      }
     }
   }
 
