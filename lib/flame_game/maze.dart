@@ -44,10 +44,10 @@ class Maze {
 
   void setMazeId(int id) {
     {
+      if (_mazeId == id) {
+        return;
+      }
       _mazeId = id;
-      ghostStart.setFrom(_volatileVectorOfMazeListCode(_kGhostStart));
-      pacmanStart.setFrom(_volatileVectorOfMazeListCode(_kPacmanStart));
-      _cage.setFrom(_volatileVectorOfMazeListCode(_kCage));
       //items below used every frame so calculate once here
       blockWidth = _blockWidth();
       spriteWidth = _spriteWidth();
@@ -57,6 +57,10 @@ class Maze {
       cloneThreshold = mazeWidth / 2 - spriteWidth / 2;
       mazeHalfWidth = mazeWidth / 2;
       mazeHalfHeight = mazeHeight / 2;
+      //other items
+      ghostStart.setFrom(_volatileVectorOfMazeListCode(_kGhostStart));
+      pacmanStart.setFrom(_volatileVectorOfMazeListCode(_kPacmanStart));
+      _cage.setFrom(_volatileVectorOfMazeListCode(_kCage));
       //item below used regularly
       _ghostStartForIdMap[0] = _ghostStartForId(0);
       _ghostStartForIdMap[1] = _ghostStartForId(1);
@@ -81,7 +85,7 @@ class Maze {
 
   bool get isDefault => mazeId == defaultMazeId;
 
-  int _mazeId = -1; //set properly in initializer
+  int _mazeId = -10; //set properly in initializer
   final Vector2 ghostStart = Vector2.zero(); //set properly in initializer
   final Vector2 pacmanStart = Vector2.zero(); //set properly in initializer
   final Vector2 _cage = Vector2.zero(); //set properly in initializer
@@ -101,7 +105,8 @@ class Maze {
   }
 
   Vector2 _ghostStartForId(int idNum) {
-    return ghostStart + Vector2(spriteWidth * (idNum % 3 - 1), 0);
+    assert(ghostStart.x != 0 || ghostStart.y != 0); //i.e. not set yet
+    return ghostStart.clone()..x += spriteWidth * (idNum % 3 - 1);
   }
 
   Vector2 ghostSpawnForId(int idNum) {
@@ -165,6 +170,7 @@ class Maze {
     /// using [_volatileInstantConsumeVector2]
     /// so we don't have to make new Vector2 every time called
     /// but therefore must instantly consume the output as it may change
+    assert(blockWidth != 0); //i.e. not set yet
     _volatileInstantConsumeVector2.setValues(
         (j + 1 / 2 - _mazeLayout[0].length / 2) * blockWidth,
         (i + 1 / 2 - _mazeLayout.length / 2) * blockWidth);
@@ -179,7 +185,7 @@ class Maze {
         }
       }
     }
-    throw 'Missing maze code';
+    throw 'Missing maze code $code';
   }
 
   bool _pelletCodeAtCell(int i, int j) {
