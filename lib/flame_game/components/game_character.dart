@@ -5,7 +5,9 @@ import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/foundation.dart';
 
+import '../../utils/constants.dart';
 import '../effects/remove_effects.dart';
+import '../effects/rotate_effect.dart';
 import '../icons/stub_sprites.dart';
 import '../maze.dart';
 import '../pacman_game.dart';
@@ -55,8 +57,9 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
       current != CharacterState.dead &&
       current != CharacterState.spawning;
 
-  late final CollisionType _defaultCollisionType =
-      this is Pacman || this is PacmanClone
+  late final CollisionType _defaultCollisionType = enableRotationRaceMode
+      ? CollisionType.inactive
+      : this is Pacman || this is PacmanClone
           ? CollisionType.active
           : CollisionType.passive;
 
@@ -140,6 +143,9 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
           .add(_ball); //should be added to static parent but risks going stray
     }
     add(_hitbox);
+    if (enableRotationRaceMode) {
+      _lapAngleLast = _getLapAngle();
+    }
   }
 
   @mustCallSuper
@@ -196,11 +202,27 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
     }
   }
 
+  late double _lapAngleLast;
+  double lapAngleProgress = 0;
+
+  double _getLapAngle() {
+    return position.screenAngle();
+  }
+
+  void _updateLapAngle() {
+    if (!enableRotationRaceMode) {
+      return;
+    }
+    lapAngleProgress += smallAngle(_getLapAngle() - _lapAngleLast);
+    _lapAngleLast = _getLapAngle();
+  }
+
   @override
   void update(double dt) {
     //note, this function is also run for clones
     _oneFrameOfPhysics(dt);
     _addRemoveClone();
+    _updateLapAngle();
     super.update(dt);
   }
 }

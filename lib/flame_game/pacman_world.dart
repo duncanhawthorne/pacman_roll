@@ -153,13 +153,16 @@ class PacmanWorld extends Forge2DWorld
     }
   }
 
-  static const bool enableMovingWalls = true && kDebugMode;
+  static const bool enableMovingWalls = kDebugMode && false;
   @override
   Future<void> onLoad() async {
     super.onLoad();
     add(noEventsWrapper);
     wrappers
         .addAll(<WrapperNoEvents>[pacmans, ghosts, pellets, _walls, _blocking]);
+    if (enableRotationRaceMode) {
+      wrappers.remove(pellets);
+    }
     if (enableMovingWalls) {
       wrappers.add(_movingWalls);
     }

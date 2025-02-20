@@ -7,6 +7,7 @@ import 'package:flame/camera.dart';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
+import 'package:flame/geometry.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flutter/foundation.dart';
 
@@ -16,9 +17,11 @@ import '../firebase/firebase_saves.dart';
 import '../level_selection/levels.dart';
 import '../player_progress/player_progress.dart';
 import '../style/palette.dart';
+import '../utils/constants.dart';
 import '../utils/helper.dart';
 import '../utils/src/workarounds.dart';
 import '../utils/stored_moves.dart';
+import 'components/ghost.dart';
 import 'game_screen.dart';
 import 'maze.dart';
 import 'pacman_world.dart';
@@ -392,6 +395,22 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
     cleanDialogs();
     await audioController.stopAllSounds();
     super.onRemove();
+  }
+
+  double getRaceProgress() {
+    assert(enableRotationRaceMode);
+    if (!enableRotationRaceMode) {
+      return 0;
+    }
+    if (world.pacmans.pacmanList.isEmpty || world.ghosts.ghostList.isEmpty) {
+      return 0;
+    }
+    return 1 /
+        tau *
+        (world.pacmans.pacmanList[0].lapAngleProgress -
+            world.ghosts.ghostList
+                .map((Ghost ghost) => ghost.lapAngleProgress)
+                .reduce(max));
   }
 }
 

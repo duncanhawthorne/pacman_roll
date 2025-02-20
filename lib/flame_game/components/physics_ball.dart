@@ -2,13 +2,14 @@ import 'package:flame/components.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flutter/foundation.dart';
 
+import '../../utils/constants.dart';
 import '../maze.dart';
 
 const double _lubricationScaleFactor = 0.99;
 const bool _kVerticalPortalsEnabled = false;
 final Vector2 _volatileInstantConsumeVector2 =
     Vector2.zero(); //shared across all balls
-const bool openSpaceMovement = kDebugMode && false;
+const bool openSpaceMovement = kDebugMode && enableRotationRaceMode;
 
 // ignore: always_specify_types
 class PhysicsBall extends BodyComponent with IgnoreEvents {

@@ -6,6 +6,7 @@ import '../../google/google.dart';
 import '../../settings/settings.dart';
 import '../../style/dialog.dart';
 import '../../style/palette.dart';
+import '../../utils/constants.dart';
 import '../game_screen.dart';
 import '../icons/pacman_icons.dart';
 import '../pacman_game.dart';
@@ -63,7 +64,7 @@ Widget _topRightWidget(BuildContext context, PacmanGame game) {
     children: <Widget>[
       _infintyWidget(context, game),
       _livesWidget(context, game),
-      _clockWidget(game),
+      enableRotationRaceMode ? _raceProgressWidget(game) : _clockWidget(game),
     ],
   );
 }
@@ -101,6 +102,7 @@ Widget _infintyWidget(BuildContext context, PacmanGame game) {
       : Text("∞", style: TextStyle(color: Palette.pacman.color));
 }
 
+// ignore: unused_element
 Widget _clockWidget(PacmanGame game) {
   return GestureDetector(
     onLongPress: () {
@@ -117,6 +119,27 @@ Widget _clockWidget(PacmanGame game) {
               (game.stopwatchMilliSeconds / 1000)
                   .toStringAsFixed(1)
                   .padLeft(4, " "),
+              style: textStyleBody);
+        },
+      ),
+    ),
+  );
+}
+
+// ignore: unused_element
+Widget _raceProgressWidget(PacmanGame game) {
+  return GestureDetector(
+    onLongPress: () {
+      if (detailedAudioLog) {
+        game.toggleOverlay(GameScreen.debugDialogKey);
+      }
+    },
+    child: Padding(
+      padding: const EdgeInsets.only(left: _clockSpacing, right: _clockSpacing),
+      child: StreamBuilder<dynamic>(
+        stream: Stream<dynamic>.periodic(const Duration(milliseconds: 100)),
+        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+          return Text(game.getRaceProgress().toStringAsFixed(2).padLeft(4, " "),
               style: textStyleBody);
         },
       ),
