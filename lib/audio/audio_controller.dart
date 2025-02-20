@@ -351,7 +351,7 @@ class AudioController {
     if (!_isAudioSystemEnabled) {
       return;
     }
-    _log.fine("stopSfx $type");
+    !isAudioOn ? null : _log.fine("stopSfx $type");
     if (_useAudioPlayers) {
       if (_apPlayers.containsKey(type)) {
         await _apPlayers[type]!.stop();
