@@ -2,7 +2,6 @@ import 'dart:core';
 
 import 'package:flame/components.dart';
 
-import '../../utils/helper.dart';
 import '../pacman_world.dart';
 import 'game_character.dart';
 import 'physics_ball.dart';
@@ -30,7 +29,7 @@ class Physics extends Component with HasWorldReference<PacmanWorld> {
 
   late final bool _freeRotation = true;
 
-  double get speed => _ballVel.length;
+  double get speed => !_ball.isMounted ? 0 : _ballVel.length;
 
   late final double _initialRadius = owner.size.x / 2;
 
@@ -54,21 +53,23 @@ class Physics extends Component with HasWorldReference<PacmanWorld> {
   late final Vector2 _ballVelUnscaled = _ball.body.linearVelocity;
 
   Future<void> initaliseFromOwner() async {
-    if (!_ball.isLoaded) {
-      logGlobal("ball not loaded");
-      //await loaded; //FIXME
-      return;
+    if (!_ball.isLoaded || !_ball.isMounted) {
+      await loaded;
+      await mounted;
     }
     owner.connectedToBall = true;
     _ball.position = owner.position;
     _ball.velocity = owner.velocity;
     _ball.radius = owner.radius;
     _ball.body.angularVelocity = owner.angularVelocity;
-    _ball.setDynamic();
+    await _ball.setDynamic();
   }
 
   void _oneFrameOfPhysics(double dt) {
-    if (!isMounted || !_ball.isMounted || !owner.connectedToBall) {
+    if (!isMounted ||
+        !_ball.isMounted ||
+        !_ball.isLoaded ||
+        !owner.connectedToBall) {
       return;
     }
     if (owner.canAccelerate) {
@@ -95,21 +96,21 @@ class Physics extends Component with HasWorldReference<PacmanWorld> {
   @override
   Future<void> onLoad() async {
     super.onLoad();
-    await initaliseFromOwner();
     if (!owner.isClone) {
       await world.add(_ball);
     }
+    await initaliseFromOwner();
   }
 
   @override
   Future<void> onMount() async {
     super.onMount();
-    await initaliseFromOwner();
     if (!_ball.isMounted) {
       if (!owner.isClone) {
         await world.add(_ball);
       }
     }
+    await initaliseFromOwner();
   }
 
   void ownerRemovedActions() {
