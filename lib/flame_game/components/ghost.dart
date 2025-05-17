@@ -92,7 +92,7 @@ class Ghost extends GameCharacter {
       if (game.level.multipleSpawningGhosts) {
         removeFromParent();
       } else {
-        setStaticMode();
+        setPhysicsState(PhysicsState.none);
         add(
           MoveToPositionEffect(
             maze.ghostStart,
@@ -111,7 +111,7 @@ class Ghost extends GameCharacter {
   void _setSpawning() {
     if (!game.isWonOrLost) {
       current = CharacterState.spawning; //stops further interactions
-      setStaticMode();
+      setPhysicsState(PhysicsState.none);
       add(
         MoveToPositionEffect(
           game.level.homingGhosts
@@ -130,7 +130,7 @@ class Ghost extends GameCharacter {
   void resetSlideAfterPacmanDeath() {
     current = CharacterState.normal;
     removeEffects(this);
-    setStaticMode();
+    setPhysicsState(PhysicsState.none);
     add(
       MoveToPositionEffect(
         maze.ghostStartForId(ghostID),
@@ -161,7 +161,7 @@ class Ghost extends GameCharacter {
       if (ghostID >= 3) {
         _setSpawning();
       } else {
-        setPhysicsMode();
+        setPhysicsState(PhysicsState.full);
       }
     }
     animations = await getAnimations(); //load for clone too

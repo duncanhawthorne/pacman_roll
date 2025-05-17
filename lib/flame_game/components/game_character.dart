@@ -31,9 +31,6 @@ class GameCharacter extends SpriteCharacter {
 
   bool possiblePhysicsConnection = true;
 
-  bool connectedToBall =
-      true; //can't rename to be private variable as overridden in clone
-
   final bool canAccelerate = false;
 
   set velocity(Vector2 v) => _velocity.setFrom(v);
@@ -51,7 +48,7 @@ class GameCharacter extends SpriteCharacter {
   double friction = 1;
   static Vector2 reusableVector = Vector2.zero();
 
-  bool get typical => connectedToBall && stateTypical;
+  bool get typical => state == PhysicsState.full && stateTypical;
 
   bool _cloneEverMade = false; //could just test clone is null
   GameCharacter? _clone;
@@ -74,24 +71,25 @@ class GameCharacter extends SpriteCharacter {
     return x.isMounted && !x.isRemoving;
   }
 
+  PhysicsState state = PhysicsState.full;
   @override
-  void setPhysicsMode() {
-    super.setPhysicsMode();
-    _physics.initaliseFromOwnerAndSetDynamic();
-    connectedToBall = true;
-    if (!_isFullyMounted(_physics)) {
-      add(_physics);
+  void setPhysicsState(PhysicsState state) {
+    super.setPhysicsState(state);
+    if (state == PhysicsState.full) {
+      state = PhysicsState.full;
+      _physics.initaliseFromOwnerAndSetDynamic();
+      if (!_isFullyMounted(_physics)) {
+        add(_physics);
+      }
+    } else if (state == PhysicsState.partial) {
+      state = PhysicsState.partial;
+    } else {
+      state = PhysicsState.none;
+      assert(!isClone); //as for clone have no way to turn collisionType back on
+      if (_isFullyMounted(_physics)) {
+        _physics.removeFromParent();
+      }
     }
-  }
-
-  @override
-  void setStaticMode() {
-    super.setStaticMode();
-    assert(!isClone); //as for clone have no way to turn collisionType back on
-    if (_isFullyMounted(_physics)) {
-      _physics.removeFromParent();
-    }
-    connectedToBall = false;
   }
 
   void setPositionStillActiveCurrentPosition() {
@@ -105,11 +103,11 @@ class GameCharacter extends SpriteCharacter {
     acceleration.setAll(0);
     angularVelocity = 0;
     _physics.initaliseFromOwnerAndSetDynamic();
-    setPhysicsMode();
+    setPhysicsState(PhysicsState.full);
   }
 
   void setPositionStillStatic(Vector2 targetLoc) {
-    setStaticMode();
+    setPhysicsState(PhysicsState.none);
     position.setFrom(targetLoc);
     velocity.setAll(0);
     acceleration.setAll(0);
@@ -128,7 +126,7 @@ class GameCharacter extends SpriteCharacter {
   void removalActions() {
     super.removalActions();
     if (!isClone) {
-      setStaticMode();
+      setPhysicsState(PhysicsState.none);
       _physics.ownerRemovedActions();
       _cloneEverMade ? _clone?.removeFromParent() : null;
       removeEffects(this); //sync and async
@@ -202,3 +200,5 @@ class GameCharacter extends SpriteCharacter {
     super.update(dt);
   }
 }
+
+enum PhysicsState { full, partial, none, unset }

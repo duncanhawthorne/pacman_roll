@@ -21,7 +21,7 @@ class GhostClone extends Ghost with Clone {
 mixin Clone on GameCharacter {
   @override
   // ignore: overridden_fields
-  final bool connectedToBall = false;
+  final PhysicsState state = PhysicsState.none;
 
   void updateCloneFrom(GameCharacter original) {
     assert(isClone);

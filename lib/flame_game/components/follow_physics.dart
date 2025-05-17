@@ -72,7 +72,7 @@ class Physics extends Component with HasWorldReference<PacmanWorld> {
     if (!isMounted ||
         !_ball.isMounted ||
         !_ball.isLoaded ||
-        !owner.connectedToBall) {
+        owner.state != PhysicsState.full) {
       return;
     }
     if (owner.canAccelerate) {

@@ -8,6 +8,7 @@ import '../../utils/helper.dart';
 import '../effects/remove_effects.dart';
 import '../pacman_game.dart';
 import '../pacman_world.dart';
+import 'game_character.dart';
 import 'ghost.dart';
 import 'sprite_character.dart';
 import 'wrapper_no_events.dart';
@@ -184,7 +185,7 @@ class Ghosts extends WrapperNoEvents
   void disconnectGhostsFromBalls() {
     for (final Ghost ghost in ghostList) {
       removeEffects(ghost);
-      ghost.setStaticMode(); //sync
+      ghost.setPhysicsState(PhysicsState.none); //sync
     }
   }
 
