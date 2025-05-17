@@ -2,6 +2,7 @@ import 'dart:core';
 
 import 'package:flame/components.dart';
 
+import '../../utils/helper.dart';
 import '../pacman_world.dart';
 import 'alien.dart';
 import 'bullet.dart';
@@ -51,7 +52,6 @@ class Physics extends Component with HasWorldReference<PacmanWorld> {
         ..setFrom(_ballPosUnscaled)
         ..scale(spriteVsPhysicsScale);
   late final Vector2 _ballPosUnscaled = _ball.position;
-
   Vector2 get _ballVel =>
       _reusableVector
         ..setFrom(_ballVelUnscaled)
@@ -59,15 +59,12 @@ class Physics extends Component with HasWorldReference<PacmanWorld> {
   late final Vector2 _ballVelUnscaled = _ball.body.linearVelocity;
 
   Future<void> initaliseFromOwner() async {
-    if (isRemoving) {
-      return;
-    }
     if (!_ball.isLoaded) {
-      //logGlobal("ball not loaded");
+      logGlobal("ball not loaded");
       //await loaded; //FIXME
       return;
     }
-    //owner.connectedToBall = true;
+    owner.connectedToBall = true;
     _ball.position = owner.position;
     _ball.velocity = owner.velocity;
     _ball.radius = owner.radius;
@@ -102,38 +99,23 @@ class Physics extends Component with HasWorldReference<PacmanWorld> {
 
   @override
   Future<void> onLoad() async {
-    await super.onLoad();
+    super.onLoad();
     await initaliseFromOwner();
-    try {
-      await world.add(_ball); //FIXME investigate
-      //FIXME but only !isClone
-    } catch (e) {
-      print("no world onload");
-    }
+    await world.add(_ball); //FIXME but only !isClone
   }
 
   @override
   Future<void> onMount() async {
     super.onMount();
-    world; //force intialise
     await initaliseFromOwner();
     if (!_ball.isMounted) {
-      try {
-        await world.add(_ball); //FIXME investigate
-        //FIXME but only !isClone
-      } catch (e) {
-        //print("no world onmount");
-      }
+      await world.add(_ball); //FIXME but only !isClone
     }
   }
 
   void ownerRemovedActions() {
     _ball.removeFromParent();
-    try {
-      world.destroyBody(_ball.body); //FIXME investigate
-    } catch (e) {
-      //print("no world ownerRemovedActions");
-    }
+    //world.destroyBody(_ball.body); //FIXME investigate
   }
 
   void removalActions() {
