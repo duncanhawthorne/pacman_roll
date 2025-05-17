@@ -1,23 +1,35 @@
 import 'dart:core';
+import 'dart:ui';
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../style/palette.dart';
+import '../../utils/constants.dart';
 import '../effects/remove_effects.dart';
 import '../icons/stub_sprites.dart';
 import '../pacman_game.dart';
 import '../pacman_world.dart';
-import 'bullet.dart';
-import 'ship.dart';
+import 'clones.dart';
+import 'game_character.dart';
+import 'pacman.dart';
+
+final Paint _highQualityPaint =
+    Paint()
+      ..filterQuality = FilterQuality.high
+      //..color = const Color.fromARGB(255, 255, 255, 255)
+      ..isAntiAlias = true;
 
 class SpriteCharacter extends SpriteAnimationGroupComponent<CharacterState>
     with
         HasWorldReference<PacmanWorld>,
         HasGameReference<PacmanGame>,
         IgnoreEvents {
-  SpriteCharacter({super.position, super.paint}) : super(anchor: Anchor.center);
+  SpriteCharacter({super.position, this.original})
+    : super(anchor: Anchor.center, paint: _highQualityPaint);
+
+  late final GameCharacter? original;
 
   String defaultSpritePath = "";
 
@@ -25,16 +37,18 @@ class SpriteCharacter extends SpriteAnimationGroupComponent<CharacterState>
       current != CharacterState.dead && current != CharacterState.spawning;
 
   late final CollisionType defaultCollisionType =
-      this is Ship || this is Bullet
+      enableRotationRaceMode
+          ? CollisionType.inactive
+          : this is Pacman || this is PacmanClone
           ? CollisionType.active
           : CollisionType.passive;
 
-  final bool isClone = false;
+  late final bool isClone = this is PacmanClone || this is GhostClone;
 
   late final CircleHitbox hitBox = CircleHitbox(
     isSolid: true,
     collisionType: defaultCollisionType,
-    anchor: Anchor.center,
+    //anchor: Anchor.center,
   )..debugMode = kDebugMode && false;
 
   Future<Map<CharacterState, SpriteAnimation>> getSingleSprite([
@@ -50,13 +64,7 @@ class SpriteCharacter extends SpriteAnimationGroupComponent<CharacterState>
   Future<Map<CharacterState, SpriteAnimation>> getAnimations([
     int size = 1,
   ]) async {
-    if (defaultSpritePath != "") {
-      return getSingleSprite(size);
-    }
-    if (animations == null) {
-      animations = stubSprites.stubAnimation;
-    }
-    return animations!;
+    return <CharacterState, SpriteAnimation>{};
   }
 
   void _loadStubAnimationsOnDebugMode() {
@@ -88,10 +96,6 @@ class SpriteCharacter extends SpriteAnimationGroupComponent<CharacterState>
   Future<void> onLoad() async {
     await super.onLoad();
     _loadStubAnimationsOnDebugMode();
-    if (this is! Ship) {
-      animations = await getAnimations(100);
-      current = CharacterState.normal;
-    }
     add(hitBox);
   }
 
@@ -115,3 +119,5 @@ class SpriteCharacter extends SpriteAnimationGroupComponent<CharacterState>
     super.onRemove();
   }
 }
+
+enum CharacterState { normal, scared, scaredIsh, eating, dead, spawning }

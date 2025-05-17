@@ -179,7 +179,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
 
   void resetSlideAfterDeath() {
     removeEffects(this);
-    setPositionStill(maze.pacmanStart);
+    setPositionStillInactive(maze.pacmanStart);
     disconnectFromBall();
     angle = 0;
     current = CharacterState.spawning;

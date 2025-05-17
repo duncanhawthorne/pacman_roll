@@ -11,7 +11,8 @@ import 'game_character.dart';
 
 const bool openSpaceMovement = kDebugMode && enableRotationRaceMode;
 
-double spriteVsPhysicsScale = 1;
+const double spriteVsPhysicsScale = 1;
+const bool spriteVsPhysicsScaleConstant = true;
 
 final Paint _activePaint = Paint()..color = Palette.pacman.color;
 final Paint _inactivePaint = Paint()..color = Palette.warning.color;

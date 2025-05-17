@@ -1,169 +1,164 @@
 import 'dart:core';
-import 'dart:ui';
 
-import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
-import 'package:flutter/foundation.dart';
 
 import '../../utils/constants.dart';
 import '../effects/remove_effects.dart';
 import '../effects/rotate_effect.dart';
-import '../icons/stub_sprites.dart';
 import '../maze.dart';
-import '../pacman_game.dart';
-import '../pacman_world.dart';
 import 'clones.dart';
+import 'follow_physics.dart';
+import 'follow_simple_physics.dart';
 import 'ghost.dart';
 import 'pacman.dart';
-import 'physics_ball.dart';
+import 'sprite_character.dart';
 
-final Paint _highQualityPaint =
-    Paint()
-      ..filterQuality = FilterQuality.high
-      //..color = const Color.fromARGB(255, 255, 255, 255)
-      ..isAntiAlias = true;
+final Vector2 north = Vector2(0, 1);
 
-final Vector2 _kVector2Zero = Vector2.zero();
+class GameCharacter extends SpriteCharacter {
+  GameCharacter({
+    super.position,
+    required Vector2 velocity,
+    required double radius,
+    this.density = 1,
+    super.original,
+  }) {
+    this.velocity = velocity; //uses setter
+    size = Vector2.all(radius * 2);
+  }
 
-/// The [GameCharacter] is the generic object that is linked to a [PhysicsBall]
-class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
-    with
-        //CollisionCallbacks,
-        IgnoreEvents,
-        HasWorldReference<PacmanWorld>,
-        HasGameReference<PacmanGame> {
-  GameCharacter({super.position, this.original})
-    : super(
-        size: maze.spriteSize,
-        paint: _highQualityPaint,
-        anchor: Anchor.center,
-      );
+  final double density;
 
-  late final PhysicsBall _ball = PhysicsBall(
-    position: position,
-  ); //never created for clone
-  late final Vector2 _ballPos = _ball.position;
-  late final Vector2 _ballVel = _ball.body.linearVelocity;
-  late final Vector2 _gravitySign = world.gravitySign;
+  bool possiblePhysicsConnection = true;
 
   bool connectedToBall =
       true; //can't rename to be private variable as overridden in clone
 
-  double get speed => _ballVel.length;
+  final bool canAccelerate = false;
 
-  double get _spinParity =>
-      _ballVel.x.abs() > _ballVel.y.abs()
-          ? _gravitySign.y * _ballVel.x.sign
-          : -_gravitySign.x * _ballVel.y.sign;
+  set velocity(Vector2 v) => _velocity.setFrom(v);
 
-  bool get typical =>
-      connectedToBall &&
-      current != CharacterState.dead &&
-      current != CharacterState.spawning;
+  Vector2 get velocity => _velocity;
+  final Vector2 _velocity = Vector2(0, 0);
 
-  late final CollisionType _defaultCollisionType =
-      enableRotationRaceMode
-          ? CollisionType.inactive
-          : this is Pacman || this is PacmanClone
-          ? CollisionType.active
-          : CollisionType.passive;
+  set acceleration(Vector2 v) => _acceleration.setFrom(v);
 
-  late final bool isClone = this is PacmanClone || this is GhostClone;
+  Vector2 get acceleration => _acceleration;
+  final Vector2 _acceleration = Vector2(0, 0);
+
+  double angularVelocity = 0;
+
+  double friction = 1;
+  static Vector2 reusableVector = Vector2.zero();
+
+  bool get typical => connectedToBall && stateTypical;
 
   bool _cloneEverMade = false; //could just test clone is null
   GameCharacter? _clone;
-  late final GameCharacter? original;
 
-  late final CircleHitbox _hitbox = CircleHitbox(
-    isSolid: true,
-    collisionType: _defaultCollisionType,
-  );
+  double get radius => size.x.toDouble() / 2;
 
-  late final double _radius = size.x / 2;
+  set radius(double x) => _setRadius(x);
 
-  void _loadStubAnimationsOnDebugMode() {
-    // works around changes made in flame 1.19
-    // where animations have to be loaded before can set current
-    // only fails due to assert, which is only tested in debug mode
-    // so if in debug mode, quickly load up stub animations first
-    // https://github.com/flame-engine/flame/pull/3258
-    if (kDebugMode) {
-      animations = stubSprites.stubAnimation;
-    }
+  double get speed => _physics.speed;
+
+  void _setRadius(double x) {
+    size = Vector2.all(x * 2);
+    _physics.setBallRadius(x);
   }
 
-  Future<Map<CharacterState, SpriteAnimation>> getAnimations([
-    int size = 1,
-  ]) async {
-    return <CharacterState, SpriteAnimation>{};
+  late final Physics _physics = Physics(owner: this);
+  late final SimplePhysics _simplePhysics = SimplePhysics(owner: this);
+
+  void disconnectFromBall({bool spawning = false}) {
+    if (!spawning) {
+      //FIXME deal with spawning
+      setImpreciseMode();
+    }
   }
 
   void bringBallToSprite() {
     if (isMounted && !isRemoving) {
+      //FIXME check if still need this test
       // must test isMounted as bringBallToSprite typically runs after a delay
       // and could have reset to remove the ball in the meantime
       setPositionStill(position);
     }
   }
 
-  void setPositionStill(Vector2 targetLoc) {
-    _ball
-      ..position = targetLoc
-      ..velocity = _kVector2Zero;
-    position.setFrom(targetLoc);
-    _connectToBall();
+  @override
+  void setPreciseMode() {
+    super.setPreciseMode();
+    _initialisePhysics();
   }
 
-  void disconnectFromBall({bool spawning = false}) {
-    assert(!isClone); //as for clone have no way to turn collisionType back on
-    if (!spawning) {
-      /// if body not yet initialised, this will crash
-      _ball.setStatic();
+  @override
+  void setImpreciseMode() {
+    super.setImpreciseMode();
+    _initialiseSimplePhysics();
+  }
+
+  void _initialisePhysics() {
+    _physics.initaliseFromOwner();
+    connectedToBall = true;
+    if (children.contains(_simplePhysics)) {
+      _simplePhysics.removeFromParent();
+    }
+    if (!children.contains(_physics)) {
+      add(_physics);
+    }
+  }
+
+  void _initialiseSimplePhysics() {
+    if (children.contains(_physics)) {
+      _physics.removeFromParent();
+    }
+    if (!children.contains(_simplePhysics)) {
+      add(_simplePhysics);
     }
     connectedToBall = false;
-    _hitbox.collisionType = CollisionType.inactive;
   }
 
-  void _connectToBall() {
-    connectedToBall = true;
-    _ball.setDynamic();
-    assert(!isClone); //not called on clones
-    _hitbox.collisionType = _defaultCollisionType;
+  void _disconnectFromBall() {
+    _physics.removeFromParent();
+    assert(!isClone); //as for clone have no way to turn collisionType back on
+    connectedToBall = false;
   }
 
-  void _oneFrameOfPhysics(double dt) {
-    if (connectedToBall) {
-      assert(!isClone);
-      position.setFrom(_ballPos);
-      if (openSpaceMovement) {
-        angle = _ball.angle;
-      } else {
-        angle += speed * dt / _radius * _spinParity;
-      }
-    }
+  void setPositionStill(Vector2 targetLoc) {
+    position.setFrom(targetLoc);
+    velocity.setAll(0);
+    acceleration.setAll(0);
+    angularVelocity = 0;
+    _physics.initaliseFromOwner();
+    setPreciseMode();
+  }
+
+  void setPositionStillInactive(Vector2 targetLoc) {
+    position.setFrom(targetLoc);
+    velocity.setAll(0);
+    acceleration.setAll(0);
+    angularVelocity = 0;
+    _physics.initaliseFromOwner();
   }
 
   @override
   Future<void> onLoad() async {
-    _loadStubAnimationsOnDebugMode();
+    await super.onLoad();
     if (!isClone) {
-      parent!.add(
-        _ball,
-      ); //should be added to static parent but risks going stray
+      setPreciseMode();
     }
-    add(_hitbox);
     if (enableRotationRaceMode) {
       _lapAngleLast = _getLapAngle();
     }
   }
 
-  @mustCallSuper
+  @override
   void removalActions() {
+    super.removalActions();
     if (!isClone) {
-      //removeEffects(this); //dont run this, runs async code which will execute after the item has already been removed and cause a crash
-      disconnectFromBall(); //sync but within async function
-      _ball.removeFromParent();
-      world.destroyBody(_ball.body);
+      _physics.ownerRemovedActions();
+      _disconnectFromBall(); //sync but within async function
       _cloneEverMade ? _clone?.removeFromParent() : null;
       removeEffects(this); //sync and async
     }
@@ -178,7 +173,7 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   @override
   Future<void> onRemove() async {
     removalActions();
-    super.onRemove();
+    await super.onRemove();
   }
 
   void _addRemoveClone() {
@@ -231,11 +226,8 @@ class GameCharacter extends SpriteAnimationGroupComponent<CharacterState>
   @override
   void update(double dt) {
     //note, this function is also run for clones
-    _oneFrameOfPhysics(dt);
     _addRemoveClone();
     _updateLapAngle();
     super.update(dt);
   }
 }
-
-enum CharacterState { normal, scared, scaredIsh, eating, dead, spawning }
