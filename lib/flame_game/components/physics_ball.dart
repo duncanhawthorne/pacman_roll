@@ -54,7 +54,7 @@ class PhysicsBall extends BodyComponent with IgnoreEvents {
 
   @override
   // ignore: overridden_fields
-  final bool renderBody = kDebugMode && false;
+  final bool renderBody = kDebugMode && true;
 
   @override
   // ignore: overridden_fields
@@ -90,7 +90,11 @@ class PhysicsBall extends BodyComponent with IgnoreEvents {
     body.setTransform(pos, owner.angle);
   }
 
-  void setDynamic() {
+  Future<void> setDynamic() async {
+    if (!isMounted) {
+      //await loaded;
+      await mounted;
+    }
     body
       ..setType(BodyType.dynamic)
       ..setActive(true);
@@ -98,14 +102,14 @@ class PhysicsBall extends BodyComponent with IgnoreEvents {
     paint = _activePaint;
   }
 
-  void setStatic() {
-    if (isMounted && body.isActive) {
-      // avoid crashes if body not yet initialised
-      // Probably about to remove ball anyway
-      body
-        ..setType(BodyType.static)
-        ..setActive(false);
+  Future<void> setStatic() async {
+    if (!isMounted) {
+      //await loaded;
+      await mounted;
     }
+    body
+      ..setType(BodyType.static)
+      ..setActive(false);
     _subConnectedBall = false;
     paint = _inactivePaint;
   }

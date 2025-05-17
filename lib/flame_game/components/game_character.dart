@@ -98,22 +98,26 @@ class GameCharacter extends SpriteCharacter {
     _initialiseSimplePhysics();
   }
 
+  bool _isFullyMounted(Component x) {
+    return x.isMounted && !x.isRemoving;
+  }
+
   void _initialisePhysics() {
     _physics.initaliseFromOwner();
     connectedToBall = true;
-    if (children.contains(_simplePhysics)) {
+    if (_isFullyMounted(_simplePhysics)) {
       _simplePhysics.removeFromParent();
     }
-    if (!children.contains(_physics)) {
+    if (!_isFullyMounted(_physics)) {
       add(_physics);
     }
   }
 
   void _initialiseSimplePhysics() {
-    if (children.contains(_physics)) {
+    if (_isFullyMounted(_physics)) {
       _physics.removeFromParent();
     }
-    if (!children.contains(_simplePhysics)) {
+    if (!_isFullyMounted(_simplePhysics)) {
       add(_simplePhysics);
     }
     connectedToBall = false;
