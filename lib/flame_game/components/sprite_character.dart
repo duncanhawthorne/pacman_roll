@@ -79,7 +79,7 @@ class SpriteCharacter extends SpriteAnimationGroupComponent<CharacterState>
   }
 
   @mustCallSuper
-  void setPreciseMode() {
+  void setPhysicsMode() {
     hitBox.collisionType = defaultCollisionType;
     hitBox.debugColor = Palette.pacman.color;
     assert(!isClone); //not called on clones
@@ -89,6 +89,13 @@ class SpriteCharacter extends SpriteAnimationGroupComponent<CharacterState>
   void setImpreciseMode() {
     hitBox.collisionType = CollisionType.inactive;
     hitBox.debugColor = Palette.warning.color;
+    assert(!isClone); //not called on clones
+  }
+
+  @mustCallSuper
+  void setStaticMode() {
+    hitBox.collisionType = CollisionType.inactive;
+    hitBox.debugColor = Palette.seed.color;
     assert(!isClone); //not called on clones
   }
 

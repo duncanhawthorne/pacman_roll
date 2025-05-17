@@ -52,16 +52,19 @@ class Physics extends Component with HasWorldReference<PacmanWorld> {
         ..scale(spriteVsPhysicsScale);
   late final Vector2 _ballVelUnscaled = _ball.body.linearVelocity;
 
-  Future<void> initaliseFromOwner() async {
+  Future<void> _initaliseFromOwner() async {
     if (!_ball.isLoaded || !_ball.isMounted) {
       await loaded;
       await mounted;
     }
-    owner.connectedToBall = true;
     _ball.position = owner.position;
     _ball.velocity = owner.velocity;
     _ball.radius = owner.radius;
     _ball.body.angularVelocity = owner.angularVelocity;
+  }
+
+  Future<void> initaliseFromOwnerAndSetDynamic() async {
+    await _initaliseFromOwner();
     await _ball.setDynamic();
   }
 
@@ -101,7 +104,7 @@ class Physics extends Component with HasWorldReference<PacmanWorld> {
         await world.add(_ball);
       }
     }
-    await initaliseFromOwner();
+    await initaliseFromOwnerAndSetDynamic();
   }
 
   void ownerRemovedActions() {
@@ -110,7 +113,6 @@ class Physics extends Component with HasWorldReference<PacmanWorld> {
   }
 
   void removalActions() {
-    owner.connectedToBall = false;
     _ball.setStatic();
   }
 

@@ -184,7 +184,7 @@ class Ghosts extends WrapperNoEvents
   void disconnectGhostsFromBalls() {
     for (final Ghost ghost in ghostList) {
       removeEffects(ghost);
-      ghost.disconnectFromBall(); //sync
+      ghost.setStaticMode(); //sync
     }
   }
 

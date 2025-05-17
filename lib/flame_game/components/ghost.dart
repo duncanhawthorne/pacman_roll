@@ -92,13 +92,13 @@ class Ghost extends GameCharacter {
       if (game.level.multipleSpawningGhosts) {
         removeFromParent();
       } else {
-        disconnectFromBall();
+        setStaticMode();
         add(
           MoveToPositionEffect(
             maze.ghostStart,
             onComplete:
                 () => <void>{
-                  bringBallToSprite(),
+                  setPositionStillActiveCurrentPosition(),
                   current = world.ghosts.current,
                 },
           ),
@@ -111,14 +111,17 @@ class Ghost extends GameCharacter {
   void _setSpawning() {
     if (!game.isWonOrLost) {
       current = CharacterState.spawning; //stops further interactions
-      disconnectFromBall(spawning: true);
+      setStaticMode();
       add(
         MoveToPositionEffect(
           game.level.homingGhosts
               ? world.pacmans.ghostHomingTarget
               : maze.ghostStart,
           onComplete:
-              () => <void>{bringBallToSprite(), current = world.ghosts.current},
+              () => <void>{
+                setPositionStillActiveCurrentPosition(),
+                current = world.ghosts.current,
+              },
         ),
       );
     }
@@ -127,7 +130,7 @@ class Ghost extends GameCharacter {
   void resetSlideAfterPacmanDeath() {
     current = CharacterState.normal;
     removeEffects(this);
-    disconnectFromBall();
+    setStaticMode();
     add(
       MoveToPositionEffect(
         maze.ghostStartForId(ghostID),
@@ -145,7 +148,7 @@ class Ghost extends GameCharacter {
   void resetInstantAfterPacmanDeath() {
     removeEffects(this);
     current = CharacterState.normal;
-    setPositionStill(maze.ghostStartForId(ghostID));
+    setPositionStillActive(maze.ghostStartForId(ghostID));
     angle = 0;
   }
 
@@ -158,7 +161,7 @@ class Ghost extends GameCharacter {
       if (ghostID >= 3) {
         _setSpawning();
       } else {
-        setPreciseMode();
+        setPhysicsMode();
       }
     }
     animations = await getAnimations(); //load for clone too
