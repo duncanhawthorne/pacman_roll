@@ -79,12 +79,12 @@ class SpriteCharacter extends SpriteAnimationGroupComponent<CharacterState>
   }
 
   @mustCallSuper
-  void setPhysicsState(PhysicsState state) {
+  void setPhysicsState(PhysicsState targetState) {
     assert(!isClone); //not called on clones
-    if (state == PhysicsState.full) {
+    if (targetState == PhysicsState.full) {
       hitBox.collisionType = defaultCollisionType;
       hitBox.debugColor = Palette.pacman.color;
-    } else if (state == PhysicsState.partial) {
+    } else if (targetState == PhysicsState.partial) {
       hitBox.collisionType = CollisionType.inactive;
       hitBox.debugColor = Palette.warning.color;
     } else {

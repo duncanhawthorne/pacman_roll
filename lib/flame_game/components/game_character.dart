@@ -73,9 +73,9 @@ class GameCharacter extends SpriteCharacter {
 
   PhysicsState state = PhysicsState.full;
   @override
-  void setPhysicsState(PhysicsState state) {
-    super.setPhysicsState(state);
-    if (state == PhysicsState.full) {
+  void setPhysicsState(PhysicsState targetState) {
+    super.setPhysicsState(targetState);
+    if (targetState == PhysicsState.full) {
       state = PhysicsState.full;
       _physics.initaliseFromOwnerAndSetDynamic();
       if (!_isFullyMounted(_physics)) {
@@ -84,7 +84,7 @@ class GameCharacter extends SpriteCharacter {
       if (_isFullyMounted(_simplePhysics)) {
         _simplePhysics.removeFromParent();
       }
-    } else if (state == PhysicsState.partial) {
+    } else if (targetState == PhysicsState.partial) {
       state = PhysicsState.partial;
       if (!_isFullyMounted(_simplePhysics)) {
         add(_simplePhysics);
