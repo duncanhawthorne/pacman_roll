@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:flame/components.dart';
 
-import '../components/game_character.dart';
+import '../components/sprite_character.dart';
 
 class StubSprites {
   Picture _stubRecorder() {

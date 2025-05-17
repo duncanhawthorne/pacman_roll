@@ -7,6 +7,8 @@ import '../effects/remove_effects.dart';
 import '../effects/rotate_effect.dart';
 import '../maze.dart';
 import 'game_character.dart';
+import 'physics_ball.dart';
+import 'sprite_character.dart';
 
 const Map<int, String> _ghostSpritePaths = <int, String>{
   0: 'ghost1.png',
@@ -19,7 +21,11 @@ _ghostSpriteAnimationCache = <int, Map<CharacterState, SpriteAnimation>>{};
 
 class Ghost extends GameCharacter {
   Ghost({required this.ghostID, super.original})
-    : super(position: maze.ghostSpawnForId(ghostID));
+    : super(
+        position: maze.ghostSpawnForId(ghostID),
+        velocity: Vector2.zero(),
+        radius: playerSize,
+      );
 
   final int ghostID;
 

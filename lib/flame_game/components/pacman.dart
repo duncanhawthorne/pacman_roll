@@ -14,6 +14,8 @@ import 'clones.dart';
 import 'game_character.dart';
 import 'ghost.dart';
 import 'pellet.dart';
+import 'physics_ball.dart';
+import 'sprite_character.dart';
 import 'super_pellet.dart';
 import 'wall.dart';
 import 'wall_dynamic_layer.dart';
@@ -26,7 +28,8 @@ const bool _freezeGhostsOnKillPacman = false;
 /// The [GameCharacter] is the component that the physical player of the game is
 /// controlling.
 class Pacman extends GameCharacter with CollisionCallbacks {
-  Pacman({required super.position, super.original});
+  Pacman({required super.position, super.original})
+    : super(velocity: Vector2.zero(), radius: playerSize);
 
   final Vector2 _screenSizeLast = Vector2(0, 0);
   final Timer _eatTimer = Timer(_kPacmanHalfEatingResetTimeMillis * 2 / 1000);

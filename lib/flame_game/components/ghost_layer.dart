@@ -8,8 +8,8 @@ import '../../utils/helper.dart';
 import '../effects/remove_effects.dart';
 import '../pacman_game.dart';
 import '../pacman_world.dart';
-import 'game_character.dart';
 import 'ghost.dart';
+import 'sprite_character.dart';
 import 'wrapper_no_events.dart';
 
 const int _kGhostScaredTimeMillis = 6000;

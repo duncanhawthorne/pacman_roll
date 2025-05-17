@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 
 import '../maze.dart';
 import '../pacman_game.dart';
-import 'game_character.dart';
 import 'pacman.dart';
+import 'sprite_character.dart';
 import 'wrapper_no_events.dart';
 
 class Pacmans extends WrapperNoEvents with HasGameReference<PacmanGame> {
