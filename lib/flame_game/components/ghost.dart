@@ -157,6 +157,8 @@ class Ghost extends GameCharacter {
       current = world.ghosts.current;
       if (ghostID >= 3) {
         _setSpawning();
+      } else {
+        setPreciseMode();
       }
     }
     animations = await getAnimations(); //load for clone too
