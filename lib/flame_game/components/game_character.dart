@@ -149,9 +149,6 @@ class GameCharacter extends SpriteCharacter {
   @override
   Future<void> onLoad() async {
     await super.onLoad();
-    if (!isClone) {
-      setPreciseMode();
-    }
     if (enableRotationRaceMode) {
       _lapAngleLast = _getLapAngle();
     }

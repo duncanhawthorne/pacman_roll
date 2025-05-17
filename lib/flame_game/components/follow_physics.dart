@@ -94,15 +94,6 @@ class Physics extends Component with HasWorldReference<PacmanWorld> {
   }
 
   @override
-  Future<void> onLoad() async {
-    super.onLoad();
-    if (!owner.isClone) {
-      await world.add(_ball);
-    }
-    await initaliseFromOwner();
-  }
-
-  @override
   Future<void> onMount() async {
     super.onMount();
     if (!_ball.isMounted) {
