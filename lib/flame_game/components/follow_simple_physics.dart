@@ -11,8 +11,6 @@ class SimplePhysics extends Component with HasWorldReference<PacmanWorld> {
   late final GameCharacter owner;
 
   void _oneFrameOfSimpleMovement(double dt) {
-    return;
-    // ignore: dead_code
     if (owner.canAccelerate) {
       owner.velocity.addScaled(owner.acceleration, dt);
     }
@@ -26,6 +24,9 @@ class SimplePhysics extends Component with HasWorldReference<PacmanWorld> {
   @override
   void update(double dt) {
     super.update(dt);
+    if (owner.state != PhysicsState.partial) {
+      return;
+    }
     _oneFrameOfSimpleMovement(dt);
   }
 

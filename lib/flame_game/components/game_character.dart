@@ -81,13 +81,25 @@ class GameCharacter extends SpriteCharacter {
       if (!_isFullyMounted(_physics)) {
         add(_physics);
       }
+      if (_isFullyMounted(_simplePhysics)) {
+        _simplePhysics.removeFromParent();
+      }
     } else if (state == PhysicsState.partial) {
       state = PhysicsState.partial;
+      if (!_isFullyMounted(_simplePhysics)) {
+        add(_simplePhysics);
+      }
+      if (_isFullyMounted(_physics)) {
+        _physics.removeFromParent();
+      }
     } else {
       state = PhysicsState.none;
       assert(!isClone); //as for clone have no way to turn collisionType back on
       if (_isFullyMounted(_physics)) {
         _physics.removeFromParent();
+      }
+      if (_isFullyMounted(_simplePhysics)) {
+        _simplePhysics.removeFromParent();
       }
     }
   }

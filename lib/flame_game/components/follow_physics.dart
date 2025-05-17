@@ -69,10 +69,7 @@ class Physics extends Component with HasWorldReference<PacmanWorld> {
   }
 
   void _oneFrameOfPhysics(double dt) {
-    if (!isMounted ||
-        !_ball.isMounted ||
-        !_ball.isLoaded ||
-        owner.state != PhysicsState.full) {
+    if (!isMounted || !_ball.isMounted || !_ball.isLoaded) {
       return;
     }
     if (owner.canAccelerate) {
@@ -93,6 +90,9 @@ class Physics extends Component with HasWorldReference<PacmanWorld> {
   @override
   void update(double dt) {
     super.update(dt);
+    if (owner.state != PhysicsState.full) {
+      return;
+    }
     _oneFrameOfPhysics(dt);
   }
 
