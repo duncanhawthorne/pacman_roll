@@ -93,6 +93,7 @@ class PhysicsBall extends BodyComponent with IgnoreEvents {
   }
 
   void setDynamic() {
+    paint = _activePaint;
     if (isRemoving) {
       return;
     }
@@ -107,17 +108,10 @@ class PhysicsBall extends BodyComponent with IgnoreEvents {
       //..setType(BodyType.dynamic)
       ..setActive(true);
     _subConnectedBall = true;
-    paint = _activePaint;
-  }
-
-  @override
-  Future<void> onLoad() async {
-    await super.onLoad();
-    //must set userData for contactCallbacks to work
-    body.userData = this;
   }
 
   void setStatic() {
+    paint = _inactivePaint;
     if (isRemoving) {
       return;
     }
@@ -132,7 +126,6 @@ class PhysicsBall extends BodyComponent with IgnoreEvents {
       //..setType(BodyType.static)
       ..setActive(false);
     _subConnectedBall = false;
-    paint = _inactivePaint;
   }
 
   Vector2 _teleportedPosition() {
@@ -150,6 +143,13 @@ class PhysicsBall extends BodyComponent with IgnoreEvents {
     if (_subConnectedBall && _outsideMazeBounds) {
       position = _teleportedPosition();
     }
+  }
+
+  @override
+  Future<void> onLoad() async {
+    await super.onLoad();
+    //must set userData for contactCallbacks to work
+    body.userData = this;
   }
 
   @override
