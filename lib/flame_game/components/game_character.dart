@@ -119,7 +119,6 @@ class GameCharacter extends SpriteCharacter {
     super.removalActions();
     if (!isClone) {
       setPhysicsState(PhysicsState.none);
-      _physics.ownerRemovedActions();
       _cloneEverMade ? _clone?.removeFromParent() : null;
       removeEffects(this); //sync and async
     }

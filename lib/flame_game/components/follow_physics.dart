@@ -103,33 +103,11 @@ class Physics extends Component with HasWorldReference<PacmanWorld> {
     if (owner.isClone) {
       return;
     }
-    if (!_ball.isLoaded) {
-      if (!_ball.isLoading) {
-        await world.add(_ball);
-        await _ball.mounted;
-      }
-    } else {
-      initaliseFromOwnerAndSetDynamic();
-    }
+    await world.add(_ball);
+    await _ball.mounted;
   }
 
-  @override
-  Future<void> onMount() async {
-    super.onMount();
-    if (owner.isClone) {
-      return;
-    }
-    if (!_ball.isLoaded) {
-      if (!_ball.isLoading) {
-        await world.add(_ball);
-        await _ball.mounted;
-      }
-    } else {
-      initaliseFromOwnerAndSetDynamic();
-    }
-  }
-
-  void ownerRemovedActions() {
+  void removalActions() {
     _ball.removeFromParent();
     //world.destroyBody(_ball.body); //FIXME investigate
   }
@@ -144,13 +122,13 @@ class Physics extends Component with HasWorldReference<PacmanWorld> {
 
   @override
   void removeFromParent() {
+    removalActions();
     super.removeFromParent(); //async
-    deactivate();
   }
 
   @override
   Future<void> onRemove() async {
+    removalActions();
     super.onRemove();
-    deactivate();
   }
 }
