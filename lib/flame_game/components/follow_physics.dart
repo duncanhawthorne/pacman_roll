@@ -97,6 +97,21 @@ class Physics extends Component with HasWorldReference<PacmanWorld> {
   }
 
   @override
+  Future<void> onLoad() async {
+    super.onLoad();
+    if (owner.isClone) {
+      return;
+    }
+    if (!_ball.isLoaded) {
+      if (!_ball.isLoading) {
+        await world.add(_ball);
+      }
+    } else {
+      initaliseFromOwnerAndSetDynamic();
+    }
+  }
+
+  @override
   Future<void> onMount() async {
     super.onMount();
     if (owner.isClone) {
@@ -117,6 +132,9 @@ class Physics extends Component with HasWorldReference<PacmanWorld> {
   }
 
   void removalActions() {
+    if (owner.isRemoving) {
+      return;
+    }
     assert(_ball.isLoaded);
     _ball.setStatic();
   }

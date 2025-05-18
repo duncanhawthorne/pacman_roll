@@ -136,6 +136,7 @@ class GameCharacter extends SpriteCharacter {
     if (enableRotationRaceMode) {
       _lapAngleLast = _getLapAngle();
     }
+    add(_physics); //makes ball ready even if only use it later
   }
 
   @override
