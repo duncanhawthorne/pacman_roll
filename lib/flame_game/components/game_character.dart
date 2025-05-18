@@ -67,44 +67,16 @@ class GameCharacter extends SpriteCharacter {
   late final Physics _physics = Physics(owner: this);
   late final SimplePhysics _simplePhysics = SimplePhysics(owner: this);
 
-  bool _isFullyMounted(Component x) {
-    return x.isMounted && !x.isRemoving;
-  }
-
   PhysicsState state = PhysicsState.full;
   @override
   void setPhysicsState(PhysicsState targetState) {
     super.setPhysicsState(targetState);
     if (targetState == PhysicsState.full) {
       state = PhysicsState.full;
-      if (_physics.isLoaded) {
-        _physics.initaliseFromOwnerAndSetDynamic();
-      } else {
-        ///physics will be initalised via adding [_physics] for the first time
-      }
-      if (!_isFullyMounted(_physics)) {
-        add(_physics);
-      }
-      if (_isFullyMounted(_simplePhysics)) {
-        _simplePhysics.removeFromParent();
-      }
     } else if (targetState == PhysicsState.partial) {
       state = PhysicsState.partial;
-      if (!_isFullyMounted(_simplePhysics)) {
-        add(_simplePhysics);
-      }
-      if (_isFullyMounted(_physics)) {
-        _physics.removeFromParent();
-      }
     } else {
       state = PhysicsState.none;
-      assert(!isClone); //as for clone have no way to turn collisionType back on
-      if (_isFullyMounted(_physics)) {
-        _physics.removeFromParent();
-      }
-      if (_isFullyMounted(_simplePhysics)) {
-        _simplePhysics.removeFromParent();
-      }
     }
   }
 
@@ -136,7 +108,10 @@ class GameCharacter extends SpriteCharacter {
     if (enableRotationRaceMode) {
       _lapAngleLast = _getLapAngle();
     }
-    add(_physics); //makes ball ready even if only use it later
+    if (!isClone) {
+      add(_physics);
+      add(_simplePhysics);
+    }
   }
 
   @override

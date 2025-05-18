@@ -29,20 +29,4 @@ class SimplePhysics extends Component with HasWorldReference<PacmanWorld> {
     }
     _oneFrameOfSimpleMovement(dt);
   }
-
-  void removalActions() {
-    //super.removalActions();
-  }
-
-  @override
-  void removeFromParent() {
-    removalActions();
-    super.removeFromParent(); //async
-  }
-
-  @override
-  Future<void> onRemove() async {
-    removalActions();
-    super.onRemove();
-  }
 }
