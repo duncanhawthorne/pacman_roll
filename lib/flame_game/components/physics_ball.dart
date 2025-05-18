@@ -30,6 +30,7 @@ class PhysicsBall extends BodyComponent with IgnoreEvents {
     required double angularVelocity,
     required double damping,
     required double density,
+    bool active = true,
     required this.owner,
   }) : super(
          fixtureDefs: <FixtureDef>[
@@ -46,6 +47,7 @@ class PhysicsBall extends BodyComponent with IgnoreEvents {
            linearVelocity: velocity / spriteVsPhysicsScale,
            angularVelocity: angularVelocity,
            type: BodyType.dynamic,
+           active: active,
            fixedRotation: !openSpaceMovement,
          ),
        );
@@ -90,25 +92,44 @@ class PhysicsBall extends BodyComponent with IgnoreEvents {
     body.setTransform(pos, owner.angle);
   }
 
-  Future<void> setDynamic() async {
-    if (!isMounted) {
-      //await loaded;
-      await mounted;
+  void setDynamic() {
+    if (isRemoving) {
+      return;
     }
+    if (body.isActive == true && _subConnectedBall == true) {
+      //no action required
+      return;
+    }
+    assert(isMounted);
+    assert(isLoaded);
+    // ignore: avoid_single_cascade_in_expression_statements
     body
-      ..setType(BodyType.dynamic)
+      //..setType(BodyType.dynamic)
       ..setActive(true);
     _subConnectedBall = true;
     paint = _activePaint;
   }
 
-  Future<void> setStatic() async {
-    if (!isMounted) {
-      //await loaded;
-      await mounted;
+  @override
+  Future<void> onLoad() async {
+    await super.onLoad();
+    //must set userData for contactCallbacks to work
+    body.userData = this;
+  }
+
+  void setStatic() {
+    if (isRemoving) {
+      return;
     }
+    if (body.isActive == false && _subConnectedBall == false) {
+      //no action required
+      return;
+    }
+    assert(isMounted);
+    assert(isLoaded);
+    // ignore: avoid_single_cascade_in_expression_statements
     body
-      ..setType(BodyType.static)
+      //..setType(BodyType.static)
       ..setActive(false);
     _subConnectedBall = false;
     paint = _inactivePaint;
@@ -124,6 +145,7 @@ class PhysicsBall extends BodyComponent with IgnoreEvents {
     return reusableVector;
   }
 
+  // ignore: unused_element
   void _moveThroughPipePortal() {
     if (_subConnectedBall && _outsideMazeBounds) {
       position = _teleportedPosition();

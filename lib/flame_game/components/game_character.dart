@@ -77,7 +77,11 @@ class GameCharacter extends SpriteCharacter {
     super.setPhysicsState(targetState);
     if (targetState == PhysicsState.full) {
       state = PhysicsState.full;
-      _physics.initaliseFromOwnerAndSetDynamic();
+      if (_physics.isLoaded) {
+        _physics.initaliseFromOwnerAndSetDynamic();
+      } else {
+        ///physics will be initalised via adding [_physics] for the first time
+      }
       if (!_isFullyMounted(_physics)) {
         add(_physics);
       }
