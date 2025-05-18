@@ -54,8 +54,8 @@ class Physics extends Component with HasWorldReference<PacmanWorld> {
 
   Future<void> _initaliseFromOwner() async {
     if (!_ball.isLoaded || !_ball.isMounted) {
-      await loaded;
-      await mounted;
+      await _ball.loaded;
+      await _ball.mounted;
     }
     _ball.position = owner.position;
     _ball.velocity = owner.velocity;
