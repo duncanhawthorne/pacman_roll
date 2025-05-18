@@ -20,7 +20,6 @@ class Physics extends Component with HasWorldReference<PacmanWorld> {
     damping: 1 - owner.friction,
     density: owner.density,
     active: true,
-    //FIXME could set this
     owner: owner,
   );
 
