@@ -14,7 +14,6 @@ import 'clones.dart';
 import 'game_character.dart';
 import 'ghost.dart';
 import 'pellet.dart';
-import 'physics_ball.dart';
 import 'sprite_character.dart';
 import 'super_pellet.dart';
 import 'wall.dart';
@@ -206,11 +205,13 @@ class Pacman extends GameCharacter with CollisionCallbacks {
 
   @override
   Future<void> onLoad() async {
+    if (!isClone) {
+      setPhysicsState(PhysicsState.full);
+    }
     await super.onLoad();
     if (!isClone) {
       world.pacmans.pacmanList.add(this);
       current = CharacterState.normal;
-      setPhysicsState(PhysicsState.full);
     }
   }
 

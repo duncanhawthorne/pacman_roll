@@ -17,7 +17,6 @@ const bool spriteVsPhysicsScaleConstant = true;
 final Paint _activePaint = Paint()..color = Palette.pacman.color;
 final Paint _inactivePaint = Paint()..color = Palette.warning.color;
 
-double get playerSize => maze.spriteWidth / 2 * _lubricationScaleFactor;
 const double _lubricationScaleFactor = 0.99;
 const bool _kVerticalPortalsEnabled = false;
 
@@ -38,7 +37,9 @@ class PhysicsBall extends BodyComponent with IgnoreEvents {
              restitution: openSpaceMovement ? 0.2 : 0,
              friction: openSpaceMovement ? 1 : 0,
              density: density,
-             CircleShape(radius: radius / spriteVsPhysicsScale),
+             CircleShape(
+               radius: radius * _lubricationScaleFactor / spriteVsPhysicsScale,
+             ),
            ),
          ],
          bodyDef: BodyDef(

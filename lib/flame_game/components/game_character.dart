@@ -13,7 +13,10 @@ import 'ghost.dart';
 import 'pacman.dart';
 import 'sprite_character.dart';
 
-final Vector2 north = Vector2(0, 1);
+// ignore: unused_element
+final Vector2 _north = Vector2(0, 1);
+
+double get playerSize => maze.spriteWidth / 2;
 
 class GameCharacter extends SpriteCharacter {
   GameCharacter({
@@ -67,7 +70,7 @@ class GameCharacter extends SpriteCharacter {
   late final Physics _physics = Physics(owner: this);
   late final SimplePhysics _simplePhysics = SimplePhysics(owner: this);
 
-  PhysicsState state = PhysicsState.full;
+  PhysicsState state = PhysicsState.unset;
   @override
   void setPhysicsState(PhysicsState targetState) {
     super.setPhysicsState(targetState);

@@ -7,6 +7,7 @@ import '../effects/remove_effects.dart';
 import '../effects/rotate_effect.dart';
 import '../maze.dart';
 import 'game_character.dart';
+// ignore: unused_import
 import 'physics_ball.dart';
 import 'sprite_character.dart';
 
@@ -28,6 +29,8 @@ class Ghost extends GameCharacter {
       );
 
   final int ghostID;
+
+  bool get _shouldFlyingSpawn => ghostID >= 3;
 
   @override
   Future<Map<CharacterState, SpriteAnimation>> getAnimations([
@@ -154,14 +157,19 @@ class Ghost extends GameCharacter {
 
   @override
   Future<void> onLoad() async {
+    if (!isClone) {
+      if (_shouldFlyingSpawn) {
+        setPhysicsState(PhysicsState.none);
+      } else {
+        setPhysicsState(PhysicsState.full);
+      }
+    }
     await super.onLoad();
     if (!isClone) {
       world.ghosts.ghostList.add(this);
       current = world.ghosts.current;
-      if (ghostID >= 3) {
+      if (_shouldFlyingSpawn) {
         _setSpawning();
-      } else {
-        setPhysicsState(PhysicsState.full);
       }
     }
     animations = await getAnimations(); //load for clone too

@@ -9,6 +9,9 @@ import 'physics_ball.dart';
 class Physics extends Component with HasWorldReference<PacmanWorld> {
   Physics({required this.owner});
 
+  @override
+  final int priority = 1000;
+
   late final GameCharacter owner;
   static final Vector2 _reusableVector = Vector2.zero();
 
