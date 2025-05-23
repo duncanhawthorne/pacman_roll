@@ -14,6 +14,7 @@ import '../pacman_world.dart';
 import 'clones.dart';
 import 'game_character.dart';
 import 'pacman.dart';
+import 'removal_actions.dart';
 
 final Paint _highQualityPaint =
     Paint()
@@ -25,6 +26,7 @@ class SpriteCharacter extends SpriteAnimationGroupComponent<CharacterState>
     with
         HasWorldReference<PacmanWorld>,
         HasGameReference<PacmanGame>,
+        RemovalActions,
         IgnoreEvents {
   SpriteCharacter({super.position, this.original})
     : super(anchor: Anchor.center, paint: _highQualityPaint);
@@ -48,8 +50,10 @@ class SpriteCharacter extends SpriteAnimationGroupComponent<CharacterState>
   late final CircleHitbox hitBox = CircleHitbox(
     isSolid: true,
     collisionType: defaultCollisionType,
-    //anchor: Anchor.center,
-  )..debugMode = kDebugMode && false;
+    radius: playerSize,
+    position: Vector2.all(playerSize),
+    anchor: Anchor.center,
+  )..debugMode = kDebugMode && true;
 
   Future<Map<CharacterState, SpriteAnimation>> getSingleSprite([
     int size = 1,
@@ -100,24 +104,13 @@ class SpriteCharacter extends SpriteAnimationGroupComponent<CharacterState>
     add(hitBox);
   }
 
-  @mustCallSuper
+  @override
   void removalActions() {
     hitBox.collisionType = CollisionType.inactive;
     if (!isClone) {
       removeEffects(this); //sync and async
     }
-  }
-
-  @override
-  void removeFromParent() {
-    removalActions();
-    super.removeFromParent(); //async
-  }
-
-  @override
-  Future<void> onRemove() async {
-    removalActions();
-    super.onRemove();
+    super.removalActions();
   }
 }
 

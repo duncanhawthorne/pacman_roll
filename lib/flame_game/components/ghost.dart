@@ -182,16 +182,4 @@ class Ghost extends GameCharacter {
     }
     super.removalActions();
   }
-
-  @override
-  void removeFromParent() {
-    removalActions();
-    super.removeFromParent();
-  }
-
-  @override
-  Future<void> onRemove() async {
-    removalActions();
-    await super.onRemove();
-  }
 }

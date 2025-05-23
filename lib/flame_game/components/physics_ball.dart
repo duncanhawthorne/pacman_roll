@@ -6,8 +6,10 @@ import 'package:flutter/foundation.dart';
 
 import '../../style/palette.dart';
 import '../../utils/constants.dart';
+import '../../utils/helper.dart';
 import '../maze.dart';
 import 'game_character.dart';
+import 'removal_actions.dart';
 
 const bool openSpaceMovement = kDebugMode && enableRotationRaceMode;
 
@@ -21,7 +23,7 @@ const double _lubricationScaleFactor = 0.99;
 const bool _kVerticalPortalsEnabled = false;
 
 // ignore: always_specify_types
-class PhysicsBall extends BodyComponent with IgnoreEvents {
+class PhysicsBall extends BodyComponent with RemovalActions, IgnoreEvents {
   PhysicsBall({
     required Vector2 position,
     required double radius,
@@ -51,7 +53,9 @@ class PhysicsBall extends BodyComponent with IgnoreEvents {
            active: active,
            fixedRotation: !openSpaceMovement,
          ),
-       );
+       ) {
+    _subConnectedBall = active;
+  }
 
   final GameCharacter owner;
 
@@ -67,7 +71,7 @@ class PhysicsBall extends BodyComponent with IgnoreEvents {
   int priority = -100;
 
   // ignore: unused_field
-  bool _subConnectedBall = true;
+  late bool _subConnectedBall;
 
   static Vector2 reusableVector = Vector2.zero();
 
@@ -116,6 +120,10 @@ class PhysicsBall extends BodyComponent with IgnoreEvents {
     if (isRemoving) {
       return;
     }
+    if (_subConnectedBall == false && !isMounted) {
+      //just test subConnectedBall as body not yet initialised
+      return;
+    }
     if (body.isActive == false && _subConnectedBall == false) {
       //no action required
       return;
@@ -157,6 +165,16 @@ class PhysicsBall extends BodyComponent with IgnoreEvents {
   void update(double dt) {
     _moveThroughPipePortal();
     super.update(dt);
+  }
+
+  @override
+  void removalActions() {
+    try {
+      setStatic();
+    } catch (e) {
+      logGlobal("catch ball removalactions set static");
+    }
+    super.removalActions();
   }
 }
 

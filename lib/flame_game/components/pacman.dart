@@ -233,18 +233,6 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   }
 
   @override
-  void removeFromParent() {
-    removalActions();
-    super.removeFromParent();
-  }
-
-  @override
-  Future<void> onRemove() async {
-    removalActions();
-    await super.onRemove();
-  }
-
-  @override
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
     onCollideWith(other);
     super.onCollision(intersectionPoints, other);

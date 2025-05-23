@@ -78,8 +78,10 @@ class GameCharacter extends SpriteCharacter {
       state = PhysicsState.full;
     } else if (targetState == PhysicsState.partial) {
       state = PhysicsState.partial;
+      _physics.deactivate();
     } else {
       state = PhysicsState.none;
+      _physics.deactivate();
     }
   }
 
@@ -126,18 +128,6 @@ class GameCharacter extends SpriteCharacter {
       removeEffects(this); //sync and async
       _physics.removeFromParent();
     }
-  }
-
-  @override
-  void removeFromParent() {
-    removalActions();
-    super.removeFromParent(); //async
-  }
-
-  @override
-  Future<void> onRemove() async {
-    removalActions();
-    await super.onRemove();
   }
 
   void _addRemoveClone() {
