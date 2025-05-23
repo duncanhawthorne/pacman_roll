@@ -2,9 +2,7 @@ import 'dart:core';
 
 import 'package:flame/components.dart';
 
-import '../../utils/constants.dart';
 import '../effects/remove_effects.dart';
-import '../effects/rotate_effect.dart';
 import '../maze.dart';
 import 'clones.dart';
 import 'follow_physics.dart';
@@ -110,9 +108,6 @@ class GameCharacter extends SpriteCharacter {
   @override
   Future<void> onLoad() async {
     await super.onLoad();
-    if (enableRotationRaceMode) {
-      _lapAngleLast = _getLapAngle();
-    }
     if (!isClone) {
       add(_physics);
       add(_simplePhysics);
@@ -162,26 +157,10 @@ class GameCharacter extends SpriteCharacter {
     }
   }
 
-  late double _lapAngleLast;
-  double lapAngleProgress = 0;
-
-  double _getLapAngle() {
-    return position.screenAngle();
-  }
-
-  void _updateLapAngle() {
-    if (!enableRotationRaceMode) {
-      return;
-    }
-    lapAngleProgress += smallAngle(_getLapAngle() - _lapAngleLast);
-    _lapAngleLast = _getLapAngle();
-  }
-
   @override
   void update(double dt) {
     //note, this function is also run for clones
     _addRemoveClone();
-    _updateLapAngle();
     super.update(dt);
   }
 }

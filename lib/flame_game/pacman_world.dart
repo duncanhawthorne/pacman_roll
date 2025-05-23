@@ -11,6 +11,7 @@ import '../../audio/sounds.dart';
 import '../utils/constants.dart';
 import 'components/blocking_bar_layer.dart';
 import 'components/ghost_layer.dart';
+import 'components/lap_angle.dart';
 import 'components/pacman.dart';
 import 'components/pacman_layer.dart';
 import 'components/pellet_layer.dart';

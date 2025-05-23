@@ -5,10 +5,10 @@ import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../style/palette.dart';
-import '../../utils/constants.dart';
 import '../../utils/helper.dart';
 import '../maze.dart';
 import 'game_character.dart';
+import 'lap_angle.dart';
 import 'removal_actions.dart';
 
 const bool openSpaceMovement = kDebugMode && enableRotationRaceMode;

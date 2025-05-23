@@ -6,13 +6,13 @@ import 'package:flame/components.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../style/palette.dart';
-import '../../utils/constants.dart';
 import '../effects/remove_effects.dart';
 import '../icons/stub_sprites.dart';
 import '../pacman_game.dart';
 import '../pacman_world.dart';
 import 'clones.dart';
 import 'game_character.dart';
+import 'lap_angle.dart';
 import 'pacman.dart';
 import 'removal_actions.dart';
 
@@ -27,6 +27,7 @@ class SpriteCharacter extends SpriteAnimationGroupComponent<CharacterState>
         HasWorldReference<PacmanWorld>,
         HasGameReference<PacmanGame>,
         RemovalActions,
+        LapAngle,
         IgnoreEvents {
   SpriteCharacter({super.position, this.original})
     : super(anchor: Anchor.center, paint: _highQualityPaint);

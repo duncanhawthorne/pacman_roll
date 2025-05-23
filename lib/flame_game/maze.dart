@@ -4,7 +4,7 @@ import 'package:flame/components.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flutter/foundation.dart';
 
-import '../utils/constants.dart';
+import 'components/lap_angle.dart';
 import 'components/mini_pellet.dart';
 import 'components/pellet.dart';
 import 'components/physics_ball.dart';
