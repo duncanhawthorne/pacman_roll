@@ -206,7 +206,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   @override
   Future<void> onLoad() async {
     if (!isClone) {
-      setPhysicsState(PhysicsState.full);
+      setPhysicsState(PhysicsState.full, starting: true);
     }
     await super.onLoad();
     if (!isClone) {

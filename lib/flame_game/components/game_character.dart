@@ -70,9 +70,16 @@ class GameCharacter extends SpriteCharacter {
 
   PhysicsState state = PhysicsState.unset;
   @override
-  void setPhysicsState(PhysicsState targetState) {
+  void setPhysicsState(PhysicsState targetState, {bool starting = false}) {
     super.setPhysicsState(targetState);
     if (targetState == PhysicsState.full) {
+      assert((_physics.isLoaded && isLoaded) || starting == true);
+      if (!starting) {
+        assert(_physics.isLoaded);
+        if (_physics.isLoaded) {
+          _physics.initaliseFromOwnerAndSetDynamic();
+        }
+      }
       state = PhysicsState.full;
     } else if (targetState == PhysicsState.partial) {
       state = PhysicsState.partial;
@@ -89,29 +96,33 @@ class GameCharacter extends SpriteCharacter {
   }
 
   void setPositionStillActive(Vector2 targetLoc) {
-    position.setFrom(targetLoc);
-    velocity.setAll(0);
-    acceleration.setAll(0);
-    angularVelocity = 0;
-    _physics.initaliseFromOwnerAndSetDynamic();
+    _setStill(targetLoc);
     setPhysicsState(PhysicsState.full);
   }
 
   void setPositionStillStatic(Vector2 targetLoc) {
     setPhysicsState(PhysicsState.none);
+    _setStill(targetLoc);
+  }
+
+  void _setStill(Vector2 targetLoc) {
     position.setFrom(targetLoc);
     velocity.setAll(0);
     acceleration.setAll(0);
     angularVelocity = 0;
   }
 
+  void forceReinitialisePhysics() {
+    setPhysicsState(PhysicsState.full);
+  }
+
   @override
   Future<void> onLoad() async {
-    await super.onLoad();
     if (!isClone) {
       add(_physics);
       add(_simplePhysics);
     }
+    await super.onLoad();
   }
 
   @override

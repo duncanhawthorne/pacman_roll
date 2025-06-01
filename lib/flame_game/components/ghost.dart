@@ -161,7 +161,7 @@ class Ghost extends GameCharacter {
       if (_shouldFlyingSpawn) {
         setPhysicsState(PhysicsState.none);
       } else {
-        setPhysicsState(PhysicsState.full);
+        setPhysicsState(PhysicsState.full, starting: true);
       }
     }
     await super.onLoad();
