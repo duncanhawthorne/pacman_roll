@@ -73,7 +73,10 @@ class GameCharacter extends SpriteCharacter {
   void setPhysicsState(PhysicsState targetState, {bool starting = false}) {
     super.setPhysicsState(targetState);
     if (targetState == PhysicsState.full) {
-      assert((_physics.isLoaded && isLoaded) || starting == true);
+      if (isRemoving) {
+        return;
+      }
+      assert((_physics.isLoaded && isLoaded) || starting == true, this);
       if (!starting) {
         assert(_physics.isLoaded);
         if (_physics.isLoaded) {
@@ -113,6 +116,9 @@ class GameCharacter extends SpriteCharacter {
   }
 
   void forceReinitialisePhysics() {
+    if (!isLoaded) {
+      return; // no action required as loading will initialise
+    }
     setPhysicsState(PhysicsState.full);
   }
 
