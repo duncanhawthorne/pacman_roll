@@ -4,11 +4,9 @@ import 'package:flame/components.dart';
 
 import '../effects/remove_effects.dart';
 import '../maze.dart';
-import 'clones.dart';
+import 'clone_manager.dart';
 import 'follow_physics.dart';
 import 'follow_simple_physics.dart';
-import 'ghost.dart';
-import 'pacman.dart';
 import 'sprite_character.dart';
 
 // ignore: unused_element
@@ -16,7 +14,7 @@ final Vector2 _north = Vector2(0, 1);
 
 double get playerSize => maze.spriteWidth / 2;
 
-class GameCharacter extends SpriteCharacter {
+class GameCharacter extends SpriteCharacter with CloneManager {
   GameCharacter({
     super.position,
     required Vector2 velocity,
@@ -50,9 +48,6 @@ class GameCharacter extends SpriteCharacter {
   static Vector2 reusableVector = Vector2.zero();
 
   bool get typical => state == PhysicsState.full && stateTypical;
-
-  bool _cloneEverMade = false; //could just test clone is null
-  GameCharacter? _clone;
 
   double get radius => size.x.toDouble() / 2;
 
@@ -136,49 +131,9 @@ class GameCharacter extends SpriteCharacter {
     super.removalActions();
     if (!isClone) {
       setPhysicsState(PhysicsState.none);
-      _cloneEverMade ? _clone?.removeFromParent() : null;
       removeEffects(this); //sync and async
       _physics.removeFromParent();
     }
-  }
-
-  void _addRemoveClone() {
-    if (isClone) {
-      return;
-    }
-    assert(!isClone); //i.e. no cascade of clones
-    if (position.x.abs() > maze.cloneThreshold) {
-      if (!_cloneEverMade) {
-        assert(_clone == null);
-        _cloneEverMade = true;
-        if (this is Pacman) {
-          _clone = PacmanClone(position: position, original: this as Pacman);
-        } else if (this is Ghost) {
-          _clone = GhostClone(
-            ghostID: (this as Ghost).ghostID,
-            original: this as Ghost,
-          );
-        }
-      }
-      assert(_clone != null);
-      assert(_clone!.isClone);
-      assert(!isClone);
-      if (!_clone!.isMounted) {
-        parent?.add(_clone!);
-      }
-    } else {
-      if (_cloneEverMade && _clone!.isMounted) {
-        assert(_clone != null);
-        _clone?.removeFromParent();
-      }
-    }
-  }
-
-  @override
-  void update(double dt) {
-    //note, this function is also run for clones
-    _addRemoveClone();
-    super.update(dt);
   }
 }
 
