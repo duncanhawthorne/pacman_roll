@@ -26,39 +26,37 @@ class GameCharacter extends SpriteCharacter with CloneManager {
     size = Vector2.all(radius * 2);
   }
 
-  final double density;
+  static Vector2 reusableVector = Vector2.zero();
 
   bool possiblePhysicsConnection = true;
 
-  final bool canAccelerate = false;
+  Vector2 get velocity => _velocity;
 
   set velocity(Vector2 v) => _velocity.setFrom(v);
-
-  Vector2 get velocity => _velocity;
   final Vector2 _velocity = Vector2(0, 0);
 
-  set acceleration(Vector2 v) => _acceleration.setFrom(v);
+  final bool canAccelerate = false;
 
   Vector2 get acceleration => _acceleration;
+  set acceleration(Vector2 v) => _acceleration.setFrom(v);
   final Vector2 _acceleration = Vector2(0, 0);
 
   double angularVelocity = 0;
 
+  final double density;
   double friction = 1;
-  static Vector2 reusableVector = Vector2.zero();
-
-  bool get typical => state == PhysicsState.full && stateTypical;
-
-  double get radius => size.x.toDouble() / 2;
-
-  set radius(double x) => _setRadius(x);
 
   double get speed => _physics.speed;
+
+  double get radius => size.x.toDouble() / 2;
+  set radius(double x) => _setRadius(x);
 
   void _setRadius(double x) {
     size = Vector2.all(x * 2);
     _physics.setBallRadius(x);
   }
+
+  bool get typical => state == PhysicsState.full && stateTypical;
 
   late final Physics _physics = Physics(owner: this);
   late final SimplePhysics _simplePhysics = SimplePhysics(owner: this);
