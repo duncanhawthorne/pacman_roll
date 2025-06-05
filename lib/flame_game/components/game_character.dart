@@ -31,7 +31,6 @@ class GameCharacter extends SpriteCharacter with CloneManager {
   bool possiblePhysicsConnection = true;
 
   Vector2 get velocity => _velocity;
-
   set velocity(Vector2 v) => _velocity.setFrom(v);
   final Vector2 _velocity = Vector2(0, 0);
 

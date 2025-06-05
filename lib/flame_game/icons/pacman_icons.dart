@@ -26,7 +26,7 @@ Widget animatedPacmanIcon(PacmanGame game, int index) {
                   ? 0 //when reset game
                   : kPacmanDeadResetTimeAnimationMillis,
         ),
-        builder: (BuildContext context, int val, __) {
+        builder: (BuildContext context, int val, _) {
           return _pacmanIconCache[val];
         },
       );
