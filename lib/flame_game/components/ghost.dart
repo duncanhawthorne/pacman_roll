@@ -7,8 +7,6 @@ import '../effects/remove_effects.dart';
 import '../effects/rotate_effect.dart';
 import '../maze.dart';
 import 'game_character.dart';
-// ignore: unused_import
-import 'physics_ball.dart';
 import 'sprite_character.dart';
 
 const Map<int, String> _ghostSpritePaths = <int, String>{

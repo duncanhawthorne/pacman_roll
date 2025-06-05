@@ -135,7 +135,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   bool playbackMode = false;
 
   // ignore: dead_code
-  static const bool _recordMode = false && kDebugMode;
+  static const bool _recordMode = kDebugMode && false;
   final List<List<double>> _recordedMovesLive = <List<double>>[];
 
   void recordAngle(double angle) {

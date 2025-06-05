@@ -9,9 +9,6 @@ import 'follow_physics.dart';
 import 'follow_simple_physics.dart';
 import 'sprite_character.dart';
 
-// ignore: unused_element
-final Vector2 _north = Vector2(0, 1);
-
 double get playerSize => maze.spriteWidth / 2;
 
 class GameCharacter extends SpriteCharacter with CloneManager {

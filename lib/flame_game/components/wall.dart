@@ -7,6 +7,7 @@ import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../style/palette.dart';
+import '../pacman_game.dart';
 import 'physics_ball.dart';
 
 final Paint _wallVisualPaint = Paint()..color = Palette.background.color;
@@ -29,8 +30,7 @@ class WallCircleVisual extends CircleComponent with IgnoreEvents {
     : super(anchor: Anchor.center, paint: _wallVisualPaint);
 }
 
-// ignore: always_specify_types
-class WallGround extends BodyComponent with IgnoreEvents {
+class WallGround extends BodyComponent<PacmanGame> with IgnoreEvents {
   WallGround({required super.fixtureDefs})
     : super(paint: _wallGroundPaint, bodyDef: _staticBodyDef);
 
@@ -42,8 +42,7 @@ final Vector2 _dynamicWallGravityScale = Vector2(-1, -1);
 
 const bool movingWallsDamage = kDebugMode && false;
 
-// ignore: always_specify_types
-class WallDynamic extends BodyComponent with IgnoreEvents {
+class WallDynamic extends BodyComponent<PacmanGame> with IgnoreEvents {
   WallDynamic({required super.fixtureDefs, required Vector2 position})
     : super(
         paint: _movingWallPaint,
