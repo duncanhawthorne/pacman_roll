@@ -34,6 +34,7 @@ class PelletWrapper extends WrapperNoEvents
   Future<void> onLoad() async {
     super.onLoad();
     pelletsRemainingNotifier.addListener(() {
+      assert(!isRemoving);
       clearSnapshot();
     });
     await reset();
