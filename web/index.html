@@ -110,9 +110,21 @@
 
 
 </body>
-<!-- FIXME
 <script>
-document.addEventListener('touchstart', (e) => e.preventDefault(), { passive: false });
+  // Global variable to control the script's activation
+  window.preventTouchDefault = true;
+
+  // Function to set the prevention status
+  function setPreventTouchDefault(enable) {
+      window.preventTouchDefault = enable;
+      console.log('preventTouchDefault set to:', window.preventTouchDefault);
+  }
+
+  // The touchstart listener, now conditional
+  document.addEventListener('touchstart', (e) => {
+      if (window.preventTouchDefault) {
+          e.preventDefault();
+      }
+  }, { passive: false });
 </script>
-!-->
 </html>
