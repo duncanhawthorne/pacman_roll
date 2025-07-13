@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../audio/audio_controller.dart';
 import '../../google/google.dart';
+import '../../google/google_widget.dart';
 import '../../settings/settings.dart';
 import '../../style/dialog.dart';
 import '../../style/palette.dart';
@@ -23,19 +24,29 @@ Widget topOverlayWidget(BuildContext context, PacmanGame game) {
   return Center(
     child: Padding(
       padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: <Widget>[
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            spacing: _widgetSpacing,
+      child: ValueListenableBuilder<bool>(
+        valueListenable: g.loggingInProcess,
+        builder: (BuildContext context, bool value, Widget? child) {
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
-              _topLeftWidget(context, game),
-              _topRightWidget(context, game),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                spacing: _widgetSpacing,
+                children: <Widget>[
+                  _topLeftWidget(context, game),
+                  _topRightWidget(context, game),
+                ],
+              ),
+              Visibility(
+                visible: g.loggingInProcess.value,
+                maintainState: true,
+                child: const GoogleSignInWidget(),
+              ),
             ],
-          ),
-        ],
+          );
+        },
       ),
     ),
   );

@@ -6,14 +6,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:logging/logging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../google/src/sign_in_button/mobile.dart';
 import 'secrets.dart';
-
-/// The type of the onClick callback for the (mobile) Sign In Button.
-//typedef HandleSignInFn = Future<void> Function();
-
-const bool _debugFakeLogin = false;
-const String _gUserFakeLogin = "joebloggs@gmail.com";
 
 final bool gOn =
     googleOnReal &&
@@ -21,7 +14,6 @@ final bool gOn =
 
 class G {
   G._() {
-    _startGoogleAccountChangeListener();
     _loadUser();
   }
 
@@ -34,7 +26,11 @@ class G {
   ///ensures singleton [G]
   static G? _instance;
 
+  Function? googleWidgetLogoutFunction;
+
   static final Logger _log = Logger('GG');
+
+  ValueNotifier<bool> loggingInProcess = ValueNotifier<bool>(false);
 
   bool get signedIn => gUser != _gUserDefault;
 
@@ -66,33 +62,14 @@ class G {
   }
 
   Widget _loginButton(BuildContext context) {
-    const bool newLoginButtons = false;
-    return newLoginButtons
-        // ignore: dead_code
-        ? _platformAdaptiveSignInButton(context)
-        : lockStyleSignInButton(context);
-  }
-
-  Widget lockStyleSignInButton(BuildContext context) {
     return IconButton(
       icon: Icon(Icons.lock, color: _color),
       onPressed: () {
-        _signInSilentlyThenDirectly();
+        loggingInProcess.value = !loggingInProcess.value;
       },
     );
   }
 
-  Widget _platformAdaptiveSignInButton(BuildContext context) {
-    // different buttons depending on web or mobile. See sign_in_button folder
-    return buildSignInButton(
-      onPressed:
-          _signInDirectly, //relevant on web only, else uses separate code
-      context: context,
-      g: this,
-    );
-  }
-
-  static const bool _requireLogoutConfirm = false;
   Widget _logoutButton(BuildContext context) {
     return IconButton(
       icon:
@@ -103,22 +80,29 @@ class G {
                 backgroundImage: NetworkImage(_gUserIcon),
               ),
       onPressed: () {
-        if (_requireLogoutConfirm) {
-          //add additional logic here
-          _signOutAndExtractDetails();
-        } else {
-          _signOutAndExtractDetails();
-        }
+        logout(context);
       },
     );
   }
 
-  GoogleSignIn googleSignIn = GoogleSignIn(
-    //gID defined in secrets.dart, not included in repo
-    //in format XXXXXX.apps.googleusercontent.com
-    clientId: gID,
-    scopes: <String>['email'],
-  );
+  void logout(BuildContext context) {
+    const bool requireLogoutConfirm = false;
+    // ignore: dead_code
+    if (requireLogoutConfirm) {
+      // ignore: dead_code
+    } else {
+      logoutNow();
+    }
+  }
+
+  void logoutNow() {
+    print("logout now");
+    assert(googleWidgetLogoutFunction != null);
+    if (googleWidgetLogoutFunction != null) {
+      print("logout now now");
+      googleWidgetLogoutFunction!();
+    }
+  }
 
   Future<List<String>> _loadUserFromFilesystem() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -149,85 +133,11 @@ class G {
     _gUserIcon = tmp[1];
   }
 
-  void _startGoogleAccountChangeListener() {
-    if (gOn) {
-      googleSignIn.onCurrentUserChanged.listen((
-        GoogleSignInAccount? account,
-      ) async {
-        _log.info("gUser changed");
-        _user = account;
-        if (_user != null) {
-          _log.fine("login successful $_user");
-          await _successfulLoginExtractDetails();
-        } else {
-          _log.fine("logout");
-          await _logoutExtractDetails();
-        }
-      });
-    }
-  }
-
-  // ignore: unused_element
-  Future<void> _signInSilently() async {
-    if (gOn) {
-      await googleSignIn.signInSilently();
-      await _successfulLoginExtractDetails();
-    }
-  }
-
-  Future<void> _signInDirectly() async {
-    _log.fine("webSignIn()");
-    if (gOn) {
-      try {
-        if (_debugFakeLogin) {
-          await _debugLoginExtractDetails();
-        } else {
-          await googleSignIn.signIn();
-          await _successfulLoginExtractDetails();
-        }
-      } catch (e) {
-        _log.severe("signInDirectly $e");
-      }
-    }
-  }
-
-  Future<void> _signOut() async {
-    if (gOn) {
-      if (_debugFakeLogin) {
-      } else {
-        try {
-          await googleSignIn.disconnect();
-          await _logoutExtractDetails();
-        } catch (e) {
-          _log.severe("signOut $e");
-        }
-      }
-      //logoutExtractDetails(); //now handled by listener
-    }
-  }
-
-  Future<void> _signInSilentlyThenDirectly() async {
-    _log.fine("mobileSignIn()");
-    if (gOn) {
-      if (_debugFakeLogin) {
-        await _debugLoginExtractDetails();
-      } else {
-        await googleSignIn.signInSilently();
-        _user = googleSignIn.currentUser;
-
-        if (_user == null) {
-          //if sign in silently didn't work
-          await googleSignIn.signIn();
-          _user = googleSignIn.currentUser;
-        }
-        await _successfulLoginExtractDetails();
-      }
-    }
-  }
-
-  Future<void> _successfulLoginExtractDetails() async {
+  Future<void> extractDetailsFromLogin(GoogleSignInAccount targetUser) async {
+    _user = targetUser;
     if (_user != null) {
       _log.fine("login extract details");
+      loggingInProcess.value = false;
       _gUser = _user!.email;
       if (_user!.photoUrl != null) {
         _gUserIcon = _user!.photoUrl ?? _gUserIconDefault;
@@ -237,28 +147,13 @@ class G {
     }
   }
 
-  Future<void> _debugLoginExtractDetails() async {
-    _log.fine("debugLoginExtractDetails");
-    assert(_debugFakeLogin);
-    _gUser = _gUserFakeLogin;
-    await _saveUserToFilesystem(gUser, _gUserIcon);
-    _log.fine("gUser = $gUser");
-  }
-
-  Future<void> _logoutExtractDetails() async {
+  Future<void> extractDetailsFromLogout() async {
     _log.fine("logout extract details");
+    loggingInProcess.value = false;
     _gUser = _gUserDefault;
     assert(!signedIn);
     await _saveUserToFilesystem(gUser, _gUserIcon);
     _log.fine("gUser =$gUser");
-  }
-
-  Future<void> _signOutAndExtractDetails() async {
-    _log.fine("sign out and extract details");
-    if (gOn) {
-      await _signOut();
-      await _logoutExtractDetails();
-    }
   }
 }
 
