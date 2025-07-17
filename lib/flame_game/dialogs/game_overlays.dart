@@ -41,7 +41,7 @@ Widget topOverlayWidget(BuildContext context, PacmanGame game) {
               ),
               Visibility(
                 visible: g.loggingInProcess.value,
-                maintainState: true,
+                maintainState: false,
                 child: const GoogleSignInWidget(),
               ),
             ],

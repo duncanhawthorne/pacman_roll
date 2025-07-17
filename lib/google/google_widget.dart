@@ -98,7 +98,14 @@ class _GoogleSignInWidgetState extends State<GoogleSignInWidget> {
     print("widget sign out");
     // Disconnect instead of just signing out, to reset the example state as
     // much as possible.
-    await GoogleSignIn.instance.disconnect();
+    if (_currentUser == null) {
+      // as already signed out, need to run run this manually
+      // as there wont be an authentication event
+      g.extractDetailsFromLogout();
+      await GoogleSignIn.instance.disconnect();
+    } else {
+      await GoogleSignIn.instance.disconnect();
+    }
   }
 
   Widget _buildBody() {
