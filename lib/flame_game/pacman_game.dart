@@ -405,8 +405,8 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   @override
   Future<void> onRemove() async {
     cleanDialogs();
-    await audioController.stopAllSounds();
     super.onRemove();
+    await audioController.stopAllSounds();
   }
 }
 
