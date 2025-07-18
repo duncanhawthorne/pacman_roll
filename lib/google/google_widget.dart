@@ -6,6 +6,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:logging/logging.dart';
 
 import 'google.dart';
 import 'secrets.dart';
@@ -31,9 +32,10 @@ class GoogleSignInWidget extends StatefulWidget {
 class _GoogleSignInWidgetState extends State<GoogleSignInWidget> {
   GoogleSignInAccount? _currentUser;
 
+  static final Logger _log = Logger('GG');
+
   @override
   void initState() {
-    print("init");
     super.initState();
 
     // #docregion Setup
@@ -68,7 +70,7 @@ class _GoogleSignInWidgetState extends State<GoogleSignInWidget> {
     };
 
     if (!mounted) {
-      print("not mounted 1");
+      _log.fine("not mounted 1");
       _currentUser = user;
     } else {
       setState(() {
@@ -85,7 +87,7 @@ class _GoogleSignInWidgetState extends State<GoogleSignInWidget> {
 
   Future<void> _handleAuthenticationError(Object e) async {
     if (!mounted) {
-      print("not mounted 2");
+      _log.fine("not mounted 2");
       _currentUser = null;
     } else {
       setState(() {
@@ -95,7 +97,7 @@ class _GoogleSignInWidgetState extends State<GoogleSignInWidget> {
   }
 
   Future<void> _handleSignOut() async {
-    print("widget sign out");
+    _log.fine("widget sign out");
     // Disconnect instead of just signing out, to reset the example state as
     // much as possible.
     if (_currentUser == null) {

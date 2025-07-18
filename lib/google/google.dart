@@ -110,10 +110,10 @@ class G {
   }
 
   void logoutNow() {
-    print("logout now");
+    _log.fine("logout");
     assert(googleWidgetLogoutFunction != null);
     if (googleWidgetLogoutFunction != null) {
-      print("logout now now");
+      _log.fine("logout now");
       googleWidgetLogoutFunction!();
     } else {
       extractDetailsFromLogout();
