@@ -101,7 +101,7 @@ class _GoogleSignInWidgetState extends State<GoogleSignInWidget> {
     if (_currentUser == null) {
       // as already signed out, need to run run this manually
       // as there wont be an authentication event
-      g.extractDetailsFromLogout();
+      await g.extractDetailsFromLogout();
       await GoogleSignIn.instance.disconnect();
     } else {
       await GoogleSignIn.instance.disconnect();

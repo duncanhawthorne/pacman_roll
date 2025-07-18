@@ -29,6 +29,7 @@ class G {
   static G? _instance;
 
   Function? googleWidgetLogoutFunction;
+  Function? googleLogoutConfirmationFunction;
 
   static final Logger _log = Logger('GG');
 
@@ -64,13 +65,13 @@ class G {
         ? const SizedBox.shrink()
         : ValueListenableBuilder<String>(
           valueListenable: gUserNotifier,
-          builder: (BuildContext context, String audioOn, Widget? child) {
-            return !signedIn ? _loginButton(context) : _logoutButton(context);
+          builder: (BuildContext context, String _, Widget? child) {
+            return !signedIn ? _loginButton() : _logoutButton();
           },
         );
   }
 
-  Widget _loginButton(BuildContext context) {
+  Widget _loginButton() {
     return IconButton(
       icon: Icon(Icons.lock, color: _color),
       onPressed: () {
@@ -79,7 +80,7 @@ class G {
     );
   }
 
-  Widget _logoutButton(BuildContext context) {
+  Widget _logoutButton() {
     return IconButton(
       icon:
           _gUserIcon == _gUserIconDefault
@@ -89,15 +90,19 @@ class G {
                 backgroundImage: NetworkImage(_gUserIcon),
               ),
       onPressed: () {
-        logout(context);
+        logoutNowOrAfterConfirmation();
       },
     );
   }
 
-  void logout(BuildContext context) {
-    const bool requireLogoutConfirm = false;
+  void logoutNowOrAfterConfirmation() {
+    const bool requireLogoutConfirm = true;
     // ignore: dead_code
     if (requireLogoutConfirm) {
+      assert(googleLogoutConfirmationFunction != null);
+      if (googleLogoutConfirmationFunction != null) {
+        googleLogoutConfirmationFunction!();
+      }
       // ignore: dead_code
     } else {
       logoutNow();
