@@ -9,21 +9,13 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:logging/logging.dart';
 
 import 'google.dart';
-import 'secrets.dart';
 import 'src/web_wrapper.dart' as web;
 
-/// To run this example, replace this value with your client ID, and/or
-/// update the relevant configuration files, as described in the README.
-String? clientId = gID;
-
-/// To run this example, replace this value with your server client ID, and/or
-/// update the relevant configuration files, as described in the README.
-String? serverClientId;
-
-/// The SignInDemo app.
 class GoogleSignInWidget extends StatefulWidget {
-  ///
-  const GoogleSignInWidget({super.key});
+  const GoogleSignInWidget({super.key, this.clientId, this.serverClientId});
+
+  final String? clientId;
+  final String? serverClientId;
 
   @override
   State createState() => _GoogleSignInWidgetState();
@@ -41,19 +33,22 @@ class _GoogleSignInWidgetState extends State<GoogleSignInWidget> {
     // #docregion Setup
     final GoogleSignIn signIn = GoogleSignIn.instance;
     unawaited(
-      signIn.initialize(clientId: clientId, serverClientId: serverClientId).then((
-        _,
-      ) {
-        signIn.authenticationEvents
-            .listen(_handleAuthenticationEvent)
-            .onError(_handleAuthenticationError);
+      signIn
+          .initialize(
+            clientId: widget.clientId,
+            serverClientId: widget.serverClientId,
+          )
+          .then((_) {
+            signIn.authenticationEvents
+                .listen(_handleAuthenticationEvent)
+                .onError(_handleAuthenticationError);
 
-        /// This example always uses the stream-based approach to determining
-        /// which UI state to show, rather than using the future returned here,
-        /// if any, to conditionally skip directly to the signed-in state.
-        signIn.attemptLightweightAuthentication();
-        g.googleWidgetLogoutFunction = _handleSignOut;
-      }),
+            /// This example always uses the stream-based approach to determining
+            /// which UI state to show, rather than using the future returned here,
+            /// if any, to conditionally skip directly to the signed-in state.
+            signIn.attemptLightweightAuthentication();
+            g.googleWidgetLogoutFunction = _handleSignOut;
+          }),
     );
     // #enddocregion Setup
   }

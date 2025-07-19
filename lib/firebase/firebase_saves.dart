@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
 
 import '../firebase_options.dart';
-import '../google/google.dart';
+import '../google/google_user.dart';
 
 /// This file has utilities for loading and saving the leaderboard in firebase
 
