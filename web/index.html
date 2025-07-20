@@ -107,24 +107,5 @@
   <script src="flutter_bootstrap.js" async=""></script>
   <script src="assets/packages/flutter_soloud/web/libflutter_soloud_plugin.js" defer></script>
   <script src="assets/packages/flutter_soloud/web/init_module.dart.js" defer></script>
-
-
 </body>
-<script>
-  // Global variable to control the script's activation
-  window.preventTouchDefault = true;
-
-  // Function to set the prevention status
-  function setPreventTouchDefault(enable) {
-      window.preventTouchDefault = enable;
-      console.log('preventTouchDefault set to:', window.preventTouchDefault);
-  }
-
-  // The touchstart listener, now conditional
-  document.addEventListener('touchstart', (e) => {
-      if (window.preventTouchDefault) {
-          e.preventDefault();
-      }
-  }, { passive: false });
-</script>
 </html>

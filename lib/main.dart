@@ -18,6 +18,7 @@ import 'style/palette.dart';
 import 'utils/constants.dart';
 import 'utils/helper.dart';
 import 'utils/src/workarounds.dart';
+import 'utils/touch_override/touch_override.dart';
 //firebase_options.dart as per direct download from google, not included in repo
 
 void main() async {
@@ -29,6 +30,7 @@ void main() async {
   setupGlobalLogger();
   fixTitlePerm();
   await firstInitialiseSoLoud();
+  blockTouchDefault(true);
   runApp(const MyGame());
 }
 
