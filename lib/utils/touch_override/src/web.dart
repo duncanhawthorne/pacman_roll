@@ -52,14 +52,22 @@ final JSObject options =
 
 final bool _isiOSWeb = defaultTargetPlatform == TargetPlatform.iOS && kIsWeb;
 
+bool _stateEnabled = false;
+
 void blockTouchDefaultReal(bool enable) {
   _log.fine(<Object>["blockTouchDefaultReal", enable, _isiOSWeb]);
   if (!_isiOSWeb) {
     return;
   }
   if (enable) {
-    document.addEventListener('touchstart', touchstartListener, options);
+    if (!_stateEnabled) {
+      document.addEventListener('touchstart', touchstartListener, options);
+      _stateEnabled = true;
+    }
   } else {
-    document.removeEventListener('touchstart', touchstartListener, options);
+    if (_stateEnabled) {
+      document.removeEventListener('touchstart', touchstartListener, options);
+      _stateEnabled = false;
+    }
   }
 }
