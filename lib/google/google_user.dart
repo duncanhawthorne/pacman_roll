@@ -1,11 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_ios_web_touch_override/flutter_ios_web_touch_override.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:logging/logging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../utils/touch_override/touch_override.dart';
 import 'google_widget.dart';
 
 class G {

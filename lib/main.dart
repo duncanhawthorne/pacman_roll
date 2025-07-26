@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flame/flame.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_ios_web_touch_override/flutter_ios_web_touch_override.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:nes_ui/nes_ui.dart';
@@ -18,7 +19,6 @@ import 'style/palette.dart';
 import 'utils/constants.dart';
 import 'utils/helper.dart';
 import 'utils/src/workarounds.dart';
-import 'utils/touch_override/touch_override.dart';
 //firebase_options.dart as per direct download from google, not included in repo
 
 void main() async {
