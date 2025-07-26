@@ -23,11 +23,11 @@ class G {
   ///ensures singleton [G]
   static G? _instance;
 
-  Function? googleWidgetLogoutFunction;
-  Function? googleLogoutConfirmationFunction;
+  Function()? googleWidgetLogoutFunction;
+  Function()? googleLogoutConfirmationFunction;
 
-  bool gOn;
-  String clientId;
+  final bool gOn;
+  final String clientId;
 
   late final GoogleSignInWidget gWidget = GoogleSignInWidget(
     clientId: clientId,

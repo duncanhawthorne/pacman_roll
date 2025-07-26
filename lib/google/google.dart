@@ -7,6 +7,6 @@ final bool _gOn =
     googleOnReal &&
     !(defaultTargetPlatform == TargetPlatform.windows && !kIsWeb);
 
-const String _gId = gID;
+final String _gId = gID;
 
 final G g = G(gOn: _gOn, clientId: _gId);
