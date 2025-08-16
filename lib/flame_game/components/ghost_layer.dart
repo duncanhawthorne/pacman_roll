@@ -121,12 +121,11 @@ class Ghosts extends WrapperNoEvents
 
   void _addThreeGhosts() {
     assert(ghostList.isEmpty);
-    final List<int> positions =
-        game.level.numStartingGhosts == 3
-            ? <int>[0, 1, 2]
-            : game.level.numStartingGhosts == 2
-            ? <int>[0, 2]
-            : <int>[1];
+    final List<int> positions = game.level.numStartingGhosts == 3
+        ? <int>[0, 1, 2]
+        : game.level.numStartingGhosts == 2
+        ? <int>[0, 2]
+        : <int>[1];
     for (int i = 0; i < game.level.numStartingGhosts; i++) {
       add(Ghost(ghostID: positions[i]));
     }
@@ -153,8 +152,8 @@ class Ghosts extends WrapperNoEvents
     assert(!game.isWonOrLost); //test before call, else test here
     if (game.level.multipleSpawningGhosts) {
       _ghostSpawner ??= SpawnComponent(
-        factory:
-            (int i) => Ghost(ghostID: <int>[3, 4, 5][game.random.nextInt(3)]),
+        factory: (int i) =>
+            Ghost(ghostID: <int>[3, 4, 5][game.random.nextInt(3)]),
         selfPositioning: true,
         period: game.level.ghostSpawnTimerLength.toDouble(),
       );

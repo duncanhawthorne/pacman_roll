@@ -18,8 +18,9 @@ const int debugLogListMaxLength = 30;
 final ValueNotifier<int> debugLogListNotifier = ValueNotifier<int>(0);
 
 void setupGlobalLogger() {
-  Logger.root.level =
-      (kDebugMode || detailedAudioLog) ? Level.FINE : Level.INFO;
+  Logger.root.level = (kDebugMode || detailedAudioLog)
+      ? Level.FINE
+      : Level.INFO;
   //logging.hierarchicalLoggingEnabled = true;
   Logger.root.onRecord.listen((LogRecord record) {
     final String time =

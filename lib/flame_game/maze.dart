@@ -245,8 +245,9 @@ class Maze {
   static const double _pixelationBuffer = 0.03;
 
   bool _topLeftOfBigBlock(int i, int j, {bool moving = false}) {
-    final bool Function(int i, int j) localWallAt =
-        moving ? _movingWallAt : _wallAt;
+    final bool Function(int i, int j) localWallAt = moving
+        ? _movingWallAt
+        : _wallAt;
     assert(localWallAt(i, j));
     return (!localWallAt(i - 1, j) || !localWallAt(i - 1, j + 1)) &&
         (!localWallAt(i, j - 1) || !localWallAt(i + 1, j - 1)) &&
@@ -262,8 +263,9 @@ class Maze {
     bool singleHeight = true,
     bool moving = false,
   }) {
-    final bool Function(int i, int j) localWallAt =
-        moving ? _movingWallAt : _wallAt;
+    final bool Function(int i, int j) localWallAt = moving
+        ? _movingWallAt
+        : _wallAt;
     assert(localWallAt(i, j));
     int k = 0;
     while (j + k < _mazeLayout[i].length &&
@@ -280,8 +282,9 @@ class Maze {
     bool singleWidth = true,
     bool moving = false,
   }) {
-    final bool Function(int i, int j) localWallAt =
-        moving ? _movingWallAt : _wallAt;
+    final bool Function(int i, int j) localWallAt = moving
+        ? _movingWallAt
+        : _wallAt;
     assert(localWallAt(i, j));
     int l = 0;
     while (i + l < _mazeLayout.length &&

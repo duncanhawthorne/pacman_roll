@@ -58,11 +58,11 @@ class _GoogleSignInWidgetState extends State<GoogleSignInWidget> {
   ) async {
     // #docregion CheckAuthorization
     final GoogleSignInAccount? user = // ...
-    // #enddocregion CheckAuthorization
-    switch (event) {
-      GoogleSignInAuthenticationEventSignIn() => event.user,
-      GoogleSignInAuthenticationEventSignOut() => null,
-    };
+        // #enddocregion CheckAuthorization
+        switch (event) {
+          GoogleSignInAuthenticationEventSignIn() => event.user,
+          GoogleSignInAuthenticationEventSignOut() => null,
+        };
 
     if (!mounted) {
       _log.fine("not mounted 1");
@@ -109,9 +109,9 @@ class _GoogleSignInWidgetState extends State<GoogleSignInWidget> {
     final GoogleSignInAccount? user = _currentUser;
     return user != null
         ? ElevatedButton(
-          onPressed: _handleSignOut,
-          child: const Text('SIGN OUT'),
-        )
+            onPressed: _handleSignOut,
+            child: const Text('SIGN OUT'),
+          )
         : web.renderButton();
   }
 

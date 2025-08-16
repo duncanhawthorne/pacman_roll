@@ -41,10 +41,9 @@ class PlayerProgress extends ChangeNotifier {
   Iterable<int> get _levelNumsCompleted =>
       _playerProgressLevels.map((Map<String, int> item) => item["levelNum"]!);
 
-  int get maxLevelCompleted =>
-      _playerProgressLevels.isEmpty
-          ? Levels.minLevel - 1
-          : _levelNumsCompleted.reduce(max);
+  int get maxLevelCompleted => _playerProgressLevels.isEmpty
+      ? Levels.minLevel - 1
+      : _levelNumsCompleted.reduce(max);
 
   bool isComplete(int levelNum) {
     return _levelNumsCompleted.contains(levelNum);
@@ -63,12 +62,9 @@ class PlayerProgress extends ChangeNotifier {
   }
 
   void _addWin(Map<String, int> win) {
-    final Map<String, int>? relevantSave =
-        _playerProgressLevels
-            .where(
-              (Map<String, int> item) => item["levelNum"] == win["levelNum"],
-            )
-            .firstOrNull;
+    final Map<String, int>? relevantSave = _playerProgressLevels
+        .where((Map<String, int> item) => item["levelNum"] == win["levelNum"])
+        .firstOrNull;
     if (relevantSave == null) {
       _playerProgressLevels.add(win);
     } else if (win["levelCompleteTime"]! < relevantSave["levelCompleteTime"]!) {

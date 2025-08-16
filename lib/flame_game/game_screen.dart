@@ -57,8 +57,8 @@ class GameScreen extends StatelessWidget {
                   mazeId: mazeId,
                   playerProgress: context.read<PlayerProgress>(),
                   audioController: context.read<AudioController>(),
-                  appLifecycleStateNotifier:
-                      context.read<AppLifecycleStateNotifier>(),
+                  appLifecycleStateNotifier: context
+                      .read<AppLifecycleStateNotifier>(),
                 ),
                 overlayBuilderMap: <String, OverlayWidgetBuilder<PacmanGame>>{
                   topOverlayKey: (BuildContext context, PacmanGame game) {

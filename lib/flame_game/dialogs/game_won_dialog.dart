@@ -47,18 +47,18 @@ class GameWonDialog extends StatelessWidget {
         !FBase.firebaseOn || game.level.isTutorial
             ? const SizedBox.shrink()
             : bodyWidget(
-              child: FutureBuilder<String>(
-                future: _scoreboardRankText(
-                  levelNum: level.number,
-                  levelCompletedInMillis: levelCompletedInMillis,
-                  mazeId: maze.mazeId,
+                child: FutureBuilder<String>(
+                  future: _scoreboardRankText(
+                    levelNum: level.number,
+                    levelCompletedInMillis: levelCompletedInMillis,
+                    mazeId: maze.mazeId,
+                  ),
+                  initialData: _scoreboardLoadingText(),
+                  builder: (BuildContext context, AsyncSnapshot<String> text) {
+                    return Text(text.data!, style: textStyleBody);
+                  },
                 ),
-                initialData: _scoreboardLoadingText(),
-                builder: (BuildContext context, AsyncSnapshot<String> text) {
-                  return Text(text.data!, style: textStyleBody);
-                },
               ),
-            ),
         levelSelector(context, game),
         mazeSelector(context, game),
         bottomRowWidget(
@@ -76,14 +76,14 @@ class GameWonDialog extends StatelessWidget {
             !showNextButton
                 ? const SizedBox.shrink()
                 : TextButton(
-                  style: buttonStyle(),
-                  onPressed: () {
-                    context.go(
-                      '/?$levelUrlKey=${game.level.number + 1}&$mazeUrlKey=${maze.mazeId}',
-                    );
-                  },
-                  child: const Text('Next', style: textStyleBody),
-                ),
+                    style: buttonStyle(),
+                    onPressed: () {
+                      context.go(
+                        '/?$levelUrlKey=${game.level.number + 1}&$mazeUrlKey=${maze.mazeId}',
+                      );
+                    },
+                    child: const Text('Next', style: textStyleBody),
+                  ),
           ],
         ),
       ],

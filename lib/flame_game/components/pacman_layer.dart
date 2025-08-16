@@ -23,10 +23,9 @@ class Pacmans extends WrapperNoEvents with HasGameReference<PacmanGame> {
 
   Vector2 get ghostHomingTarget => pacmanList[0].position;
 
-  bool get anyAlivePacman =>
-      pacmanList
-          .where((Pacman pacman) => pacman.current != CharacterState.dead)
-          .isNotEmpty;
+  bool get anyAlivePacman => pacmanList
+      .where((Pacman pacman) => pacman.current != CharacterState.dead)
+      .isNotEmpty;
 
   void resetInstantAfterPacmanDeath() {
     assert(pacmanList.length == 1);

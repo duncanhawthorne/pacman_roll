@@ -58,18 +58,18 @@ class MyGame extends StatelessWidget {
             // Ensures that music starts immediately.
             lazy: false,
             create: (BuildContext context) => AudioController(),
-            update: (
-              BuildContext context,
-              SettingsController settings,
-              AppLifecycleStateNotifier lifecycleNotifier,
-              AudioController? audio,
-            ) {
-              audio!.attachDependencies(lifecycleNotifier, settings);
-              return audio;
-            },
-            dispose:
-                (BuildContext context, AudioController audio) =>
-                    audio.dispose(),
+            update:
+                (
+                  BuildContext context,
+                  SettingsController settings,
+                  AppLifecycleStateNotifier lifecycleNotifier,
+                  AudioController? audio,
+                ) {
+                  audio!.attachDependencies(lifecycleNotifier, settings);
+                  return audio;
+                },
+            dispose: (BuildContext context, AudioController audio) =>
+                audio.dispose(),
           ),
         ],
         child: Builder(

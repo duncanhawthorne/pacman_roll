@@ -67,11 +67,11 @@ class G {
     return !gOn
         ? const SizedBox.shrink()
         : ValueListenableBuilder<String>(
-          valueListenable: gUserNotifier,
-          builder: (BuildContext context, String _, Widget? child) {
-            return !signedIn ? _loginButton() : _logoutButton();
-          },
-        );
+            valueListenable: gUserNotifier,
+            builder: (BuildContext context, String _, Widget? child) {
+              return !signedIn ? _loginButton() : _logoutButton();
+            },
+          );
   }
 
   Widget _loginButton() {
@@ -85,13 +85,12 @@ class G {
 
   Widget _logoutButton() {
     return IconButton(
-      icon:
-          _gUserIcon == _gUserIconDefault
-              ? Icon(Icons.face_outlined, color: _color)
-              : CircleAvatar(
-                radius: _iconWidth / 2,
-                backgroundImage: NetworkImage(_gUserIcon),
-              ),
+      icon: _gUserIcon == _gUserIconDefault
+          ? Icon(Icons.face_outlined, color: _color)
+          : CircleAvatar(
+              radius: _iconWidth / 2,
+              backgroundImage: NetworkImage(_gUserIcon),
+            ),
       onPressed: () {
         _logoutNowOrAfterConfirmation();
       },

@@ -16,11 +16,10 @@ import 'lap_angle.dart';
 import 'pacman.dart';
 import 'removal_actions.dart';
 
-final Paint _highQualityPaint =
-    Paint()
-      ..filterQuality = FilterQuality.high
-      //..color = const Color.fromARGB(255, 255, 255, 255)
-      ..isAntiAlias = true;
+final Paint _highQualityPaint = Paint()
+  ..filterQuality = FilterQuality.high
+  //..color = const Color.fromARGB(255, 255, 255, 255)
+  ..isAntiAlias = true;
 
 class SpriteCharacter extends SpriteAnimationGroupComponent<CharacterState>
     with
@@ -39,12 +38,11 @@ class SpriteCharacter extends SpriteAnimationGroupComponent<CharacterState>
   bool get stateTypical =>
       current != CharacterState.dead && current != CharacterState.spawning;
 
-  late final CollisionType defaultCollisionType =
-      enableRotationRaceMode
-          ? CollisionType.inactive
-          : this is Pacman || this is PacmanClone
-          ? CollisionType.active
-          : CollisionType.passive;
+  late final CollisionType defaultCollisionType = enableRotationRaceMode
+      ? CollisionType.inactive
+      : this is Pacman || this is PacmanClone
+      ? CollisionType.active
+      : CollisionType.passive;
 
   late final bool isClone = this is PacmanClone || this is GhostClone;
 

@@ -29,10 +29,9 @@ class Physics extends Component
     owner: owner,
   );
 
-  double get _spinParity =>
-      _ballVel.x.abs() > _ballVel.y.abs()
-          ? _gravitySign.y * _ballVel.x.sign
-          : -_gravitySign.x * _ballVel.y.sign;
+  double get _spinParity => _ballVel.x.abs() > _ballVel.y.abs()
+      ? _gravitySign.y * _ballVel.x.sign
+      : -_gravitySign.x * _ballVel.y.sign;
 
   late final bool _freeRotation = true;
 

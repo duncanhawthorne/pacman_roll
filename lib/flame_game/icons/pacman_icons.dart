@@ -21,10 +21,9 @@ Widget animatedPacmanIcon(PacmanGame game, int index) {
                   ),
         ),
         duration: Duration(
-          milliseconds:
-              game.world.pacmans.pacmanDyingNotifier.value <= index
-                  ? 0 //when reset game
-                  : kPacmanDeadResetTimeAnimationMillis,
+          milliseconds: game.world.pacmans.pacmanDyingNotifier.value <= index
+              ? 0 //when reset game
+              : kPacmanDeadResetTimeAnimationMillis,
         ),
         builder: (BuildContext context, int val, _) {
           return _pacmanIconCache[val];

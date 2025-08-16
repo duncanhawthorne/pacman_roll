@@ -34,8 +34,9 @@ class Ghost extends GameCharacter {
   Future<Map<CharacterState, SpriteAnimation>> getAnimations([
     int size = 1,
   ]) async {
-    final int ghostIconNumber =
-        game.level.numStartingGhosts == 1 ? 0 : ghostID % 3;
+    final int ghostIconNumber = game.level.numStartingGhosts == 1
+        ? 0
+        : ghostID % 3;
     if (!_ghostSpriteAnimationCache.containsKey(ghostIconNumber)) {
       _ghostSpriteAnimationCache[ghostIconNumber] =
           <CharacterState, SpriteAnimation>{
@@ -97,11 +98,10 @@ class Ghost extends GameCharacter {
         add(
           MoveToPositionEffect(
             maze.ghostStart,
-            onComplete:
-                () => <void>{
-                  setPositionStillActiveCurrentPosition(),
-                  current = world.ghosts.current,
-                },
+            onComplete: () => <void>{
+              setPositionStillActiveCurrentPosition(),
+              current = world.ghosts.current,
+            },
           ),
         );
         resetSlideAngle(this);
@@ -118,11 +118,10 @@ class Ghost extends GameCharacter {
           game.level.homingGhosts
               ? world.pacmans.ghostHomingTarget
               : maze.ghostStart,
-          onComplete:
-              () => <void>{
-                setPositionStillActiveCurrentPosition(),
-                current = world.ghosts.current,
-              },
+          onComplete: () => <void>{
+            setPositionStillActiveCurrentPosition(),
+            current = world.ghosts.current,
+          },
         ),
       );
     }
@@ -135,12 +134,11 @@ class Ghost extends GameCharacter {
     add(
       MoveToPositionEffect(
         maze.ghostStartForId(ghostID),
-        onComplete:
-            () => <void>{
-              //bringBallToSprite()
-              //Calling bringBallToSprite here creates a crash
-              //also would be a race condition
-            },
+        onComplete: () => <void>{
+          //bringBallToSprite()
+          //Calling bringBallToSprite here creates a crash
+          //also would be a race condition
+        },
       ),
     );
     resetSlideAngle(this);

@@ -31,48 +31,47 @@ class StartDialog extends StatelessWidget {
         ...game.playbackMode
             ? <Widget>[const SizedBox.shrink()]
             : <Widget>[
-              levelSelector(context, game),
-              mazeSelector(context, game),
-            ],
+                levelSelector(context, game),
+                mazeSelector(context, game),
+              ],
         bottomRowWidget(
-          children:
-              game.stopwatchStarted && !game.playbackMode
-                  ? <Widget>[
-                    TextButton(
-                      style: buttonStyle(borderColor: Palette.warning.color),
-                      onPressed: () {
+          children: game.stopwatchStarted && !game.playbackMode
+              ? <Widget>[
+                  TextButton(
+                    style: buttonStyle(borderColor: Palette.warning.color),
+                    onPressed: () {
+                      game.overlays.remove(GameScreen.startDialogKey);
+                      game.resetAndStart();
+                    },
+                    child: const Text('Reset', style: textStyleBody),
+                  ),
+                  TextButton(
+                    style: buttonStyle(),
+                    onPressed: () {
+                      game.overlays.remove(GameScreen.startDialogKey);
+                    },
+                    child: const Text('Resume', style: textStyleBody),
+                  ),
+                ]
+              : <Widget>[
+                  TextButton(
+                    style: buttonStyle(),
+                    onPressed: () {
+                      if (game.playbackMode) {
+                        context.go(
+                          '/?$levelUrlKey=${Levels.minLevel}&$mazeUrlKey=${mazeNames[Maze.defaultMazeId]}',
+                        );
+                      } else {
                         game.overlays.remove(GameScreen.startDialogKey);
-                        game.resetAndStart();
-                      },
-                      child: const Text('Reset', style: textStyleBody),
+                        game.start();
+                      }
+                    },
+                    child: Text(
+                      game.playbackMode ? 'Start' : 'Play',
+                      style: textStyleBody,
                     ),
-                    TextButton(
-                      style: buttonStyle(),
-                      onPressed: () {
-                        game.overlays.remove(GameScreen.startDialogKey);
-                      },
-                      child: const Text('Resume', style: textStyleBody),
-                    ),
-                  ]
-                  : <Widget>[
-                    TextButton(
-                      style: buttonStyle(),
-                      onPressed: () {
-                        if (game.playbackMode) {
-                          context.go(
-                            '/?$levelUrlKey=${Levels.minLevel}&$mazeUrlKey=${mazeNames[Maze.defaultMazeId]}',
-                          );
-                        } else {
-                          game.overlays.remove(GameScreen.startDialogKey);
-                          game.start();
-                        }
-                      },
-                      child: Text(
-                        game.playbackMode ? 'Start' : 'Play',
-                        style: textStyleBody,
-                      ),
-                    ),
-                  ],
+                  ),
+                ],
         ),
       ],
     );
@@ -141,17 +140,15 @@ Widget levelButtonSingle(BuildContext context, PacmanGame game, int levelNum) {
     return const SizedBox.shrink();
   }
   final GameLevel level = levels.getLevel(levelNum);
-  final int fixedMazeId =
-      !level.isTutorial && maze.isTutorial
-          ? Maze.defaultMazeId
-          : level.isTutorial && !maze.isTutorial
-          ? Maze.tutorialMazeId
-          : maze.mazeId;
+  final int fixedMazeId = !level.isTutorial && maze.isTutorial
+      ? Maze.defaultMazeId
+      : level.isTutorial && !maze.isTutorial
+      ? Maze.tutorialMazeId
+      : maze.mazeId;
   return TextButton(
-    style:
-        game.level.number == levelNum
-            ? buttonStyle(small: true)
-            : buttonStyle(small: true, borderColor: Palette.transp.color),
+    style: game.level.number == levelNum
+        ? buttonStyle(small: true)
+        : buttonStyle(small: true, borderColor: Palette.transp.color),
     onPressed: () {
       context.go(
         '/?$levelUrlKey=$levelNum&$mazeUrlKey=${mazeNames[fixedMazeId]}',
@@ -159,10 +156,9 @@ Widget levelButtonSingle(BuildContext context, PacmanGame game, int levelNum) {
     },
     child: Text(
       level.levelString,
-      style:
-          game.playerProgress.isComplete(levelNum)
-              ? textStyleBody
-              : textStyleBodyDull,
+      style: game.playerProgress.isComplete(levelNum)
+          ? textStyleBody
+          : textStyleBodyDull,
     ),
   );
 }
@@ -186,35 +182,34 @@ Widget mazeSelectorReal(BuildContext context, PacmanGame game) {
           game.level.isTutorial
       ? const SizedBox.shrink()
       : bodyWidget(
-        child: Column(
-          children: <Widget>[
-            Row(
-              spacing: 4,
-              children: <Widget>[
-                !showText
-                    ? const SizedBox.shrink()
-                    // ignore: dead_code
-                    : const Padding(
-                      padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
-                      child: Text('Maze:', style: textStyleBody),
-                    ),
-                ...List<Widget>.generate(
-                  3,
-                  (int index) => mazeButtonSingle(context, game, index),
-                ),
-              ],
-            ),
-          ],
-        ),
-      );
+          child: Column(
+            children: <Widget>[
+              Row(
+                spacing: 4,
+                children: <Widget>[
+                  !showText
+                      ? const SizedBox.shrink()
+                      // ignore: dead_code
+                      : const Padding(
+                          padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
+                          child: Text('Maze:', style: textStyleBody),
+                        ),
+                  ...List<Widget>.generate(
+                    3,
+                    (int index) => mazeButtonSingle(context, game, index),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
 }
 
 Widget mazeButtonSingle(BuildContext context, PacmanGame game, int mazeId) {
   return TextButton(
-    style:
-        maze.mazeId == mazeId
-            ? buttonStyle(small: true)
-            : buttonStyle(small: true, borderColor: Palette.transp.color),
+    style: maze.mazeId == mazeId
+        ? buttonStyle(small: true)
+        : buttonStyle(small: true, borderColor: Palette.transp.color),
     onPressed: () {
       if (mazeId != maze.mazeId) {
         context.go(

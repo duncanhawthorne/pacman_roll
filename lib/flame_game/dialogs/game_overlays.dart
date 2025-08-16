@@ -166,8 +166,8 @@ Widget _raceProgressWidget(PacmanGame game) {
 
 Widget _audioOnOffButtonWidget(BuildContext context, PacmanGame game) {
   const Color color = Palette.textColor;
-  final SettingsController settingsController =
-      context.watch<SettingsController>();
+  final SettingsController settingsController = context
+      .watch<SettingsController>();
   return ValueListenableBuilder<bool>(
     valueListenable: settingsController.audioOn,
     builder: (BuildContext context, bool audioOn, Widget? child) {

@@ -84,24 +84,19 @@ class FBase {
       try {
         final CollectionReference<Map<String, dynamic>> collectionRef = _db!
             .collection(_mainDB);
-        final AggregateQuerySnapshot fasterSnapshot =
-            await collectionRef
-                .where("levelCompleteTime", isLessThan: levelCompletedInMillis)
-                .where("levelNum", isEqualTo: levelNum)
-                .where("mazeId", isEqualTo: mazeId)
-                .count()
-                .get();
+        final AggregateQuerySnapshot fasterSnapshot = await collectionRef
+            .where("levelCompleteTime", isLessThan: levelCompletedInMillis)
+            .where("levelNum", isEqualTo: levelNum)
+            .where("mazeId", isEqualTo: mazeId)
+            .count()
+            .get();
         final int fasterCount = fasterSnapshot.count ?? 0;
-        final AggregateQuerySnapshot slowerSnapshot =
-            await collectionRef
-                .where(
-                  "levelCompleteTime",
-                  isGreaterThan: levelCompletedInMillis,
-                )
-                .where("levelNum", isEqualTo: levelNum)
-                .where("mazeId", isEqualTo: mazeId)
-                .count()
-                .get();
+        final AggregateQuerySnapshot slowerSnapshot = await collectionRef
+            .where("levelCompleteTime", isGreaterThan: levelCompletedInMillis)
+            .where("levelNum", isEqualTo: levelNum)
+            .where("mazeId", isEqualTo: mazeId)
+            .count()
+            .get();
         final int slowerCount = slowerSnapshot.count ?? 100;
         final int allCount = fasterCount + slowerCount + 1; //ignore equal times
         return (fasterCount + 1 - 1) / (allCount == 1 ? 100 : allCount - 1);
