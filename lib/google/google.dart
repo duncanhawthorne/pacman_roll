@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
+import 'package:google_user/google_user.dart';
 
-import 'google_user.dart';
 import 'secrets.dart';
 
 final bool _gOn =

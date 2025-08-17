@@ -31,6 +31,10 @@ dependencies:
   google_sign_in_web: ^1.0.0
   flame_lint: ^1.1.2
   flutter_soloud: ^3.0.0
+  google_user:
+    git:
+      url: https://github.com/duncanhawthorne/google_user.git
+      ref: main
   flutter_ios_web_touch_override:
     git:
       url: https://github.com/duncanhawthorne/flutter_ios_web_touch_override.git
