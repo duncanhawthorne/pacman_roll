@@ -136,6 +136,11 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   }
 
   void _dieFromGhost() {
+    if (world.doingLevelResetFlourish) {
+      // avoid race condition
+      // already doing a level reset flourish from somewhere else
+      return;
+    }
     if (typical) {
       if (!game.isWonOrLost) {
         world.play(SfxType.pacmanDeath);
