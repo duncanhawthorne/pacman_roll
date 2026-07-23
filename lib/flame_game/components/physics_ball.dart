@@ -20,10 +20,8 @@ const double invPhysicsScale =
     1 / physicsScale; // change to get if physicsScale non-constant
 const bool kPhysicsScaleLockedAtOne = true;
 
-final Paint _activePaint = Paint()
-  ..color = Palette.pacman.color;
-final Paint _inactivePaint = Paint()
-  ..color = Palette.warning.color;
+final Paint _activePaint = Paint()..color = Palette.pacman.color;
+final Paint _inactivePaint = Paint()..color = Palette.warning.color;
 
 const double _lubricationScaleFactor = 0.99;
 const bool _kVerticalPortalsEnabled = false;
@@ -41,18 +39,18 @@ class PhysicsBall extends BodyComponent<PacmanGame>
     bool active = true,
     required this.owner,
   }) : super(
-    shapeSpecs: <ShapeSpec>[_buildShape(radius, density)],
-    bodyDef: BodyDef(
-      enableSleep: false,
-      angularDamping: openSpaceMovement ? 1 : 0,
-      position: position * physicsScale,
-      linearVelocity: velocity * physicsScale,
-      angularVelocity: angularVelocity,
-      type: BodyType.dynamic,
-      isEnabled: active,
-      fixedRotation: !openSpaceMovement,
-    ),
-  ) {
+         shapeSpecs: <ShapeSpec>[_buildShape(radius, density)],
+         bodyDef: BodyDef(
+           enableSleep: false,
+           angularDamping: openSpaceMovement ? 1 : 0,
+           position: position * physicsScale,
+           linearVelocity: velocity * physicsScale,
+           angularVelocity: angularVelocity,
+           type: BodyType.dynamic,
+           isEnabled: active,
+           fixedRotation: !openSpaceMovement,
+         ),
+       ) {
     _bodyIsActive = active;
   }
 
@@ -90,31 +88,29 @@ class PhysicsBall extends BodyComponent<PacmanGame>
   }
 
   /// Synchronizes the physical body's position with the character's visual position.
-  set position(Vector2 pos) =>
-      body.setTransform(
-        kPhysicsScaleLockedAtOne ? pos : _reusableVector
-          ..setFrom(pos)
-          ..scale(physicsScale),
-        Rot.fromAngle(owner.angle),
-      );
+  set position(Vector2 pos) => body.setTransform(
+    kPhysicsScaleLockedAtOne ? pos : _reusableVector
+      ..setFrom(pos)
+      ..scale(physicsScale),
+    Rot.fromAngle(owner.angle),
+  );
 
   /// Checks if the ball has moved outside the maze boundaries (e.g., into a portal).
   bool get _outsideMazeBounds =>
       position.x.abs() > maze.dimensions.mazeHalfWidthPhysics ||
-          (_kVerticalPortalsEnabled &&
-              position.y.abs() > maze.dimensions.mazeHalfHeightPhysics);
+      (_kVerticalPortalsEnabled &&
+          position.y.abs() > maze.dimensions.mazeHalfHeightPhysics);
 
   /// Synchronizes the physical body's linear velocity.
   set velocity(Vector2 vel) =>
       body.linearVelocity = kPhysicsScaleLockedAtOne ? vel : vel * physicsScale;
 
   /// Applies a force to the physical body.
-  set acceleration(Vector2 acceleration) =>
-      body.applyForce(
-        _reusableVector
-          ..setFrom(acceleration)
-          ..scale(body.mass * physicsScale),
-      );
+  set acceleration(Vector2 acceleration) => body.applyForce(
+    _reusableVector
+      ..setFrom(acceleration)
+      ..scale(body.mass * physicsScale),
+  );
 
   /// Updates the radius of the physical fixture.
   set radius(double rad) {
