@@ -4,8 +4,8 @@ import 'package:flame/components.dart';
 import 'package:flame/geometry.dart';
 
 import '../../utils/constants.dart';
+import '../custom_world.dart';
 import '../effects/rotate_effect.dart';
-import '../pacman_world.dart';
 import 'ghost.dart';
 import 'sprite_character.dart';
 
@@ -48,7 +48,7 @@ mixin LapAngle on SpriteAnimationGroupComponent<CharacterState> {
 }
 
 /// Calculates the overall progress of the race by comparing Pacman's laps to the ghosts'.
-double getRaceProgress(PacmanWorld world) {
+double getRaceProgress(CustomWorld world) {
   assert(enableRotationRaceMode);
   if (!enableRotationRaceMode) {
     return 0;

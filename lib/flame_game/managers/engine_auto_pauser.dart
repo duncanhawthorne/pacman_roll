@@ -4,15 +4,15 @@ import 'package:flame/components.dart';
 
 import '../../utils/helper.dart';
 import '../components/base_component.dart';
-import '../pacman_game.dart';
-import '../pacman_world.dart';
+import '../custom_game.dart';
+import '../custom_world.dart';
 
 /// Automatically pauses the game engine when no activity is detected to save resources.
 ///
 /// It monitors frames rendered and game state to determine if the engine
 /// should be paused during inactivity (e.g., at the start of a level before play begins).
 class EngineAutoPauser extends BaseComponent
-    with HasWorldReference<PacmanWorld>, HasGameReference<PacmanGame> {
+    with HasWorldReference<CustomWorld>, HasGameReference<CustomGame> {
   int _framesRendered = 0;
 
   async.Timer? _activityCheckTimer;

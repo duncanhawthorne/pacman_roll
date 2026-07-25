@@ -7,7 +7,7 @@ import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../style/palette.dart';
-import '../pacman_game.dart';
+import '../custom_game.dart';
 import 'physics_ball.dart';
 import 'scaled_body_render.dart';
 
@@ -18,7 +18,7 @@ const bool movingWallsDamage = kDebugMode && false;
 final Paint _movingWallPaint = Paint()..color = Palette.text.color;
 
 /// A physical wall component that can move or be affected by physics.
-class WallDynamic extends BodyComponent<PacmanGame>
+class WallDynamic extends BodyComponent<CustomGame>
     with IgnoreEvents, ScaledBodyRender {
   WallDynamic({required super.shapeSpecs, required Vector2 position})
     : super(

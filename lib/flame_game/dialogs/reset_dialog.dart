@@ -5,7 +5,7 @@ import '../../style/dialog.dart';
 import '../../style/palette.dart';
 import '../../utils/constants.dart';
 import '../game_screen.dart';
-import '../pacman_game.dart';
+import '../custom_game.dart';
 
 /// This dialog is shown when a level is won.
 ///
@@ -16,7 +16,7 @@ import '../pacman_game.dart';
 class ResetDialog extends StatelessWidget {
   const ResetDialog({super.key, required this.game});
 
-  final PacmanGame game;
+  final CustomGame game;
 
   @override
   Widget build(BuildContext context) {

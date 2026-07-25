@@ -4,11 +4,11 @@ import 'package:flame/components.dart';
 
 import '../../level_selection/levels.dart';
 import '../game_screen.dart';
-import '../pacman_game.dart';
+import '../custom_game.dart';
 import 'base_component.dart';
 
 /// Manages the display of tutorial instructions during specified levels.
-class TutorialWrapper extends BaseComponent with HasGameReference<PacmanGame> {
+class TutorialWrapper extends BaseComponent with HasGameReference<CustomGame> {
   bool _tutorialEverManuallyHidden = false;
   static const Duration _tutorialDelay = Duration(milliseconds: 3000);
 

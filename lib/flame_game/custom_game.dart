@@ -14,13 +14,13 @@ import '../player_progress/player_progress.dart';
 import '../style/palette.dart';
 import '../utils/helper.dart';
 import '../utils/src/workarounds.dart';
+import 'custom_world.dart';
 import 'game_screen.dart';
 import 'managers/dialog_manager.dart';
 import 'managers/game_lifecycle.dart';
 import 'managers/game_session.dart';
 import 'managers/playback.dart';
 import 'maze/maze.dart';
-import 'pacman_world.dart';
 
 /// The core physics-driven game loop class that mounts inside the [GameWidget].
 ///
@@ -28,7 +28,7 @@ import 'pacman_world.dart';
 /// of the Pacman simulation. It configures:
 /// * A [FixedResolutionViewport] mapping to a square [worldSquareSize] canvas to
 ///   ensure aspect ratio consistency across diverse device screens.
-/// * A specialized [Forge2DGame] simulation utilizing a dedicated [PacmanWorld].
+/// * A specialized [Forge2DGame] simulation utilizing a dedicated [CustomWorld].
 /// * Custom QuadTree broadphase collision optimizations appropriate for high-density maps.
 ///
 /// Both the world and fixed-resolution camera configurations are directly initialized
@@ -44,20 +44,20 @@ const double mapSizeScale = 1;
 const double _kVirtualGameSize = 1700 / 30;
 const double worldSquareSize = _kVirtualGameSize * mapSizeScale;
 
-class PacmanGame extends Forge2DGame<PacmanWorld>
+class CustomGame extends Forge2DGame<CustomWorld>
     with
-        HasQuadTreeCollisionDetection<PacmanWorld>,
+        HasQuadTreeCollisionDetection<CustomWorld>,
         SingleGameInstance,
         HasTimeScale {
   /// Private generative constructor initialized by the singleton factory wrapper.
-  PacmanGame._({
+  CustomGame._({
     required this.level,
     required int mazeId,
     required this.playerProgress,
     required this.audioController,
     required this.appLifecycleStateNotifier,
   }) : super(
-         world: PacmanWorld(),
+         world: CustomWorld(),
          camera: CameraComponent.withFixedResolution(
            width: worldSquareSize,
            height: worldSquareSize,
@@ -67,11 +67,11 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
     maze.mazeId = mazeId;
   }
 
-  /// Factory constructor managing a single global instance of [PacmanGame].
+  /// Factory constructor managing a single global instance of [CustomGame].
   ///
   /// On subsequent calls, instead of re-instantiating, it updates the mutable configuration properties
   /// of the existing instance and issues an internal soft reset sequence.
-  factory PacmanGame({
+  factory CustomGame({
     required GameLevel level,
     required int mazeId,
     required PlayerProgress playerProgress,
@@ -79,7 +79,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
     required AppLifecycleStateNotifier appLifecycleStateNotifier,
   }) {
     if (_instance == null) {
-      _instance = PacmanGame._(
+      _instance = CustomGame._(
         level: level,
         mazeId: mazeId,
         playerProgress: playerProgress,
@@ -96,7 +96,7 @@ class PacmanGame extends Forge2DGame<PacmanWorld>
   }
 
   /// Cached reference enforcing the singleton instance pattern.
-  static PacmanGame? _instance;
+  static CustomGame? _instance;
 
   /// Holds structural metadata configuration relating to the current stage/level.
   GameLevel level;

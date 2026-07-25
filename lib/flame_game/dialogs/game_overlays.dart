@@ -11,7 +11,7 @@ import '../../utils/constants.dart';
 import '../components/lap_angle.dart';
 import '../game_screen.dart';
 import '../icons/pacman_icons.dart';
-import '../pacman_game.dart';
+import '../custom_game.dart';
 
 const double _statusWidgetHeightFactor = 1.0;
 const double _widgetSpacing = 8 * _statusWidgetHeightFactor;
@@ -22,7 +22,7 @@ const double pacmanIconSize = 21 * _statusWidgetHeightFactor;
 const double gIconSize = pacmanIconSize * 4 / 3;
 
 /// Top-level status widget displayed over the game.
-Widget topOverlayWidget(BuildContext context, PacmanGame game) {
+Widget topOverlayWidget(BuildContext context, CustomGame game) {
   return Center(
     child: Padding(
       padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
@@ -54,7 +54,7 @@ Widget topOverlayWidget(BuildContext context, PacmanGame game) {
   );
 }
 
-Widget _topLeftWidget(BuildContext context, PacmanGame game) {
+Widget _topLeftWidget(BuildContext context, CustomGame game) {
   return Row(
     crossAxisAlignment: CrossAxisAlignment.center,
     mainAxisAlignment: MainAxisAlignment.start,
@@ -69,7 +69,7 @@ Widget _topLeftWidget(BuildContext context, PacmanGame game) {
   );
 }
 
-Widget _topRightWidget(BuildContext context, PacmanGame game) {
+Widget _topRightWidget(BuildContext context, CustomGame game) {
   return Row(
     crossAxisAlignment: CrossAxisAlignment.center,
     mainAxisAlignment: MainAxisAlignment.end,
@@ -83,7 +83,7 @@ Widget _topRightWidget(BuildContext context, PacmanGame game) {
   );
 }
 
-Widget _mainMenuButtonWidget(BuildContext context, PacmanGame game) {
+Widget _mainMenuButtonWidget(BuildContext context, CustomGame game) {
   return IconButton(
     onPressed: () {
       game.overlays.activeOverlays.contains(GameScreen.beginDialogKey)
@@ -94,7 +94,7 @@ Widget _mainMenuButtonWidget(BuildContext context, PacmanGame game) {
   );
 }
 
-Widget _livesWidget(BuildContext context, PacmanGame game) {
+Widget _livesWidget(BuildContext context, CustomGame game) {
   return Padding(
     padding: const EdgeInsets.only(
       left: _pacmanOuterSpacing,
@@ -116,14 +116,14 @@ Widget _livesWidget(BuildContext context, PacmanGame game) {
   );
 }
 
-Widget _infintyWidget(BuildContext context, PacmanGame game) {
+Widget _infintyWidget(BuildContext context, CustomGame game) {
   return !game.level.infLives
       ? const SizedBox.shrink()
       : Text("∞", style: TextStyle(color: Palette.pacman.color));
 }
 
 // ignore: unused_element
-Widget _clockWidget(PacmanGame game) {
+Widget _clockWidget(CustomGame game) {
   return GestureDetector(
     onLongPress: () {
       if (detailedAudioLog) {
@@ -151,7 +151,7 @@ Widget _clockWidget(PacmanGame game) {
 }
 
 // ignore: unused_element
-Widget _raceProgressWidget(PacmanGame game) {
+Widget _raceProgressWidget(CustomGame game) {
   return GestureDetector(
     onLongPress: () {
       if (detailedAudioLog) {
@@ -176,7 +176,7 @@ Widget _raceProgressWidget(PacmanGame game) {
   );
 }
 
-Widget _audioOnOffButtonWidget(BuildContext context, PacmanGame game) {
+Widget _audioOnOffButtonWidget(BuildContext context, CustomGame game) {
   const Color color = Palette.textColor;
   final SettingsController settingsController = context
       .watch<SettingsController>();
@@ -193,7 +193,7 @@ Widget _audioOnOffButtonWidget(BuildContext context, PacmanGame game) {
   );
 }
 
-Widget _mouseLockButtonWidget(BuildContext context, PacmanGame game) {
+Widget _mouseLockButtonWidget(BuildContext context, CustomGame game) {
   const Color color = Palette.textColor;
   return IconButton(
     onPressed: () {

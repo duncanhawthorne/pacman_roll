@@ -4,14 +4,14 @@ import 'package:flame/components.dart';
 import 'package:flutter/foundation.dart';
 
 import '../maze/maze.dart';
-import '../pacman_game.dart';
+import '../custom_game.dart';
 import 'base_component.dart';
 import 'mini_pellet.dart';
 import 'super_pellet.dart';
 
 /// A container component that manages and renders all pellets in the maze.
 class PelletWrapper extends BaseComponent
-    with HasGameReference<PacmanGame>, Snapshot {
+    with HasGameReference<CustomGame>, Snapshot {
   @override
   final int priority = -2;
 

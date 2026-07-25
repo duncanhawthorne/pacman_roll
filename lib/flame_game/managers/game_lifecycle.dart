@@ -3,15 +3,15 @@ import 'dart:ui';
 import 'package:flame/components.dart';
 
 import '../components/base_component.dart';
-import '../pacman_game.dart';
-import '../pacman_world.dart';
+import '../custom_game.dart';
+import '../custom_world.dart';
 
 /// Manages the game's lifecycle, including pausing, resuming, and tracking play time.
 ///
 /// Handles application lifecycle changes and coordinates the starting/stopping
 /// of game elements.
 class GameLifecycle extends BaseComponent
-    with HasWorldReference<PacmanWorld>, HasGameReference<PacmanGame> {
+    with HasWorldReference<CustomWorld>, HasGameReference<CustomGame> {
   VoidCallback? _lifecycleListenerRef;
   bool _regularItemsStarted = false;
 

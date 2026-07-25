@@ -16,13 +16,13 @@ import 'dialogs/level_choose.dart';
 import 'dialogs/playback_dialog.dart';
 import 'dialogs/reset_dialog.dart';
 import 'dialogs/tutorial_dialog.dart';
-import 'pacman_game.dart';
+import 'custom_game.dart';
 
 /// This widget defines the properties of the game screen.
 ///
 /// It mostly sets up the overlays (widgets shown on top of the Flame game) and
 /// the gets the [AudioController] from the context and passes it in to the
-/// [PacmanGame] class so that it can play audio.
+/// [CustomGame] class so that it can play audio.
 
 class GameScreen extends StatelessWidget {
   const GameScreen({required this.level, required this.mazeId, super.key});
@@ -53,9 +53,9 @@ class GameScreen extends StatelessWidget {
             padding: EdgeInsets.only(bottom: gestureInset()),
             child: Scaffold(
               backgroundColor: Palette.background.color,
-              body: GameWidget<PacmanGame>(
+              body: GameWidget<CustomGame>(
                 key: const Key('play session'),
-                game: PacmanGame(
+                game: CustomGame(
                   level: level,
                   mazeId: mazeId,
                   playerProgress: context.read<PlayerProgress>(),
@@ -63,14 +63,14 @@ class GameScreen extends StatelessWidget {
                   appLifecycleStateNotifier: context
                       .read<AppLifecycleStateNotifier>(),
                 ),
-                overlayBuilderMap: <String, OverlayWidgetBuilder<PacmanGame>>{
-                  topOverlayKey: (BuildContext context, PacmanGame game) {
+                overlayBuilderMap: <String, OverlayWidgetBuilder<CustomGame>>{
+                  topOverlayKey: (BuildContext context, CustomGame game) {
                     return topOverlayWidget(context, game);
                   },
-                  loseDialogKey: (BuildContext context, PacmanGame game) {
+                  loseDialogKey: (BuildContext context, CustomGame game) {
                     return GameLoseDialog(level: level, game: game);
                   },
-                  wonDialogKey: (BuildContext context, PacmanGame game) {
+                  wonDialogKey: (BuildContext context, CustomGame game) {
                     return GameWonDialog(
                       level: level,
                       levelCompletedInMillis:
@@ -78,19 +78,19 @@ class GameScreen extends StatelessWidget {
                       game: game,
                     );
                   },
-                  startDialogKey: (BuildContext context, PacmanGame game) {
+                  startDialogKey: (BuildContext context, CustomGame game) {
                     return LevelChooseDialog(level: level, game: game);
                   },
-                  tutorialDialogKey: (BuildContext context, PacmanGame game) {
+                  tutorialDialogKey: (BuildContext context, CustomGame game) {
                     return TutorialDialog(game: game);
                   },
-                  resetDialogKey: (BuildContext context, PacmanGame game) {
+                  resetDialogKey: (BuildContext context, CustomGame game) {
                     return ResetDialog(game: game);
                   },
-                  beginDialogKey: (BuildContext context, PacmanGame game) {
+                  beginDialogKey: (BuildContext context, CustomGame game) {
                     return PlaybackDialog(game: game);
                   },
-                  debugDialogKey: (BuildContext context, PacmanGame game) {
+                  debugDialogKey: (BuildContext context, CustomGame game) {
                     return DebugDialog(game: game);
                   },
                 },

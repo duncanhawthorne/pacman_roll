@@ -5,10 +5,10 @@ import 'package:flutter/foundation.dart';
 import 'package:web/web.dart' as web;
 
 import '../components/base_component.dart';
-import '../pacman_game.dart';
+import '../custom_game.dart';
 
 /// Captures web pointer lock click triggers and delegates mouse movement deltas to [DragRotation].
-class MouseMove extends BaseComponent with HasGameReference<PacmanGame> {
+class MouseMove extends BaseComponent with HasGameReference<CustomGame> {
   void requestPointerLockIfAllowed() {
     if (!kIsWeb) return;
     if (game.dialogs.anyDialogShowing()) return;

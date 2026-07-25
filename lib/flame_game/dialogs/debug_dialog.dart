@@ -6,7 +6,7 @@ import '../../audio/audio_controller.dart';
 import '../../audio/sounds.dart';
 import '../../style/dialog.dart';
 import '../../utils/helper.dart';
-import '../pacman_game.dart';
+import '../custom_game.dart';
 
 /// This first dialog shown during playback mode
 
@@ -14,7 +14,7 @@ import '../pacman_game.dart';
 class DebugDialog extends StatelessWidget {
   const DebugDialog({super.key, required this.game});
 
-  final PacmanGame game;
+  final CustomGame game;
 
   @override
   Widget build(BuildContext context) {

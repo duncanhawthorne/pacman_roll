@@ -2,8 +2,8 @@ import 'dart:async' as async;
 
 import 'package:flame/components.dart';
 
-import '../pacman_game.dart';
-import '../pacman_world.dart';
+import '../custom_game.dart';
+import '../custom_world.dart';
 import 'base_component.dart';
 import 'ghost.dart';
 import 'ghost_layer.dart';
@@ -11,7 +11,7 @@ import 'sprite_character.dart';
 
 /// Manages the dynamic volume of the ghost siren sound based on ghost speed.
 class GhostSiren extends BaseComponent
-    with HasGameReference<PacmanGame>, HasWorldReference<PacmanWorld> {
+    with HasGameReference<CustomGame>, HasWorldReference<CustomWorld> {
   late final Ghosts ghosts = world.ghosts;
   late final List<Ghost> ghostList = ghosts.ghostList;
 

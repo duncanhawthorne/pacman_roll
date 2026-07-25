@@ -8,7 +8,7 @@ import '../effects/null_effect.dart';
 import '../effects/remove_effects.dart';
 import '../icons/pacman_sprites.dart';
 import '../maze/maze.dart';
-import '../pacman_game.dart';
+import '../custom_game.dart';
 import 'clones.dart';
 import 'game_character.dart';
 import 'ghost.dart';

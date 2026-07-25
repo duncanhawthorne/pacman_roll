@@ -3,15 +3,15 @@ import 'package:flame/components.dart';
 import '../../audio/sounds.dart';
 import '../components/base_component.dart';
 import '../components/pacman.dart';
-import '../pacman_game.dart';
-import '../pacman_world.dart';
+import '../custom_game.dart';
+import '../custom_world.dart';
 
 /// Manages the reset logic when Pacman dies.
 ///
 /// This includes stopping sounds, sliding characters back to their start
 /// positions, and resetting the game state.
 class DeathReset extends BaseComponent
-    with HasGameReference<PacmanGame>, HasWorldReference<PacmanWorld> {
+    with HasGameReference<CustomGame>, HasWorldReference<CustomWorld> {
   static const bool _slideCharactersAfterPacmanDeath = true;
 
   /// Initiates the reset process after Pacman dies.

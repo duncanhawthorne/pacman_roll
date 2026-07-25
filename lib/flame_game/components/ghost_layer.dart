@@ -4,9 +4,9 @@ import 'package:flame/components.dart';
 
 import '../../audio/sounds.dart';
 import '../../utils/helper.dart';
+import '../custom_game.dart';
+import '../custom_world.dart';
 import '../effects/remove_effects.dart';
-import '../pacman_game.dart';
-import '../pacman_world.dart';
 import 'base_component.dart';
 import 'game_character.dart';
 import 'ghost.dart';
@@ -17,7 +17,7 @@ const int _kGhostScaredTimeMillis = 6000;
 
 /// A container component that manages all active ghosts in the game.
 class Ghosts extends BaseComponent
-    with HasWorldReference<PacmanWorld>, HasGameReference<PacmanGame> {
+    with HasWorldReference<CustomWorld>, HasGameReference<CustomGame> {
   @override
   final int priority = 1;
 

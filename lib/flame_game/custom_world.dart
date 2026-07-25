@@ -12,11 +12,11 @@ import 'components/pacman_layer.dart';
 import 'components/pellet_layer.dart';
 import 'components/wall_dynamic_layer.dart';
 import 'components/wall_layer.dart';
+import 'custom_game.dart';
 import 'managers/death_reset.dart';
 import 'managers/drag_rotation.dart';
 import 'managers/engine_auto_pauser.dart';
 import 'managers/mouse_move.dart';
-import 'pacman_game.dart';
 
 /// The game world responsible for managing the lifecycle, physics, and hierarchy
 /// of all active gameplay elements in the Pacman game.
@@ -26,27 +26,27 @@ import 'pacman_game.dart';
 /// **Mixins:**
 /// * [DragCallbacks]: Enables the world to intercept and respond to user touch,
 ///   drag, and mouse interactions.
-/// * [HasGameReference]: Provides direct access to the parent [PacmanGame]
+/// * [HasGameReference]: Provides direct access to the parent [CustomGame]
 ///   instance via the `game` property.
-class PacmanWorld extends Forge2DWorld
-    with HasGameReference<PacmanGame>, DragCallbacks {
+class CustomWorld extends Forge2DWorld
+    with HasGameReference<CustomGame>, DragCallbacks {
   /// Private constructor to enforce the singleton pattern.
-  PacmanWorld._();
+  CustomWorld._();
 
-  /// Factory constructor that returns the single initialized instance of [PacmanWorld].
+  /// Factory constructor that returns the single initialized instance of [CustomWorld].
   ///
   /// Throws an [AssertionError] if an attempt is made to instantiate more than once.
-  factory PacmanWorld() {
+  factory CustomWorld() {
     assert(
       _instance == null,
-      'PacmanWorld is a singleton and can only be initialized once.',
+      'CustomWorld is a singleton and can only be initialized once.',
     );
-    _instance ??= PacmanWorld._();
+    _instance ??= CustomWorld._();
     return _instance!;
   }
 
   /// The internal singleton instance of the world.
-  static PacmanWorld? _instance;
+  static CustomWorld? _instance;
 
   /// Vector tracking the directional sign of the world's gravity.
   final Vector2 gravitySign = Vector2.zero();

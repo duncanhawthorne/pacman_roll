@@ -2,11 +2,11 @@ import 'package:flame/geometry.dart';
 import 'package:flutter/material.dart';
 
 import '../dialogs/game_overlays.dart';
-import '../pacman_game.dart';
+import '../custom_game.dart';
 import 'pacman_sprites.dart';
 
 /// Returns an animated Pacman icon that reflects whether a life has been lost.
-Widget animatedPacmanIcon(PacmanGame game, int index) {
+Widget animatedPacmanIcon(CustomGame game, int index) {
   return ValueListenableBuilder<int>(
     valueListenable: game.world.pacmans.pacmanDyingNotifier,
     builder: (BuildContext context, int value, Widget? child) {

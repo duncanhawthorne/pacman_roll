@@ -8,7 +8,7 @@ import '../../style/dialog.dart';
 import '../../style/palette.dart';
 import '../game_screen.dart';
 import '../maze/maze.dart';
-import '../pacman_game.dart';
+import '../custom_game.dart';
 import 'level_choose.dart';
 
 /// This dialog is shown when a level is won.
@@ -28,7 +28,7 @@ class GameWonDialog extends StatelessWidget {
   /// The properties of the level that was just finished.
   final GameLevel level;
 
-  final PacmanGame game;
+  final CustomGame game;
 
   /// How many milliseconds the level took to complete.
   final int levelCompletedInMillis;

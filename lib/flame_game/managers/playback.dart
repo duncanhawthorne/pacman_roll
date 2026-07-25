@@ -5,14 +5,14 @@ import '../../level_selection/levels.dart';
 import '../../utils/helper.dart';
 import '../../utils/stored_moves.dart';
 import '../components/base_component.dart';
-import '../pacman_game.dart';
-import '../pacman_world.dart';
+import '../custom_game.dart';
+import '../custom_world.dart';
 
 /// Manages the recording and playback of maze rotation moves.
 ///
 /// This is used for a special "playback mode" level.
-class Playback extends BaseComponent with HasWorldReference<PacmanWorld> {
-  late final PacmanGame game;
+class Playback extends BaseComponent with HasWorldReference<CustomWorld> {
+  late final CustomGame game;
 
   int _counter = 0;
   bool _playbackModeEverDismissed = false;

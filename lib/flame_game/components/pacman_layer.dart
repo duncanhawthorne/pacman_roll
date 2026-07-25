@@ -5,13 +5,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../maze/maze.dart';
-import '../pacman_game.dart';
+import '../custom_game.dart';
 import 'base_component.dart';
 import 'pacman.dart';
 import 'sprite_character.dart';
 
 /// A container component that manages all Pacman instances in the game.
-class Pacmans extends BaseComponent with HasGameReference<PacmanGame> {
+class Pacmans extends BaseComponent with HasGameReference<CustomGame> {
   @override
   final int priority = 2;
 

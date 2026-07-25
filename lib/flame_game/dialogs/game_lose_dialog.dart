@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../level_selection/levels.dart';
 import '../../style/dialog.dart';
 import '../game_screen.dart';
-import '../pacman_game.dart';
+import '../custom_game.dart';
 import 'level_choose.dart';
 
 /// This dialog is shown when a level is lost.
@@ -14,7 +14,7 @@ class GameLoseDialog extends StatelessWidget {
 
   /// The properties of the level that was just lost.
   final GameLevel level;
-  final PacmanGame game;
+  final CustomGame game;
 
   @override
   Widget build(BuildContext context) {

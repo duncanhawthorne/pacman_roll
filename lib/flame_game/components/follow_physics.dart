@@ -1,14 +1,14 @@
 import 'package:flame/components.dart';
 
 import '../../utils/helper.dart';
-import '../pacman_world.dart';
+import '../custom_world.dart';
 import 'game_character.dart';
 import 'physics_ball.dart';
 import 'removal_actions.dart';
 
 /// A component that syncs a character's position and angle with its physical [PhysicsBall].
 class Physics extends Component
-    with HasWorldReference<PacmanWorld>, RemovalActions, IgnoreEvents {
+    with HasWorldReference<CustomWorld>, RemovalActions, IgnoreEvents {
   Physics({required this.owner});
 
   @override
