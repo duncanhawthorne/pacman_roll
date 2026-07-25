@@ -89,6 +89,7 @@ class GameSession extends BaseComponent
     assert(isWonOrLost);
     assert(game.lifecycle.stopwatchStarted);
     assert(!(game.playState == PlayState.playbackMode));
+    world.mouseMove.exitPointerLock();
     game.lifecycle.stopRegularItems();
     game.audioController.playSfx(SfxType.endMusic);
     world.ghosts.resetAfterGameWin();
@@ -106,6 +107,7 @@ class GameSession extends BaseComponent
     assert(!isRemoving);
     assert(isWonOrLost);
     assert(game.lifecycle.stopwatchStarted);
+    world.mouseMove.exitPointerLock();
     game.lifecycle.stopRegularItems();
     game.audioController.stopAllSounds();
     game.dialogs.switchTo(GameScreen.loseDialogKey);

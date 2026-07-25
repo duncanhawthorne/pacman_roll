@@ -23,6 +23,15 @@ class MouseMove extends BaseComponent with HasGameReference<PacmanGame> {
     }
   }
 
+  /// Releases the mouse pointer lock if currently locked on the web.
+  void exitPointerLock() {
+    if (!kIsWeb) return;
+
+    if (web.document.pointerLockElement != null) {
+      web.document.exitPointerLock();
+    }
+  }
+
   @override
   Future<void> onLoad() async {
     await super.onLoad();
