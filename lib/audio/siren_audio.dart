@@ -34,11 +34,20 @@ class SirenAudioController {
   }
 
   /// Dynamically adjusts the volume of the ghost roaming siren.
+  /// IOS GUARD: Called by Flame's 250ms periodic timer. Bails out silently if iOS audio is locked
+  /// waiting for a tap, preventing the background timer from forcing a invalid SoLoud init.
   Future<void> setVolume(
     double normalisedAverageGhostSpeed, {
     bool gradual = false,
   }) async {
     const SfxType siren = SfxType.ghostsRoamingSiren;
+
+    // GUARD: On iOS Web, if the user hasn't tapped yet after resume,
+    // bail out silently so the periodic timer doesn't force a SoLoud init.
+    if (!_audioController.isIosUnlocked) {
+      return;
+    }
+
     if (!(await _audioController.canPlay(siren))) {
       return;
     }
@@ -50,7 +59,10 @@ class SirenAudioController {
       _log.info('Restarting ghostsRoamingSiren');
       await _audioController.playSfx(siren);
     }
-    final SoundHandle handle = _audioController.getHandle(siren)!;
+
+    final SoundHandle? handle = _audioController.getHandle(siren);
+    if (handle == null) return;
+
     currentVolume = soLoud.getVolume(handle);
     final double desiredSirenVolume = _getDesiredSirenVolume(
       normalisedAverageGhostSpeed,

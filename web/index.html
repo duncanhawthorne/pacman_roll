@@ -145,5 +145,86 @@
 </script>
 <script defer src="assets/packages/flutter_soloud/web/libflutter_soloud_plugin.js"></script>
 <script defer src="assets/packages/flutter_soloud/web/init_module.dart.js"></script>
+<!--
+  IOS SILENT SWITCH BYPASS & MEDIA CHANNEL ENFORCER:
+  Sets WebAudio Session API category to 'playback' on iOS 17+.
+  This forces iOS Safari to route WebAudio through the Media Playback output channel
+  rather than the Ringer channel, allowing audio to play even when the physical Silent switch is ON.
+-->
+<script>
+  (function() {
+    console.log('[iOS-MediaChannel] Script injected.');
+
+    // 1. Force AudioSession to 'playback' mode
+    function setPlaybackCategory() {
+      if ('audioSession' in navigator) {
+        try {
+          navigator.audioSession.type = 'playback';
+          console.log('[iOS-MediaChannel] navigator.audioSession.type set to "playback" (Silent Switch Bypassed).');
+        } catch (err) {
+          console.warn('[iOS-MediaChannel] Failed setting navigator.audioSession.type:', err);
+        }
+      } else {
+        console.log('[iOS-MediaChannel] navigator.audioSession API not supported in this browser.');
+      }
+    }
+
+    // Run on script load
+    setPlaybackCategory();
+
+    // 2. Gesture listener to kick the browser AudioContext into active media mode on tap
+    let sessionInitialized = false;
+
+    function activateMediaChannel(event) {
+      console.log(`[iOS-MediaChannel] User gesture detected (${event.type}). Setting up media context...`);
+
+      // Re-enforce playback mode inside user tap stack
+      setPlaybackCategory();
+
+      // Check browser WebAudio Context
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (AudioContextClass) {
+        try {
+          const context = new AudioContextClass();
+          console.log(`[iOS-MediaChannel] Created AudioContext. State: ${context.state}, BaseLatency: ${context.baseLatency}`);
+
+          if (context.state === 'suspended') {
+            context.resume().then(() => {
+              console.log(`[iOS-MediaChannel] AudioContext resumed successfully! State: ${context.state}`);
+              sessionInitialized = true;
+              context.close();
+            }).catch((err) => {
+              console.error('[iOS-MediaChannel] Error resuming AudioContext:', err);
+            });
+          } else {
+            sessionInitialized = true;
+            context.close();
+          }
+        } catch (e) {
+          console.error('[iOS-MediaChannel] Exception initializing AudioContext:', e);
+        }
+      } else {
+        console.warn('[iOS-MediaChannel] WebAudio API not available.');
+      }
+
+      // Remove gesture listeners once executed
+      if (sessionInitialized) {
+        window.removeEventListener('pointerdown', activateMediaChannel);
+        window.removeEventListener('touchstart', activateMediaChannel);
+      }
+    }
+
+    window.addEventListener('pointerdown', activateMediaChannel, { passive: true });
+    window.addEventListener('touchstart', activateMediaChannel, { passive: true });
+
+    // 3. Keep media mode alive when switching tabs or resuming from Apple Music
+    document.addEventListener('visibilitychange', function() {
+      console.log(`[iOS-MediaChannel] Visibility changed to: ${document.visibilityState}`);
+      if (document.visibilityState === 'visible') {
+        setPlaybackCategory();
+      }
+    });
+  })();
+</script>
 </body>
 </html>
