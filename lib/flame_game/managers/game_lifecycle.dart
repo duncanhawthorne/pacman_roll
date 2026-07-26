@@ -42,7 +42,7 @@ class GameLifecycle extends BaseComponent
   void resumeGame() {
     if (game.paused || game.timeScale == 0) {
       noteThatSomeRegularItemHasStopped();
-      game.audioController.workaroundiOSSafariAudioOnUserInteraction();
+      game.audioController.iosWorkaround.workaround();
       game.timeScale = 1;
       game
         ..resume() //timeScale = 1.0;
@@ -53,7 +53,7 @@ class GameLifecycle extends BaseComponent
   /// Starts regular game activities and the stopwatch.
   void startRegularItems() {
     if (!_regularItemsStarted) {
-      game.audioController.workaroundiOSSafariAudioOnUserInteraction();
+      game.audioController.iosWorkaround.workaround();
       _regularItemsStarted = true;
       _stopwatchStarted = true; //once per reset
       stopwatch.resume();

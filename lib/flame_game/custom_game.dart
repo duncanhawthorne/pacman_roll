@@ -162,7 +162,7 @@ class CustomGame extends Forge2DGame<CustomWorld>
   /// Begins primary gameplay activities, including audio and world updates.
   void start() {
     audioController
-      ..workaroundiOSSafariAudioOnUserInteraction()
+      ..iosWorkaround.workaround()
       ..playSfx(SfxType.startMusic);
     world.start();
   }

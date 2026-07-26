@@ -42,7 +42,7 @@ class GhostSiren extends BaseComponent
 
   /// Starts a periodic timer to update the siren volume based on ghost activity.
   async.Future<void> startSirenVolumeUpdaterTimer() async {
-    final bool sirenEnabled = game.audioController.canDoVariableVolume;
+    final bool sirenEnabled = true;
     if (sirenEnabled) {
       if (!ghosts.isMounted) {
         return;
@@ -65,7 +65,7 @@ class GhostSiren extends BaseComponent
               game.playState == PlayState.playbackMode,
         );
         if (game.isLive) {
-          game.audioController.setSirenVolume(
+          game.audioController.siren.setVolume(
             _averageGhostSpeed() / game.level.levelSpeed * 15,
             gradual: true,
           );
@@ -79,7 +79,7 @@ class GhostSiren extends BaseComponent
   /// Cancels the siren volume updater and silences the siren.
   void cancelSirenVolumeUpdaterTimer() {
     if (_sirenTimer != null) {
-      game.audioController.setSirenVolume(0);
+      game.audioController.siren.setVolume(0);
       _sirenTimer!.cancel();
       _sirenTimer = null;
       game.lifecycle.noteThatSomeRegularItemHasStopped();
