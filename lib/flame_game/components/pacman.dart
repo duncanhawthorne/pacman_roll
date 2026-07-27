@@ -3,12 +3,12 @@ import 'package:flame/components.dart';
 
 import '../../audio/sounds.dart';
 import '../../utils/constants.dart';
+import '../custom_game.dart';
 import '../effects/move_to_effect.dart';
 import '../effects/null_effect.dart';
 import '../effects/remove_effects.dart';
 import '../icons/pacman_sprites.dart';
 import '../maze/maze.dart';
-import '../custom_game.dart';
 import 'clones.dart';
 import 'game_character.dart';
 import 'ghost.dart';
@@ -82,12 +82,12 @@ class Pacman extends GameCharacter with CollisionCallbacks {
       _eatTimer.start();
       if (isPellet) {
         //only play waka if not recently played waka
-        game.audioController.playSfx(SfxType.waka);
+        game.audioController.play(SfxType.waka);
       }
     }
     if (!isPellet) {
       //play eatGhost irrespective of current state
-      game.audioController.playSfx(SfxType.eatGhost);
+      game.audioController.play(SfxType.eatGhost);
     }
     //if in eating state, just let that sequence complete normally
   }
@@ -160,7 +160,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
     if (!game.session.isWonOrLost) {
       current = CharacterState.dead;
       setPhysicsState(PhysicsState.none);
-      game.audioController.playSfx(SfxType.pacmanDeath);
+      game.audioController.play(SfxType.pacmanDeath);
       if (_freezeGhostsOnKillPacman) {
         world.ghosts.disconnectGhostsFromBalls();
       }

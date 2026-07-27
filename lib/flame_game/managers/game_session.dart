@@ -91,7 +91,7 @@ class GameSession extends BaseComponent
     assert(!(game.playState == PlayState.playbackMode));
     world.mouseMove.exitPointerLock();
     game.lifecycle.stopRegularItems();
-    game.audioController.playSfx(SfxType.endMusic);
+    game.audioController.play(SfxType.endMusic);
     world.ghosts.resetAfterGameWin();
     const int minRecordableWinTimeMillis = 10 * 1000;
     if (stopwatchMilliSeconds > minRecordableWinTimeMillis &&

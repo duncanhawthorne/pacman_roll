@@ -161,7 +161,7 @@ class CustomGame extends Forge2DGame<CustomWorld>
 
   /// Begins primary gameplay activities, including audio and world updates.
   void start() {
-    audioController.playSfx(SfxType.startMusic);
+    audioController.play(SfxType.startMusic);
     world.start();
   }
 

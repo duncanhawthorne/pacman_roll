@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:logging/logging.dart';
 
+import '../utils/constants.dart';
 import 'audio_controller.dart';
 import 'sounds.dart';
 
@@ -14,7 +15,10 @@ class IosWorkaround {
   static final Logger _log = Logger('IA');
   final AudioController _audioController;
 
-  final Map<SfxType, AudioPlayer> _apPlayers = <SfxType, AudioPlayer>{};
+  AudioPlayer? _silencePlayer;
+
+  /// Platform check: true only if running on iOS Safari / iOS Web.
+  final bool _soLoudIsUnreliable = isiOSWeb;
 
   bool _needsReUnlockOnResume = false;
 
@@ -25,8 +29,25 @@ class IosWorkaround {
   /// Returns true if iOS WebAudio has been unlocked by a user gesture.
   bool get isUnlocked => !_needsReUnlockOnResume;
 
+  /// CLEAN GUARD CHECK:
+  /// Returns true immediately on non-iOS platforms, or if iOS WebAudio is unlocked.
+  bool get isReady => !_soLoudIsUnreliable || isUnlocked;
+
+  /// Handles AppLifecycleState.hidden teardown for unreliable platform audio.
+  Future<void> handleLifecycleHidden(
+    Future<void> Function() powerDownResetCallback,
+  ) async {
+    if (_soLoudIsUnreliable) {
+      _log.info("soLoudReset due to unreliable soLoud");
+      await powerDownResetCallback();
+    } else {
+      await _audioController.stopAllSounds();
+    }
+  }
+
   /// Called on AppLifecycleState.resumed to invalidate the silence player state.
   void resetStateOnResume() {
+    if (!_soLoudIsUnreliable) return;
     _log.info(
       '[LIFECYCLE] Flagging IosWorkaround for re-unlock on next user tap.',
     );
@@ -34,58 +55,11 @@ class IosWorkaround {
     _isUnlockingSilence = false;
   }
 
-  /// Plays a specific sound effect via AudioPlayers (HTML5 Audio).
-  Future<void> _playSfxForceAudioPlayers(SfxType type) async {
-    if (!isAudioSystemEnabled) {
-      return;
-    }
-    !_audioController.isAudioOn ? null : _log.fine('Playing $type');
-
-    if (_apPlayers.containsKey(type)) {
-      try {
-        await _apPlayers[type]!.stop();
-      } catch (_) {}
-    } else {
-      _apPlayers[type] = AudioPlayer(playerId: 'sfxPlayer#$type');
-    }
-
-    final AudioPlayer currentPlayer = _apPlayers[type]!;
-    await currentPlayer.setReleaseMode(ReleaseMode.loop);
-
-    try {
-      // Double call ensures Safari gesture stack binds the hardware audio node cleanly.
-      await currentPlayer.play(
-        AssetSource(type.filename),
-        volume: type.targetVolume,
-      );
-      await currentPlayer.play(
-        AssetSource(type.filename),
-        volume: type.targetVolume,
-      );
-
-      if (type == SfxType.silence) {
-        _log.info(
-          '[TOUCH] Silence stream restarted successfully. WebAudio hardware is UNLOCKED.',
-        );
-      }
-    } catch (e) {
-      _log.warning('[TOUCH] Silence playback warning/error: $e');
-    } finally {
-      if (type == SfxType.silence) {
-        _isUnlockingSilence = false;
-      }
-    }
-
-    _log.finest(() => "Player state $type ${currentPlayer.state}");
-  }
-
   /// Safari workaround: Triggers audio activation on a user-initiated touch event (PointerDown).
   /// Synchronously clears _needsReUnlockOnResume and forces SoLoud re-init inside the gesture callstack.
   Future<void> workaround() async {
     // GUARD: If already unlocked OR an unlock attempt is currently in progress, do nothing.
-    if (isUnlocked || _isUnlockingSilence) {
-      return;
-    }
+    if (isUnlocked || _isUnlockingSilence) return;
 
     _log.info('[TOUCH] User interacted with screen. workaround() called.');
     _isUnlockingSilence = true;
@@ -99,46 +73,60 @@ class IosWorkaround {
     await _playSilence();
   }
 
-  /// Returns true if silence is playing on AudioPlayers.
-  bool _silencePlayingOnAp() {
-    final SfxType type = SfxType.silence;
-    return _apPlayers.containsKey(type) &&
-        _apPlayers[type]!.state == PlayerState.playing;
-  }
-
   /// Plays a silent track via HTML5 Audio to keep the browser audio session active.
   Future<void> _playSilence() async {
-    if (!isAudioSystemEnabled) {
+    if (!kEnableAudioSystem || !_soLoudIsUnreliable) return;
+
+    if (_silencePlayer?.state == PlayerState.playing) {
+      _log.fine('Silence already playing');
+      _isUnlockingSilence = false;
       return;
     }
-    if (_audioController.soLoudIsUnreliable) {
-      if (_silencePlayingOnAp()) {
-        _log.fine('Silence already playing');
-        _isUnlockingSilence = false;
-        return;
-      }
-      !_audioController.isAudioOn ? null : _log.fine("playSilence");
-      await _playSfxForceAudioPlayers(SfxType.silence);
+    if (_audioController.isAudioOn) _log.fine("playSilence");
+    final SfxType type = SfxType.silence;
+
+    if (_silencePlayer != null) {
+      await _silencePlayer?.stop().catchError((_) {});
+    } else {
+      _silencePlayer = AudioPlayer(playerId: 'sfxPlayer#$type');
     }
+
+    final AudioPlayer currentPlayer = _silencePlayer!;
+    await currentPlayer.setReleaseMode(ReleaseMode.loop);
+
+    try {
+      // Double call ensures Safari gesture stack binds the hardware audio node cleanly.
+      await currentPlayer.play(
+        AssetSource(type.filename),
+        volume: type.targetVolume,
+      );
+      await currentPlayer.play(
+        AssetSource(type.filename),
+        volume: type.targetVolume,
+      );
+
+      _log.info(
+        '[TOUCH] Silence stream restarted successfully. WebAudio hardware is UNLOCKED.',
+      );
+    } catch (e) {
+      _log.warning('[TOUCH] Silence playback warning/error: $e');
+    } finally {
+      _isUnlockingSilence = false;
+    }
+
+    _log.finest(() => "Player state $type ${currentPlayer.state}");
   }
 
   /// Stops all currently playing sounds and clears players map.
   Future<void> stopAllSounds() async {
-    if (!isAudioSystemEnabled) {
-      return;
-    }
-    if (_apPlayers.containsKey(SfxType.silence)) {
-      try {
-        await _apPlayers[SfxType.silence]!.stop();
-      } catch (_) {}
+    if (!kEnableAudioSystem) return;
+    if (_silencePlayer != null) {
+      await _silencePlayer!.stop().catchError((_) {});
       _log.fine(
-        () => <Object?>[
-          'Stop silence as part of all',
-          _apPlayers[SfxType.silence]?.state,
-        ],
+        () => <Object?>['Stop silence as part of all', _silencePlayer?.state],
       );
     }
-    _apPlayers.clear();
+    _silencePlayer = null;
     _isUnlockingSilence = false;
   }
 }

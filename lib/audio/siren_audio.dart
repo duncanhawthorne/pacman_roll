@@ -44,20 +44,14 @@ class SirenAudioController {
 
     // GUARD: On iOS Web, if the user hasn't tapped yet after resume,
     // bail out silently so the periodic timer doesn't force a SoLoud init.
-    if (!_audioController.isIosUnlocked) {
-      return;
-    }
+    if (!_audioController.isAudioStackUnlocked) return;
+    if (!(await _audioController.canPlay(siren))) return;
 
-    if (!(await _audioController.canPlay(siren))) {
-      return;
-    }
     double currentVolume = 0;
 
-    await _audioController.soLoudEnsureInitialised();
-    if (!(await _audioController.soLoudHandleValid(siren)) ||
-        soLoud.getPause(_audioController.getHandle(siren)!)) {
+    if (!await _audioController.isPlaying(siren)) {
       _log.info('Restarting ghostsRoamingSiren');
-      await _audioController.playSfx(siren);
+      await _audioController.play(siren);
     }
 
     final SoundHandle? handle = _audioController.getHandle(siren);

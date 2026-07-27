@@ -52,7 +52,7 @@ class Ghosts extends BaseComponent
     }
     current = CharacterState.scared;
     if (!game.session.isWonOrLost) {
-      game.audioController.playSfx(SfxType.ghostsScared);
+      game.audioController.play(SfxType.ghostsScared);
       for (final Ghost ghost in ghostList) {
         ghost.setScared();
       }
