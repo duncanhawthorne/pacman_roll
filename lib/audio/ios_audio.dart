@@ -27,11 +27,11 @@ class IosWorkaround {
   bool _isUnlockingSilence = false;
 
   /// Returns true if iOS WebAudio has been unlocked by a user gesture.
-  bool get isUnlocked => !_needsReUnlockOnResume;
+  bool get _isUnlocked => !_needsReUnlockOnResume;
 
   /// CLEAN GUARD CHECK:
   /// Returns true immediately on non-iOS platforms, or if iOS WebAudio is unlocked.
-  bool get isReady => !_soLoudIsUnreliable || isUnlocked;
+  bool get isReady => !_soLoudIsUnreliable || _isUnlocked;
 
   /// Handles AppLifecycleState.hidden teardown for unreliable platform audio.
   Future<void> handleLifecycleHidden(
@@ -59,7 +59,7 @@ class IosWorkaround {
   /// Synchronously clears _needsReUnlockOnResume and forces SoLoud re-init inside the gesture callstack.
   Future<void> workaround() async {
     // GUARD: If already unlocked OR an unlock attempt is currently in progress, do nothing.
-    if (isUnlocked || _isUnlockingSilence) return;
+    if (_isUnlocked || _isUnlockingSilence) return;
 
     _log.info('[TOUCH] User interacted with screen. workaround() called.');
     _isUnlockingSilence = true;

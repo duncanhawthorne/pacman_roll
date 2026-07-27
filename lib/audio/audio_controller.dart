@@ -51,7 +51,8 @@ class AudioController {
   SoundHandle? getHandle(SfxType type) => _soLoudHandles[type];
 
   /// Checks if audio is enabled in settings and not muted.
-  bool get isAudioOn => kEnableAudioSystem && (settings?.audioOn.value ?? true);
+  bool get isAudioOn =>
+      kEnableAudioSystem && (_settings?.audioOn.value ?? true);
 
   /// IOS SAFARI GUARD:
   /// Delegates directly to [iosWorkaround.isReady]. On non-iOS platforms, this returns true immediately.
@@ -60,7 +61,7 @@ class AudioController {
   static final Logger _log = Logger('AC');
   static final Logger _logLC = Logger('LC');
 
-  SettingsController? settings;
+  SettingsController? _settings;
   ValueNotifier<AppLifecycleState>? _lifecycleNotifier;
 
   /// Caches for SoLoud audio sources and handles.
@@ -247,20 +248,20 @@ class AudioController {
   }
 
   void _attachSettings(SettingsController settingsController) {
-    if (settings == settingsController) return;
+    if (_settings == settingsController) return;
 
-    final SettingsController? oldSettings = settings;
+    final SettingsController? oldSettings = _settings;
     if (oldSettings != null) {
       oldSettings.audioOn.removeListener(_audioOnOffHandler);
     }
 
-    settings = settingsController;
+    _settings = settingsController;
     settingsController.audioOn.addListener(_audioOnOffHandler);
   }
 
   void _audioOnOffHandler() {
-    _log.fine('audioOn changed to ${settings!.audioOn.value}');
-    if (settings!.audioOn.value) {
+    _log.fine('audioOn changed to ${_settings!.audioOn.value}');
+    if (_settings!.audioOn.value) {
       iosWorkaround.workaround();
     } else {
       stopAllSounds();
