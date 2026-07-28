@@ -22,7 +22,7 @@ Future<void> firstInitializeSoLoud() async {
     await soLoud.init();
     soLoud.setMaxActiveVoiceCount(64);
   } catch (e) {
-    logGlobal("SoLoud crash");
+    logGlobal("SoLoud crash $e");
   }
 }
 
@@ -219,7 +219,6 @@ class AudioController {
       }
     }
 
-    unawaited(_sources.remove(type));
     if (!preload) _log.fine("New audio source $type");
 
     final Future<AudioSource> currentSound = soLoud.loadAsset(
