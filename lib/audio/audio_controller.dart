@@ -45,6 +45,17 @@ class AudioController {
   late final SirenAudioController siren = SirenAudioController(this);
   late final IosWorkaround iosWorkaround = IosWorkaround(this);
 
+  static final Logger _log = Logger('AC');
+  static final Logger _logLC = Logger('LC');
+
+  SettingsController? _settings;
+  ValueNotifier<AppLifecycleState>? _lifecycleNotifier;
+
+  /// Caches for SoLoud audio sources and handles.
+  final Map<SfxType, Future<AudioSource>> _soLoudSources =
+      <SfxType, Future<AudioSource>>{};
+  final Map<SfxType, SoundHandle> _soLoudHandles = <SfxType, SoundHandle>{};
+
   /// Holds singleton instance reference.
   static AudioController? _instance;
 
@@ -62,58 +73,6 @@ class AudioController {
   /// IOS SAFARI GUARD:
   /// Delegates directly to [iosWorkaround.isReady]. On non-iOS platforms, this returns true immediately.
   bool get isAudioStackUnlocked => iosWorkaround.isReady;
-
-  static final Logger _log = Logger('AC');
-  static final Logger _logLC = Logger('LC');
-
-  SettingsController? _settings;
-  ValueNotifier<AppLifecycleState>? _lifecycleNotifier;
-
-  /// Caches for SoLoud audio sources and handles.
-  final Map<SfxType, Future<AudioSource>> _soLoudSources =
-      <SfxType, Future<AudioSource>>{};
-  final Map<SfxType, SoundHandle> _soLoudHandles = <SfxType, SoundHandle>{};
-
-  /// Prunes invalid or finished voice handles from memory to prevent reaching max active voice limits.
-  void _pruneStaleHandles() {
-    if (!soLoud.isInitialized) return;
-    _soLoudHandles.removeWhere(
-      (SfxType type, SoundHandle handle) =>
-          !soLoud.getIsValidVoiceHandle(handle),
-    );
-  }
-
-  /// Loads or retrieves a cached SoLoud audio source.
-  Future<AudioSource> _getSoLoudSound(
-    SfxType type, {
-    bool preload = false,
-  }) async {
-    assert(_canInitialize);
-    if (!soLoud.isInitialized) {
-      await _initialize();
-    }
-    assert(type != SfxType.silence);
-
-    if (isAudioStackUnlocked && soLoud.isInitialized) {
-      final Future<AudioSource>? existingFuture = _soLoudSources[type];
-      if (existingFuture != null) {
-        final AudioSource source = await existingFuture;
-        if (soLoud.activeSounds.contains(source)) {
-          return source;
-        }
-      }
-    }
-
-    unawaited(_soLoudSources.remove(type));
-    if (!preload) _log.fine("New audio source $type");
-
-    final Future<AudioSource> currentSound = soLoud.loadAsset(
-      'assets/${type.filename}',
-      mode: LoadMode.memory,
-    );
-    _soLoudSources[type] = currentSound;
-    return currentSound;
-  }
 
   /// Validates whether a sound can safely be played.
   /// IOS GUARD: Rejects playback if the app is hidden or if iOS WebAudio is locked waiting for a tap.
@@ -205,59 +164,6 @@ class AudioController {
     await iosWorkaround.releaseWorkaround();
   }
 
-  /// Synchronously checks if a voice handle is valid.
-  /// If the engine is uninitialized or audio stack is locked, returns `false` instantly without awaiting.
-  bool _soLoudHandleValidToPlay(SfxType type) {
-    if (!_canInitialize || !soLoud.isInitialized) return false;
-    final SoundHandle? handle = _soLoudHandles[type];
-    return handle != null && soLoud.getIsValidVoiceHandle(handle);
-  }
-
-  void attachDependencies(
-    AppLifecycleStateNotifier lifecycleNotifier,
-    SettingsController settingsController,
-  ) {
-    // Attach lifecycle listener
-    _lifecycleNotifier?.removeListener(_handleAppLifecycle);
-    lifecycleNotifier.addListener(_handleAppLifecycle);
-    _lifecycleNotifier = lifecycleNotifier;
-
-    // Attach settings listener
-    if (_settings != settingsController) {
-      _settings?.audioOn.removeListener(_audioOnOffHandler);
-      _settings = settingsController;
-      _settings!.audioOn.addListener(_audioOnOffHandler);
-    }
-  }
-
-  void _audioOnOffHandler() {
-    _log.fine('audioOn changed to ${_settings!.audioOn.value}');
-    if (_settings!.audioOn.value) {
-      iosWorkaround.workaround();
-    } else {
-      stopAllSounds();
-    }
-  }
-
-  /// IOS LIFECYCLE MANAGEMENT:
-  /// Delegates lifecycle handling to [IosWorkaround].
-  Future<void> _handleAppLifecycle() async {
-    if (!kEnableAudioSystem) return;
-
-    final AppLifecycleState? state = _lifecycleNotifier?.value;
-    if (state == null) return;
-    _logLC.info('Lifecycle ${state.name}');
-
-    switch (state) {
-      case AppLifecycleState.hidden:
-        await iosWorkaround.handleLifecycleHidden(_soLoudPowerDownForReset);
-      case AppLifecycleState.resumed:
-        iosWorkaround.handleLifecycleResume();
-      default:
-        break;
-    }
-  }
-
   Future<void> _initialize({bool calledFromPreload = false}) async {
     _log.info("soLoud not initialized, re-initialize");
     _clearSources();
@@ -294,6 +200,100 @@ class AudioController {
       for (SfxType type in SfxType.values)
         if (type != SfxType.silence) _getSoLoudSound(type, preload: true),
     ]);
+  }
+
+  /// Loads or retrieves a cached SoLoud audio source.
+  Future<AudioSource> _getSoLoudSound(
+    SfxType type, {
+    bool preload = false,
+  }) async {
+    assert(_canInitialize);
+    if (!soLoud.isInitialized) {
+      await _initialize();
+    }
+    assert(type != SfxType.silence);
+
+    if (isAudioStackUnlocked && soLoud.isInitialized) {
+      final Future<AudioSource>? existingFuture = _soLoudSources[type];
+      if (existingFuture != null) {
+        final AudioSource source = await existingFuture;
+        if (soLoud.activeSounds.contains(source)) {
+          return source;
+        }
+      }
+    }
+
+    unawaited(_soLoudSources.remove(type));
+    if (!preload) _log.fine("New audio source $type");
+
+    final Future<AudioSource> currentSound = soLoud.loadAsset(
+      'assets/${type.filename}',
+      mode: LoadMode.memory,
+    );
+    _soLoudSources[type] = currentSound;
+    return currentSound;
+  }
+
+  /// Prunes invalid or finished voice handles from memory to prevent reaching max active voice limits.
+  void _pruneStaleHandles() {
+    if (!soLoud.isInitialized) return;
+    _soLoudHandles.removeWhere(
+      (SfxType type, SoundHandle handle) =>
+          !soLoud.getIsValidVoiceHandle(handle),
+    );
+  }
+
+  /// IOS LIFECYCLE MANAGEMENT:
+  /// Delegates lifecycle handling to [IosWorkaround].
+  Future<void> _handleAppLifecycle() async {
+    if (!kEnableAudioSystem) return;
+
+    final AppLifecycleState? state = _lifecycleNotifier?.value;
+    if (state == null) return;
+    _logLC.info('Lifecycle ${state.name}');
+
+    switch (state) {
+      case AppLifecycleState.hidden:
+        await iosWorkaround.handleLifecycleHidden(_soLoudPowerDownForReset);
+      case AppLifecycleState.resumed:
+        iosWorkaround.handleLifecycleResume();
+      default:
+        break;
+    }
+  }
+
+  /// Synchronously checks if a voice handle is valid.
+  /// If the engine is uninitialized or audio stack is locked, returns `false` instantly without awaiting.
+  bool _soLoudHandleValidToPlay(SfxType type) {
+    if (!_canInitialize || !soLoud.isInitialized) return false;
+    final SoundHandle? handle = _soLoudHandles[type];
+    return handle != null && soLoud.getIsValidVoiceHandle(handle);
+  }
+
+  void attachDependencies(
+    AppLifecycleStateNotifier lifecycleNotifier,
+    SettingsController settingsController,
+  ) {
+    // Attach lifecycle listener
+    _lifecycleNotifier?.removeListener(_handleAppLifecycle);
+    lifecycleNotifier.addListener(_handleAppLifecycle);
+    _lifecycleNotifier = lifecycleNotifier;
+
+    // Attach settings listener
+    if (_settings != settingsController) {
+      _settings?.audioOn.removeListener(_audioOnOffHandler);
+      _settings = settingsController;
+      _settings!.audioOn.addListener(_audioOnOffHandler);
+    }
+  }
+
+  void _audioOnOffHandler() {
+    _log.fine('audioOn changed to ${_settings!.audioOn.value}');
+    if (_settings!.audioOn.value) {
+      iosWorkaround.workaround();
+    } else {
+      stopAllSounds();
+    }
   }
 
   /// SINGLETON PROTECTION:
