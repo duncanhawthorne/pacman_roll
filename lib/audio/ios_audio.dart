@@ -106,11 +106,11 @@ class IosWorkaround {
 
   /// Handles AppLifecycleState.hidden teardown for unreliable platform audio.
   Future<void> handleLifecycleHidden(
-    Future<void> Function() powerDownResetCallback,
+    Future<void> Function() powerDownForResetCallback,
   ) async {
     if (_silencePlayable) {
       _log.info("soLoudReset due to unreliable soLoud");
-      await powerDownResetCallback();
+      await powerDownForResetCallback();
     } else {
       await _audioController.stopAllSounds();
     }

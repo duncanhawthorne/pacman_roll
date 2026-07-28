@@ -159,8 +159,6 @@ class AudioController {
     for (final SfxType type in _handles.keys.toList()) {
       await stopSound(type);
     }
-
-    await iosWorkaround.releaseWorkaround();
   }
 
   Future<void> _initialize({bool calledFromPreload = false}) async {
@@ -292,6 +290,7 @@ class AudioController {
       iosWorkaround.workaround();
     } else {
       stopAllSounds();
+      iosWorkaround.releaseWorkaround();
     }
   }
 
@@ -314,6 +313,7 @@ class AudioController {
     if (!kEnableAudioSystem) return;
     _log.fine("soLoudPowerDownForReset start");
     await stopAllSounds();
+    unawaited(iosWorkaround.releaseWorkaround());
     _clearSources();
     if (soLoud.isInitialized) {
       try {

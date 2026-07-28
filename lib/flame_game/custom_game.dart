@@ -183,6 +183,7 @@ class CustomGame extends Forge2DGame<CustomWorld>
   @override
   Future<void> onRemove() async {
     await audioController.stopAllSounds();
+    await audioController.iosWorkaround.releaseWorkaround();
     super.onRemove();
   }
 
