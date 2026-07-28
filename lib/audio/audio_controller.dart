@@ -124,9 +124,7 @@ class AudioController {
         _handles[type] = fHandle;
       }
     } catch (e) {
-      _log
-        ..severe('SoLoud play crash, reset $type')
-        ..severe(e);
+      _log.severe('SoLoud play crash, reset $type $e');
       await _powerDownForReset();
     }
   }
