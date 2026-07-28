@@ -154,11 +154,10 @@ class AudioController {
   /// Stops all playing sounds safely.
   Future<void> stopAllSounds() async {
     if (!kEnableAudioSystem) return;
-    _log.fine('Stop all sound ${_handles.keys}');
-
-    for (final SfxType type in _handles.keys.toList()) {
-      await stopSound(type);
-    }
+    _log.fine('Stop all sounds ${_handles.keys}');
+    await Future.wait(<Future<void>>[
+      for (final SfxType type in _handles.keys.toList()) stopSound(type),
+    ]);
   }
 
   Future<void> _initialize({bool calledFromPreload = false}) async {
@@ -251,7 +250,11 @@ class AudioController {
 
     switch (state) {
       case AppLifecycleState.hidden:
-        await iosWorkaround.handleLifecycleHidden(_powerDownForReset);
+        if (iosWorkaround.onHideDoFullShutdown) {
+          await _powerDownForReset();
+        } else {
+          await stopAllSounds();
+        }
       case AppLifecycleState.resumed:
         iosWorkaround.handleLifecycleResume();
       default:
@@ -273,14 +276,12 @@ class AudioController {
   ) {
     // Attach lifecycle listener
     _lifecycleNotifier?.removeListener(_handleAppLifecycle);
-    lifecycleNotifier.addListener(_handleAppLifecycle);
-    _lifecycleNotifier = lifecycleNotifier;
+    _lifecycleNotifier = lifecycleNotifier..addListener(_handleAppLifecycle);
 
     // Attach settings listener
     if (_settings != settingsController) {
       _settings?.audioOn.removeListener(_audioOnOffHandler);
-      _settings = settingsController;
-      _settings!.audioOn.addListener(_audioOnOffHandler);
+      _settings = settingsController..audioOn.addListener(_audioOnOffHandler);
     }
   }
 

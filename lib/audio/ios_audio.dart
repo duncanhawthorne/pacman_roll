@@ -35,6 +35,8 @@ class IosWorkaround {
 
   bool get _silencePlayable => kEnableAudioSystem && _soLoudIsUnreliable;
 
+  bool get onHideDoFullShutdown => _silencePlayable;
+
   /// Safari workaround: Triggers audio activation on a user-initiated touch event (PointerDown).
   /// Synchronously clears _needsReUnlockOnResume and forces SoLoud re-init inside the gesture callstack.
   Future<void> workaround() async {
@@ -102,18 +104,6 @@ class IosWorkaround {
     _log.fine('Stop silence as part of all ${_silencePlayer?.state}');
     _silencePlayer = null;
     _isUnlockingSilence = false;
-  }
-
-  /// Handles AppLifecycleState.hidden teardown for unreliable platform audio.
-  Future<void> handleLifecycleHidden(
-    Future<void> Function() powerDownForResetCallback,
-  ) async {
-    if (_silencePlayable) {
-      _log.info("soLoudReset due to unreliable soLoud");
-      await powerDownForResetCallback();
-    } else {
-      await _audioController.stopAllSounds();
-    }
   }
 
   /// Called on AppLifecycleState.resumed to invalidate the silence player state.
