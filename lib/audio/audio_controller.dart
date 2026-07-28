@@ -120,9 +120,7 @@ class AudioController {
     // IOS SAFARI GUARD: Block playing or re-initializing until user physically touches screen.
     if (!isAudioStackUnlocked) {
       if (type != SfxType.ghostsRoamingSiren) {
-        _log.info(
-          "[GUARD] canPlay($type) BLOCKED: Waiting for user touch to unlock iOS audio.",
-        );
+        _log.info("[GUARD] canPlay($type) BLOCKED: Waiting for user touch.");
       }
       return false;
     }
@@ -133,10 +131,7 @@ class AudioController {
       return false;
     }
 
-    final bool audioOn = isAudioOn;
-    if (!audioOn) {
-      return false;
-    }
+    if (!isAudioOn) return false;
 
     if (type != SfxType.ghostsRoamingSiren) {
       _log.finest('Can play: $type');
@@ -216,7 +211,7 @@ class AudioController {
   /// Stops all playing sounds safely using a list snapshot to prevent concurrent modification errors.
   Future<void> stopAllSounds() async {
     if (!kEnableAudioSystem) return;
-    _log.fine(() => <Object>['Stop all sound', _soLoudHandles.keys]);
+    _log.fine('Stop all sound ${_soLoudHandles.keys}');
 
     for (final SfxType type in _soLoudHandles.keys.toList()) {
       await stopSound(type);
@@ -237,26 +232,17 @@ class AudioController {
     AppLifecycleStateNotifier lifecycleNotifier,
     SettingsController settingsController,
   ) {
-    _attachLifecycleNotifier(lifecycleNotifier);
-    _attachSettings(settingsController);
-  }
-
-  void _attachLifecycleNotifier(AppLifecycleStateNotifier lifecycleNotifier) {
+    // Attach lifecycle listener
     _lifecycleNotifier?.removeListener(_handleAppLifecycle);
     lifecycleNotifier.addListener(_handleAppLifecycle);
     _lifecycleNotifier = lifecycleNotifier;
-  }
 
-  void _attachSettings(SettingsController settingsController) {
-    if (_settings == settingsController) return;
-
-    final SettingsController? oldSettings = _settings;
-    if (oldSettings != null) {
-      oldSettings.audioOn.removeListener(_audioOnOffHandler);
+    // Attach settings listener
+    if (_settings != settingsController) {
+      _settings?.audioOn.removeListener(_audioOnOffHandler);
+      _settings = settingsController;
+      _settings!.audioOn.addListener(_audioOnOffHandler);
     }
-
-    _settings = settingsController;
-    settingsController.audioOn.addListener(_audioOnOffHandler);
   }
 
   void _audioOnOffHandler() {
@@ -333,50 +319,27 @@ class AudioController {
     // Do NOT destroy singleton on Provider disposal
   }
 
-  /// Disposes of all active SoLoud audio sources.
-  Future<void> _soLoudDisposeAllSources() async {
-    _log.fine("soLoudDisposeAllSources and clear");
-    _clearSources();
-    if (soLoud.isInitialized) {
-      try {
-        _log.fine("soLoud.disposeAllSources real");
-        await soLoud.disposeAllSources();
-      } catch (e) {
-        _log
-          ..severe("Crash on disposeAllSources")
-          ..severe(e);
-      }
-    } else {
-      _log.fine("soLoud.disposeAllSources, but soLoud not initialised");
-    }
-  }
-
-  /// Shuts down the SoLoud C++ engine.
-  void _soLoudDeInitOnly() {
-    _log.fine("soLoudDeInitOnly");
-    assert(_soLoudSources.isEmpty);
-    assert(_soLoudHandles.isEmpty);
-    soLoud.deinit();
-  }
-
   /// Clears the cached SoLoud audio sources.
   void _clearSources() {
     _log.fine("clearSources");
     _soLoudHandles.clear();
     _soLoudSources.clear();
-    assert(_soLoudSources.isEmpty);
-    assert(_soLoudHandles.isEmpty);
   }
 
   /// Fully shuts down SoLoud when backgrounding or resetting engine state on iOS.
   Future<void> _soLoudPowerDownForReset() async {
     if (!kEnableAudioSystem) return;
-    _log.fine("soLoudPowerDownForReset");
+    _log.fine("soLoudPowerDownForReset start");
     await stopAllSounds();
-    await _soLoudDisposeAllSources();
-    assert(_soLoudSources.isEmpty);
-    assert(_soLoudHandles.isEmpty);
-    _soLoudDeInitOnly();
-    _log.info("soLoudReset complete");
+    _clearSources();
+    if (soLoud.isInitialized) {
+      try {
+        await soLoud.disposeAllSources();
+      } catch (e) {
+        _log.severe("Crash on disposeAllSources $e");
+      }
+    }
+    soLoud.deinit();
+    _log.info("soLoudPowerDownForReset complete");
   }
 }

@@ -122,9 +122,7 @@ class IosWorkaround {
     if (!kEnableAudioSystem) return;
     if (_silencePlayer != null) {
       await _silencePlayer!.stop().catchError((_) {});
-      _log.fine(
-        () => <Object?>['Stop silence as part of all', _silencePlayer?.state],
-      );
+      _log.fine('Stop silence as part of all ${_silencePlayer?.state}');
     }
     _silencePlayer = null;
     _isUnlockingSilence = false;
