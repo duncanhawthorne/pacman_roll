@@ -131,7 +131,7 @@ class AudioController {
 
   /// Synchronously checks if a sound is currently playing.
   bool isPlaying(SfxType type) {
-    if (!_soLoudHandleValid(type)) return false;
+    if (!_soLoudHandleValidToPlay(type)) return false;
     final SoundHandle? handle = getHandle(type);
     final bool isPaused = handle != null && soLoud.getPause(handle);
     return !isPaused;
@@ -150,7 +150,7 @@ class AudioController {
       final bool retainForStopping =
           looping || type == SfxType.startMusic || type == SfxType.endMusic;
 
-      if (retainForStopping && _soLoudHandleValid(type)) {
+      if (retainForStopping && _soLoudHandleValidToPlay(type)) {
         _log.info(() => "Retained handle, stopping to replay");
         unawaited(soLoud.stop(_soLoudHandles[type]!));
       }
@@ -187,11 +187,9 @@ class AudioController {
       return;
     }
 
-    if (_soLoudHandleValid(type)) {
-      final SoundHandle? fHandle = _soLoudHandles.remove(type);
-      if (fHandle != null) {
-        await soLoud.stop(fHandle);
-      }
+    final SoundHandle? fHandle = _soLoudHandles.remove(type);
+    if (fHandle != null && soLoud.getIsValidVoiceHandle(fHandle)) {
+      await soLoud.stop(fHandle);
     }
   }
 
@@ -203,14 +201,13 @@ class AudioController {
     for (final SfxType type in _soLoudHandles.keys.toList()) {
       await stopSound(type);
     }
-    _soLoudHandles.clear();
 
     await iosWorkaround.stopAllSounds();
   }
 
   /// Synchronously checks if a voice handle is valid.
   /// If the engine is uninitialized or audio stack is locked, returns `false` instantly without awaiting.
-  bool _soLoudHandleValid(SfxType type) {
+  bool _soLoudHandleValidToPlay(SfxType type) {
     if (!_canInitialize || !soLoud.isInitialized) return false;
     final SoundHandle? handle = _soLoudHandles[type];
     return handle != null && soLoud.getIsValidVoiceHandle(handle);

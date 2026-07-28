@@ -118,10 +118,8 @@ class IosWorkaround {
   /// Stops all currently playing sounds and clears players map.
   Future<void> stopAllSounds() async {
     if (!_silencePlayable) return;
-    if (_silencePlayer != null) {
-      await _silencePlayer!.stop().catchError((_) {});
-      _log.fine('Stop silence as part of all ${_silencePlayer?.state}');
-    }
+    await _silencePlayer?.stop().catchError((_) {});
+    _log.fine('Stop silence as part of all ${_silencePlayer?.state}');
     _silencePlayer = null;
     _isUnlockingSilence = false;
   }
