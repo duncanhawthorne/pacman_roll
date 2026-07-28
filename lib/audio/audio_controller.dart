@@ -202,7 +202,7 @@ class AudioController {
       await stopSound(type);
     }
 
-    await iosWorkaround.stopAllSounds();
+    await iosWorkaround.releaseWorkaround();
   }
 
   /// Synchronously checks if a voice handle is valid.
@@ -252,7 +252,7 @@ class AudioController {
       case AppLifecycleState.hidden:
         await iosWorkaround.handleLifecycleHidden(_soLoudPowerDownForReset);
       case AppLifecycleState.resumed:
-        iosWorkaround.resetStateOnResume();
+        iosWorkaround.handleLifecycleResume();
       default:
         break;
     }

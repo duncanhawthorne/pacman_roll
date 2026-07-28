@@ -48,7 +48,7 @@ class IosWorkaround {
   }
 
   /// Called on AppLifecycleState.resumed to invalidate the silence player state.
-  void resetStateOnResume() {
+  void handleLifecycleResume() {
     if (!_silencePlayable) return;
     _log.info('Flagging IosWorkaround for re-unlock on next user tap.');
     _needsReUnlockOnResume = true;
@@ -115,8 +115,8 @@ class IosWorkaround {
     _log.finest(() => "Player state $type ${currentPlayer.state}");
   }
 
-  /// Stops all currently playing sounds and clears players map.
-  Future<void> stopAllSounds() async {
+  /// Stops silence and clears player.
+  Future<void> releaseWorkaround() async {
     if (!_silencePlayable) return;
     await _silencePlayer?.stop().catchError((_) {});
     _log.fine('Stop silence as part of all ${_silencePlayer?.state}');
