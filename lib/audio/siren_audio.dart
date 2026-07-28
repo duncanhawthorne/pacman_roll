@@ -49,7 +49,7 @@ class SirenAudioController {
 
     double currentVolume = 0;
 
-    if (!await _audioController.isPlaying(siren)) {
+    if (!_audioController.isPlaying(siren)) {
       _log.info('Restarting ghostsRoamingSiren');
       await _audioController.play(siren);
     }

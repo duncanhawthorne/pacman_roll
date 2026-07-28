@@ -86,7 +86,7 @@ class AudioController {
     await soLoudEnsureInitialised();
     assert(type != SfxType.silence);
 
-    if (isAudioStackUnlocked) {
+    if (isAudioStackUnlocked && soLoud.isInitialized) {
       final Future<AudioSource>? existingFuture = _soLoudSources[type];
       if (existingFuture != null) {
         final AudioSource source = await existingFuture;
@@ -109,13 +109,9 @@ class AudioController {
 
   /// Validates whether a sound can safely be played.
   /// IOS GUARD: Rejects playback if the app is hidden or if iOS WebAudio is locked waiting for a tap.
+  /// If uninitialized, lazily attempts to initialize SoLoud.
   Future<bool> canPlay(SfxType type) async {
-    if (!kEnableAudioSystem) return false;
-
-    if (_hiddenBlockPlay()) {
-      _log.info("App hidden can't play $type");
-      return false;
-    }
+    if (!kEnableAudioSystem || !isAudioOn || _hiddenBlockPlay()) return false;
 
     // IOS SAFARI GUARD: Block playing or re-initializing until user physically touches screen.
     if (!isAudioStackUnlocked) {
@@ -131,16 +127,15 @@ class AudioController {
       return false;
     }
 
-    if (!isAudioOn) return false;
-
     if (type != SfxType.ghostsRoamingSiren) {
       _log.finest('Can play: $type');
     }
     return true;
   }
 
-  Future<bool> isPlaying(SfxType type) async {
-    if (!await _soLoudHandleValid(type)) return false;
+  /// Synchronously checks if a sound is currently playing.
+  bool isPlaying(SfxType type) {
+    if (!_soLoudHandleValid(type)) return false;
     final SoundHandle? handle = getHandle(type);
     final bool isPaused = handle != null && soLoud.getPause(handle);
     return !isPaused;
@@ -157,22 +152,22 @@ class AudioController {
     final bool looping =
         type == SfxType.ghostsRoamingSiren || type == SfxType.ghostsScared;
     try {
-      await soLoudEnsureInitialised();
       final AudioSource sound = await _getSoLoudSound(type);
       final bool retainForStopping =
           looping || type == SfxType.startMusic || type == SfxType.endMusic;
-      if (retainForStopping) {
-        if (await _soLoudHandleValid(type)) {
-          _log.info(() => "Retained handle, stopping to replay");
-          unawaited(soLoud.stop(_soLoudHandles[type]!));
-        }
+
+      if (retainForStopping && _soLoudHandleValid(type)) {
+        _log.info(() => "Retained handle, stopping to replay");
+        unawaited(soLoud.stop(_soLoudHandles[type]!));
       }
+
       final SoundHandle fHandle = soLoud.play(
         sound,
         paused: false,
         looping: looping,
         volume: type.targetVolume,
       );
+
       if (retainForStopping) {
         _soLoudHandles[type] = fHandle;
       }
@@ -191,24 +186,28 @@ class AudioController {
   }
 
   /// Stops a specific playing sound effect.
+  /// Safe to call synchronously when engine is deinitialized.
   Future<void> stopSound(SfxType type) async {
-    if (!kEnableAudioSystem) return;
+    if (!kEnableAudioSystem || !isAudioStackUnlocked) return;
 
     assert(type != SfxType.silence);
     if (isAudioOn) _log.fine("stopSfx $type");
 
-    // IOS GUARD: Prevent triggering ensureInitialised if iOS isn't unlocked
-    if (!isAudioStackUnlocked) return;
-
-    await soLoudEnsureInitialised();
-    if (await _soLoudHandleValid(type)) {
-      final SoundHandle fHandle = _soLoudHandles[type]!;
+    // If uninitialized, stale handles are already defunct in C++/Wasm
+    if (!soLoud.isInitialized) {
       _soLoudHandles.remove(type);
-      await soLoud.stop(fHandle);
+      return;
+    }
+
+    if (_soLoudHandleValid(type)) {
+      final SoundHandle? fHandle = _soLoudHandles.remove(type);
+      if (fHandle != null) {
+        await soLoud.stop(fHandle);
+      }
     }
   }
 
-  /// Stops all playing sounds safely using a list snapshot to prevent concurrent modification errors.
+  /// Stops all playing sounds safely.
   Future<void> stopAllSounds() async {
     if (!kEnableAudioSystem) return;
     _log.fine('Stop all sound ${_soLoudHandles.keys}');
@@ -221,9 +220,10 @@ class AudioController {
     await iosWorkaround.stopAllSounds();
   }
 
-  Future<bool> _soLoudHandleValid(SfxType type) async {
-    if (!isAudioStackUnlocked) return false;
-    await soLoudEnsureInitialised();
+  /// Synchronously checks if a voice handle is valid.
+  /// If the engine is uninitialized or audio stack is locked, returns `false` instantly without awaiting.
+  bool _soLoudHandleValid(SfxType type) {
+    if (!isAudioStackUnlocked || !soLoud.isInitialized) return false;
     final SoundHandle? handle = _soLoudHandles[type];
     return handle != null && soLoud.getIsValidVoiceHandle(handle);
   }
@@ -277,6 +277,7 @@ class AudioController {
 
   /// Ensures that the SoLoud engine is initialized and ready for use.
   /// IOS GUARD: Blocked if iOS audio is currently locked (waiting for user touch).
+  /// Bypasses initialization if already initialized or stack is locked.
   Future<void> soLoudEnsureInitialised() async {
     if (!kEnableAudioSystem) return;
 
