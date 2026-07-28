@@ -44,7 +44,6 @@ class SirenAudioController {
 
     // GUARD: On iOS Web, if the user hasn't tapped yet after resume,
     // bail out silently so the periodic timer doesn't force a SoLoud init.
-    if (!_audioController.isAudioStackUnlocked) return;
     if (!(await _audioController.canPlay(siren))) return;
 
     double currentVolume = 0;

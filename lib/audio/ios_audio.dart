@@ -33,11 +33,13 @@ class IosWorkaround {
   /// Returns true immediately on non-iOS platforms, or if iOS WebAudio is unlocked.
   bool get isReady => !_soLoudIsUnreliable || _isUnlocked;
 
+  bool get _silencePlayable => kEnableAudioSystem && _soLoudIsUnreliable;
+
   /// Handles AppLifecycleState.hidden teardown for unreliable platform audio.
   Future<void> handleLifecycleHidden(
     Future<void> Function() powerDownResetCallback,
   ) async {
-    if (_soLoudIsUnreliable) {
+    if (_silencePlayable) {
       _log.info("soLoudReset due to unreliable soLoud");
       await powerDownResetCallback();
     } else {
@@ -47,10 +49,8 @@ class IosWorkaround {
 
   /// Called on AppLifecycleState.resumed to invalidate the silence player state.
   void resetStateOnResume() {
-    if (!_soLoudIsUnreliable) return;
-    _log.info(
-      '[LIFECYCLE] Flagging IosWorkaround for re-unlock on next user tap.',
-    );
+    if (!_silencePlayable) return;
+    _log.info('Flagging IosWorkaround for re-unlock on next user tap.');
     _needsReUnlockOnResume = true;
     _isUnlockingSilence = false;
   }
@@ -61,28 +61,28 @@ class IosWorkaround {
     // GUARD: If already unlocked OR an unlock attempt is currently in progress, do nothing.
     if (_isUnlocked || _isUnlockingSilence) return;
 
-    _log.info('[TOUCH] User interacted with screen. workaround() called.');
+    _log.info('User interacted with screen. workaround() called.');
     _isUnlockingSilence = true;
 
     // UNLOCK IMMEDIATELY inside the user tap callstack
     _needsReUnlockOnResume = false;
 
     // Force SoLoud re-initialization synchronously inside the user tap gesture stack
-    _audioController.soLoudIsInitialisedOrInitialiseAsync();
+    _audioController.soLoudIsInitializedOrInitializeAsync();
 
     await _playSilence();
   }
 
   /// Plays a silent track via HTML5 Audio to keep the browser audio session active.
   Future<void> _playSilence() async {
-    if (!kEnableAudioSystem || !_soLoudIsUnreliable) return;
+    if (!_silencePlayable) return;
 
     if (_silencePlayer?.state == PlayerState.playing) {
       _log.fine('Silence already playing');
       _isUnlockingSilence = false;
       return;
     }
-    if (_audioController.isAudioOn) _log.fine("playSilence");
+    _log.fine("playSilence");
     final SfxType type = SfxType.silence;
 
     if (_silencePlayer != null) {
@@ -105,11 +105,9 @@ class IosWorkaround {
         volume: type.targetVolume,
       );
 
-      _log.info(
-        '[TOUCH] Silence stream restarted successfully. WebAudio hardware is UNLOCKED.',
-      );
+      _log.info('Silence stream restarted. WebAudio hardware is UNLOCKED.');
     } catch (e) {
-      _log.warning('[TOUCH] Silence playback warning/error: $e');
+      _log.warning('Silence playback warning/error: $e');
     } finally {
       _isUnlockingSilence = false;
     }
@@ -119,7 +117,7 @@ class IosWorkaround {
 
   /// Stops all currently playing sounds and clears players map.
   Future<void> stopAllSounds() async {
-    if (!kEnableAudioSystem) return;
+    if (!_silencePlayable) return;
     if (_silencePlayer != null) {
       await _silencePlayer!.stop().catchError((_) {});
       _log.fine('Stop silence as part of all ${_silencePlayer?.state}');
