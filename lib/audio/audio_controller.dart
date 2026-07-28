@@ -83,7 +83,10 @@ class AudioController {
     SfxType type, {
     bool preload = false,
   }) async {
-    await soLoudEnsureInitialised();
+    assert(!_canInitialise());
+    if (!soLoud.isInitialized) {
+      await _initialise();
+    }
     assert(type != SfxType.silence);
 
     if (isAudioStackUnlocked && soLoud.isInitialized) {
@@ -121,11 +124,7 @@ class AudioController {
       return false;
     }
 
-    await soLoudEnsureInitialised();
-    if (!soLoud.isInitialized) {
-      _log.severe("canPlay SoLoud not initialised, after ensureInitialised");
-      return false;
-    }
+    if (!soLoudIsInitialisedOrInitialiseAsync()) return false;
 
     if (type != SfxType.ghostsRoamingSiren) {
       _log.finest('Can play: $type');
@@ -275,11 +274,21 @@ class AudioController {
     }
   }
 
-  /// Ensures that the SoLoud engine is initialized and ready for use.
-  /// IOS GUARD: Blocked if iOS audio is currently locked (waiting for user touch).
-  /// Bypasses initialization if already initialized or stack is locked.
-  Future<void> soLoudEnsureInitialised() async {
-    if (!kEnableAudioSystem) return;
+  Future<void> _initialise({bool calledFromPreload = false}) async {
+    _log.info("soLoud not initialised, re-initialise");
+    assert(!_hiddenBlockPlay());
+    _clearSources();
+    await soLoud.init();
+    soLoud.setMaxActiveVoiceCount(64);
+    assert(soLoud.isInitialized);
+    _log.info("soLoud now initialised");
+    if (!calledFromPreload) {
+      unawaited(_preloadSfx());
+    }
+  }
+
+  bool _canInitialise() {
+    if (!kEnableAudioSystem) return false;
 
     // IOS SAFARI GUARD: Do NOT re-init SoLoud programmatically on lifecycle resume!
     // Wait until the user physically touches the screen (isIosUnlocked == true)
@@ -287,26 +296,32 @@ class AudioController {
       _log.finest(
         "[GUARD] soLoudEnsureInitialised BLOCKED: Waiting for user touch.",
       );
-      return;
+      return false;
     }
+    return true;
+  }
+
+  /// Ensures that the SoLoud engine is initialized and ready for use.
+  /// IOS GUARD: Blocked if iOS audio is currently locked (waiting for user touch).
+  /// Bypasses initialization if already initialized or stack is locked.
+  bool soLoudIsInitialisedOrInitialiseAsync() {
+    if (!_canInitialise()) return false;
 
     if (!soLoud.isInitialized) {
-      _log.info("soLoud not initialised, re-initialise");
-      assert(!_hiddenBlockPlay());
-      _clearSources();
-      await soLoud.init();
-      soLoud.setMaxActiveVoiceCount(64);
-      assert(soLoud.isInitialized);
-      _log.info("soLoud now initialised");
-      unawaited(_preloadSfx());
+      _initialise();
+      return false;
     }
+    return true;
   }
 
   /// Preloads sound effects into memory.
   Future<void> _preloadSfx() async {
     _log.fine('Preloading sounds');
     if (_hiddenBlockPlay() || !isAudioStackUnlocked) return;
-    await soLoudEnsureInitialised();
+    if (!_canInitialise()) return;
+    if (!soLoud.isInitialized) {
+      await _initialise(calledFromPreload: true);
+    }
     await Future.wait(<Future<AudioSource>>[
       for (SfxType type in SfxType.values)
         if (type != SfxType.silence) _getSoLoudSound(type, preload: true),

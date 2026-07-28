@@ -68,7 +68,7 @@ class IosWorkaround {
     _needsReUnlockOnResume = false;
 
     // Force SoLoud re-initialization synchronously inside the user tap gesture stack
-    unawaited(_audioController.soLoudEnsureInitialised());
+    _audioController.soLoudIsInitialisedOrInitialiseAsync();
 
     await _playSilence();
   }
