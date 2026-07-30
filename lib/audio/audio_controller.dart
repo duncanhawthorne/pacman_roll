@@ -11,9 +11,12 @@ import 'ios_audio.dart';
 import 'siren_audio.dart';
 import 'sounds.dart';
 
+/// Global flag enabling or disabling the audio engine system.
 const bool kEnableAudioSystem = true;
 
 /// Performs the initial setup of the SoLoud audio engine on app launch.
+///
+/// Bypasses setup if [kEnableAudioSystem] is false. Logs any initialization crash.
 Future<void> firstInitializeSoLoud() async {
   if (!kEnableAudioSystem) return;
   await _initEngine().catchError((Object e) => logGlobal("SoLoud crash $e"));
@@ -46,7 +49,10 @@ class AudioController {
     return _instance!;
   }
 
+  /// Sub-controller responsible for dynamic ghost siren sound modulation.
   late final SirenAudioController siren = SirenAudioController(this);
+
+  /// Sub-controller responsible for managing iOS WebAudio unlock requirements.
   late final IosWorkaround iosWorkaround = IosWorkaround(this);
 
   static final Logger _log = Logger('AC');
@@ -55,7 +61,7 @@ class AudioController {
   SettingsController? _settings;
   ValueNotifier<AppLifecycleState>? _lifecycleNotifier;
 
-  /// Caches for SoLoud audio sources and handles.
+  /// Caches for SoLoud audio sources and active voice handles.
   final Map<SfxType, Future<AudioSource>> _sources =
       <SfxType, Future<AudioSource>>{};
   final Map<SfxType, SoundHandle> _handles = <SfxType, SoundHandle>{};
@@ -63,12 +69,17 @@ class AudioController {
   /// Holds singleton instance reference.
   static AudioController? _instance;
 
+  /// Retrieves the active [SoundHandle] for the specified [SfxType] if retained.
   SoundHandle? getHandle(SfxType type) => _handles[type];
 
-  /// Checks if audio is enabled in settings and not muted.
+  /// Checks if audio is enabled in system constants and user settings.
   bool get _isAudioOn =>
       kEnableAudioSystem && (_settings?.audioOn.value ?? true);
 
+  /// Evaluates whether the engine is allowed to initialize or resume audio playback.
+  ///
+  /// Returns `false` if audio settings are disabled, if the audio stack is locked on iOS,
+  /// or if the app lifecycle state is [AppLifecycleState.hidden].
   bool get _canInitialize =>
       _isAudioOn &&
       isAudioStackUnlocked &&
@@ -79,8 +90,9 @@ class AudioController {
   bool get isAudioStackUnlocked => iosWorkaround.isReady;
 
   /// Validates whether a sound can safely be played.
+  ///
   /// IOS GUARD: Rejects playback if the app is hidden or if iOS WebAudio is locked waiting for a tap.
-  /// If uninitialized, lazily attempts to initialize SoLoud.
+  /// If uninitialized, lazily attempts to initialize SoLoud and returns `false` during the spin-up frame.
   Future<bool> canPlay(SfxType type) async {
     if (!_canInitialize) return false;
     if (!isInitializedOrInitializeAsync()) return false;
@@ -91,7 +103,7 @@ class AudioController {
     return true;
   }
 
-  /// Synchronously checks if a sound is currently playing.
+  /// Synchronously checks if a specific sound type is currently playing and unpaused.
   bool isPlaying(SfxType type) {
     if (!_handleValidToPlay(type)) return false;
     final SoundHandle? handle = getHandle(type);
@@ -100,6 +112,9 @@ class AudioController {
   }
 
   /// Plays a specific sound effect using SoLoud.
+  ///
+  /// Prunes stale handles prior to playback. If the sound is marked as [SfxType.longSound],
+  /// any existing playback handle for that sound type is stopped before playing anew.
   Future<void> play(SfxType type) async {
     if (!(await canPlay(type))) return;
     assert(type.toPlayInSoLoud);
@@ -130,8 +145,9 @@ class AudioController {
     }
   }
 
-  /// Stops a specific playing sound effect.
-  /// Safe to call synchronously when engine is deinitialized.
+  /// Stops a specific playing sound effect asynchronously.
+  ///
+  /// Handles cleanup safely even if the engine is uninitialized or handle is defunct.
   Future<void> stopSound(SfxType type, [bool fromStopAll = false]) async {
     if (!kEnableAudioSystem) return;
 
@@ -150,7 +166,7 @@ class AudioController {
     }
   }
 
-  /// Stops all playing sounds safely.
+  /// Stops all tracked playing sounds safely.
   Future<void> stopAllSounds() async {
     if (!kEnableAudioSystem) return;
     _log.fine('Stop all sounds ${_handles.keys}');
@@ -169,8 +185,9 @@ class AudioController {
   }
 
   /// Ensures that the SoLoud engine is initialized and ready for use.
+  ///
   /// IOS GUARD: Blocked if iOS audio is currently locked (waiting for user touch).
-  /// Bypasses initialization if already initialized or stack is locked.
+  /// Returns `true` if SoLoud is initialized, or `false` if initialization was newly kicked off or blocked.
   bool isInitializedOrInitializeAsync() {
     if (!_canInitialize) return false;
 
@@ -193,6 +210,8 @@ class AudioController {
   }
 
   /// Loads or retrieves a cached SoLoud audio source.
+  ///
+  /// Validates cached sources against [soLoud.activeSounds] before returning.
   Future<AudioSource> _getSoundSource(
     SfxType type, {
     bool preload = false,
@@ -261,6 +280,7 @@ class AudioController {
     return handle != null && soLoud.getIsValidVoiceHandle(handle);
   }
 
+  /// Binds the lifecycle notifier and settings controller dependencies to this controller.
   void attachDependencies(
     AppLifecycleStateNotifier lifecycleNotifier,
     SettingsController settingsController,
@@ -293,7 +313,7 @@ class AudioController {
     // Do NOT destroy singleton on Provider disposal
   }
 
-  /// Clears the cached SoLoud audio sources.
+  /// Clears cached SoLoud audio sources and tracked handles.
   void _clearSources() {
     _log.fine("clearSources");
     _handles.clear();

@@ -33,8 +33,10 @@ class IosWorkaround {
   /// Returns true immediately on non-iOS platforms, or if iOS WebAudio is unlocked.
   bool get isReady => !_soLoudIsUnreliable || _isUnlocked;
 
+  /// Checks if playing silent audio via HTML5 Audio is applicable for this environment.
   bool get _silencePlayable => kEnableAudioSystem && _soLoudIsUnreliable;
 
+  /// Determines whether hiding the app should trigger a full engine teardown.
   bool get onHideDoFullShutdown => _silencePlayable;
 
   /// Safari workaround: Triggers audio activation on a user-initiated touch event (PointerDown).
@@ -56,6 +58,8 @@ class IosWorkaround {
   }
 
   /// Plays a silent track via HTML5 Audio to keep the browser audio session active.
+  ///
+  /// Performs back-to-back `.play()` calls to guarantee Safari binds the hardware audio node cleanly.
   Future<void> _playSilence() async {
     if (!_silencePlayable) return;
 
@@ -97,7 +101,7 @@ class IosWorkaround {
     _log.finest(() => "Player state $type ${currentPlayer.state}");
   }
 
-  /// Stops silence and clears player.
+  /// Stops silence and clears player instance.
   Future<void> releaseWorkaround() async {
     if (!_silencePlayable) return;
     await _silencePlayer?.stop().catchError((_) {});
@@ -106,7 +110,8 @@ class IosWorkaround {
     _isUnlockingSilence = false;
   }
 
-  /// Called on AppLifecycleState.resumed to invalidate the silence player state.
+  /// Called on AppLifecycleState.resumed to invalidate the silence player state
+  /// and flag the stack as requiring a re-unlock gesture.
   void handleLifecycleResume() {
     if (!_silencePlayable) return;
     _log.info('Flagging IosWorkaround for re-unlock on next user tap.');

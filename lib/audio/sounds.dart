@@ -23,12 +23,15 @@ enum SfxType {
   /// Returns the full asset path for the sound effect.
   String get filename => 'sfx/$_filename';
 
+  /// Flags whether the sound effect loops infinitely when played.
   bool get looping =>
       this == SfxType.ghostsRoamingSiren || this == SfxType.ghostsScared;
 
+  /// Flags whether the handle should be retained in memory for explicit manual stopping.
   bool get longSound =>
       looping || this == SfxType.startMusic || this == SfxType.endMusic;
 
+  /// Indicates if this sound is intended for playback via SoLoud engine vs external audio players.
   bool get toPlayInSoLoud => this != SfxType.silence;
 
   /// Returns the final calculated target volume.

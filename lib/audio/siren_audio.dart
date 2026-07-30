@@ -14,8 +14,9 @@ class SirenAudioController {
   final AudioController _audioController;
 
   /// Dynamically adjusts the volume of the ghost roaming siren.
-  /// IOS GUARD: Called by Flame's 250ms periodic timer. Bails out silently if iOS audio is locked
-  /// waiting for a tap, preventing the background timer from forcing a invalid SoLoud init.
+  ///
+  /// IOS GUARD: Called by Flame's periodic timer. Bails out silently if iOS audio is locked
+  /// waiting for a tap, preventing the background timer from forcing an invalid SoLoud init.
   Future<void> setVolume(
     double normalisedAverageGhostSpeed, {
     bool gradual = false,
@@ -45,11 +46,13 @@ class SirenAudioController {
     soLoud.setVolume(handle, desiredSirenVolume);
   }
 
+  /// Calculates target siren volume from normalized ghost speed.
   double _getUltimateTargetSirenVolume(double normalisedAverageGhostSpeed) {
     final double tmpSirenVolume = normalisedAverageGhostSpeed * 5; //1.25;
     return min(1, tmpSirenVolume) * volumeScalar;
   }
 
+  /// Computes target volume, supporting gradual step interpolation and small-volume zeroing.
   double _getDesiredSirenVolume(
     double normalisedAverageGhostSpeed,
     double currentVolume, {
