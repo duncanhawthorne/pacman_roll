@@ -3,8 +3,6 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
 
-import '../audio/audio_controller.dart';
-
 /// This file has utilities used by other bits of code
 
 /// Universal source for random calculations.
@@ -20,6 +18,8 @@ void logGlobal(dynamic x) {
 final List<String> debugLogList = <String>[""];
 const int debugLogListMaxLength = 30;
 final ValueNotifier<int> debugLogListNotifier = ValueNotifier<int>(0);
+
+const bool detailedAudioLog = true;
 
 /// Configures the global logging system and hooks into [debugPrint] and a local log buffer.
 void setupGlobalLogger() {

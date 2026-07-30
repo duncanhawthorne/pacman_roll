@@ -46,7 +46,7 @@ class SirenAudioController {
   }
 
   double _getUltimateTargetSirenVolume(double normalisedAverageGhostSpeed) {
-    final double tmpSirenVolume = normalisedAverageGhostSpeed / 30 * 2.5;
+    final double tmpSirenVolume = normalisedAverageGhostSpeed * 5; //1.25;
     return min(1, tmpSirenVolume) * volumeScalar;
   }
 

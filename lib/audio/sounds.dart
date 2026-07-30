@@ -23,6 +23,14 @@ enum SfxType {
   /// Returns the full asset path for the sound effect.
   String get filename => 'sfx/$_filename';
 
+  bool get looping =>
+      this == SfxType.ghostsRoamingSiren || this == SfxType.ghostsScared;
+
+  bool get longSound =>
+      looping || this == SfxType.startMusic || this == SfxType.endMusic;
+
+  bool get toPlayInSoLoud => this != SfxType.silence;
+
   /// Returns the final calculated target volume.
   double get targetVolume => _relativeVolume * volumeScalar;
 }

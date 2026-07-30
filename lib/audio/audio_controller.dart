@@ -13,17 +13,15 @@ import 'sounds.dart';
 
 const bool kEnableAudioSystem = true;
 
-const bool detailedAudioLog = true;
-
 /// Performs the initial setup of the SoLoud audio engine on app launch.
 Future<void> firstInitializeSoLoud() async {
   if (!kEnableAudioSystem) return;
-  try {
-    await soLoud.init();
-    soLoud.setMaxActiveVoiceCount(64);
-  } catch (e) {
-    logGlobal("SoLoud crash $e");
-  }
+  await _initEngine().catchError((Object e) => logGlobal("SoLoud crash $e"));
+}
+
+Future<void> _initEngine() async {
+  await soLoud.init();
+  soLoud.setMaxActiveVoiceCount(64);
 }
 
 /// Global instance of the SoLoud C++/Wasm audio engine.
@@ -32,10 +30,16 @@ final SoLoud soLoud = SoLoud.instance;
 /// Global audio controller that manages sound effects, music, and iOS Web lifecycle recovery.
 class AudioController {
   AudioController._() {
-    unawaited(_preloadSounds());
+    isInitializedOrInitializeAsync();
   }
 
   /// Returns the singleton instance of the [AudioController].
+  ///
+  /// DEBUG PATTERN: The assertion [_instance == null] is an intentional guardrail.
+  /// It ensures this factory is only ever called exactly once (e.g., during root
+  /// dependency injection). If called a second time in debug mode, it crashes to
+  /// flag the architectural mistake. In production, assertions are stripped,
+  /// so it safely falls back to returning the existing instance without crashing.
   factory AudioController() {
     assert(_instance == null);
     _instance ??= AudioController._();
@@ -98,25 +102,22 @@ class AudioController {
   /// Plays a specific sound effect using SoLoud.
   Future<void> play(SfxType type) async {
     if (!(await canPlay(type))) return;
-
+    assert(type.toPlayInSoLoud);
     _pruneStaleHandles();
 
-    final bool looping =
-        type == SfxType.ghostsRoamingSiren || type == SfxType.ghostsScared;
     try {
       final AudioSource sound = await _getSoundSource(type);
-      final bool retainForStopping =
-          looping || type == SfxType.startMusic || type == SfxType.endMusic;
+      final bool retainForStopping = type.longSound;
 
       if (retainForStopping && _handleValidToPlay(type)) {
-        _log.info(() => "Retained handle, stopping to replay");
+        _log.info("Retained handle, stopping to replay");
         unawaited(soLoud.stop(_handles[type]!));
       }
 
       final SoundHandle fHandle = soLoud.play(
         sound,
         paused: false,
-        looping: looping,
+        looping: type.looping,
         volume: type.targetVolume,
       );
 
@@ -124,20 +125,20 @@ class AudioController {
         _handles[type] = fHandle;
       }
     } catch (e) {
-      _log.severe('SoLoud play crash, reset $type $e');
+      _log.severe('SoLoud play crash $type $e');
       await _powerDownForReset();
     }
   }
 
   /// Stops a specific playing sound effect.
   /// Safe to call synchronously when engine is deinitialized.
-  Future<void> stopSound(SfxType type) async {
+  Future<void> stopSound(SfxType type, [bool fromStopAll = false]) async {
     if (!kEnableAudioSystem) return;
 
-    assert(type != SfxType.silence);
-    _log.fine("stopSfx $type");
+    assert(type.toPlayInSoLoud);
+    if (!fromStopAll) _log.fine("stopSfx $type");
 
-    // If uninitialized, stale handles are already defunct in C++/Wasm
+    // If uninitialized, stale handles are already defunct in C++/Wasm, so just remove them
     if (!soLoud.isInitialized) {
       _handles.remove(type);
       return;
@@ -154,20 +155,17 @@ class AudioController {
     if (!kEnableAudioSystem) return;
     _log.fine('Stop all sounds ${_handles.keys}');
     await Future.wait(<Future<void>>[
-      for (final SfxType type in _handles.keys.toList()) stopSound(type),
+      for (final SfxType type in _handles.keys.toList()) stopSound(type, true),
     ]);
   }
 
-  Future<void> _initialize({bool calledFromPreload = false}) async {
+  Future<void> _initialize() async {
     _log.info("soLoud not initialized, re-initialize");
     _clearSources();
-    await soLoud.init();
-    soLoud.setMaxActiveVoiceCount(64);
+    await _initEngine();
     assert(soLoud.isInitialized);
     _log.info("soLoud now initialized");
-    if (!calledFromPreload) {
-      unawaited(_preloadSounds());
-    }
+    unawaited(_preloadSounds());
   }
 
   /// Ensures that the SoLoud engine is initialized and ready for use.
@@ -186,13 +184,11 @@ class AudioController {
   /// Preloads sound effects into memory.
   Future<void> _preloadSounds() async {
     _log.fine('Preloading sounds');
-    if (!_canInitialize) return;
-    if (!soLoud.isInitialized) {
-      await _initialize(calledFromPreload: true);
-    }
+    assert(soLoud.isInitialized);
+    if (!soLoud.isInitialized) return;
     await Future.wait(<Future<AudioSource>>[
       for (SfxType type in SfxType.values)
-        if (type != SfxType.silence) _getSoundSource(type, preload: true),
+        if (type.toPlayInSoLoud) _getSoundSource(type, preload: true),
     ]);
   }
 
@@ -205,7 +201,7 @@ class AudioController {
     if (!soLoud.isInitialized) {
       await _initialize();
     }
-    assert(type != SfxType.silence);
+    assert(type.toPlayInSoLoud);
 
     if (isAudioStackUnlocked && soLoud.isInitialized) {
       final Future<AudioSource>? existingFuture = _sources[type];
@@ -219,12 +215,10 @@ class AudioController {
 
     if (!preload) _log.fine("New audio source $type");
 
-    final Future<AudioSource> currentSound = soLoud.loadAsset(
+    return _sources[type] = soLoud.loadAsset(
       'assets/${type.filename}',
       mode: LoadMode.memory,
     );
-    _sources[type] = currentSound;
-    return currentSound;
   }
 
   /// Prunes invalid or finished voice handles from memory to prevent reaching max active voice limits.
@@ -314,11 +308,9 @@ class AudioController {
     unawaited(iosWorkaround.releaseWorkaround());
     _clearSources();
     if (soLoud.isInitialized) {
-      try {
-        await soLoud.disposeAllSources();
-      } catch (e) {
-        _log.severe("Crash on disposeAllSources $e");
-      }
+      await soLoud.disposeAllSources().catchError(
+        (Object e) => _log.severe("Crash on disposeAllSources $e"),
+      );
     }
     soLoud.deinit();
     _log.info("soLoudPowerDownForReset complete");

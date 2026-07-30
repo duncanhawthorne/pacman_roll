@@ -66,7 +66,7 @@ class GhostSiren extends BaseComponent
         );
         if (game.isLive) {
           game.audioController.siren.setVolume(
-            _averageGhostSpeed() / game.level.levelSpeed * 15,
+            _averageGhostSpeed() / game.level.levelSpeed,
             gradual: true,
           );
         } else {
