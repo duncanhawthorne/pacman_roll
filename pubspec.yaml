@@ -43,6 +43,7 @@ dependencies:
       ref: main
 
 dependency_overrides:
+  flutter_soloud: 4.0.13
   flame:
     git:
       url: https://github.com/flame-engine/flame.git
