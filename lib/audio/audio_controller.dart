@@ -79,8 +79,7 @@ class AudioController {
   ///
   /// IOS GUARD: Rejects playback if the app is hidden or if iOS WebAudio is locked waiting for a tap.
   /// If uninitialized, lazily attempts to initialize SoLoud and returns `false` during the spin-up frame.
-  Future<bool> canPlay(SfxType type) async {
-    if (!_canInitialize) return false;
+  bool canPlay(SfxType type) {
     if (!isInitializedOrInitializeAsync()) return false;
 
     if (type != SfxType.ghostsRoamingSiren) {
@@ -102,12 +101,13 @@ class AudioController {
   /// Prunes stale handles prior to playback. If the sound is marked as [SfxType.longSound],
   /// any existing playback handle for that sound type is stopped before playing anew.
   Future<void> play(SfxType type) async {
-    if (!(await canPlay(type))) return;
+    if (!canPlay(type)) return;
     assert(type.toPlayInSoLoud);
     _pruneStaleHandles();
 
     try {
       final AudioSource sound = await _getSoundSource(type);
+      if (!canPlay(type)) return; // in case state changed via await above
       final bool retainForStopping = type.longSound;
 
       if (retainForStopping && _handleValidToPlay(type)) {
@@ -156,9 +156,9 @@ class AudioController {
   Future<void> stopAllSounds() async {
     if (!kEnableAudioSystem) return;
     _log.fine('Stop all sounds ${_handles.keys}');
-    await Future.wait(<Future<void>>[
-      for (final SfxType type in _handles.keys.toList()) stopSound(type, true),
-    ]);
+    await Future.wait(
+      _handles.keys.toList().map((SfxType type) => stopSound(type, true)),
+    );
   }
 
   Future<void> _initialize() async {
@@ -190,10 +190,11 @@ class AudioController {
     _log.fine('Preloading sounds');
     assert(_soLoud.isInitialized);
     if (!_soLoud.isInitialized) return;
-    await Future.wait(<Future<AudioSource>>[
-      for (SfxType type in SfxType.values)
-        if (type.toPlayInSoLoud) _getSoundSource(type, preload: true),
-    ]);
+    await Future.wait(
+      SfxType.values
+          .where((SfxType type) => type.toPlayInSoLoud)
+          .map((SfxType type) => _getSoundSource(type, preload: true)),
+    );
   }
 
   /// Loads or retrieves a cached SoLoud audio source.
@@ -209,13 +210,11 @@ class AudioController {
     }
     assert(type.toPlayInSoLoud);
 
-    if (_isAudioStackUnlocked && _soLoud.isInitialized) {
-      final Future<AudioSource>? existingFuture = _sources[type];
-      if (existingFuture != null) {
-        final AudioSource source = await existingFuture;
-        if (_soLoud.activeSounds.contains(source)) {
-          return source;
-        }
+    final Future<AudioSource>? existingFuture = _sources[type];
+    if (existingFuture != null) {
+      final AudioSource source = await existingFuture;
+      if (_soLoud.activeSounds.contains(source)) {
+        return source;
       }
     }
 
