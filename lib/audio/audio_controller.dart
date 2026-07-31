@@ -48,8 +48,9 @@ class AudioController {
   ValueNotifier<AppLifecycleState>? _lifecycleNotifier;
 
   /// Caches for SoLoud audio sources and active voice handles.
-  final Map<SfxType, Future<AudioSource>> _sources =
+  final Map<SfxType, Future<AudioSource>> _unreadySources =
       <SfxType, Future<AudioSource>>{};
+  final Map<SfxType, AudioSource> _sources = <SfxType, AudioSource>{};
   final Map<SfxType, SoundHandle> _handles = <SfxType, SoundHandle>{};
 
   /// Holds singleton instance reference.
@@ -60,7 +61,7 @@ class AudioController {
 
   /// Checks if audio is enabled in system constants and user settings.
   bool get _isAudioOn =>
-      kEnableAudioSystem && (_settings?.audioOn.value ?? true);
+      kEnableAudioSystem && (_settings?.audioOn.value ?? false);
 
   /// Evaluates whether the engine is allowed to initialize or resume audio playback.
   ///
@@ -68,12 +69,10 @@ class AudioController {
   /// or if the app lifecycle state is [AppLifecycleState.hidden].
   bool get _canInitialize =>
       _isAudioOn &&
-      _isAudioStackUnlocked &&
+      iosWorkaround.isReady &&
       _lifecycleNotifier?.value != AppLifecycleState.hidden;
 
-  /// IOS SAFARI GUARD:
-  /// Delegates directly to [iosWorkaround.isReady]. On non-iOS platforms, this returns true immediately.
-  bool get _isAudioStackUnlocked => iosWorkaround.isReady;
+  Future<void>? _initFutureForSoLoud;
 
   /// Validates whether a sound can safely be played.
   ///
@@ -106,7 +105,8 @@ class AudioController {
     _pruneStaleHandles();
 
     try {
-      final AudioSource sound = await _getSoundSource(type);
+      final AudioSource sound =
+          _getSoundSourceSync(type) ?? await _getSoundSourceAsync(type);
       if (!canPlay(type)) return; // in case state changed via await above
       final bool retainForStopping = type.longSound;
 
@@ -138,7 +138,7 @@ class AudioController {
     if (!kEnableAudioSystem) return;
 
     assert(type.toPlayInSoLoud);
-    if (!fromStopAll) _log.fine("stopSfx $type");
+    if (!fromStopAll && isPlaying(type)) _log.fine("stop $type");
 
     // If uninitialized, stale handles are already defunct in C++/Wasm, so just remove them
     if (!_soLoud.isInitialized) {
@@ -162,13 +162,24 @@ class AudioController {
   }
 
   Future<void> _initialize() async {
+    if (_initFutureForSoLoud != null) return _initFutureForSoLoud;
+
     _log.info("soLoud not initialized, re-initialize");
     _clearSources();
-    await _soLoud.init();
-    _soLoud.setMaxActiveVoiceCount(64);
-    assert(_soLoud.isInitialized);
-    _log.info("soLoud now initialized");
-    unawaited(_preloadSounds());
+
+    _initFutureForSoLoud = _soLoud
+        .init()
+        .then((_) {
+          _soLoud.setMaxActiveVoiceCount(64);
+          assert(_soLoud.isInitialized);
+          _log.info("soLoud now initialized");
+          unawaited(_preloadSounds());
+        })
+        .whenComplete(() {
+          _initFutureForSoLoud = null;
+        });
+
+    return _initFutureForSoLoud;
   }
 
   /// Ensures that the SoLoud engine is initialized and ready for use.
@@ -193,14 +204,14 @@ class AudioController {
     await Future.wait(
       SfxType.values
           .where((SfxType type) => type.toPlayInSoLoud)
-          .map((SfxType type) => _getSoundSource(type, preload: true)),
+          .map((SfxType type) => _getSoundSourceAsync(type, preload: true)),
     );
   }
 
   /// Loads or retrieves a cached SoLoud audio source.
   ///
   /// Validates cached sources against [_soLoud.activeSounds] before returning.
-  Future<AudioSource> _getSoundSource(
+  Future<AudioSource> _getSoundSourceAsync(
     SfxType type, {
     bool preload = false,
   }) async {
@@ -209,21 +220,41 @@ class AudioController {
       await _initialize();
     }
     assert(type.toPlayInSoLoud);
-
-    final Future<AudioSource>? existingFuture = _sources[type];
-    if (existingFuture != null) {
-      final AudioSource source = await existingFuture;
-      if (_soLoud.activeSounds.contains(source)) {
-        return source;
-      }
-    }
+    assert(_sources[type] == null);
 
     if (!preload) _log.fine("New audio source $type");
 
-    return _sources[type] = _soLoud.loadAsset(
-      'assets/${type.filename}',
-      mode: LoadMode.memory,
-    );
+    Future<AudioSource>? pendingSource = _unreadySources[type];
+    if (pendingSource == null) {
+      pendingSource = _soLoud.loadAsset(
+        'assets/${type.filename}',
+        mode: LoadMode.memory,
+      );
+      _unreadySources[type] = pendingSource;
+    }
+
+    try {
+      final AudioSource res = await pendingSource;
+      _sources[type] = res;
+      return res;
+    } finally {
+      unawaited(_unreadySources.remove(type));
+    }
+  }
+
+  AudioSource? _getSoundSourceSync(SfxType type) {
+    assert(_canInitialize);
+    if (!_soLoud.isInitialized) {
+      return null;
+    }
+    assert(type.toPlayInSoLoud);
+
+    final AudioSource? readySource = _sources[type];
+    if (readySource != null && _soLoud.activeSounds.contains(readySource)) {
+      return readySource;
+    }
+
+    return null;
   }
 
   /// Prunes invalid or finished voice handles from memory to prevent reaching max active voice limits.
@@ -303,6 +334,7 @@ class AudioController {
   void _clearSources() {
     _log.fine("clearSources");
     _handles.clear();
+    _unreadySources.clear();
     _sources.clear();
   }
 
