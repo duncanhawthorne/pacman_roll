@@ -33,7 +33,6 @@ void main() async {
   await Flame.device.fullScreen();
   setupGlobalLogger();
   fixTitlePerm();
-  await firstInitializeSoLoud();
   blockTouchDefault(true);
   runApp(const MyGame());
 }

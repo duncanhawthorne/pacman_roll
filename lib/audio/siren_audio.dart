@@ -8,10 +8,11 @@ import 'sounds.dart';
 
 /// Manages dynamic volume and state transitions for the ghost roaming siren.
 class SirenAudioController {
-  SirenAudioController(this._audioController);
+  SirenAudioController(this._audioController, this._soLoud);
 
   static final Logger _log = Logger('SI');
   final AudioController _audioController;
+  final SoLoud _soLoud;
 
   /// Dynamically adjusts the volume of the ghost roaming siren.
   ///
@@ -37,13 +38,13 @@ class SirenAudioController {
     final SoundHandle? handle = _audioController.getHandle(siren);
     if (handle == null) return;
 
-    currentVolume = soLoud.getVolume(handle);
+    currentVolume = _soLoud.getVolume(handle);
     final double desiredSirenVolume = _getDesiredSirenVolume(
       normalisedAverageGhostSpeed,
       currentVolume,
       gradual: gradual,
     );
-    soLoud.setVolume(handle, desiredSirenVolume);
+    _soLoud.setVolume(handle, desiredSirenVolume);
   }
 
   /// Calculates target siren volume from normalized ghost speed.

@@ -6,29 +6,12 @@ import 'package:logging/logging.dart';
 
 import '../app_lifecycle/app_lifecycle.dart';
 import '../settings/settings.dart';
-import '../utils/helper.dart';
 import 'ios_audio.dart';
 import 'siren_audio.dart';
 import 'sounds.dart';
 
 /// Global flag enabling or disabling the audio engine system.
 const bool kEnableAudioSystem = true;
-
-/// Performs the initial setup of the SoLoud audio engine on app launch.
-///
-/// Bypasses setup if [kEnableAudioSystem] is false. Logs any initialization crash.
-Future<void> firstInitializeSoLoud() async {
-  if (!kEnableAudioSystem) return;
-  await _initEngine().catchError((Object e) => logGlobal("SoLoud crash $e"));
-}
-
-Future<void> _initEngine() async {
-  await soLoud.init();
-  soLoud.setMaxActiveVoiceCount(64);
-}
-
-/// Global instance of the SoLoud C++/Wasm audio engine.
-final SoLoud soLoud = SoLoud.instance;
 
 /// Global audio controller that manages sound effects, music, and iOS Web lifecycle recovery.
 class AudioController {
@@ -49,8 +32,11 @@ class AudioController {
     return _instance!;
   }
 
+  /// Instance of the SoLoud C++/Wasm audio engine.
+  final SoLoud _soLoud = SoLoud.instance;
+
   /// Sub-controller responsible for dynamic ghost siren sound modulation.
-  late final SirenAudioController siren = SirenAudioController(this);
+  late final SirenAudioController siren = SirenAudioController(this, _soLoud);
 
   /// Sub-controller responsible for managing iOS WebAudio unlock requirements.
   late final IosWorkaround iosWorkaround = IosWorkaround(this);
@@ -82,12 +68,12 @@ class AudioController {
   /// or if the app lifecycle state is [AppLifecycleState.hidden].
   bool get _canInitialize =>
       _isAudioOn &&
-      isAudioStackUnlocked &&
+      _isAudioStackUnlocked &&
       _lifecycleNotifier?.value != AppLifecycleState.hidden;
 
   /// IOS SAFARI GUARD:
   /// Delegates directly to [iosWorkaround.isReady]. On non-iOS platforms, this returns true immediately.
-  bool get isAudioStackUnlocked => iosWorkaround.isReady;
+  bool get _isAudioStackUnlocked => iosWorkaround.isReady;
 
   /// Validates whether a sound can safely be played.
   ///
@@ -107,7 +93,7 @@ class AudioController {
   bool isPlaying(SfxType type) {
     if (!_handleValidToPlay(type)) return false;
     final SoundHandle? handle = getHandle(type);
-    final bool isPaused = handle != null && soLoud.getPause(handle);
+    final bool isPaused = handle != null && _soLoud.getPause(handle);
     return !isPaused;
   }
 
@@ -126,10 +112,10 @@ class AudioController {
 
       if (retainForStopping && _handleValidToPlay(type)) {
         _log.info("Retained handle, stopping to replay");
-        unawaited(soLoud.stop(_handles[type]!));
+        unawaited(_soLoud.stop(_handles[type]!));
       }
 
-      final SoundHandle fHandle = soLoud.play(
+      final SoundHandle fHandle = _soLoud.play(
         sound,
         paused: false,
         looping: type.looping,
@@ -155,14 +141,14 @@ class AudioController {
     if (!fromStopAll) _log.fine("stopSfx $type");
 
     // If uninitialized, stale handles are already defunct in C++/Wasm, so just remove them
-    if (!soLoud.isInitialized) {
+    if (!_soLoud.isInitialized) {
       _handles.remove(type);
       return;
     }
 
     final SoundHandle? fHandle = _handles.remove(type);
-    if (fHandle != null && soLoud.getIsValidVoiceHandle(fHandle)) {
-      await soLoud.stop(fHandle);
+    if (fHandle != null && _soLoud.getIsValidVoiceHandle(fHandle)) {
+      await _soLoud.stop(fHandle);
     }
   }
 
@@ -178,8 +164,9 @@ class AudioController {
   Future<void> _initialize() async {
     _log.info("soLoud not initialized, re-initialize");
     _clearSources();
-    await _initEngine();
-    assert(soLoud.isInitialized);
+    await _soLoud.init();
+    _soLoud.setMaxActiveVoiceCount(64);
+    assert(_soLoud.isInitialized);
     _log.info("soLoud now initialized");
     unawaited(_preloadSounds());
   }
@@ -191,7 +178,7 @@ class AudioController {
   bool isInitializedOrInitializeAsync() {
     if (!_canInitialize) return false;
 
-    if (!soLoud.isInitialized) {
+    if (!_soLoud.isInitialized) {
       _initialize();
       return false;
     }
@@ -201,8 +188,8 @@ class AudioController {
   /// Preloads sound effects into memory.
   Future<void> _preloadSounds() async {
     _log.fine('Preloading sounds');
-    assert(soLoud.isInitialized);
-    if (!soLoud.isInitialized) return;
+    assert(_soLoud.isInitialized);
+    if (!_soLoud.isInitialized) return;
     await Future.wait(<Future<AudioSource>>[
       for (SfxType type in SfxType.values)
         if (type.toPlayInSoLoud) _getSoundSource(type, preload: true),
@@ -211,22 +198,22 @@ class AudioController {
 
   /// Loads or retrieves a cached SoLoud audio source.
   ///
-  /// Validates cached sources against [soLoud.activeSounds] before returning.
+  /// Validates cached sources against [_soLoud.activeSounds] before returning.
   Future<AudioSource> _getSoundSource(
     SfxType type, {
     bool preload = false,
   }) async {
     assert(_canInitialize);
-    if (!soLoud.isInitialized) {
+    if (!_soLoud.isInitialized) {
       await _initialize();
     }
     assert(type.toPlayInSoLoud);
 
-    if (isAudioStackUnlocked && soLoud.isInitialized) {
+    if (_isAudioStackUnlocked && _soLoud.isInitialized) {
       final Future<AudioSource>? existingFuture = _sources[type];
       if (existingFuture != null) {
         final AudioSource source = await existingFuture;
-        if (soLoud.activeSounds.contains(source)) {
+        if (_soLoud.activeSounds.contains(source)) {
           return source;
         }
       }
@@ -234,7 +221,7 @@ class AudioController {
 
     if (!preload) _log.fine("New audio source $type");
 
-    return _sources[type] = soLoud.loadAsset(
+    return _sources[type] = _soLoud.loadAsset(
       'assets/${type.filename}',
       mode: LoadMode.memory,
     );
@@ -242,10 +229,10 @@ class AudioController {
 
   /// Prunes invalid or finished voice handles from memory to prevent reaching max active voice limits.
   void _pruneStaleHandles() {
-    if (!soLoud.isInitialized) return;
+    if (!_soLoud.isInitialized) return;
     _handles.removeWhere(
       (SfxType type, SoundHandle handle) =>
-          !soLoud.getIsValidVoiceHandle(handle),
+          !_soLoud.getIsValidVoiceHandle(handle),
     );
   }
 
@@ -275,9 +262,9 @@ class AudioController {
   /// Synchronously checks if a voice handle is valid.
   /// If the engine is uninitialized or audio stack is locked, returns `false` instantly without awaiting.
   bool _handleValidToPlay(SfxType type) {
-    if (!_canInitialize || !soLoud.isInitialized) return false;
+    if (!_canInitialize || !_soLoud.isInitialized) return false;
     final SoundHandle? handle = _handles[type];
-    return handle != null && soLoud.getIsValidVoiceHandle(handle);
+    return handle != null && _soLoud.getIsValidVoiceHandle(handle);
   }
 
   /// Binds the lifecycle notifier and settings controller dependencies to this controller.
@@ -327,12 +314,12 @@ class AudioController {
     await stopAllSounds();
     unawaited(iosWorkaround.releaseWorkaround());
     _clearSources();
-    if (soLoud.isInitialized) {
-      await soLoud.disposeAllSources().catchError(
+    if (_soLoud.isInitialized) {
+      await _soLoud.disposeAllSources().catchError(
         (Object e) => _log.severe("Crash on disposeAllSources $e"),
       );
     }
-    soLoud.deinit();
+    _soLoud.deinit();
     _log.info("soLoudPowerDownForReset complete");
   }
 }
