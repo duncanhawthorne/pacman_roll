@@ -45,45 +45,47 @@ class MyGame extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppLifecycleObserver(
-      child: Listener(
-        behavior: HitTestBehavior.translucent,
-        onPointerDown: (_) {
-          // Re-enforces WebAudio playback and restarts background silence loop on user touch.
-          unawaited(AudioController().iosWorkaround.workaround());
-        },
-        child: MultiProvider(
-          providers: <SingleChildWidget>[
-            Provider<Palette>(create: (BuildContext context) => Palette()),
-            ChangeNotifierProvider<PlayerProgress>(
-              create: (BuildContext context) => PlayerProgress(),
-            ),
-            Provider<SettingsController>(
-              create: (BuildContext context) => SettingsController(),
-            ),
-            // Set up audio as a persistent singleton.
-            ProxyProvider2<
-              SettingsController,
-              AppLifecycleStateNotifier,
-              AudioController
-            >(
-              lazy: false,
-              create: (BuildContext context) => AudioController(),
-              update:
-                  (
-                    BuildContext context,
-                    SettingsController settings,
-                    AppLifecycleStateNotifier lifecycleNotifier,
-                    AudioController? audio,
-                  ) {
-                    audio!.attachDependencies(lifecycleNotifier, settings);
-                    return audio;
-                  },
-              // REMOVED dispose callback so Provider does not destroy singleton instance
-            ),
-          ],
-          child: Builder(
-            builder: (BuildContext context) {
-              return MaterialApp.router(
+      child: MultiProvider(
+        providers: <SingleChildWidget>[
+          Provider<Palette>(create: (BuildContext context) => Palette()),
+          ChangeNotifierProvider<PlayerProgress>(
+            create: (BuildContext context) => PlayerProgress(),
+          ),
+          Provider<SettingsController>(
+            create: (BuildContext context) => SettingsController(),
+          ),
+          // Set up audio as a persistent singleton.
+          ProxyProvider2<
+            SettingsController,
+            AppLifecycleStateNotifier,
+            AudioController
+          >(
+            lazy: false,
+            create: (BuildContext context) => AudioController(),
+            update:
+                (
+                  BuildContext context,
+                  SettingsController settings,
+                  AppLifecycleStateNotifier lifecycleNotifier,
+                  AudioController? audio,
+                ) {
+                  audio!.attachDependencies(lifecycleNotifier, settings);
+                  return audio;
+                },
+            // REMOVED dispose callback so Provider does not destroy singleton instance
+          ),
+        ],
+        child: Builder(
+          builder: (BuildContext context) {
+            return Listener(
+              behavior: HitTestBehavior.translucent,
+              onPointerDown: (_) {
+                // Re-enforces WebAudio playback and restarts background silence loop on user touch.
+                unawaited(
+                  context.read<AudioController>().iosWorkaround.workaround(),
+                );
+              },
+              child: MaterialApp.router(
                 title: appTitle,
                 theme: flutterNesTheme().copyWith(
                   scaffoldBackgroundColor: Palette.background.color,
@@ -99,9 +101,9 @@ class MyGame extends StatelessWidget {
                 routeInformationProvider: router.routeInformationProvider,
                 routeInformationParser: router.routeInformationParser,
                 routerDelegate: router.routerDelegate,
-              );
-            },
-          ),
+              ),
+            );
+          },
         ),
       ),
     );
