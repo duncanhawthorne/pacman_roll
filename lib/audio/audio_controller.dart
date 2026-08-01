@@ -15,9 +15,7 @@ const bool kEnableAudioSystem = true;
 
 /// Global audio controller that manages sound effects, music, and iOS Web lifecycle recovery.
 class AudioController {
-  AudioController._() {
-    isInitializedOrInitializeAsync();
-  }
+  AudioController._();
 
   /// Returns the singleton instance of the [AudioController].
   ///
@@ -39,7 +37,7 @@ class AudioController {
   late final SirenAudioController siren = SirenAudioController(this, _soLoud);
 
   /// Sub-controller responsible for managing iOS WebAudio unlock requirements.
-  late final IosWorkaround iosWorkaround = IosWorkaround(this);
+  late final IosWorkaround iosWorkaround = IosWorkaround();
 
   static final Logger _log = Logger('AC');
   static final Logger _logLC = Logger('LC');
@@ -79,7 +77,7 @@ class AudioController {
   /// IOS GUARD: Rejects playback if the app is hidden or if iOS WebAudio is locked waiting for a tap.
   /// If uninitialized, lazily attempts to initialize SoLoud and returns `false` during the spin-up frame.
   bool canPlay(SfxType type) {
-    if (!isInitializedOrInitializeAsync()) return false;
+    if (!_isInitializedOrInitializeAsync()) return false;
 
     if (type != SfxType.ghostsRoamingSiren) {
       _log.finest('Can play: $type');
@@ -186,7 +184,7 @@ class AudioController {
   ///
   /// IOS GUARD: Blocked if iOS audio is currently locked (waiting for user touch).
   /// Returns `true` if SoLoud is initialized, or `false` if initialization was newly kicked off or blocked.
-  bool isInitializedOrInitializeAsync() {
+  bool _isInitializedOrInitializeAsync() {
     if (!_canInitialize) return false;
 
     if (!_soLoud.isInitialized) {
@@ -311,12 +309,14 @@ class AudioController {
       _settings?.audioOn.removeListener(_audioOnOffHandler);
       _settings = settingsController..audioOn.addListener(_audioOnOffHandler);
     }
+    _isInitializedOrInitializeAsync();
   }
 
   void _audioOnOffHandler() {
     _log.fine('audioOn changed to ${_settings!.audioOn.value}');
     if (_settings!.audioOn.value) {
       iosWorkaround.workaround();
+      _isInitializedOrInitializeAsync();
     } else {
       stopAllSounds();
       iosWorkaround.releaseWorkaround();

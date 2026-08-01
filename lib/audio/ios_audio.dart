@@ -10,10 +10,7 @@ import 'sounds.dart';
 /// Manages the HTML5 Audio stream workaround required to keep WebAudio
 /// unlocked and active on iOS Safari / iOS Chrome.
 class IosWorkaround {
-  IosWorkaround(this._audioController);
-
   static final Logger _log = Logger('IA');
-  final AudioController _audioController;
 
   AudioPlayer? _silencePlayer;
 
@@ -50,9 +47,6 @@ class IosWorkaround {
 
     // UNLOCK IMMEDIATELY inside the user tap callstack
     _needsReUnlockOnResume = false;
-
-    // Force SoLoud re-initialization synchronously inside the user tap gesture stack
-    _audioController.isInitializedOrInitializeAsync();
 
     await _playSilence();
   }
