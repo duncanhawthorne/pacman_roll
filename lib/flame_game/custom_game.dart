@@ -167,7 +167,7 @@ class CustomGame extends Forge2DGame<CustomWorld>
 
   @override
   Future<void> onLoad() async {
-    super.onLoad();
+    await super.onLoad();
     bugFixes();
     initializeCollisionDetection(
       mapDimensions: Rect.fromLTWH(
