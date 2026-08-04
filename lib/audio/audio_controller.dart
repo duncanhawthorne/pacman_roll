@@ -37,7 +37,9 @@ class AudioController {
   late final SirenAudioController siren = SirenAudioController(this, _soLoud);
 
   /// Sub-controller responsible for managing iOS WebAudio unlock requirements.
-  late final IosWorkaround iosWorkaround = IosWorkaround();
+  late final IosWorkaround iosWorkaround = IosWorkaround(
+    isAudioOn: () => _isAudioOn,
+  );
 
   static final Logger _log = Logger('AC');
   static final Logger _logLC = Logger('LC');
@@ -54,6 +56,9 @@ class AudioController {
   /// Holds singleton instance reference.
   static AudioController? _instance;
 
+  /// Guard flag to block initialization checks while teardown is active.
+  bool _isPoweringDown = false;
+
   /// Retrieves the active [SoundHandle] for the specified [SfxType] if retained.
   SoundHandle? getHandle(SfxType type) => _handles[type];
 
@@ -67,6 +72,7 @@ class AudioController {
   /// or if the app lifecycle state is [AppLifecycleState.hidden].
   bool get _canInitialize =>
       _isAudioOn &&
+      !_isPoweringDown &&
       iosWorkaround.isReady &&
       _lifecycleNotifier?.value != AppLifecycleState.hidden;
 
@@ -136,7 +142,7 @@ class AudioController {
     if (!kEnableAudioSystem) return;
 
     assert(type.toPlayInSoLoud);
-    if (!fromStopAll && isPlaying(type)) _log.fine("stop $type");
+    if (!fromStopAll && isPlaying(type)) _log.fine('stop $type');
 
     // If uninitialized, stale handles are already defunct in C++/Wasm, so just remove them
     if (!_soLoud.isInitialized) {
@@ -162,7 +168,7 @@ class AudioController {
   Future<void> _initialize() async {
     if (_initFutureForSoLoud != null) return _initFutureForSoLoud;
 
-    _log.info("soLoud not initialized, re-initialize");
+    _log.info('soLoud not initialized, re-initialize');
     _clearSources();
 
     _initFutureForSoLoud = _soLoud
@@ -170,7 +176,7 @@ class AudioController {
         .then((_) {
           _soLoud.setMaxActiveVoiceCount(64);
           assert(_soLoud.isInitialized);
-          _log.info("soLoud now initialized");
+          _log.info('soLoud now initialized');
           unawaited(_preloadSounds());
         })
         .whenComplete(() {
@@ -220,7 +226,7 @@ class AudioController {
     assert(type.toPlayInSoLoud);
     assert(_sources[type] == null);
 
-    if (!preload) _log.fine("New audio source $type");
+    if (!preload) _log.fine('New audio source $type');
 
     Future<AudioSource>? pendingSource = _unreadySources[type];
     if (pendingSource == null) {
@@ -326,13 +332,13 @@ class AudioController {
   /// SINGLETON PROTECTION:
   /// Overridden to prevent Provider widget disposal from destroying the global singleton instance.
   Future<void> dispose() async {
-    _log.info("Dispose request from Provider - ignoring to preserve singleton");
+    _log.info('Dispose request from Provider - ignoring to preserve singleton');
     // Do NOT destroy singleton on Provider disposal
   }
 
   /// Clears cached SoLoud audio sources and tracked handles.
   void _clearSources() {
-    _log.fine("clearSources");
+    _log.fine('clearSources');
     _handles.clear();
     _unreadySources.clear();
     _sources.clear();
@@ -340,17 +346,26 @@ class AudioController {
 
   /// Fully shuts down SoLoud when backgrounding or resetting engine state on iOS.
   Future<void> _powerDownForReset() async {
-    if (!kEnableAudioSystem) return;
-    _log.fine("soLoudPowerDownForReset start");
-    await stopAllSounds();
-    unawaited(iosWorkaround.releaseWorkaround());
-    _clearSources();
-    if (_soLoud.isInitialized) {
-      await _soLoud.disposeAllSources().catchError(
-        (Object e) => _log.severe("Crash on disposeAllSources $e"),
-      );
+    if (!kEnableAudioSystem || _isPoweringDown) return;
+    _isPoweringDown = true;
+    _log.fine('soLoudPowerDownForReset start');
+
+    try {
+      await iosWorkaround.releaseWorkaround();
+      await stopAllSounds();
+
+      _clearSources();
+
+      if (_soLoud.isInitialized) {
+        try {
+          _soLoud.deinit();
+        } catch (e) {
+          _log.severe('Crash during soLoud.deinit(): $e');
+        }
+      }
+    } finally {
+      _isPoweringDown = false;
+      _log.info('soLoudPowerDownForReset complete');
     }
-    _soLoud.deinit();
-    _log.info("soLoudPowerDownForReset complete");
   }
 }

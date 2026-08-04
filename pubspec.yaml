@@ -32,7 +32,7 @@ dependencies:
   google_sign_in: ^7.1.0
   google_sign_in_web: ^1.0.0
   flame_lint: ^1.1.2
-  flutter_soloud: 4.0.13
+  flutter_soloud: ^4.0.13
   google_user:
     git:
       url: https://github.com/duncanhawthorne/google_user.git
@@ -43,7 +43,7 @@ dependencies:
       ref: main
 
 dependency_overrides:
-  flutter_soloud: 4.0.13
+
   flame:
     git:
       url: https://github.com/flame-engine/flame.git
