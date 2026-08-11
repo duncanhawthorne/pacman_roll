@@ -1,8 +1,8 @@
 import 'package:flame/geometry.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
-import '../dialogs/game_overlays.dart';
 import '../custom_game.dart';
+import '../dialogs/game_overlays.dart';
 import 'pacman_sprites.dart';
 
 /// Returns an animated Pacman icon that reflects whether a life has been lost.

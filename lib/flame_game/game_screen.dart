@@ -1,5 +1,5 @@
 import 'package:flame/game.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 
 import '../app_lifecycle/app_lifecycle.dart';
@@ -8,6 +8,7 @@ import '../level_selection/levels.dart';
 import '../player_progress/player_progress.dart';
 import '../style/palette.dart';
 import '../utils/src/workarounds.dart';
+import 'custom_game.dart';
 import 'dialogs/debug_dialog.dart';
 import 'dialogs/game_lose_dialog.dart';
 import 'dialogs/game_overlays.dart';
@@ -16,7 +17,6 @@ import 'dialogs/level_choose.dart';
 import 'dialogs/playback_dialog.dart';
 import 'dialogs/reset_dialog.dart';
 import 'dialogs/tutorial_dialog.dart';
-import 'custom_game.dart';
 
 /// This widget defines the properties of the game screen.
 ///

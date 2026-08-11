@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../../level_selection/levels.dart';
 import '../../style/dialog.dart';
-import '../game_screen.dart';
 import '../custom_game.dart';
+import '../game_screen.dart';
 import 'level_choose.dart';
 
 /// This dialog is shown when a level is lost.

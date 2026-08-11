@@ -2,10 +2,9 @@ import 'dart:async';
 
 import 'package:flame/components.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 
-import '../maze/maze.dart';
 import '../custom_game.dart';
+import '../maze/maze.dart';
 import 'base_component.dart';
 import 'pacman.dart';
 import 'sprite_character.dart';

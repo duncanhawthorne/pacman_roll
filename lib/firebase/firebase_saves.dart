@@ -10,6 +10,8 @@ import '../firebase_options.dart';
 
 /// This file has utilities for loading and saving the leaderboard in firebase
 
+/// firebase_options.dart as per direct download from google, not included in repo
+
 /// Manages Firebase interactions, specifically for high scores and player progress.
 class FBase {
   FBase._() {

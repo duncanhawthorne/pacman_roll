@@ -1,11 +1,11 @@
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../../style/dialog.dart';
 import '../../style/palette.dart';
 import '../../utils/constants.dart';
-import '../game_screen.dart';
 import '../custom_game.dart';
+import '../game_screen.dart';
 
 /// This dialog is shown when a level is won.
 ///

@@ -1,14 +1,14 @@
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../../firebase/firebase_saves.dart';
 import '../../level_selection/levels.dart';
 import '../../router.dart';
 import '../../style/dialog.dart';
 import '../../style/palette.dart';
+import '../custom_game.dart';
 import '../game_screen.dart';
 import '../maze/maze.dart';
-import '../custom_game.dart';
 import 'level_choose.dart';
 
 /// This dialog is shown when a level is won.

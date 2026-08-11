@@ -1,11 +1,10 @@
 import 'dart:async';
 
 import 'package:flame/flame.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_ios_web_touch_override/flutter_ios_web_touch_override.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:nes_ui/nes_ui.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 
@@ -19,8 +18,7 @@ import 'style/palette.dart';
 import 'utils/constants.dart';
 import 'utils/helper.dart';
 import 'utils/src/workarounds.dart';
-
-//firebase_options.dart as per direct download from google, not included in repo
+import 'utils/src/workarounds_material.dart';
 
 /// Entry point of the application.
 void main() async {
@@ -85,17 +83,7 @@ class MyGame extends StatelessWidget {
               },
               child: MaterialApp.router(
                 title: appTitle,
-                theme: flutterNesTheme().copyWith(
-                  scaffoldBackgroundColor: Palette.background.color,
-                  colorScheme: ColorScheme.fromSeed(
-                    seedColor: Palette.seed.color,
-                    surface: Palette.background.color,
-                  ),
-                  textTheme: GoogleFonts.pressStart2pTextTheme().apply(
-                    bodyColor: Palette.text.color,
-                    displayColor: Palette.text.color,
-                  ),
-                ),
+                theme: flutterNesThemeAdapted(),
                 routeInformationProvider: router.routeInformationProvider,
                 routeInformationParser: router.routeInformationParser,
                 routerDelegate: router.routerDelegate,

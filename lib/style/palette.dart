@@ -1,5 +1,5 @@
 import 'package:flame/palette.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// A palette of colors to be used in the game.
 
