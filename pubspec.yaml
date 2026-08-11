@@ -32,7 +32,7 @@ dependencies:
   google_sign_in: ^7.1.0
   google_sign_in_web: ^1.0.0
   flame_lint: ^1.1.2
-  flutter_soloud: ^4.0.13
+  flutter_soloud: ^4.1.6
   google_user:
     git:
       url: https://github.com/duncanhawthorne/google_user.git
@@ -43,17 +43,18 @@ dependencies:
       ref: main
 
 dependency_overrides:
+  flutter_soloud: 4.1.6
 
   flame:
     git:
       url: https://github.com/flame-engine/flame.git
-      ref: forge2d-box2d-v3
+      ref: ffaa10d6c32acb44859c09e295790c1237bdb7fb #ref: forge2d-box2d-v3
       path: packages/flame
 
   flame_forge2d:
     git:
       url: https://github.com/flame-engine/flame.git
-      ref: forge2d-box2d-v3
+      ref: ffaa10d6c32acb44859c09e295790c1237bdb7fb #ref: forge2d-box2d-v3
       path: packages/flame_forge2d
 
 dev_dependencies:
