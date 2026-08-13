@@ -24,8 +24,7 @@ dependencies:
   go_router: ^17.0.0
   provider: ^6.1.1
   shared_preferences: ^2.2.2
-  nes_ui: ^0.30.0
-  google_fonts: ^6.1.0
+  google_fonts: ^8.2.1
   logging: ^1.2.0
   flutter_native_splash: ^2.4.0
   cloud_firestore: ^6.0.0

@@ -83,7 +83,20 @@ class MyGame extends StatelessWidget {
               },
               child: MaterialApp.router(
                 title: appTitle,
-                theme: flutterNesThemeAdapted(),
+                theme: ThemeData(
+                  useMaterial3: true,
+                  scaffoldBackgroundColor: Palette.background.color,
+                  colorScheme: ColorScheme.fromSeed(
+                    seedColor: Palette.seed.color,
+                    surface: Palette.background.color,
+                  ),
+                  textTheme: modernise(
+                    GoogleFonts.pressStart2pTextTheme().apply(
+                      bodyColor: Palette.text.color,
+                      displayColor: Palette.text.color,
+                    ),
+                  ),
+                ),
                 routeInformationProvider: router.routeInformationProvider,
                 routeInformationParser: router.routeInformationParser,
                 routerDelegate: router.routerDelegate,
