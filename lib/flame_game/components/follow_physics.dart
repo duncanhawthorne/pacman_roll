@@ -28,10 +28,6 @@ class Physics extends Component
     owner: owner,
   );
 
-  double get _spinParity => _ballVel.x.abs() > _ballVel.y.abs()
-      ? _gravitySign.y * _ballVel.x.sign
-      : -_gravitySign.x * _ballVel.y.sign;
-
   late final bool _freeRotation = true;
 
   /// Returns the current speed of the physical ball.
@@ -66,7 +62,7 @@ class Physics extends Component
   // Before Forge2D 0.15, could do late final Vector2 here
   Vector2 get _ballVelUnscaled => _ball.body.linearVelocity;
 
-  void _initaliseFromOwner() {
+  void _initializeFromOwner() {
     assert(_ball.isLoaded);
     _ball.radius = owner.radius;
     _ball.position = owner.position;
@@ -75,12 +71,12 @@ class Physics extends Component
   }
 
   /// Resynchronizes the physical ball's state with the owner's current state and activates it.
-  void initialiseFromOwnerAndSetDynamic() {
+  void initializeFromOwnerAndSetDynamic() {
     assert(_ball.isLoaded);
     _ball.setActive();
     _isActive = true;
-    // ball must be active before can initialise
-    _initaliseFromOwner();
+    // ball must be active before can initialize
+    _initializeFromOwner();
   }
 
   /// One frame of physics synchronization, updating the owner's visual properties from the ball's simulation.
@@ -99,7 +95,11 @@ class Physics extends Component
         owner.angle = _ball.angle;
       }
     } else {
-      owner.angle += speed * dt * _invInitialRadius * _spinParity;
+      final Vector2 v = owner.velocity;
+      final double spinParity = v.x.abs() > v.y.abs()
+          ? _gravitySign.y * v.x.sign
+          : -_gravitySign.x * v.y.sign;
+      owner.angle += v.length * dt * _invInitialRadius * spinParity;
     }
   }
 
@@ -137,7 +137,7 @@ class Physics extends Component
   /// Deactivates the physical ball and stops physics synchronization.
   void deactivate() {
     // disable _isActive before _ball first reference
-    // as _ball is initialised by referencing _ball as late final
+    // as _ball is initialized by referencing _ball as late final
     _isActive = false;
     _ball.setInactive();
   }

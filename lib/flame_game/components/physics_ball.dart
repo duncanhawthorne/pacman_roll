@@ -7,8 +7,8 @@ import 'package:flutter/foundation.dart';
 import '../../style/palette.dart';
 import '../../utils/constants.dart';
 import '../../utils/helper.dart';
-import '../maze/maze.dart';
 import '../custom_game.dart';
+import '../maze/maze.dart';
 import 'game_character.dart';
 import 'removal_actions.dart';
 import 'scaled_body_render.dart';
@@ -68,7 +68,7 @@ class PhysicsBall extends BodyComponent<CustomGame>
   int priority = -100;
 
   ///[_bodyIsActive] is a mirror variable to [body.isEnabled]
-  ///for use when body not yet initialised
+  ///for use when body not yet initialized
   late bool _bodyIsActive;
 
   static final Vector2 _reusableVector = Vector2.zero();
@@ -150,7 +150,7 @@ class PhysicsBall extends BodyComponent<CustomGame>
       return;
     }
     if (_bodyIsActive == false && !isMounted) {
-      //just test subConnectedBall as body not yet initialised
+      //just test subConnectedBall as body not yet initialized
       return;
     }
     if (body.isEnabled == false && _bodyIsActive == false) {

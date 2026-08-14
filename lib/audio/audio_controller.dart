@@ -219,7 +219,7 @@ class AudioController {
     SfxType type, {
     bool preload = false,
   }) async {
-    assert(_canInitialize);
+    //assert(_canInitialize);
     if (!_soLoud.isInitialized) {
       await _initialize();
     }

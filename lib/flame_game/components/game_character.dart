@@ -70,7 +70,7 @@ class GameCharacter extends SpriteCharacter with CloneManager {
       if (!starting) {
         assert(_physics.isLoaded);
         if (_physics.isLoaded) {
-          _physics.initialiseFromOwnerAndSetDynamic();
+          _physics.initializeFromOwnerAndSetDynamic();
         }
       }
       state = PhysicsState.full;
@@ -108,9 +108,9 @@ class GameCharacter extends SpriteCharacter with CloneManager {
     angularVelocity = 0;
   }
 
-  void forceReinitialisePhysics() {
+  void forceReinitializePhysics() {
     if (!isLoaded) {
-      return; // no action required as loading will initialise
+      return; // no action required as loading will initialize
     }
     setPhysicsState(PhysicsState.full);
   }
