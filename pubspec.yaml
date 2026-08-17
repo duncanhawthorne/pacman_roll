@@ -18,7 +18,7 @@ dependencies:
   web: any
 
   flame: ^1.14.0
-  flame_forge2d: ^0.19.0+4
+  flame_forge2d: ^0.20.0
 
   audioplayers: ^6.0.0
   go_router: ^17.0.0
@@ -46,18 +46,6 @@ dependencies:
 dependency_overrides:
   flutter_soloud: 4.1.6
 
-  flame:
-    git:
-      url: https://github.com/flame-engine/flame.git
-      ref: ffaa10d6c32acb44859c09e295790c1237bdb7fb #ref: forge2d-box2d-v3
-      path: packages/flame
-
-  flame_forge2d:
-    git:
-      url: https://github.com/flame-engine/flame.git
-      ref: ffaa10d6c32acb44859c09e295790c1237bdb7fb #ref: forge2d-box2d-v3
-      path: packages/flame_forge2d
-
 dev_dependencies:
   #  flame_test: ^1.15.3
   flutter_lints: ^6.0.0
@@ -71,10 +59,6 @@ flutter:
 
   assets:
     - assets/images/
-    #    - assets/images/dash/
-    #    - assets/images/enemies/
-    #    - assets/images/scenery/
-    #    - assets/music/
     - assets/sfx/
     - assets/fonts/Press_Start_2P/
 
