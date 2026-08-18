@@ -15,8 +15,13 @@ class Physics extends Component
   final int priority = 1000;
 
   late final GameCharacter owner;
+
+  /// Single static vector buffer shared across classes to eliminate per-frame allocations.
+  /// Getters referencing this buffer be consumed immediately
   static final Vector2 _reusableVector = Vector2.zero();
 
+  /// Initialized as [late final] to prevent construction crashes that occur if [owner] properties
+  /// or dependencies are not yet fully resolved at object instantiation time.
   late final PhysicsBall _ball = PhysicsBall(
     position: owner.position,
     radius: owner.radius,
@@ -44,6 +49,8 @@ class Physics extends Component
     }
   }
 
+  /// Cached from [world] to bypass Flame's tree lookup in [HasWorldReference] during
+  /// high-frequency [update] loops
   late final Vector2 _gravitySign = world.gravitySign;
 
   Vector2 get _ballPos =>
@@ -87,8 +94,8 @@ class Physics extends Component
     if (owner.canAccelerate) {
       _ball.acceleration = owner.acceleration;
     }
-    owner.position = _ballPos;
-    owner.velocity = _ballVel;
+    owner.position = _ballPos; //setter, so instantly consumed
+    owner.velocity = _ballVel; //setter, so instantly consumed
     owner.angularVelocity = _ball.body.angularVelocity;
     if (openSpaceMovement) {
       if (_freeRotation) {
@@ -123,6 +130,8 @@ class Physics extends Component
       return;
     }
     await world.add(_ball);
+    // Explicitly waiting for _ball mounting ensures this component completes onLoad
+    // only when the physical body is completely mounted and ready for synchronization.
     await _ball.mounted;
   }
 
