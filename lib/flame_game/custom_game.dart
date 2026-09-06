@@ -46,7 +46,7 @@ const double worldSquareSize = _kVirtualGameSize * mapSizeScale;
 
 class CustomGame extends Forge2DGame<CustomWorld>
     with
-        HasQuadTreeCollisionDetection<CustomWorld>,
+        HasCollisionDetection<Broadphase<ShapeHitbox>>,
         SingleGameInstance,
         HasTimeScale {
   /// Private generative constructor initialized by the singleton factory wrapper.
@@ -145,7 +145,6 @@ class CustomGame extends Forge2DGame<CustomWorld>
       assert(world.isLoaded);
       world.reset();
     }
-    collisionDetection.broadphase.tree.optimize();
     if (showStartDialog) {
       playState = playback.isPlaybackAppropriate()
           ? PlayState.playbackMode
@@ -169,14 +168,6 @@ class CustomGame extends Forge2DGame<CustomWorld>
   Future<void> onLoad() async {
     await super.onLoad();
     bugFixes();
-    initializeCollisionDetection(
-      mapDimensions: Rect.fromLTWH(
-        -maze.dimensions.mazeWidth / 2,
-        -maze.dimensions.mazeHeight / 2,
-        maze.dimensions.mazeWidth,
-        maze.dimensions.mazeHeight,
-      ),
-    ); // assumes maze size won't change
     reset(firstRun: true, showStartDialog: true);
   }
 
