@@ -18,7 +18,6 @@ import 'style/palette.dart';
 import 'utils/constants.dart';
 import 'utils/helper.dart';
 import 'utils/src/workarounds.dart';
-import 'utils/src/workarounds_material.dart';
 
 /// Entry point of the application.
 void main() async {
@@ -90,11 +89,9 @@ class MyGame extends StatelessWidget {
                     seedColor: Palette.seed.color,
                     surface: Palette.background.color,
                   ),
-                  textTheme: modernise(
-                    GoogleFonts.pressStart2pTextTheme().apply(
-                      bodyColor: Palette.text.color,
-                      displayColor: Palette.text.color,
-                    ),
+                  textTheme: GoogleFonts.pressStart2pTextTheme().apply(
+                    bodyColor: Palette.text.color,
+                    displayColor: Palette.text.color,
                   ),
                 ),
                 routeInformationProvider: router.routeInformationProvider,

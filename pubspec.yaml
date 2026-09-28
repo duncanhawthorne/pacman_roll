@@ -21,10 +21,10 @@ dependencies:
   flame_forge2d: ^0.20.0
 
   audioplayers: ^6.0.0
-  go_router: ^17.0.0
+  go_router: ^18.0.1
   provider: ^6.1.1
   shared_preferences: ^2.2.2
-  google_fonts: ^8.2.1
+  google_fonts: ^9.0.0
   logging: ^1.2.0
   flutter_native_splash: ^2.4.0
   cloud_firestore: ^6.0.0
