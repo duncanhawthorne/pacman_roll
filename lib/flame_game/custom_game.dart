@@ -140,10 +140,13 @@ class CustomGame extends Forge2DGame<CustomWorld>
   ///
   /// * Set [firstRun] to `true` on initial canvas allocation to avoid resetting unbuilt items.
   /// * Set [showStartDialog] to `true` to push standard overlays over the current viewport layer.
-  void reset({bool firstRun = false, bool showStartDialog = false}) {
+  Future<void> reset({
+    bool firstRun = false,
+    bool showStartDialog = false,
+  }) async {
     if (!firstRun) {
-      assert(world.isLoaded);
-      world.reset();
+      await world.loaded;
+      await world.reset();
     }
     if (showStartDialog) {
       playState = playback.isPlaybackAppropriate()
@@ -168,7 +171,7 @@ class CustomGame extends Forge2DGame<CustomWorld>
   Future<void> onLoad() async {
     await super.onLoad();
     bugFixes();
-    reset(firstRun: true, showStartDialog: true);
+    await reset(firstRun: true, showStartDialog: true);
   }
 
   @override

@@ -96,14 +96,11 @@ class CustomWorld extends Forge2DWorld
   ///
   /// If [firstRun] is true, the reset cycle is skipped, as components are
   /// expected to initialize to their default states natively during [onLoad].
-  void reset({bool firstRun = false}) {
+  Future<void> reset({bool firstRun = false}) async {
     if (!firstRun) {
       for (final BaseComponent wrapper in _wrappers) {
-        assert(
-          wrapper.isLoaded,
-          'Attempted to reset a component that has not finished loading: $wrapper',
-        );
-        wrapper.reset();
+        await wrapper.loaded;
+        await wrapper.reset();
       }
     }
   }
@@ -147,7 +144,7 @@ class CustomWorld extends Forge2DWorld
     /// methods like `deliverAtPoint` during drag interactions.
     _wrappers.forEach(_noEvents.add);
 
-    reset(firstRun: true);
+    await reset(firstRun: true);
   }
 
   @override
