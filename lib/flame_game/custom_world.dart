@@ -123,13 +123,14 @@ class CustomWorld extends Forge2DWorld
     add(_noEvents);
 
     // Register all core gameplay elements, configuration layers, and systems.
+    //FIXME ordering workaround to priority being ineffective
     _wrappers.addAll(<BaseComponent>[
-      pacmans,
-      ghosts,
-      if (!enableRotationRaceMode) pellets,
       _walls,
-      _blocking,
       if (enableMovingWalls) _movingWalls,
+      if (!enableRotationRaceMode) pellets,
+      ghosts,
+      pacmans,
+      _blocking,
       deathReset,
       autoPauser,
       dragRotate,

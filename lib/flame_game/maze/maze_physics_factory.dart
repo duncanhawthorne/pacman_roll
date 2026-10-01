@@ -209,7 +209,8 @@ class MazePhysicsFactory {
       result.clear();
     }
     if (includeGround) {
-      result.add(WallGround(shapeSpecs: shapeSpecs));
+      //FIXME ordering workaround to priority being ineffective
+      result.insert(0, WallGround(shapeSpecs: shapeSpecs));
     }
     return result;
   }
