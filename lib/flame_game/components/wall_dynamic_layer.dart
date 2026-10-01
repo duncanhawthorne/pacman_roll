@@ -10,12 +10,12 @@ class MovingWallWrapper extends BaseComponent {
     if (children.isNotEmpty) {
       removeAll(children);
     }
-    await addAll(maze.physicsFactory.movingWalls());
+    addAll(maze.physicsFactory.movingWalls());
   }
 
   @override
   Future<void> onLoad() async {
-    super.onLoad();
+    await super.onLoad();
     await reset();
   }
 }

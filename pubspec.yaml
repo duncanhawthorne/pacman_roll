@@ -17,8 +17,8 @@ dependencies:
 
   web: any
 
-  flame: ^1.14.0
-  flame_forge2d: ^0.20.0
+  flame: ^2.0.0-dev.0
+  flame_forge2d: ^0.21.0-dev.0
 
   audioplayers: ^6.0.0
   go_router: ^18.0.1

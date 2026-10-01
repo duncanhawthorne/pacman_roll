@@ -6,7 +6,7 @@ import '../maze/maze.dart';
 import 'base_component.dart';
 
 /// A container component for static visual boundaries at the edges of the maze.
-class BlockingBarWrapper extends BaseComponent with Snapshot {
+class BlockingBarWrapper extends BaseComponent with CustomTraversal, Snapshot {
   @override
   final int priority = 1000;
   int _mazeIdLast = -100;
@@ -20,18 +20,18 @@ class BlockingBarWrapper extends BaseComponent with Snapshot {
     if (children.isNotEmpty) {
       removeAll(children);
     }
-    await addAll(maze.itemFactory.blockingWalls());
+    addAll(maze.itemFactory.blockingWalls());
     clearSnapshot();
   }
 
   @override
   Future<void> onLoad() async {
-    super.onLoad();
+    await super.onLoad();
     await reset();
   }
 
   @override
-  void updateTree(double dt) {
+  void updateSubtree(double dt) {
     // no point traversing large list of children as nothing to update
     // so cut short the updateTree here
     //super.updateTree(dt);

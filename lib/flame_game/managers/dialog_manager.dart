@@ -10,7 +10,7 @@ import '../game_screen.dart';
 /// Manages the display and cleaning of game dialog overlays.
 ///
 /// This includes start, lose, won, tutorial, reset, and debug dialogs.
-class DialogManager extends BaseComponent with HasWorldReference<CustomWorld> {
+class DialogManager extends BaseComponent with HasWorldRef<CustomWorld> {
   late final CustomGame game;
 
   /// Removes all active game dialog overlays.

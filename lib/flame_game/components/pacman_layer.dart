@@ -10,7 +10,9 @@ import 'pacman.dart';
 import 'sprite_character.dart';
 
 /// A container component that manages all Pacman instances in the game.
-class Pacmans extends BaseComponent with HasGameReference<CustomGame> {
+class Pacmans extends BaseComponent with HasGameRef<CustomGame> {
+  late final CustomGame game = gameRef;
+
   @override
   final int priority = 2;
 
@@ -49,7 +51,7 @@ class Pacmans extends BaseComponent with HasGameReference<CustomGame> {
 
   @override
   Future<void> onLoad() async {
-    super.onLoad();
+    await super.onLoad();
     await reset();
   }
 }

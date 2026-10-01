@@ -17,26 +17,26 @@ import '../maze/maze.dart';
 ///
 /// Tracks the number of deaths, items remaining, and game time.
 class GameSession extends BaseComponent
-    with HasWorldReference<CustomWorld>, HasGameReference<CustomGame> {
+    with HasWorldRef<CustomWorld>, HasGameRef<CustomGame> {
   String _userString = "";
 
   static const int _deathPenaltyMillis = 5000;
 
-  int get _deathPenalty => (game.level.isTutorial
+  int get _deathPenalty => (gameRef.level.isTutorial
       ? 0
-      : min(game.level.maxAllowedDeaths - 1, numberOfDeathsNotifier.value) *
+      : min(gameRef.level.maxAllowedDeaths - 1, numberOfDeathsNotifier.value) *
             _deathPenaltyMillis);
 
   /// Returns the current game time in milliseconds, including death penalties.
   int get stopwatchMilliSeconds =>
-      (game.lifecycle.stopwatch.current * 1000).toInt() + _deathPenalty;
+      (gameRef.lifecycle.stopwatch.current * 1000).toInt() + _deathPenalty;
 
   /// Returns true if the player has won the game (all items collected).
-  bool get _isWon => world.pellets.winState;
+  bool get _isWon => worldRef.pellets.winState;
 
   /// Returns true if the player has lost the game (exceeded max allowed deaths).
   bool get _isLost =>
-      numberOfDeathsNotifier.value >= game.level.maxAllowedDeaths;
+      numberOfDeathsNotifier.value >= gameRef.level.maxAllowedDeaths;
 
   /// Returns true if the game is over, either by winning or losing.
   bool get isWonOrLost => _isWon || _isLost;
@@ -49,13 +49,13 @@ class GameSession extends BaseComponent
 
   /// Notifies listeners when the number of items remaining changes.
   late final ValueNotifier<int> itemsRemainingNotifier =
-      world.pellets.pelletsRemainingNotifier;
+      worldRef.pellets.pelletsRemainingNotifier;
 
   /// Gathers relevant state for saving or uploading scores.
   Map<String, Object> _getCurrentGameState() {
     final Map<String, Object> gameStateTmp = <String, Object>{};
     gameStateTmp["userString"] = _userString;
-    gameStateTmp["levelNum"] = game.level.number;
+    gameStateTmp["levelNum"] = gameRef.level.number;
     gameStateTmp["levelCompleteTime"] = stopwatchMilliSeconds;
     gameStateTmp["dateTime"] = DateTime.now().millisecondsSinceEpoch;
     gameStateTmp["mazeId"] = maze.mazeId;
@@ -64,18 +64,18 @@ class GameSession extends BaseComponent
 
   /// Sets up listeners to monitor win/loss conditions.
   void _winOrLoseGameListener() {
-    assert(!game.lifecycle.stopwatchStarted); //so no instant trigger
+    assert(!gameRef.lifecycle.stopwatchStarted); //so no instant trigger
     _deathsListenerRef = () {
       if (_isLost &&
-          game.lifecycle.stopwatchStarted &&
-          game.playState != PlayState.playbackMode) {
+          gameRef.lifecycle.stopwatchStarted &&
+          gameRef.playState != PlayState.playbackMode) {
         _handleLoseGame();
       }
     };
     _itemsListenerRef = () {
       if (_isWon &&
-          game.lifecycle.stopwatchStarted &&
-          game.playState != PlayState.playbackMode) {
+          gameRef.lifecycle.stopwatchStarted &&
+          gameRef.playState != PlayState.playbackMode) {
         _handleWinGame();
       }
     };
@@ -87,30 +87,30 @@ class GameSession extends BaseComponent
   void _handleWinGame() {
     assert(!isRemoving);
     assert(isWonOrLost);
-    assert(game.lifecycle.stopwatchStarted);
-    assert(!(game.playState == PlayState.playbackMode));
-    world.mouseMove.exitPointerLock();
-    game.lifecycle.stopRegularItems();
-    game.audioController.play(SfxType.endMusic);
-    world.ghosts.resetAfterGameWin();
+    assert(gameRef.lifecycle.stopwatchStarted);
+    assert(!(gameRef.playState == PlayState.playbackMode));
+    worldRef.mouseMove.exitPointerLock();
+    gameRef.lifecycle.stopRegularItems();
+    gameRef.audioController.play(SfxType.endMusic);
+    worldRef.ghosts.resetAfterGameWin();
     const int minRecordableWinTimeMillis = 10 * 1000;
     if (stopwatchMilliSeconds > minRecordableWinTimeMillis &&
-        !game.level.isTutorial) {
+        !gameRef.level.isTutorial) {
       fBase.firebasePushSingleScore(_userString, _getCurrentGameState());
     }
-    game.playerProgress.saveLevelComplete(_getCurrentGameState());
-    game.dialogs.switchTo(GameScreen.wonDialogKey);
+    gameRef.playerProgress.saveLevelComplete(_getCurrentGameState());
+    gameRef.dialogs.switchTo(GameScreen.wonDialogKey);
   }
 
   /// Handles the game lose state, including stopping sounds and showing the lose dialog.
   void _handleLoseGame() {
     assert(!isRemoving);
     assert(isWonOrLost);
-    assert(game.lifecycle.stopwatchStarted);
-    world.mouseMove.exitPointerLock();
-    game.lifecycle.stopRegularItems();
-    game.audioController.stopAllSounds();
-    game.dialogs.switchTo(GameScreen.loseDialogKey);
+    assert(gameRef.lifecycle.stopwatchStarted);
+    worldRef.mouseMove.exitPointerLock();
+    gameRef.lifecycle.stopRegularItems();
+    gameRef.audioController.stopAllSounds();
+    gameRef.dialogs.switchTo(GameScreen.loseDialogKey);
   }
 
   @override
@@ -120,7 +120,7 @@ class GameSession extends BaseComponent
 
   @override
   Future<void> onLoad() async {
-    super.onLoad();
+    await super.onLoad();
     _winOrLoseGameListener(); //isn't disposed so run once, not on start()
   }
 

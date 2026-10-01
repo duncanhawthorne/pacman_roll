@@ -3,12 +3,14 @@ import 'dart:async';
 import 'package:flame/components.dart';
 
 import '../../level_selection/levels.dart';
-import '../game_screen.dart';
 import '../custom_game.dart';
+import '../game_screen.dart';
 import 'base_component.dart';
 
 /// Manages the display of tutorial instructions during specified levels.
-class TutorialWrapper extends BaseComponent with HasGameReference<CustomGame> {
+class TutorialWrapper extends BaseComponent with HasGameRef<CustomGame> {
+  late final CustomGame game = gameRef;
+
   bool _tutorialEverManuallyHidden = false;
   static const Duration _tutorialDelay = Duration(milliseconds: 3000);
 
@@ -40,7 +42,7 @@ class TutorialWrapper extends BaseComponent with HasGameReference<CustomGame> {
 
   @override
   Future<void> onLoad() async {
-    super.onLoad();
+    await super.onLoad();
     await reset();
   }
 }

@@ -3,15 +3,17 @@ import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flutter/foundation.dart';
 
-import '../maze/maze.dart';
 import '../custom_game.dart';
+import '../maze/maze.dart';
 import 'base_component.dart';
 import 'mini_pellet.dart';
 import 'super_pellet.dart';
 
 /// A container component that manages and renders all pellets in the maze.
 class PelletWrapper extends BaseComponent
-    with HasGameReference<CustomGame>, Snapshot {
+    with HasGameRef<CustomGame>, CustomTraversal, Snapshot {
+  late final CustomGame game = gameRef;
+
   @override
   final int priority = -2;
 
@@ -53,7 +55,7 @@ class PelletWrapper extends BaseComponent
 
   @override
   Future<void> onLoad() async {
-    super.onLoad();
+    await super.onLoad();
     pelletsRemainingNotifier.addListener(() {
       assert(!isRemoving);
       clearSnapshot();
@@ -63,7 +65,7 @@ class PelletWrapper extends BaseComponent
   }
 
   @override
-  void updateTree(double dt) {
+  void updateSubtree(double dt) {
     // no point traversing large list of children as nothing to update
     // so cut short the updateTree here
     //super.updateTree(dt);

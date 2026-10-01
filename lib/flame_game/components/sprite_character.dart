@@ -25,13 +25,16 @@ final Paint _highQualityPaint = Paint()
 /// Component that handles the visual animation and collision hitbox for game characters.
 class SpriteCharacter extends SpriteAnimationGroupComponent<CharacterState>
     with
-        HasWorldReference<CustomWorld>,
-        HasGameReference<CustomGame>,
+        HasWorldRef<CustomWorld>,
+        HasGameRef<CustomGame>,
         RemovalActions,
         LapAngle,
         IgnoreEvents {
   SpriteCharacter({super.position, this.original})
     : super(anchor: Anchor.center, paint: _highQualityPaint);
+
+  late final CustomGame game = gameRef;
+  late final CustomWorld world = worldRef;
 
   /// Reference to the original character if this is a visual clone.
   late final GameCharacter? original;

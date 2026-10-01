@@ -8,9 +8,9 @@ import 'game_character.dart';
 import 'sprite_character.dart';
 
 const Map<int, String> _ghostSpritePaths = <int, String>{
-  0: 'ghost1.png',
-  1: 'ghost3.png',
-  2: 'ghost2.png',
+  0: 'assets/images/ghost1.png',
+  1: 'assets/images/ghost3.png',
+  2: 'assets/images/ghost2.png',
 };
 
 final Map<int, Map<CharacterState, SpriteAnimation>>
@@ -42,9 +42,9 @@ class Ghost extends GameCharacter {
     if (!_ghostSpriteAnimationCache.containsKey(ghostIconNumber)) {
       final List<Sprite> sprites = await Future.wait(<Future<Sprite>>[
         game.loadSprite(_ghostSpritePaths[ghostIconNumber]!),
-        game.loadSprite('ghostscared1.png'),
-        game.loadSprite('ghostscared2.png'),
-        game.loadSprite('eyes.png'),
+        game.loadSprite('assets/images/ghostscared1.png'),
+        game.loadSprite('assets/images/ghostscared2.png'),
+        game.loadSprite('assets/images/eyes.png'),
       ]);
 
       _ghostSpriteAnimationCache[ghostIconNumber] =

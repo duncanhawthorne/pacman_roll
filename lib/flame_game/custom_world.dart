@@ -26,10 +26,10 @@ import 'managers/mouse_move.dart';
 /// **Mixins:**
 /// * [DragCallbacks]: Enables the world to intercept and respond to user touch,
 ///   drag, and mouse interactions.
-/// * [HasGameReference]: Provides direct access to the parent [CustomGame]
+/// * [HasGameRef]: Provides direct access to the parent [CustomGame]
 ///   instance via the `game` property.
 class CustomWorld extends Forge2DWorld
-    with HasGameReference<CustomGame>, DragCallbacks {
+    with HasGameRef<CustomGame>, DragCallbacks {
   /// Private constructor to enforce the singleton pattern.
   CustomWorld._();
 
@@ -117,7 +117,7 @@ class CustomWorld extends Forge2DWorld
 
   @override
   Future<void> onLoad() async {
-    super.onLoad();
+    await super.onLoad();
 
     // Mount the non-event container directly to the world.
     add(_noEvents);
@@ -134,10 +134,10 @@ class CustomWorld extends Forge2DWorld
       autoPauser,
       dragRotate,
       mouseMove,
-      game.session,
-      game.lifecycle,
-      game.playback,
-      game.dialogs,
+      gameRef.session,
+      gameRef.lifecycle,
+      gameRef.playback,
+      gameRef.dialogs,
     ]);
 
     /// Optimization: Nesting wrappers inside [_noEvents] keeps the flat count

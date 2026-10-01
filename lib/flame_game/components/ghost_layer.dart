@@ -17,7 +17,9 @@ const int _kGhostScaredTimeMillis = 6000;
 
 /// A container component that manages all active ghosts in the game.
 class Ghosts extends BaseComponent
-    with HasWorldReference<CustomWorld>, HasGameReference<CustomGame> {
+    with HasWorldRef<CustomWorld>, HasGameRef<CustomGame> {
+  late final CustomGame game = gameRef;
+
   @override
   final int priority = 1;
 
@@ -26,7 +28,7 @@ class Ghosts extends BaseComponent
 
   /// Shared character state for all ghosts (e.g., Normal, Scared).
   CharacterState current = CharacterState.normal;
-  Timer _ghostsScaredTimer = Timer(0); //length set in reset
+  Timer _ghostsScaredTimer = Timer(period: 0); //period set in reset
   SpawnComponent? _ghostSpawner;
 
   /// Helper to manage the ghost siren sound effects.
@@ -153,7 +155,7 @@ class Ghosts extends BaseComponent
     _ghostsScaredTimer.update(dt);
     if (current == CharacterState.scared) {
       if (_ghostsScaredTimer.current >
-          _scaredToScaredIshThreshold * _ghostsScaredTimer.limit) {
+          _scaredToScaredIshThreshold * _ghostsScaredTimer.period) {
         current = CharacterState.scaredIsh;
         for (final Ghost ghost in ghostList) {
           ghost.setScaredToScaredIsh();
@@ -181,7 +183,7 @@ class Ghosts extends BaseComponent
     _removeAllGhosts();
     _ghostSpawner = null; //so will reflect new level parameters
     _ghostsScaredTimer = Timer(
-      _kGhostScaredTimeMillis / game.level.ghostScaredTimeFactor / 1000,
+      period: _kGhostScaredTimeMillis / game.level.ghostScaredTimeFactor / 1000,
     );
     _addThreeGhosts();
   }
@@ -194,7 +196,7 @@ class Ghosts extends BaseComponent
 
   @override
   Future<void> onLoad() async {
-    super.onLoad();
+    await super.onLoad();
     add(ghostSiren);
     await reset();
   }

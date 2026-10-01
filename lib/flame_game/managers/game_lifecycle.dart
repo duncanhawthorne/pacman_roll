@@ -11,7 +11,7 @@ import '../custom_world.dart';
 /// Handles application lifecycle changes and coordinates the starting/stopping
 /// of game elements.
 class GameLifecycle extends BaseComponent
-    with HasWorldReference<CustomWorld>, HasGameReference<CustomGame> {
+    with HasWorldRef<CustomWorld>, HasGameRef<CustomGame> {
   VoidCallback? _lifecycleListenerRef;
   bool _regularItemsStarted = false;
 
@@ -21,7 +21,7 @@ class GameLifecycle extends BaseComponent
   bool get stopwatchStarted => _stopwatchStarted;
 
   /// The stopwatch tracking active play time.
-  final Timer stopwatch = Timer(double.infinity);
+  final Timer stopwatch = Timer(period: double.infinity);
 
   /// Resets the flag indicating regular items are active.
   void noteThatSomeRegularItemHasStopped() {
@@ -31,7 +31,7 @@ class GameLifecycle extends BaseComponent
 
   /// Pauses the game engine and time scale.
   void pauseGame() {
-    game
+    gameRef
       ..pause() //timeScale = 0;
       ..pauseEngine();
     noteThatSomeRegularItemHasStopped();
@@ -40,10 +40,10 @@ class GameLifecycle extends BaseComponent
 
   /// Resumes the game engine and time scale if it was paused.
   void resumeGame() {
-    if (game.paused || game.timeScale == 0) {
+    if (gameRef.isPaused || gameRef.timeScale == 0) {
       noteThatSomeRegularItemHasStopped();
-      game.timeScale = 1;
-      game
+      gameRef.timeScale = 1;
+      gameRef
         ..resume() //timeScale = 1.0;
         ..resumeEngine();
     }
@@ -55,7 +55,7 @@ class GameLifecycle extends BaseComponent
       _regularItemsStarted = true;
       _stopwatchStarted = true; //once per reset
       stopwatch.resume();
-      world.ghosts.startRegularItems();
+      worldRef.ghosts.startRegularItems();
     }
   }
 
@@ -63,22 +63,23 @@ class GameLifecycle extends BaseComponent
   void stopRegularItems() {
     noteThatSomeRegularItemHasStopped();
     stopwatch.pause();
-    world.ghosts.stopRegularItems();
+    worldRef.ghosts.stopRegularItems();
   }
 
   /// Sets up a listener for application lifecycle changes (e.g., backgrounding).
   void _lifecycleChangeListener() {
     _lifecycleListenerRef = () {
-      if (game.appLifecycleStateNotifier.value == AppLifecycleState.hidden) {
+      if (gameRef.appLifecycleStateNotifier.value == AppLifecycleState.hidden) {
         assert(!isRemoving);
         pauseGame();
       }
-      if (game.appLifecycleStateNotifier.value == AppLifecycleState.resumed) {
+      if (gameRef.appLifecycleStateNotifier.value ==
+          AppLifecycleState.resumed) {
         assert(!isRemoving);
         resumeGame();
       }
     };
-    game.appLifecycleStateNotifier.addListener(_lifecycleListenerRef!);
+    gameRef.appLifecycleStateNotifier.addListener(_lifecycleListenerRef!);
   }
 
   @override
@@ -92,21 +93,23 @@ class GameLifecycle extends BaseComponent
 
   @override
   Future<void> onLoad() async {
-    super.onLoad();
+    await super.onLoad();
     _lifecycleChangeListener(); //isn't disposed so run once, not on start()
   }
 
   @override
   Future<void> onRemove() async {
     if (_lifecycleListenerRef != null) {
-      game.appLifecycleStateNotifier.removeListener(_lifecycleListenerRef!);
+      gameRef.appLifecycleStateNotifier.removeListener(_lifecycleListenerRef!);
     }
     super.onRemove();
   }
 
   @override
   void update(double dt) {
-    stopwatch.update(dt * game.timeScale); //stops stopwatch when timeScale = 0
+    stopwatch.update(
+      dt * gameRef.timeScale,
+    ); //stops stopwatch when timeScale = 0
     super.update(dt);
   }
 }

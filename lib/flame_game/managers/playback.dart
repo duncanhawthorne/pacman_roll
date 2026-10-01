@@ -11,7 +11,7 @@ import '../custom_world.dart';
 /// Manages the recording and playback of maze rotation moves.
 ///
 /// This is used for a special "playback mode" level.
-class Playback extends BaseComponent with HasWorldReference<CustomWorld> {
+class Playback extends BaseComponent with HasWorldRef<CustomWorld> {
   late final CustomGame game;
 
   int _counter = 0;
@@ -61,7 +61,7 @@ class Playback extends BaseComponent with HasWorldReference<CustomWorld> {
         storedMoves[_counter + 1][0] < stopwatch) {
       _counter++;
     }
-    world.dragRotate.setMazeAngle(storedMoves[_counter][1]);
+    worldRef.dragRotate.setMazeAngle(storedMoves[_counter][1]);
   }
 
   /// Resets the playback counter and cleared any recorded live moves.

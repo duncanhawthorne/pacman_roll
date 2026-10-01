@@ -4,7 +4,7 @@ import '../custom_world.dart';
 import 'game_character.dart';
 
 /// A component that handles basic kinematics for characters when full physics is disabled.
-class SimplePhysics extends Component with HasWorldReference<CustomWorld> {
+class SimplePhysics extends Component with HasWorldRef<CustomWorld> {
   SimplePhysics({required this.owner});
 
   late final GameCharacter owner;

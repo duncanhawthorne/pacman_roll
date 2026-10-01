@@ -32,10 +32,12 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   final Vector2 _screenSizeLast = Vector2.zero();
 
   /// Timer used to control the mouth-closing animation duration when eating.
-  final Timer _eatTimer = Timer(_kPacmanHalfEatingResetTimeMillis * 2 / 1000);
+  final Timer _eatTimer = Timer(
+    period: _kPacmanHalfEatingResetTimeMillis * 2 / 1000,
+  );
 
-  @override
   /// Loads or retrieves animations for Pacman (Normal, Eating, Dying, Spawning).
+  @override
   Future<Map<CharacterState, SpriteAnimation>> getAnimations([
     int size = 1,
   ]) async {
@@ -259,7 +261,7 @@ class Pacman extends GameCharacter with CollisionCallbacks {
   }
 
   @override
-  void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
+  void onCollision(List<Vector2> intersectionPoints, PositionComponent other) {
     assert(isMounted && other.isMounted);
     onCollideWith(other);
     super.onCollision(intersectionPoints, other);

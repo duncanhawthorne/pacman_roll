@@ -11,7 +11,10 @@ import 'sprite_character.dart';
 
 /// Manages the dynamic volume of the ghost siren sound based on ghost speed.
 class GhostSiren extends BaseComponent
-    with HasGameReference<CustomGame>, HasWorldReference<CustomWorld> {
+    with HasGameRef<CustomGame>, HasWorldRef<CustomWorld> {
+  late final CustomGame game = gameRef;
+  late final CustomWorld world = worldRef;
+
   late final Ghosts ghosts = world.ghosts;
   late final List<Ghost> ghostList = ghosts.ghostList;
 

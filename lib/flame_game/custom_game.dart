@@ -123,7 +123,7 @@ class CustomGame extends Forge2DGame<CustomWorld>
   late final DialogManager dialogs = DialogManager()..game = this;
 
   /// Evaluates whether the simulation frame is ready, running, and active inside the widget tree.
-  bool get isLive => !paused && isLoaded && isMounted && timeScale != 0;
+  bool get isLive => !isPaused && isLoaded && isMounted && timeScale != 0;
 
   @override
   Color backgroundColor() => Palette.background.color;
