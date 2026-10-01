@@ -103,10 +103,16 @@ class Physics extends Component
       }
     } else {
       final Vector2 v = owner.velocity;
-      final double spinParity = v.x.abs() > v.y.abs()
-          ? _gravitySign.y * v.x.sign
-          : -_gravitySign.x * v.y.sign;
-      owner.angle += v.length * dt * _invInitialRadius * spinParity;
+      if (v.x != 0 || v.y != 0) {
+        //final double spinParity = v.x.abs() > v.y.abs()
+        //    ? _gravitySign.y * v.x.sign
+        //    : -_gravitySign.x * v.y.sign;
+        //final double rollingSpeed = v.length * spinParity;
+        /// v is almost always axis aligned so either v.x == 0 or v.y == 0
+        /// so [rollingSpeed] simply selects whichever one is non-zero
+        final double rollingSpeed = _gravitySign.y * v.x - _gravitySign.x * v.y;
+        owner.angle += rollingSpeed * dt * _invInitialRadius;
+      }
     }
   }
 
