@@ -34,7 +34,7 @@ class GameLifecycle extends BaseComponent
 
   /// Pauses the game engine and time scale.
   void pauseGame() {
-    gameRef
+    game
       ..pause() //timeScale = 0;
       ..pauseEngine();
     noteThatSomeRegularItemHasStopped();
@@ -46,7 +46,7 @@ class GameLifecycle extends BaseComponent
     if (game.isPaused || game.timeScale == 0) {
       noteThatSomeRegularItemHasStopped();
       game.timeScale = 1;
-      gameRef
+      game
         ..resume() //timeScale = 1.0;
         ..resumeEngine();
     }
