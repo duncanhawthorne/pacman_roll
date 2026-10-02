@@ -18,6 +18,7 @@ import 'playback.dart';
 /// This class handles the conversion of drag events into maze rotation,
 /// which in turn affects the gravity in the game world.
 class DragRotation extends BaseComponent with HasGameRef<CustomGame> {
+  late final CustomGame game = gameRef;
   late final CustomWorld world;
 
   double _canvasRadiusInv = 1.0;
@@ -26,9 +27,9 @@ class DragRotation extends BaseComponent with HasGameRef<CustomGame> {
 
   /// Initiates a sliding reset of the maze angle to its default.
   void resetSlide(VoidCallback callback) {
-    assert(gameRef.playState == PlayState.flourish);
+    assert(game.playState == PlayState.flourish);
     _cameraRotatable = false;
-    resetSlideAngle(gameRef.camera.viewfinder, onComplete: callback);
+    resetSlideAngle(game.camera.viewfinder, onComplete: callback);
   }
 
   /// Resets the maze angle to zero instantly and stops any ongoing rotation effects.
@@ -36,7 +37,7 @@ class DragRotation extends BaseComponent with HasGameRef<CustomGame> {
   Future<void> reset() async {
     //stop any rotation effect added to camera
     //note, still leaves flourish variable hot, so fix below
-    removeEffects(gameRef.camera.viewfinder);
+    removeEffects(game.camera.viewfinder);
     setMazeAngle(0, noStartRegularItems: true);
     _cameraRotatable = true;
   }
@@ -44,13 +45,12 @@ class DragRotation extends BaseComponent with HasGameRef<CustomGame> {
   @override
   void onGameResize(Vector2 size) {
     super.onGameResize(size);
-    _canvasRadiusInv =
-        1 / (min(gameRef.canvasSize.x, gameRef.canvasSize.y) / 2);
+    _canvasRadiusInv = 1 / (min(game.canvasSize.x, game.canvasSize.y) / 2);
   }
 
   /// Handles the locked cursor moving to rotate the maze.
   void onLockedCursorMove(double dx, double dy) {
-    gameRef.lifecycle.resumeGame();
+    game.lifecycle.resumeGame();
 
     final double mouseDelta = dx + dy;
     const double mouseSensitivity = 0.005;
@@ -68,17 +68,17 @@ class DragRotation extends BaseComponent with HasGameRef<CustomGame> {
       _fingersLastDragAngle[event.pointerId] = null;
     } else {
       _fingersLastDragAngle[event.pointerId] = atan2(
-        event.canvasPosition.x - gameRef.canvasSize.x * 0.5,
-        event.canvasPosition.y - gameRef.canvasSize.y * 0.5,
+        event.canvasPosition.x - game.canvasSize.x * 0.5,
+        event.canvasPosition.y - game.canvasSize.y * 0.5,
       );
     }
   }
 
   /// Handles the update of a drag event, calculating the rotation delta and applying it.
   void onDragUpdate(DragUpdateEvent event) {
-    gameRef.lifecycle.resumeGame();
-    final double dx = event.canvasStartPosition.x - gameRef.canvasSize.x * 0.5;
-    final double dy = event.canvasStartPosition.y - gameRef.canvasSize.y * 0.5;
+    game.lifecycle.resumeGame();
+    final double dx = event.canvasStartPosition.x - game.canvasSize.x * 0.5;
+    final double dy = event.canvasStartPosition.y - game.canvasSize.y * 0.5;
     final double fingerCurrentDragAngle = atan2(dx, dy);
     final double? lastAngle = _fingersLastDragAngle[event.pointerId];
     if (lastAngle != null) {
@@ -88,7 +88,7 @@ class DragRotation extends BaseComponent with HasGameRef<CustomGame> {
       const double maxSpinMultiplierRadiusInv = 1 / 0.75;
       final double spinMultiplier =
           4 *
-          gameRef.level.spinSpeedFactor *
+          game.level.spinSpeedFactor *
           min(1, eventVectorLengthProportion * maxSpinMultiplierRadiusInv);
       _moveMazeAngleByDelta(angleDelta * spinMultiplier);
     }
@@ -107,9 +107,9 @@ class DragRotation extends BaseComponent with HasGameRef<CustomGame> {
   /// Moves the maze angle by the specified delta if rotation is allowed.
   void _moveMazeAngleByDelta(double angleDelta) {
     if (_cameraRotatable &&
-        gameRef.isLive &&
-        (gameRef.playState == PlayState.gaming ||
-            gameRef.playState == PlayState.flourish)) {
+        game.isLive &&
+        (game.playState == PlayState.gaming ||
+            game.playState == PlayState.flourish)) {
       setMazeAngle(
         _cameraAngle + (_reversedRotation ? -angleDelta : angleDelta),
       );
@@ -137,27 +137,26 @@ class DragRotation extends BaseComponent with HasGameRef<CustomGame> {
 
   /// Gets the current camera (maze) angle.
   double get _cameraAngle =>
-      _kRotatingCamera ? gameRef.camera.viewfinder.angle : _debugFakeAngle;
+      _kRotatingCamera ? game.camera.viewfinder.angle : _debugFakeAngle;
 
   /// Sets the current camera (maze) angle.
-  set _cameraAngle(double z) => _kRotatingCamera
-      ? gameRef.camera.viewfinder.angle = z
-      : _debugFakeAngle = z;
+  set _cameraAngle(double z) =>
+      _kRotatingCamera ? game.camera.viewfinder.angle = z : _debugFakeAngle = z;
 
   double _debugFakeAngle = 0;
 
   /// Sets the maze angle and updates gravity and related game state.
   void setMazeAngle(double angle, {bool noStartRegularItems = false}) {
     if (!noStartRegularItems &&
-        gameRef.playState != PlayState.flourish &&
-        !gameRef.session.isWonOrLost) {
-      gameRef.lifecycle.startRegularItems();
+        game.playState != PlayState.flourish &&
+        !game.session.isWonOrLost) {
+      game.lifecycle.startRegularItems();
     }
-    Playback.recordMode ? gameRef.playback.recordAngle(angle) : null; //disabled
+    Playback.recordMode ? game.playback.recordAngle(angle) : null; //disabled
     _cameraAngle = angle;
     downDirection
       ..setValues(-sin(angle), cos(angle))
-      ..scale(gameRef.level.levelSpeed);
+      ..scale(game.level.levelSpeed);
 
     if (_updateGravityOnRotation) {
       /// The gravity is defined in virtual pixels per second squared.

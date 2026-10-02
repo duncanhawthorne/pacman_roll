@@ -9,9 +9,11 @@ import '../custom_game.dart';
 
 /// Captures web pointer lock click triggers and delegates mouse movement deltas to [DragRotation].
 class MouseMove extends BaseComponent with HasGameRef<CustomGame> {
+  late final CustomGame game = gameRef;
+
   void requestPointerLockIfAllowed() {
     if (!kIsWeb) return;
-    if (gameRef.dialogs.anyDialogShowing()) return;
+    if (game.dialogs.anyDialogShowing()) return;
 
     if (web.document.pointerLockElement == null) {
       final web.Element? canvas = web.document.querySelector('canvas');
@@ -48,7 +50,7 @@ class MouseMove extends BaseComponent with HasGameRef<CustomGame> {
             final double dx = -mouseEvent.movementX.toDouble();
             final double dy = mouseEvent.movementY.toDouble();
 
-            gameRef.world.dragRotate.onLockedCursorMove(dx, dy);
+            game.world.dragRotate.onLockedCursorMove(dx, dy);
           }
         }.toJS,
       );

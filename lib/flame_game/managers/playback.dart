@@ -13,6 +13,7 @@ import '../custom_world.dart';
 /// This is used for a special "playback mode" level.
 class Playback extends BaseComponent with HasWorldRef<CustomWorld> {
   late final CustomGame game;
+  late final CustomWorld world = worldRef;
 
   int _counter = 0;
   bool _playbackModeEverDismissed = false;
@@ -61,7 +62,7 @@ class Playback extends BaseComponent with HasWorldRef<CustomWorld> {
         storedMoves[_counter + 1][0] < stopwatch) {
       _counter++;
     }
-    worldRef.dragRotate.setMazeAngle(storedMoves[_counter][1]);
+    world.dragRotate.setMazeAngle(storedMoves[_counter][1]);
   }
 
   /// Resets the playback counter and cleared any recorded live moves.

@@ -5,21 +5,20 @@ import 'package:flame/components.dart';
 import '../../utils/helper.dart';
 import '../components/base_component.dart';
 import '../custom_game.dart';
-import '../custom_world.dart';
 
 /// Automatically pauses the game engine when no activity is detected to save resources.
 ///
 /// It monitors frames rendered and game state to determine if the engine
 /// should be paused during inactivity (e.g., at the start of a level before play begins).
-class EngineAutoPauser extends BaseComponent
-    with HasWorldRef<CustomWorld>, HasGameRef<CustomGame> {
+class EngineAutoPauser extends BaseComponent with HasGameRef<CustomGame> {
+  late final CustomGame game = gameRef;
   int _framesRendered = 0;
 
   async.Timer? _activityCheckTimer;
 
   /// Starts a timer to check for inactivity and pause the engine if necessary.
   void _pauseEngineIfNoActivity() {
-    gameRef.lifecycle.resumeGame(); //resume first, so any pause is intentional
+    game.lifecycle.resumeGame(); //resume first, so any pause is intentional
     _framesRendered = 0;
     _activityCheckTimer?.cancel(); // Kill any preexisting active loops
     // If all characters at starting position and nothing happening,
@@ -29,19 +28,19 @@ class EngineAutoPauser extends BaseComponent
     _activityCheckTimer = async.Timer.periodic(
       const Duration(milliseconds: 1000),
       (async.Timer timer) {
-        if (gameRef.isPaused) {
+        if (game.isPaused) {
           //already paused, no further action required, just cancel timer
           timer.cancel();
-        } else if (gameRef.playState == PlayState.playbackMode) {
+        } else if (game.playState == PlayState.playbackMode) {
           //want to continue playback in playbackMode
           timer.cancel();
-        } else if (gameRef.lifecycle.stopwatchStarted) {
+        } else if (game.lifecycle.stopwatchStarted) {
           //some game activity has happened, no need to pause, just cancel timer
           timer.cancel();
         } else if (_framesRendered >= 60) {
           //everything loaded and rendered, and still no game activity
           logGlobal("inactive");
-          gameRef.lifecycle.pauseGame();
+          game.lifecycle.pauseGame();
           timer.cancel();
           if (_activityCheckTimer == timer) _activityCheckTimer = null;
         }

@@ -45,6 +45,8 @@ class CustomWorld extends Forge2DWorld
     return _instance!;
   }
 
+  late final CustomGame game = gameRef;
+
   /// The internal singleton instance of the world.
   static CustomWorld? _instance;
 
@@ -132,10 +134,10 @@ class CustomWorld extends Forge2DWorld
       autoPauser,
       dragRotate,
       mouseMove,
-      gameRef.session,
-      gameRef.lifecycle,
-      gameRef.playback,
-      gameRef.dialogs,
+      game.session,
+      game.lifecycle,
+      game.playback,
+      game.dialogs,
     ]);
 
     /// Optimization: Nesting wrappers inside [_noEvents] keeps the flat count

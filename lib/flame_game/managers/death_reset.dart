@@ -12,6 +12,9 @@ import '../custom_world.dart';
 /// positions, and resetting the game state.
 class DeathReset extends BaseComponent
     with HasGameRef<CustomGame>, HasWorldRef<CustomWorld> {
+  late final CustomGame game = gameRef;
+  late final CustomWorld world = worldRef;
+
   static const bool _slideCharactersAfterPacmanDeath = true;
 
   /// Initiates the reset process after Pacman dies.
@@ -22,12 +25,12 @@ class DeathReset extends BaseComponent
   /// Resets the positions of characters with a sliding animation if enabled.
   void _resetSlideAfterPacmanDeath(Pacman dyingPacman) {
     //reset ghost scared status. Shouldn't be relevant as just died
-    gameRef.audioController.stopSound(SfxType.ghostsScared);
-    if (!gameRef.session.isWonOrLost) {
+    game.audioController.stopSound(SfxType.ghostsScared);
+    if (!game.session.isWonOrLost) {
       if (_slideCharactersAfterPacmanDeath) {
-        worldRef.dragRotate.resetSlide(_resetInstantAfterPacmanDeath);
+        world.dragRotate.resetSlide(_resetInstantAfterPacmanDeath);
         dyingPacman.resetSlideAfterDeath();
-        worldRef.ghosts.resetSlideAfterPacmanDeath();
+        world.ghosts.resetSlideAfterPacmanDeath();
       } else {
         _resetInstantAfterPacmanDeath();
       }
@@ -38,26 +41,26 @@ class DeathReset extends BaseComponent
 
   /// Performs an instant reset of the characters and game state.
   void _resetInstantAfterPacmanDeath() {
-    if (gameRef.playState == PlayState.flourish) {
-      if (gameRef.level.infLives) {
-        gameRef.session.numberOfDeathsNotifier.value = 0;
-        worldRef.pacmans.pacmanDyingNotifier.value = 0;
+    if (game.playState == PlayState.flourish) {
+      if (game.level.infLives) {
+        game.session.numberOfDeathsNotifier.value = 0;
+        world.pacmans.pacmanDyingNotifier.value = 0;
       }
-      worldRef.pacmans.resetInstantAfterPacmanDeath();
-      worldRef.ghosts.resetInstantAfterPacmanDeath();
-      worldRef.dragRotate.reset();
-      worldRef.autoPauser.reset();
+      world.pacmans.resetInstantAfterPacmanDeath();
+      world.ghosts.resetInstantAfterPacmanDeath();
+      world.dragRotate.reset();
+      world.autoPauser.reset();
       _resetFlourishState();
-      if (gameRef.playState == PlayState.playbackMode) {
-        gameRef.reset();
+      if (game.playState == PlayState.playbackMode) {
+        game.reset();
       }
     }
   }
 
   /// Transitions the game state from flourish to unflourish.
   void _resetFlourishState() {
-    if (gameRef.playState == PlayState.flourish) {
-      gameRef.playState = PlayState.unflourish;
+    if (game.playState == PlayState.flourish) {
+      game.playState = PlayState.unflourish;
     }
   }
 
